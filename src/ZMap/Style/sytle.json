@@ -1,0 +1,56 @@
+[
+  {
+    "type": "line",
+    "opacity": "1",
+    "width": 6,
+    "color": "#ffc20e",
+    "dashArray": [
+      5,
+      5
+    ],
+    "dashOffset": 1,
+    "cap": "Butt | Round | Square",
+    "lineJoin": "Miter | Round | Bevel",
+    "blur": 10,
+    "filter": "feature[\"is_deleted\"]!=null",
+    "minZoom": 500,
+    "maxZoom": 128000,
+    "zoomUnit": "scale"
+  },
+  {
+    "type": "text",
+    "property": {
+      "value": null,
+      "expression": "feature[\"xzq_mc\"]"
+    },
+    "font": [
+      "SimSun"
+    ],
+    "color": "#ffff00",
+    "size": 32,
+    "align": "Left | Center | Right",
+    "rotate": 2.1,
+    "filter": "feature[\"is_deleted\"]!=null",
+    "minZoom": 500,
+    "maxZoom": 128000,
+    "zoomUnit": "scale"
+  },
+  {
+    "type": "fill",
+    "opacity": "0.4",
+    "color": "#9370DB",
+    "filter": "feature[\"is_deleted\"]!=null",
+    "minZoom": 500,
+    "maxZoom": 128000,
+    "zoomUnit": "scale"
+  },
+  {
+    "type": "symbol",
+    "uri": "file://Symbols/yellowtree.png",
+    "size": 30,
+    "filter": "feature[\"is_deleted\"]!=null",
+    "minZoom": 500,
+    "maxZoom": 128000,
+    "zoomUnit": "scale"
+  }
+]

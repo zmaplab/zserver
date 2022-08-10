@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../package.props" />
+
+    <ItemGroup>
+        <PackageReference Include="DeepCloner" Version="0.10.4" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+        <PackageReference Include="Dapper" Version="2.0.123" />
+        <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="proj.xml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="location.svg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ZMap.Renderer.SkiaSharp\ZMap.Renderer.SkiaSharp.csproj" />
+        <ProjectReference Include="..\ZMap.Source.ShapeFile\ZMap.Source.ShapeFile.csproj" />
+        <ProjectReference Include="..\ZMap.TileGrid\ZMap.TileGrid.csproj" />
+        <ProjectReference Include="..\ZMap\ZMap.csproj" />
+    </ItemGroup>
+</Project>

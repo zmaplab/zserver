@@ -1,0 +1,20 @@
+<Project>
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>1.0.8</Version>
+        <FileVersion>1.0.8</FileVersion>
+        <Authors>zmap lab;</Authors>
+        <Copyright>Copyright 2019 zmap lab</Copyright>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <IsPackable>true</IsPackable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+<!--        <None Include="..\..\images\icon.png" Pack="true" PackagePath="icon.png"/>-->
+    </ItemGroup>
+
+</Project>

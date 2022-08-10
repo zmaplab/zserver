@@ -1,0 +1,18 @@
+version: '3'
+services:
+  geoserver:
+    image: 'zmap/zserver'
+    restart: always
+    ports:
+      - 8081:8081
+      - 30001:30001
+      - 11111:11111
+    environment:
+      - TZ=Asia/Shanghai
+      - HOST_IP=${HOST_IP}
+      - DOTNET_ENVIRONMENT=Development
+      - Orleans:ConnectionString="User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=zserver_dev;Pooling=true;"
+    volumes:
+      - ./src/ZServer.SiloHost/appsettings.Development.json:/app/appsettings.Development.json
+      - ./src/ZServer.SiloHost/Fonts:/app/Fonts
+      - ./src/ZServer.SiloHost/bin/Debug/net5.0/runtimes:/app/runtimes

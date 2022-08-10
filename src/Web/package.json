@@ -1,0 +1,14 @@
+{
+    "name": "vue3.0",
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "parcel serve -p 3000 index.html wms.html wmts.html ",
+        "build": "parcel build --public-url . index.html"
+    },
+    "dependencies": {
+        "ol": "6.6.1"
+    },
+    "devDependencies": {
+        "parcel-bundler": "^1.12.5"
+    }
+}
