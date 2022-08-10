@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>wms</title>
+    <!-- Pointer events polyfill for old browsers, see https://caniuse.com/#feat=pointer -->
+    <script src="https://unpkg.com/elm-pep"></script>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v3/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,TextDecoder,Number.isInteger"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.6.1/css/ol.css" type="text/css">
+    <style>
+        .map {
+            width: 100%;
+            height: 900px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="./wmts.html">wmts</a>
+    <br>
+    <a href="./wms.html">wms</a>
+    <div id="map" class="map"></div>
+    <script src="./wms.js"></script>
+
+
+</body>
+
+</html>

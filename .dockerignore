@@ -1,0 +1,18 @@
+.idea
+
+src/Web
+**/bin/
+
+**/obj/
+
+#Ignoring all the markdown and class files
+*.md
+
+#Ignore the logs directory
+logs/
+
+#Ignoring git and cache folders
+.git
+.cache
+
+zserver.json

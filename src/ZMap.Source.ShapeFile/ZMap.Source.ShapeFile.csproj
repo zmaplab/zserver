@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../package.props" />
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+        <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.1.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ZMap\ZMap.csproj" />
+    </ItemGroup>
+</Project>

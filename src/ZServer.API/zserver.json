@@ -1,0 +1,73 @@
+{
+  "swagger": true,
+  "traceFetch": false,
+  "orleans": {
+    "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=zserver_dev;Pooling=true;",
+    "invariant": "Npgsql",
+    "siloName": "zserver",
+    "clusterId": "zserver",
+    "serviceId": "zserver",
+    "gatewayPort": 41113,
+    "siloPort": 31113,
+    "dashboard": true
+  },
+  "sources": {
+    "zserver": {
+      "provider": "ZMap.Source.Postgre.PostgreSource, ZMap.Source.Postgre",
+      "database": "zserver_dev",
+      "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=zserver_dev;Pooling=true;"
+    }
+  },
+  "styleGroups": {
+    "polygon": {
+      "description": "",
+      "minZoom": 100,
+      "maxZoom": 80000,
+      "zoomUnit": "scale",
+      "styles": [
+        {
+          "type": "line",
+          "opacity": "1",
+          "width": 2,
+          "color": "#e0861a"
+        },
+        {
+          "type": "text",
+          "minZoom": 100,
+          "maxZoom": 3000,
+          "zoomUnit": "scale",
+          "property": {
+            "value": null,
+            "expression": "feature[\"id\"]"
+          },
+          "font": [
+            "SimSun"
+          ],
+          "color": "#FF0000",
+          "size": 16
+        }
+      ]
+    }
+  },
+  "resourceGroups": {
+    "zserver": {
+      "description": "zserver"
+    }
+  },
+  "layerGroups": {
+  },
+  "layers": {
+    "polygon": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "zserver",
+      "sourceTable": "polygon",
+      "sourceGeometry": "geom",
+      "sourceSRID": 4326,
+      "styleGroups": [
+        "polygon"
+      ]
+    }
+  }
+}

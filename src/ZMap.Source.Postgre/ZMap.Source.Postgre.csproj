@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../package.props" />
+
+    <ItemGroup>
+        <ProjectReference Include="..\ZServer\ZServer.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Npgsql" Version="6.0.5" />
+        <PackageReference Include="Npgsql.NetTopologySuite" Version="6.0.4" />
+    </ItemGroup>
+</Project>
