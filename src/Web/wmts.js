@@ -43,10 +43,6 @@ const centerXY = [12.477070574987795, 41.85776175318455];
 const map = new Map({
   target: "map",
   layers: [
-    // new TileLayer({
-    //   source: new OSM(),
-    //   opacity: 0.7,
-    // }),
     new TileLayer({
       source: new WMTS({
         url: "http://localhost:8200/wmts",
@@ -65,9 +61,9 @@ const map = new Map({
     }),
   ],
   view: new View({
-    projection: projection,
+    projection: projection4326,
     center: centerXY,
-    zoom: 12,
+    zoom: 17,
   }),
 });
 
