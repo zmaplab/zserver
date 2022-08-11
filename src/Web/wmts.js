@@ -38,8 +38,7 @@ for (let z = 0; z < 22; ++z) {
   resolutions4326[z] = size4326 / Math.pow(2, z);
   matrixIds4326[z] = z;
 }
-
-const centerXY = [117.27, 31.86];
+const centerXY = [12.477070574987795, 41.85776175318455];
 
 const map = new Map({
   target: "map",
@@ -51,7 +50,7 @@ const map = new Map({
     new TileLayer({
       source: new WMTS({
         url: "http://localhost:8200/wmts",
-        layer: "ah2021:xzqcj",
+        layer: "zserver:polygon",
         matrixSet: "EPSG:4326",
         format: "image/png",
         projection: projection4326,
