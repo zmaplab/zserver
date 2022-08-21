@@ -73,6 +73,7 @@ create extension postgis;
 2. 完整 OGC 规范的 WMTS 服务（实时渲染）
 3. CRUD 的 REST 接口（分布式事务?）
 4. 图形操作（切割、合并、相交）（分布式事务?）
+5. SLD 的支持
 
 ### 2.0 
 
