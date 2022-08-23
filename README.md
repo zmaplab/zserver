@@ -17,7 +17,7 @@ https://docs.docker.com/engine/install/
 + PostgreSQL + PostGIS
 
 ```
-docker run --name postgis -e POSTGRES_PASSWORD=1qazZAQ! -d postgis/postgis
+docker run --name postgis -p 5432:5432 -e POSTGRES_PASSWORD=1qazZAQ! -d postgis/postgis
 ```
 
 + dotnet sdk 5.0 或以上
@@ -42,13 +42,12 @@ yarn global add parcel-bundler 或者 npm install -g parcel-bundler
 
 + 安装 PostgreSQL
 ```
-docker run --name postgis -e POSTGRES_PASSWORD=1qazZAQ! -d postgis/postgis
+docker run --name postgis -p 5432:5432 -e POSTGRES_PASSWORD=1qazZAQ! -d postgis/postgis
 ```
 + 创建数据库并添加 postgis 扩展
 
 ```
 create database zserver_dev;
-use zserver_dev;
 create extension postgis;
 ```
 + 上传 Demo 数据
@@ -74,6 +73,7 @@ create extension postgis;
 2. 完整 OGC 规范的 WMTS 服务（实时渲染）
 3. CRUD 的 REST 接口（分布式事务?）
 4. 图形操作（切割、合并、相交）（分布式事务?）
+5. SLD 的支持
 
 ### 2.0 
 
