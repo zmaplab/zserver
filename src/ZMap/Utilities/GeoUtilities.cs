@@ -134,12 +134,35 @@ namespace ZMap.Utilities
         //     feature.Geometry = VWSimplifier.Simplify(feature.Geometry, distanceTolerance);
         // }
 
+        /// <summary>
+        /// 经纬度坐标系的比例尺计算
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="width"></param>
+        /// <param name="dpi"></param>
+        /// <returns></returns>
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static double CalculateOGCScale(Envelope envelope, int width, double dpi)
         {
             var widthMeters = envelope.Width * MetersPerDegreeAtEquator;
             return widthMeters / (width / dpi * 0.0254D);
         }
+
+        /// <summary>
+        /// 经纬度坐标系的比例尺计算
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="srid"></param>
+        /// <param name="width"></param>
+        /// <param name="dpi"></param>
+        /// <returns></returns>
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static double CalculateOGCScale(Envelope envelope, int srid, int width, double dpi)
+        {
+            var envelope4326 = envelope.Transform(srid, 4326);
+            return CalculateOGCScale(envelope4326, width, dpi);
+        }
+
 
         /// <summary>
         /// Calculate the Representative Fraction Scale for a Lat/Long map.
@@ -196,7 +219,8 @@ namespace ZMap.Utilities
             return ratio;
         }
 
-        public static (double Lat, double Lon) CalculateLatLongFromGrid(Envelope bbox, double pixelWidth, double pixelHeight, int x,
+        public static (double Lat, double Lon) CalculateLatLongFromGrid(Envelope bbox, double pixelWidth,
+            double pixelHeight, int x,
             int y)
         {
             var lon = bbox.MinX + pixelWidth * x;

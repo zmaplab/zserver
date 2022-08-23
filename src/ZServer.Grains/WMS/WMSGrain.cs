@@ -121,23 +121,22 @@ namespace ZServer.Grains.WMS
                     return MapResult.Ok(Array.Empty<byte>(), format);
                 }
 
-                // comments: CalculateOGCScale 在 4326 才是正确的
                 var envelope = new Envelope(modeState.MinX, modeState.MaxX, modeState.MinY, modeState.MaxY);
-                var envelope4326 = envelope.Transform(modeState.SRID, 4326);
+
                 var viewPort = new Viewport
                 {
-                    Extent = envelope4326,
+                    Extent = envelope,
                     Width = width,
                     Height = height,
                     Transparent = transparent,
                     Bordered = false,
                     BackgroundColor = bgColor
                 };
-                var scale = GeoUtilities.CalculateOGCScale(envelope4326, width, dpi);
 
+                var scale = GeoUtilities.CalculateOGCScale(envelope, modeState.SRID, width, dpi);
                 var map = new Map();
                 map.SetId(traceIdentifier)
-                    .SetSRID(4326)
+                    .SetSRID(modeState.SRID)
                     .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                     .SetLogger(_logger)
                     .SetGraphicsContextFactory(_graphicsServiceProvider)
