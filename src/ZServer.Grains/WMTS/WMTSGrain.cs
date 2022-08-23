@@ -146,9 +146,10 @@ namespace ZServer.Grains.WMTS
                     Transparent = true,
                     Bordered = false
                 };
+
                 var map = new Map();
                 map.SetId(traceIdentifier)
-                    .SetSRID(4326)
+                    .SetSRID(gridSet.SRID)
                     .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                     .SetLogger(_logger)
                     .SetGraphicsContextFactory(_graphicsServiceProvider)

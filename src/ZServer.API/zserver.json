@@ -16,6 +16,10 @@
       "provider": "ZMap.Source.Postgre.PostgreSource, ZMap.Source.Postgre",
       "database": "zserver_dev",
       "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=zserver_dev;Pooling=true;"
+    },
+    "zserver_shp": {
+      "provider": "ZMap.Source.ShapeFile.ShapeFileSource, ZMap.Source.ShapeFile",
+      "file": "shape/osmbuildings.shp"
     }
   },
   "styleGroups": {
@@ -62,9 +66,6 @@
       "services": [],
       "extent": [],
       "source": "zserver",
-      "sourceTable": "polygon",
-      "sourceGeometry": "geom",
-      "sourceSRID": 4326,
       "styleGroups": [
         "polygon"
       ]
