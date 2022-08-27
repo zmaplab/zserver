@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index;
@@ -16,64 +14,9 @@ namespace ZMap.Source.ShapeFile
 {
     public class SpatialIndexFactory
     {
-        private static readonly Dictionary<string, ISpatialIndex<SpatialIndexEntry>>
-            Cache = new();
-
-        private static readonly Dictionary<string, object> Lockers = new();
-
         public ISpatialIndex<SpatialIndexEntry> TryCreate(string shapeFile, SpatialIndexType type)
         {
-            lock (GetOrCreateLocker(shapeFile))
-            {
-                if (Cache.ContainsKey(shapeFile))
-                {
-                    return Cache[shapeFile];
-                }
-
-                ISpatialIndex<SpatialIndexEntry> tree;
-
-                var sidxPath = Path.ChangeExtension(shapeFile, ".sidx");
-
-                if (!File.Exists(sidxPath))
-                {
-                    tree = CreateSpatialIndex(type, GetAllFeatureBoundingBoxes(shapeFile));
-                    Save(tree, sidxPath);
-                }
-                else
-                {
-                    tree = Load(sidxPath);
-                }
-
-                Cache.Add(shapeFile, tree);
-                return Cache[shapeFile];
-            }
-        }
-
-        private void Save(ISpatialIndex<SpatialIndexEntry> tree, string path)
-        {
-            var formatter = new BinaryFormatter();
-            var rems = new MemoryStream();
-            formatter.Serialize(rems, tree);
-            File.WriteAllBytes(path, rems.GetBuffer());
-        }
-
-        private ISpatialIndex<SpatialIndexEntry> Load(string filename)
-        {
-            var formatter = new BinaryFormatter();
-            return (ISpatialIndex<SpatialIndexEntry>)formatter.Deserialize(File.OpenRead(filename));
-        }
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        private object GetOrCreateLocker(string filename)
-        {
-            if (Lockers.TryGetValue(filename, out var lockValue))
-            {
-                return lockValue;
-            }
-
-            lockValue = new object();
-            Lockers.Add(filename, lockValue);
-            return lockValue;
+            return CreateSpatialIndex(type, GetAllFeatureBoundingBoxes(shapeFile));
         }
 
         private static int SwapByteOrder(int i)
@@ -90,9 +33,7 @@ namespace ZMap.Source.ShapeFile
         private IEnumerable<SpatialIndexEntry> GetAllFeatureBoundingBoxes(string shapeFile)
         {
             using var shapeFileStream = new FileStream(shapeFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            var headerBuffer = new byte[100];
-            shapeFileStream.Read(headerBuffer, 0, 100);
+            shapeFileStream.Position = 100;
 
             using var shapeFileReader = new BinaryReader(shapeFileStream, Encoding.Unicode);
 

@@ -65,7 +65,7 @@
       "resourceGroup": "zserver",
       "services": [],
       "extent": [],
-      "source": "zserver",
+      "source": "zserver_shp",
       "styleGroups": [
         "polygon"
       ]

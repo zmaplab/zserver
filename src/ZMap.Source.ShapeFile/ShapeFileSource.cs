@@ -48,17 +48,22 @@ namespace ZMap.Source.ShapeFile
             File = file;
             SRID = GetSrid(file);
             EnableMemoryMappedFile = enableMMF;
-            _geometryFactory =
-                NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), SRID);
+            _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), SRID);
 
-            _tree = new SpatialIndexFactory().TryCreate(file, SpatialIndexType.STRTree);
+            _tree = MemoryCache.GetOrCreate(file, entry =>
+            {
+                var tree = new SpatialIndexFactory().TryCreate(file, SpatialIndexType.STRTree);
+                entry.SetValue(tree);
+                entry.SetAbsoluteExpiration(TimeSpan.FromDays(30));
+                return tree;
+            });
         }
 
         public override ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
         {
             var features = new List<Feature>();
 
-            Func<Feature, bool> filterFunc = Filter.GetFunc();
+            var filterFunc = Filter?.GetFunc();
 
             var spatialIndexItems = GetObjectIDsInView(extent);
             if (spatialIndexItems.Count == 0)
