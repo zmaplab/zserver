@@ -127,6 +127,7 @@ namespace ZServer.Store.Configuration
                 Property = section.Get<string>("property"),
                 Align = section.Get<string>("align"),
                 Color = section.Get<string>("color"),
+                BackgroundColor = section.Get<string>("backgroundColor"),
                 Font = section.Get<string[]>("font"),
                 Size = section.Get<int>("size"),
                 Rotate = section.Get<float>("rotate"),

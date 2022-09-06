@@ -32,6 +32,11 @@
         {
           "type": "line",
           "opacity": "1",
+          "dashArray": [
+            5,
+            5
+          ],
+          "dashOffset": 0,
           "width": 2,
           "color": "#e0861a"
         },
@@ -42,12 +47,13 @@
           "zoomUnit": "scale",
           "property": {
             "value": null,
-            "expression": "feature[\"id\"]"
+            "expression": "feature[\"name\"]"
           },
           "font": [
-            "SimSun"
+            "Source Han Sans SC"
           ],
           "color": "#FF0000",
+          "backgroundColor": "#00FA9A",
           "size": 16
         }
       ]
@@ -66,6 +72,9 @@
       "services": [],
       "extent": [],
       "source": "zserver",
+      "sourceTable": "polygon",
+      "sourceGeometry": "geom",
+      "sourceSRID": 4326,
       "styleGroups": [
         "polygon"
       ]

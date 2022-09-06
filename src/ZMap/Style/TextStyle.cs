@@ -4,6 +4,7 @@ namespace ZMap.Style
     {
         public Expression<string> Property { get; set; }
         public Expression<string> Color { get; set; }
+        public Expression<string> BackgroundColor { get; set; }
         public Expression<string[]> Font { get; set; }
         public Expression<int> Size { get; set; }
         public Expression<string> Align { get; set; }
