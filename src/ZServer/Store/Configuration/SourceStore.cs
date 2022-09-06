@@ -41,7 +41,7 @@ namespace ZServer.Store.Configuration
         /// <returns></returns>
         public async Task<ISource> FindAsync(string name)
         {
-            // TODO: 是否需要 COPY 对象
+            // comments: 必须复制对像，不然并发情况会异常
             return string.IsNullOrWhiteSpace(name)
                 ? null
                 : (await _cache.GetOrCreateAsync($"{GetType().FullName}:{name}", entry =>
@@ -50,8 +50,7 @@ namespace ZServer.Store.Configuration
                     entry.SetValue(source);
                     entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
                     return Task.FromResult(source);
-                })) ;
-            
+                })).Clone();
         }
 
         public async Task<List<ISource>> GetAllAsync()

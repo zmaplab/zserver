@@ -24,6 +24,11 @@ namespace ZMap.Source
 
         public abstract Envelope GetEnvelope();
 
+        public ISource Clone()
+        {
+            return (ISource)MemberwiseClone();
+        }
+
         public abstract void Dispose();
     }
 }

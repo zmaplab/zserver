@@ -22,6 +22,10 @@ namespace ZMap.Source
         public abstract ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
 
         public abstract Envelope GetEnvelope();
+        public ISource Clone()
+        {
+            return (ISource)MemberwiseClone();
+        }
 
         public abstract void Dispose();
     }

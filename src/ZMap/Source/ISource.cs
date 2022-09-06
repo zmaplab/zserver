@@ -7,5 +7,6 @@ namespace ZMap.Source
     {
         int SRID { get; }
         Envelope GetEnvelope();
+        ISource Clone();
     }
 }
