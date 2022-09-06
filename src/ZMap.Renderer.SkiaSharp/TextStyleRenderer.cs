@@ -86,9 +86,44 @@ namespace ZMap.Renderer.SkiaSharp
             }
 
             var paint = CreatePaint(feature);
+
+            var backgroundColor = _style.BackgroundColor.Invoke(feature);
+            if (!string.IsNullOrWhiteSpace(backgroundColor))
+            {
+                var rect = new SKRect();
+                paint.MeasureText(text, ref rect);
+
+                using var textPath = paint.GetTextPath(text, offsetX - rect.Width / 2, offsetY);
+                // Create a new path for the outlines of the path
+                using var outlinePath = new SKPath();
+                var framePaint = CreateBackgroundPaint(backgroundColor);
+                framePaint.GetFillPath(textPath, outlinePath);
+
+                graphics.DrawPath(outlinePath, framePaint);
+            }
+
             graphics.DrawText(text, offsetX, offsetY, paint);
         }
 
+        private SKPaint CreateBackgroundPaint(string color)
+        {
+            var key = $"TEXT_STYLE_PAINT_{color}";
+
+            return _cache.GetOrCreate(key, entry =>
+            {
+                var c = ((string)entry.Key).Replace("TEXT_STYLE_PAINT_", "");
+                var paint = new SKPaint
+                {
+                    Style = SKPaintStyle.StrokeAndFill,
+                    StrokeWidth = 2,
+                    IsAntialias = true,
+                    Color = ColorUtilities.GetColor(c),
+                };
+                entry.SetValue(paint);
+                entry.SetAbsoluteExpiration(TimeSpan.FromDays(1));
+                return paint;
+            });
+        }
 
         protected override SKPaint CreatePaint(Feature feature)
         {

@@ -26,8 +26,15 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
             // fc-cache
 
             var folder = Path.Combine(AppContext.BaseDirectory, "Fonts");
-            var files = Directory.GetFiles(folder, "*.ttc");
-            foreach (var file in files)
+            var ttcFiles = Directory.GetFiles(folder, "*.ttc");
+            foreach (var file in ttcFiles)
+            {
+                var typeface = SKTypeface.FromFile(file);
+                SkTypefaceCache.TryAdd(typeface.FamilyName, typeface);
+            }
+
+            var ttfFiles = Directory.GetFiles(folder, "*.ttf");
+            foreach (var file in ttfFiles)
             {
                 var typeface = SKTypeface.FromFile(file);
                 SkTypefaceCache.TryAdd(typeface.FamilyName, typeface);
