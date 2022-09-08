@@ -5,8 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.1</Version>
-        <FileVersion>1.1.1</FileVersion>
+        <Version>1.1.2</Version>
+        <FileVersion>1.1.2</FileVersion>
         <Authors>zmap lab;</Authors>
         <Copyright>Copyright 2019 zmap lab</Copyright>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -14,10 +14,10 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="DotNetCore.Natasha.CSharp.All" Version="3.6.0"/>
-        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1"/>
+        <PackageReference Include="DotNetCore.Natasha.CSharp.All" Version="3.6.0" />
+        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\ZMap\ZMap.csproj"/>
+        <ProjectReference Include="..\ZMap\ZMap.csproj" />
     </ItemGroup>
 </Project>
