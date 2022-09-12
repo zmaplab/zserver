@@ -5,8 +5,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "HOST_IP": "127.0.0.1",
-        "TRACE_FETCH": "true",
-        "LOG_SQL": "true"
+        "EnableSensitiveDataLogging": "true"
       }
     }
   }

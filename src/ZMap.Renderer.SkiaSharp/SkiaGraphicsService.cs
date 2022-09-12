@@ -14,11 +14,10 @@ public class SkiaGraphicsService : IGraphicsService
     private readonly IMemoryCache _cache;
 
     public string MapId { get; }
-    public Envelope Envelope { get; }
     public int Width { get; }
     public int Height { get; }
 
-    public SkiaGraphicsService(string mapId, int width, int height, Envelope envelope, IMemoryCache cache)
+    public SkiaGraphicsService(string mapId, int width, int height, IMemoryCache cache)
     {
         _cache = cache;
         _bitmap = new SKBitmap(width, height);
@@ -26,7 +25,6 @@ public class SkiaGraphicsService : IGraphicsService
         Width = width;
         Height = height;
         MapId = mapId;
-        Envelope = envelope;
     }
 
     public byte[] GetImage(string imageFormat)
@@ -35,16 +33,16 @@ public class SkiaGraphicsService : IGraphicsService
         return _bitmap.Encode(GetImageFormat(imageFormat), 80).ToArray();
     }
 
-    public void Render(RasterStyle style, byte[] image)
+    public void Render(byte[] image, RasterStyle style)
     {
         throw new NotImplementedException();
     }
 
-    public void Render(VectorStyle style, Feature feature)
+    public void Render(Envelope extent, Feature feature, VectorStyle style)
     {
         if (Create(style) is IVectorRenderer<SKCanvas> renderer)
         {
-            renderer.Render(_canvas, feature, Envelope, Width, Height);
+            renderer.Render(_canvas, feature, extent, Width, Height);
         }
     }
 
