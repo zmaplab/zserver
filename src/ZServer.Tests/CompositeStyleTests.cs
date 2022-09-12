@@ -33,12 +33,12 @@ namespace ZServer.Tests
             var height = 256;
             var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
             var graphicsService =
-                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height, Extent, memoryCache);
+                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height, memoryCache);
 
             foreach (var feature in data)
             {
-                graphicsService.Render(style1, feature);
-                graphicsService.Render(style2, feature);
+                graphicsService.Render(Extent, feature, style1);
+                graphicsService.Render(Extent, feature, style2);
             }
 
             var bytes = graphicsService.GetImage("image/png");
@@ -67,11 +67,11 @@ namespace ZServer.Tests
             var height = 256;
             var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
             var graphicsService =
-                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height, Extent, memoryCache);
+                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height, memoryCache);
             foreach (var feature in data)
             {
-                graphicsService.Render(style1, feature);
-                graphicsService.Render(style2, feature);
+                graphicsService.Render(Extent, feature, style1);
+                graphicsService.Render(Extent, feature, style2);
             }
 
             var bytes = graphicsService.GetImage("image/png");

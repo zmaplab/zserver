@@ -12,8 +12,8 @@ public class GraphicsServiceProvider : IGraphicsServiceProvider
         _memoryCache = memoryCache;
     }
 
-    public IGraphicsService Create(string mapId, int width, int height, Envelope envelope)
+    public IGraphicsService Create(string mapId, int width, int height)
     {
-        return new SkiaGraphicsService(mapId, width, height, envelope, _memoryCache);
+        return new SkiaGraphicsService(mapId, width, height, _memoryCache);
     }
 }

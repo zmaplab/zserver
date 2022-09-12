@@ -101,12 +101,20 @@ namespace ZMap
             }
 
             // 由前端的 SRID 的 extent 转换成数据源的 extent
-            var extent = viewport.Extent.Transform(SRID, srid);
+
+            var extent = viewport.Extent.Transform(srid, SRID);
 
             // 不在当前图层的范围内，不需要渲染
             if (Envelope != null && !Envelope.Intersects(extent))
             {
                 return;
+            }
+
+            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
+                    StringComparison.InvariantCultureIgnoreCase))
+            {
+                Log.Logger.LogInformation(
+                    $"From viewport extent {viewport.Extent.MinX},{viewport.Extent.MinY},{viewport.Extent.MaxX},{viewport.Extent.MaxY} {srid} to {extent.MinX},{extent.MinY},{extent.MaxX},{extent.MaxY} {SRID}");
             }
 
             // 使用应用层投影转换的原因是规避数据库支持问题
@@ -122,7 +130,7 @@ namespace ZMap
             switch (Source)
             {
                 case IVectorSource vectorSource:
-                    await RenderVectorAsync(graphicsService, vectorSource, zoom,
+                    await RenderVectorAsync(graphicsService, vectorSource, extent, viewport.Extent, zoom,
                         transformation);
                     break;
                 case IRasterSource rasterSource:
@@ -155,31 +163,18 @@ namespace ZMap
                         continue;
                     }
 
-                    service.Render(rasterStyle, image);
+                    service.Render(image, rasterStyle);
                 }
             }
         }
 
         private async Task RenderVectorAsync(IGraphicsService service, IVectorSource vectorSource,
+            Envelope sourceExtent,
+            Envelope targetExtent,
             Zoom zoom,
             ICoordinateTransformation transformation)
         {
-            IEnumerable<Feature> features;
-
-            var fetching = string.Empty;
-            if (string.Equals(Environment.GetEnvironmentVariable("TRACE_FETCH"), "true",
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                var stopwatch1 = new Stopwatch();
-                stopwatch1.Start();
-                features = (await vectorSource.GetFeaturesInExtentAsync(service.Envelope)).ToList();
-                stopwatch1.Stop();
-                fetching = stopwatch1.ElapsedMilliseconds.ToString();
-            }
-            else
-            {
-                features = await vectorSource.GetFeaturesInExtentAsync(service.Envelope);
-            }
+            var features = await vectorSource.GetFeaturesInExtentAsync(sourceExtent);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -224,7 +219,7 @@ namespace ZMap
                             continue;
                         }
 
-                        service.Render(vectorStyle, feature);
+                        service.Render(targetExtent, feature, vectorStyle);
                     }
                 }
 
@@ -232,21 +227,12 @@ namespace ZMap
             }
 
             stopwatch.Stop();
-            if (count > 0)
+
+            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
+                    StringComparison.InvariantCultureIgnoreCase))
             {
                 Log.Logger.LogInformation(
-                    fetching == string.Empty
-                        ? $"[{service.MapId}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}"
-                        : $"[{service.MapId}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, fetching: {fetching}, rendering: {stopwatch.ElapsedMilliseconds}");
-            }
-            else
-            {
-#if DEBUG
-                Log.Logger.LogInformation(
-                    fetching == string.Empty
-                        ? $"[{service.MapId}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}"
-                        : $"[{service.MapId}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, fetching: {fetching}, rendering: {stopwatch.ElapsedMilliseconds}");
-#endif
+                    $"[{service.MapId}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}");
             }
         }
 

@@ -53,7 +53,7 @@ namespace ZMap.Source.Postgre
                     $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
 
-            if (string.Equals("true", Environment.GetEnvironmentVariable("LOG_SQL"),
+            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
                     StringComparison.InvariantCultureIgnoreCase))
             {
                 Log.Logger.LogInformation(sql);

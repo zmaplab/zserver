@@ -65,7 +65,7 @@ public class Map : IDisposable
         }
 
         using var graphicsService =
-            _graphicsServiceProvider.Create(Id, viewport.Width, viewport.Height, viewport.Extent);
+            _graphicsServiceProvider.Create(Id, viewport.Width, viewport.Height);
         if (graphicsService == null)
         {
             _logger.LogWarning("Create graphics context failed");
