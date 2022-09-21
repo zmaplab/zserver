@@ -4,18 +4,17 @@ using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source;
 using ZMap.Style;
+using ZMap.Utilities;
 
 namespace ZMap.Renderer.SkiaSharp
 {
     public class FillStyleRenderer : SkiaRenderer, IFillStyleRenderer<SKCanvas>
     {
         protected readonly FillStyle Style;
-        protected readonly IMemoryCache Cache;
 
-        public FillStyleRenderer(FillStyle style, IMemoryCache cache)
+        public FillStyleRenderer(FillStyle style)
         {
             Style = style;
-            Cache = cache;
         }
 
         protected override SKPaint CreatePaint(Feature feature)

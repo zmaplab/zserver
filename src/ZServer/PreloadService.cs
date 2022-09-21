@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ZMap;
@@ -14,35 +15,37 @@ namespace ZServer
     public class PreloadService : IHostedService
     {
         private readonly ILogger<PreloadService> _logger;
+        private readonly IConfiguration _configuration;
 
-        public PreloadService(ILogger<PreloadService> logger)
+        public PreloadService(ILogger<PreloadService> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
                 if (!string.Equals(Environment.GetEnvironmentVariable("PREHEAT"), "false",
                         StringComparison.InvariantCultureIgnoreCase))
                 {
-                    await LoadAllShapes();
+                    LoadAllShapes().Wait(cancellationToken);
+                    _logger.LogInformation("Preload completed");
                 }
-
-                _logger.LogInformation("Preload completed");
             }, cancellationToken);
         }
 
-        private static async Task LoadAllShapes()
+        private async Task LoadAllShapes()
         {
-            await LoadDirectory("shapes");
+            await LoadDirectory(Path.Combine(AppContext.BaseDirectory, "shapes"));
         }
 
-        private static async Task LoadDirectory(string directory)
+        private async Task LoadDirectory(string directory)
         {
             if (!Directory.Exists(directory))
             {
+                _logger.LogInformation($"目录不存在: {directory}");
                 return;
             }
 
@@ -62,12 +65,12 @@ namespace ZServer
             }
         }
 
-        private static async Task LoadShape(string path)
+        private async Task LoadShape(string path)
         {
-            Log.Logger.LogInformation($"Start loading {path}");
-            var shapeFileSource = new ShapeFileSource(path, false);
+            _logger.LogInformation($"Start loading {path}");
+            var shapeFileSource = new ShapeFileSource(path);
             var features = (await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326)).ToList();
-            Log.Logger.LogInformation($"Load {path} success: {features.Count}");
+            _logger.LogInformation($"Load {path} success: {features.Count}");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

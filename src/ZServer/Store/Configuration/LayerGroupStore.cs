@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZMap;
+using ZMap.Utilities;
 using ZServer.Entity;
 
 namespace ZServer.Store.Configuration
@@ -15,18 +16,16 @@ namespace ZServer.Store.Configuration
     {
         private readonly IConfiguration _configuration;
         private readonly IResourceGroupStore _resourceGroupStore;
-        private readonly IMemoryCache _cache;
         private readonly ILayerStore _layerStore;
         private readonly ILogger<LayerGroupStore> _logger;
         private readonly ServerOptions _options;
-        
+
         public LayerGroupStore(IConfiguration configuration,
-            IResourceGroupStore resourceGroupStore, IMemoryCache cache, ILayerStore layerStore,
+            IResourceGroupStore resourceGroupStore, ILayerStore layerStore,
             ILogger<LayerGroupStore> logger, IOptionsMonitor<ServerOptions> options)
         {
             _configuration = configuration;
             _resourceGroupStore = resourceGroupStore;
-            _cache = cache;
             _layerStore = layerStore;
             _logger = logger;
             _options = options.CurrentValue;
@@ -39,7 +38,7 @@ namespace ZServer.Store.Configuration
                 return null;
             }
 
-            var result = await _cache.GetOrCreateAsync($"{GetType().FullName}:{resourceGroupName}:{layerGroupName}",
+            var result = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerGroupName}",
                 async entry =>
                 {
                     var resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
@@ -81,7 +80,7 @@ namespace ZServer.Store.Configuration
         {
             return string.IsNullOrWhiteSpace(layerGroupName)
                 ? null
-                : await _cache.GetOrCreateAsync($"{GetType().FullName}:{layerGroupName}",
+                : await Cache.GetOrCreate($"{GetType().FullName}:{layerGroupName}",
                     async entry =>
                     {
                         var section =

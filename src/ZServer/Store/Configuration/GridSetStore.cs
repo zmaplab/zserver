@@ -12,14 +12,12 @@ namespace ZServer.Store.Configuration
     public class GridSetStore : IGridSetStore
     {
         private readonly IConfiguration _configuration;
-        private readonly IMemoryCache _cache;
         private readonly ServerOptions _options;
 
-        public GridSetStore(IConfiguration configuration, IMemoryCache cache,
+        public GridSetStore(IConfiguration configuration,
             IOptionsMonitor<ServerOptions> options)
         {
             _configuration = configuration;
-            _cache = cache;
             _options = options.CurrentValue;
         }
 
@@ -31,7 +29,7 @@ namespace ZServer.Store.Configuration
             }
 
             var gridSet = DefaultGridSets.TryGet(name) ??
-                          _cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>
+                          Cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>
                           {
                               var section = _configuration.GetSection($"gridSets:{name}");
                               var srid = section.GetSection("srid").Get<int>();

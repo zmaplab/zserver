@@ -5,9 +5,10 @@ using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Extensions;
-using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source;
 using ZMap.Style;
+using ZMap.Utilities;
+using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 
 namespace ZMap.Renderer.SkiaSharp
 {
@@ -15,17 +16,15 @@ namespace ZMap.Renderer.SkiaSharp
     {
         private static readonly SKBitmap DefaultImage;
         private readonly SymbolStyle _style;
-        private readonly IMemoryCache _cache;
 
         static SymbolStyleRenderer()
         {
             DefaultImage = SKBitmap.Decode("108.png");
         }
 
-        public SymbolStyleRenderer(SymbolStyle style, IMemoryCache cache)
+        public SymbolStyleRenderer(SymbolStyle style)
         {
             _style = style;
-            _cache = cache;
         }
 
         public override void Render(SKCanvas graphics, Feature feature, Envelope extent, int width, int height)
@@ -96,7 +95,7 @@ namespace ZMap.Renderer.SkiaSharp
             }
             else
             {
-                image = _cache.GetOrCreate($"SYMBOL_STYLE_IMAGE_{_style.Uri.Value}", _ =>
+                image = Cache.GetOrCreate($"SYMBOL_STYLE_IMAGE_{_style.Uri.Value}", _ =>
                 {
                     switch (uri.Scheme)
                     {

@@ -51,21 +51,33 @@ namespace ZServer.API
 
             var client = new Lazy<IClusterClient>(() =>
             {
-                var cb = new ClientBuilder()
-                    .Configure<ClusterOptions>(options =>
-                    {
-                        options.ClusterId = Configuration["Orleans:ClusterId"];
-                        options.ServiceId = Configuration["Orleans:ServiceId"];
-                    })
-                    .UseAdoNetClustering(options =>
-                    {
-                        options.ConnectionString = Configuration["Orleans:ConnectionString"];
-                        options.Invariant = Configuration["Orleans:Invariant"];
-                    })
-                    .ConfigureLogging(logging => logging.AddSerilog())
-                    .Build();
-                cb.Connect().GetAwaiter().GetResult();
-                return cb;
+                if ("true".Equals(Configuration["standalone"]))
+                {
+                    var cb = new ClientBuilder()
+                        .UseLocalhostClustering(30000, "zserver", "zserver")
+                        .ConfigureLogging(logging => logging.AddSerilog())
+                        .Build();
+                    cb.Connect().GetAwaiter().GetResult();
+                    return cb;
+                }
+                else
+                {
+                    var cb = new ClientBuilder()
+                        .Configure<ClusterOptions>(options =>
+                        {
+                            options.ClusterId = Configuration["Orleans:ClusterId"];
+                            options.ServiceId = Configuration["Orleans:ServiceId"];
+                        })
+                        .UseAdoNetClustering(options =>
+                        {
+                            options.ConnectionString = Configuration["Orleans:ConnectionString"];
+                            options.Invariant = Configuration["Orleans:Invariant"];
+                        })
+                        .ConfigureLogging(logging => logging.AddSerilog())
+                        .Build();
+                    cb.Connect().GetAwaiter().GetResult();
+                    return cb;
+                }
             });
 
             services.Configure<ClusterOptions>("Orleans", Configuration);

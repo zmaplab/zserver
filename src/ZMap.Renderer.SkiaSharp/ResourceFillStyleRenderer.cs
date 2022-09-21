@@ -6,6 +6,7 @@ using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source;
 using ZMap.Style;
+using ZMap.Utilities;
 
 namespace ZMap.Renderer.SkiaSharp
 {
@@ -19,8 +20,8 @@ namespace ZMap.Renderer.SkiaSharp
 
         private static readonly SKPathEffect Times = SKPathEffect.CreateSum(Times1, Times2);
 
-        public ResourceFillStyleRenderer(ResourceFillStyle style, IMemoryCache cache) :
-            base(style, cache)
+        public ResourceFillStyleRenderer(ResourceFillStyle style) :
+            base(style)
         {
         }
 

@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +15,7 @@ using ZMap.DynamicCompiler;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source.Postgre;
+using ZMap.Utilities;
 using ZServer.API.Extensions;
 
 #if !DEBUG
@@ -46,6 +49,7 @@ namespace ZServer.API
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((_, builder) =>
                 {
+                    builder.AddCommandLine(args);
                     builder.AddJsonFile($"serilog.json",
                         optional: true, reloadOnChange: true);
                     builder.AddJsonFile($"zserver.json",

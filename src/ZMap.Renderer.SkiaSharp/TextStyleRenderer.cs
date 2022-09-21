@@ -15,12 +15,10 @@ namespace ZMap.Renderer.SkiaSharp
     public class TextStyleRenderer : SkiaRenderer, ITextStyleRenderer<SKCanvas>
     {
         private readonly TextStyle _style;
-        private readonly IMemoryCache _cache;
 
-        public TextStyleRenderer(TextStyle style, IMemoryCache cache)
+        public TextStyleRenderer(TextStyle style)
         {
             _style = style;
-            _cache = cache;
         }
 
         public override void Render(SKCanvas graphics, Feature feature, Envelope extent, int width, int height)
@@ -109,7 +107,7 @@ namespace ZMap.Renderer.SkiaSharp
         {
             var key = $"TEXT_STYLE_PAINT_{color}";
 
-            return _cache.GetOrCreate(key, entry =>
+            return Cache.GetOrCreate(key, entry =>
             {
                 var c = ((string)entry.Key).Replace("TEXT_STYLE_PAINT_", "");
                 var paint = new SKPaint
@@ -138,7 +136,7 @@ namespace ZMap.Renderer.SkiaSharp
             var fontKey = fontFamily == null ? string.Empty : string.Join(",", fontFamily);
             var key = $"TEXT_STYLE_PAINT_{fontKey}{size}{rotate}{color}{align}";
 
-            return _cache.GetOrCreate(key, _ => new SKPaint
+            return Cache.GetOrCreate(key, _ => new SKPaint
             {
                 Style = SKPaintStyle.Fill,
                 IsAntialias = true,

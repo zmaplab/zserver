@@ -19,7 +19,7 @@
     },
     "zserver_shp": {
       "provider": "ZMap.Source.ShapeFile.ShapeFileSource, ZMap.Source.ShapeFile",
-      "file": "shape/osmbuildings.shp"
+      "file": "shapes/polygon.shp"
     }
   },
   "styleGroups": {
@@ -71,7 +71,7 @@
       "resourceGroup": "zserver",
       "services": [],
       "extent": [],
-      "source": "zserver",
+      "source": "zserver_shp",
       "sourceTable": "polygon",
       "sourceGeometry": "geom",
       "sourceSRID": 4326,

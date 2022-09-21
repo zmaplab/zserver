@@ -11,15 +11,13 @@ public class SkiaGraphicsService : IGraphicsService
 {
     private readonly SKBitmap _bitmap;
     private readonly SKCanvas _canvas;
-    private readonly IMemoryCache _cache;
 
     public string MapId { get; }
     public int Width { get; }
     public int Height { get; }
 
-    public SkiaGraphicsService(string mapId, int width, int height, IMemoryCache cache)
+    public SkiaGraphicsService(string mapId, int width, int height)
     {
-        _cache = cache;
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         Width = width;
@@ -56,12 +54,12 @@ public class SkiaGraphicsService : IGraphicsService
     {
         return style switch
         {
-            ResourceFillStyle resourceFillStyle => new ResourceFillStyleRenderer(resourceFillStyle, _cache),
-            FillStyle fillStyle => new FillStyleRenderer(fillStyle, _cache),
-            LineStyle lineStyle => new LineStyleRenderer(lineStyle, _cache),
-            TextStyle textStyle => new TextStyleRenderer(textStyle, _cache),
-            SymbolStyle symbolStyle => new SymbolStyleRenderer(symbolStyle, _cache),
-            RasterStyle rasterStyle => new RasterStyleRender(rasterStyle, _cache),
+            ResourceFillStyle resourceFillStyle => new ResourceFillStyleRenderer(resourceFillStyle),
+            FillStyle fillStyle => new FillStyleRenderer(fillStyle),
+            LineStyle lineStyle => new LineStyleRenderer(lineStyle),
+            TextStyle textStyle => new TextStyleRenderer(textStyle),
+            SymbolStyle symbolStyle => new SymbolStyleRenderer(symbolStyle),
+            RasterStyle rasterStyle => new RasterStyleRender(rasterStyle),
             _ => throw new NotSupportedException("不支持的样式")
         };
     }

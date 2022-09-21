@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
+using System.Linq;
+using MessagePack;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index;
 using NetTopologySuite.Index.HPRtree;
@@ -14,66 +14,43 @@ using ZMap.Indexing;
 
 namespace ZMap.Source.ShapeFile
 {
-    public class SpatialIndexFactory
+    public static class SpatialIndexFactory
     {
-        private static readonly Dictionary<string, ISpatialIndex<SpatialIndexEntry>>
-            Cache = new();
+        private static readonly MessagePackSerializerOptions SerializerOptions =
+            MessagePackSerializer.Typeless.DefaultOptions.WithCompression(MessagePackCompression.Lz4Block);
 
-        private static readonly Dictionary<string, object> Lockers = new();
-
-        public ISpatialIndex<SpatialIndexEntry> TryCreate(string shapeFile, SpatialIndexType type)
+        public static ISpatialIndex<SpatialIndexEntry> Create(string shapeFile, BinaryReader reader,
+            SpatialIndexType type)
         {
-            lock (GetOrCreateLocker(shapeFile))
+            ISpatialIndex<SpatialIndexEntry> tree;
+
+            var sidxPath = Path.ChangeExtension(shapeFile, ".sidx");
+
+            if (!File.Exists(sidxPath))
             {
-                if (Cache.ContainsKey(shapeFile))
-                {
-                    return Cache[shapeFile];
-                }
-
-                ISpatialIndex<SpatialIndexEntry> tree;
-
-                var sidxPath = Path.ChangeExtension(shapeFile, ".sidx");
-
-                if (!File.Exists(sidxPath))
-                {
-                    tree = CreateSpatialIndex(type, GetAllFeatureBoundingBoxes(shapeFile));
-                    Save(tree, sidxPath);
-                }
-                else
-                {
-                    tree = Load(sidxPath);
-                }
-
-                Cache.Add(shapeFile, tree);
-                return Cache[shapeFile];
+                var entries = GetAllFeatureBoundingBoxes(reader).ToList();
+                tree = CreateSpatialIndex(type, entries);
+                Save(entries, sidxPath);
             }
-        }
-
-        private void Save(ISpatialIndex<SpatialIndexEntry> tree, string path)
-        {
-            var formatter = new BinaryFormatter();
-            var rems = new MemoryStream();
-            formatter.Serialize(rems, tree);
-            File.WriteAllBytes(path, rems.GetBuffer());
-        }
-
-        private ISpatialIndex<SpatialIndexEntry> Load(string filename)
-        {
-            var formatter = new BinaryFormatter();
-            return (ISpatialIndex<SpatialIndexEntry>)formatter.Deserialize(File.OpenRead(filename));
-        }
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        private object GetOrCreateLocker(string filename)
-        {
-            if (Lockers.TryGetValue(filename, out var lockValue))
+            else
             {
-                return lockValue;
+                tree = Load(sidxPath, type);
             }
 
-            lockValue = new object();
-            Lockers.Add(filename, lockValue);
-            return lockValue;
+            return tree;
+        }
+
+        private static void Save(IEnumerable<SpatialIndexEntry> entries, string path)
+        {
+            File.WriteAllBytes(path, MessagePackSerializer.Serialize(entries, SerializerOptions));
+        }
+
+        public static ISpatialIndex<SpatialIndexEntry> Load(string filename, SpatialIndexType type)
+        {
+            using var stream = File.OpenRead(filename);
+            var entries = MessagePackSerializer.Deserialize<IEnumerable<SpatialIndexEntry>>(stream,
+                SerializerOptions);
+            return CreateSpatialIndex(type, entries);
         }
 
         private static int SwapByteOrder(int i)
@@ -87,19 +64,19 @@ namespace ZMap.Source.ShapeFile
         /// Reads all boundingboxes of features in the shapefile. This is used for spatial indexing.
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<SpatialIndexEntry> GetAllFeatureBoundingBoxes(string shapeFile)
+        private static IEnumerable<SpatialIndexEntry> GetAllFeatureBoundingBoxes(BinaryReader shapeFileReader)
         {
-            using var shapeFileStream = new FileStream(shapeFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            var headerBuffer = new byte[100];
-            shapeFileStream.Read(headerBuffer, 0, 100);
-
-            using var shapeFileReader = new BinaryReader(shapeFileStream, Encoding.Unicode);
+            // var headerBuffer = new byte[100];
+            // shapeFileStream.Read(headerBuffer, 0, 100);
+            var shapeFileStream = shapeFileReader.BaseStream;
+            shapeFileStream.Seek(100, SeekOrigin.Begin);
 
             for (var a = 0; a < int.MaxValue; ++a)
             {
-                if (shapeFileStream.Position >= shapeFileStream.Length)
+                if (shapeFileStream.Position >= shapeFileStream.Length ||
+                    shapeFileStream.Length - shapeFileStream.Position < 24)
                 {
+                    Log.Logger.LogInformation($"Read end stream at: {shapeFileStream.Position}, stream length: {shapeFileStream.Length}");
                     break;
                 }
 
@@ -112,7 +89,7 @@ namespace ZMap.Source.ShapeFile
                 var recordLength = 2 * SwapByteOrder(shapeFileReader.ReadInt32()); // 108
 
                 var typeValue = shapeFileReader.ReadInt32(); // 112
-                if (typeValue == 0)
+                if (typeValue <= 0)
                 {
                     continue;
                 }
@@ -121,28 +98,38 @@ namespace ZMap.Source.ShapeFile
                 if (shapeType == ShapeGeometryType.Point || shapeType == ShapeGeometryType.PointZ ||
                     shapeType == ShapeGeometryType.PointM)
                 {
-                    var coordinate = new Coordinate(shapeFileReader.ReadDouble(), shapeFileReader.ReadDouble());
+                    var x1 = shapeFileReader.ReadDouble();
+                    var y1 = shapeFileReader.ReadDouble();
 
                     shapeFileStream.Seek(recordLength - 20, SeekOrigin.Current);
+
                     yield return new SpatialIndexEntry
                     {
                         Index = (uint)a /*+1*/,
                         Offset = recordOffset,
                         RecordLength = recordLength,
-                        Box = new Envelope(coordinate)
+                        X1 = x1,
+                        Y1 = y1,
+                        X2 = x1,
+                        Y2 = y1
                     };
                 }
                 else
                 {
-                    var c1 = new Coordinate(shapeFileReader.ReadDouble(), shapeFileReader.ReadDouble());
-                    var c2 = new Coordinate(shapeFileReader.ReadDouble(), shapeFileReader.ReadDouble());
+                    var x1 = shapeFileReader.ReadDouble();
+                    var y1 = shapeFileReader.ReadDouble();
+                    var x2 = shapeFileReader.ReadDouble();
+                    var y2 = shapeFileReader.ReadDouble();
                     shapeFileStream.Seek(recordLength - 36, SeekOrigin.Current);
                     yield return new SpatialIndexEntry
                     {
                         Index = (uint)a /*+1*/,
                         Offset = recordOffset,
                         RecordLength = recordLength,
-                        Box = new Envelope(c1, c2)
+                        X1 = x1,
+                        X2 = x2,
+                        Y1 = y1,
+                        Y2 = y2
                     };
                 }
             }
@@ -164,12 +151,13 @@ namespace ZMap.Source.ShapeFile
 
             foreach (var entry in entries)
             {
-                if (entry.Box.IsNull)
+                var box = new Envelope(entry.X1, entry.X2, entry.Y1, entry.Y2);
+                if (box.IsNull)
                 {
                     continue;
                 }
 
-                tree.Insert(entry.Box, entry);
+                tree.Insert(box, entry);
             }
 
             return tree;

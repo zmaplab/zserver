@@ -5,18 +5,17 @@ using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source;
 using ZMap.Style;
+using ZMap.Utilities;
 
 namespace ZMap.Renderer.SkiaSharp
 {
     public class LineStyleRenderer : SkiaRenderer, ILineStyleRenderer<SKCanvas>
     {
         private readonly LineStyle _style;
-        private readonly IMemoryCache _cache;
 
-        public LineStyleRenderer(LineStyle style, IMemoryCache cache)
+        public LineStyleRenderer(LineStyle style)
         {
             _style = style;
-            _cache = cache;
         }
 
         protected override SKPaint CreatePaint(Feature feature)
@@ -39,7 +38,7 @@ namespace ZMap.Renderer.SkiaSharp
             var key =
                 $"LINE_STYLE_PAINT_{opacity}{width}{color}{color}{dashArrayKey}{dashOffset}{lineJoin}{cap}{translate}{translateAnchor}{gapWidth}{offset}{blur}{gradient}";
 
-            return _cache.GetOrCreate(key, _ =>
+            return Cache.GetOrCreate(key, _ =>
             {
                 var paint = new SKPaint
                 {
