@@ -4,6 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+        <AssemblyName>api</AssemblyName>
 
     </PropertyGroup>
 
@@ -33,9 +34,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!--        <ProjectReference Include="..\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj" />-->
         <ProjectReference Include="..\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj" />
         <ProjectReference Include="..\ZMap.Source.Postgre\ZMap.Source.Postgre.csproj" />
+        <ProjectReference Include="..\ZMap.Source.ShapeFile\ZMap.Source.ShapeFile.csproj" />
         <ProjectReference Include="..\ZServer.Grains\ZServer.Grains.csproj" />
         <ProjectReference Include="..\ZServer.Interfaces\ZServer.Interfaces.csproj" />
     </ItemGroup>
@@ -63,6 +64,45 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Fonts\SourceHanSansSC-Regular.ttf">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shape\polygon.cpg">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shape\polygon.dbf">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shape\polygon.prj">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shape\polygon.shp">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shape\polygon.shx">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.cpg">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.dbf">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.prj">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.shp">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.shx">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.sidx">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="start.sh">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="start.bat">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZMap;
 using ZMap.Style;
+using ZMap.Utilities;
 using ZServer.Extensions;
 
 namespace ZServer.Store.Configuration
@@ -15,16 +15,12 @@ namespace ZServer.Store.Configuration
     public class StyleGroupStore : IStyleGroupStore
     {
         private readonly IConfiguration _configuration;
-        private readonly IMemoryCache _cache;
         private readonly ServerOptions _options;
-        private readonly ILogger<StyleGroupStore> _logger;
 
-        public StyleGroupStore(IConfiguration configuration, IMemoryCache cache, IOptionsMonitor<ServerOptions> options,
-            ILogger<StyleGroupStore> logger)
+        public StyleGroupStore(IConfiguration configuration, IOptionsMonitor<ServerOptions> options)
         {
             _configuration = configuration;
-            _cache = cache;
-            _logger = logger;
+
             _options = options.CurrentValue;
         }
 
@@ -35,7 +31,7 @@ namespace ZServer.Store.Configuration
                 return null;
             }
 
-            var result = _cache.GetOrCreate($"{GetType().FullName}:{name}",
+            var result = Cache.GetOrCreate($"{GetType().FullName}:{name}",
                 entry =>
                 {
                     var section =

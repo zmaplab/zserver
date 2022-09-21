@@ -7,7 +7,7 @@ namespace ZMap.Renderer.SkiaSharp
 {
     public class RasterStyleRender : SkiaRenderer, IRasterStyleRender<SKCanvas>
     {
-        public RasterStyleRender(RasterStyle style, IMemoryCache cache)
+        public RasterStyleRender(RasterStyle style)
         {
         }
 

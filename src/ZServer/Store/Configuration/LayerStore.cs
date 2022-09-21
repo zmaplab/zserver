@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using ZMap;
 using ZMap.Source;
 using ZMap.Style;
+using ZMap.Utilities;
 using ZServer.Entity;
 using ZServer.Extensions;
 
@@ -26,19 +27,17 @@ namespace ZServer.Store.Configuration
         private readonly IStyleGroupStore _styleStore;
         private readonly IResourceGroupStore _resourceGroupStore;
         private readonly ISourceStore _sourceStore;
-        private readonly IMemoryCache _cache;
         private readonly ServerOptions _options;
         private readonly ILogger<LayerStore> _logger;
 
         public LayerStore(IConfiguration configuration, IStyleGroupStore styleStore,
-            IResourceGroupStore resourceGroupStore, ISourceStore sourceStore, IMemoryCache cache,
+            IResourceGroupStore resourceGroupStore, ISourceStore sourceStore,
             IOptionsMonitor<ServerOptions> options, ILogger<LayerStore> logger)
         {
             _configuration = configuration;
             _styleStore = styleStore;
             _resourceGroupStore = resourceGroupStore;
             _sourceStore = sourceStore;
-            _cache = cache;
             _logger = logger;
             _options = options.CurrentValue;
         }
@@ -50,7 +49,7 @@ namespace ZServer.Store.Configuration
                 return null;
             }
 
-            var result = await _cache.GetOrCreateAsync($"{GetType().FullName}:{resourceGroupName}:{layerName}",
+            var result = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerName}",
                 async entry =>
                 {
                     var resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
@@ -85,7 +84,7 @@ namespace ZServer.Store.Configuration
                 return null;
             }
 
-            var result = await _cache.GetOrCreateAsync($"{GetType().FullName}:{layerName}",
+            var result = await Cache.GetOrCreate($"{GetType().FullName}:{layerName}",
                 async entry =>
                 {
                     var layer = await BindLayerAsync(layerName);

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZMap.Source;
+using ZMap.Utilities;
 
 namespace ZServer.Store.Configuration
 {
@@ -17,7 +18,6 @@ namespace ZServer.Store.Configuration
     public class SourceStore : ISourceStore
     {
         private readonly IConfiguration _configuration;
-        private readonly IMemoryCache _cache;
         private readonly ServerOptions _options;
         private readonly ILogger<SourceStore> _logger;
 
@@ -25,11 +25,10 @@ namespace ZServer.Store.Configuration
             StorageTypeCache =
                 new();
 
-        public SourceStore(IConfiguration configuration, IMemoryCache cache, IOptionsMonitor<ServerOptions> options,
+        public SourceStore(IConfiguration configuration, IOptionsMonitor<ServerOptions> options,
             ILogger<SourceStore> logger)
         {
             _configuration = configuration;
-            _cache = cache;
             _logger = logger;
             _options = options.CurrentValue;
         }
@@ -44,7 +43,7 @@ namespace ZServer.Store.Configuration
             // comments: 必须复制对像，不然并发情况会异常
             return string.IsNullOrWhiteSpace(name)
                 ? null
-                : (await _cache.GetOrCreateAsync($"{GetType().FullName}:{name}", entry =>
+                : (await Cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>
                 {
                     var source = Get(name);
                     entry.SetValue(source);

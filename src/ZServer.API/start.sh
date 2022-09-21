@@ -1,0 +1,1 @@
+dotnet api.dll --standalone true
