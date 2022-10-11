@@ -3,32 +3,28 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
-        <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
-        <AssemblyName>api</AssemblyName>
-
+        <AssemblyName>zapi</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.0.123" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
         <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="3.6.5" />
         <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="3.6.5" />
         <PackageReference Include="Microsoft.Orleans.Server" Version="3.6.5" />
-        <PackageReference Include="MongoDB.Bson" Version="2.17.1" />
         <PackageReference Include="OrleansDashboard" Version="3.6.2" />
         <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
-        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.1" />
+        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
+        <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.1" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-        <PackageReference Include="Serilog.Expressions" Version="3.4.0" />
+        <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
         <PackageReference Include="nacos-sdk-csharp" Version="1.3.4" />
         <PackageReference Include="nacos-sdk-csharp.Extensions.Configuration" Version="1.3.4" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3" />
         <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     </ItemGroup>
@@ -42,68 +38,35 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Fonts\宋体.ttc">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="Npgsql.sql">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="shape\osmbuildings.dbf">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\osmbuildings.prj">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\osmbuildings.shp">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\osmbuildings.shx">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Fonts\SourceHanSerifSC-Regular.ttf">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="Fonts\SourceHanSansSC-Regular.ttf">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\polygon.cpg">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\polygon.dbf">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\polygon.prj">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\polygon.shp">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shape\polygon.shx">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shapes\polygon.cpg">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shapes\polygon.dbf">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shapes\polygon.prj">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shapes\polygon.shp">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shapes\polygon.shx">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="shapes\polygon.sidx">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="start.sh">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="start.bat">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.cpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.dbf">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.prj">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.shp">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.shx">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="shapes\polygon.sidx">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 

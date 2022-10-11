@@ -9,9 +9,9 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
         <PackageReference Include="NetTopologySuite.IO.PostGis" Version="2.1.0" />
         <PackageReference Include="Dapper" Version="2.0.123" />
-        <PackageReference Include="Npgsql" Version="6.0.6" />
+        <PackageReference Include="Npgsql" Version="6.0.7" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-        <PackageReference Include="Npgsql.NetTopologySuite" Version="6.0.6" />
+        <PackageReference Include="Npgsql.NetTopologySuite" Version="6.0.7" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ZMap.Source.Postgre\ZMap.Source.Postgre.csproj" />
