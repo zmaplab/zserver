@@ -34,7 +34,6 @@ public class CSharpDynamicCompiler : ICSharpDynamicCompiler
             NatashaInitializer.Initialize();
             //注册+预热组件 , 之后编译会更加快速
             NatashaInitializer.InitializeAndPreheating();
-
             DynamicCompilationUtilities.Load(new CSharpDynamicCompiler());
         }
     }

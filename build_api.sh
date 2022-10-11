@@ -1,1 +1,0 @@
-dotnet publish src/ZServer.API -c Release -r win-x64

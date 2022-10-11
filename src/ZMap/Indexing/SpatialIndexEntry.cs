@@ -1,6 +1,5 @@
 using System;
 using MessagePack;
-using NetTopologySuite.Geometries;
 
 namespace ZMap.Indexing
 {

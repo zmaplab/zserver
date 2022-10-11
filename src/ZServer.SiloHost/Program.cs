@@ -17,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
-using NetTopologySuite.IO;
 using Npgsql;
 using ZMap.Source.Postgre;
 using Orleans;

@@ -4,11 +4,17 @@
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <AssemblyName>zapi</AssemblyName>
+        <!-- Warning: setting the below switch is *NOT* recommended in web apps -->
+        <!-- See: https://aka.ms/binaryformatter -->
+        <!-- See: https://github.com/dotnet/orleans/issues/6805 -->
+        <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Lib.Harmony" Version="2.2.2" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
         <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="3.6.5" />
+        <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
         <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="3.6.5" />
         <PackageReference Include="Microsoft.Orleans.Server" Version="3.6.5" />
         <PackageReference Include="OrleansDashboard" Version="3.6.2" />
@@ -40,33 +46,43 @@
     <ItemGroup>
         <None Update="Npgsql.sql">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="Fonts\SourceHanSansSC-Regular.ttf">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="start.sh">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="start.bat">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon.cpg">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon.dbf">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon.prj">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon.shp">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon.shx">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon.sidx">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
     </ItemGroup>
 
