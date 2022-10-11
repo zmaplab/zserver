@@ -1,1 +1,1 @@
-dotnet api.dll --standalone true
+dotnet zapi.dll --standalone true

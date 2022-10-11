@@ -2,11 +2,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Dapper;
+using HarmonyLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
@@ -15,7 +16,6 @@ using ZMap.DynamicCompiler;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source.Postgre;
-using ZMap.Utilities;
 using ZServer.API.Extensions;
 
 #if !DEBUG
@@ -27,6 +27,8 @@ namespace ZServer.API
     {
         public static void Main(string[] args)
         {
+            FixOrleansPublishSingleFileIssue();
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             NtsGeometryServices.Instance = new NtsGeometryServices(
                 CoordinateArraySequenceFactory.Instance,
@@ -43,6 +45,36 @@ namespace ZServer.API
             }
 
             CreateHostBuilder(args).Build().Run();
+        }
+
+        private static void FixOrleansPublishSingleFileIssue()
+        {
+            var assembly = typeof(Orleans.Runtime.SiloStatus).Assembly;
+
+            // if (!string.IsNullOrWhiteSpace(assembly.Location))
+            // {
+            //     return;
+            // }
+
+            var type = typeof(Orleans.Runtime.SiloStatus).Assembly.GetTypes()
+                .First(
+                    x => x.FullName == "Orleans.Runtime.RuntimeVersion");
+            var method = type.GetProperty("Current")?.GetMethod;
+            if (method == null)
+            {
+                return;
+            }
+
+            var harmony = new Harmony("orleans.publishSingleFile");
+            var prefix = typeof(Program).GetMethod("Prefix");
+            harmony.Patch(method, new HarmonyMethod(prefix));
+            Console.WriteLine("Patch Orleans completed");
+        }
+
+        public static bool Prefix(ref string __result)
+        {
+            __result = "3.6.5";
+            return false; // make sure you only skip if really necessary
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>

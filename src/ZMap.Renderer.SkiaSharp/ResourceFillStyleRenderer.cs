@@ -1,5 +1,4 @@
 using System.IO;
-using Microsoft.Extensions.Caching.Memory;
 using SkiaSharp;
 using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Extensions;

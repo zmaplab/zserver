@@ -1,5 +1,3 @@
-using NetTopologySuite.Geometries;
-
 namespace ZMap;
 
 public interface IGraphicsServiceProvider
