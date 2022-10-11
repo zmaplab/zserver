@@ -22,7 +22,8 @@ public static class OrleansExtensions
         {
             siloBuilder.AddMemoryGrainStorageAsDefault();
 
-            if ("true".Equals(context.Configuration["standalone"]))
+            if ("true".Equals(context.Configuration["standalone"]) ||
+                "true".Equals(Environment.GetEnvironmentVariable("standalone")?.ToLower()))
             {
                 siloBuilder.UseLocalhostClustering(11111, 30000, null, "zserver", "zserver");
                 siloBuilder.UseInMemoryReminderService();

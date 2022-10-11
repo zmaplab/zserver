@@ -3,7 +3,7 @@
     <Import Project="../../package.props" />
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
         <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />
         <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5" PrivateAssets="all">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

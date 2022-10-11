@@ -1,0 +1,28 @@
+version: "3"
+networks:
+  api:
+
+services:
+  api:
+    image: "zlzforever/zserver-api:arm64-20221011"
+    restart: always
+    container_name: zserver_api
+    ports:
+      - 8200:8200
+      - 8201:8182
+      - 41113:41113
+      - 31113:31113
+    volumes:
+      - ./serilog.json:/app/serilog.json
+      - ./zserver.json:/app/zserver.json
+      - ./Fonts:/app/Fonts
+      - ./shapes:/app/shapes
+    environment:
+      - HOST_IP=192.168.50.23
+      - standalone=true
+      - TZ=Asia/Shanghai
+    networks:
+      - api
+  
+  
+  

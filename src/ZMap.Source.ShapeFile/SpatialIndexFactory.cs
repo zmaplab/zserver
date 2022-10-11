@@ -107,7 +107,7 @@ namespace ZMap.Source.ShapeFile
                     {
                         Index = (uint)a /*+1*/,
                         Offset = recordOffset,
-                        RecordLength = recordLength,
+                        Length = recordLength,
                         X1 = x1,
                         Y1 = y1,
                         X2 = x1,
@@ -125,7 +125,7 @@ namespace ZMap.Source.ShapeFile
                     {
                         Index = (uint)a /*+1*/,
                         Offset = recordOffset,
-                        RecordLength = recordLength,
+                        Length = recordLength,
                         X1 = x1,
                         X2 = x2,
                         Y1 = y1,

@@ -202,7 +202,7 @@ namespace ZMap.Source.ShapeFile
                 //Skip record number
                 reader.BaseStream.Seek(8, SeekOrigin.Current);
 
-                var bytes = reader.ReadBytes(entry.RecordLength);
+                var bytes = reader.ReadBytes(entry.Length);
                 using var geometryReader = new BigEndianBinaryReader(new MemoryStream(bytes));
 
                 var typeValue = geometryReader.ReadInt32();
@@ -218,7 +218,7 @@ namespace ZMap.Source.ShapeFile
 
                 try
                 {
-                    var geometry = handler.Read(geometryReader, entry.RecordLength, _geometryFactory);
+                    var geometry = handler.Read(geometryReader, entry.Length, _geometryFactory);
                     return geometry;
                 }
                 catch
