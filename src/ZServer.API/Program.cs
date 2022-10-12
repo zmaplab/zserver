@@ -1,22 +1,27 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using Dapper;
 using HarmonyLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using Serilog;
+using ZMap;
 using ZMap.DynamicCompiler;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Source.Postgre;
 using ZServer.API.Extensions;
+using Log = Serilog.Log;
 
 #if !DEBUG
 #endif
@@ -51,10 +56,10 @@ namespace ZServer.API
         {
             var assembly = typeof(Orleans.Runtime.SiloStatus).Assembly;
 
-            // if (!string.IsNullOrWhiteSpace(assembly.Location))
-            // {
-            //     return;
-            // }
+            if (!string.IsNullOrWhiteSpace(assembly.Location))
+            {
+                return;
+            }
 
             var type = typeof(Orleans.Runtime.SiloStatus).Assembly.GetTypes()
                 .First(
