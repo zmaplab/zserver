@@ -191,6 +191,8 @@ namespace ZServer.Grains.WMS
                 var envelope = new Envelope(modeState.MinX, modeState.MaxX, modeState.MinY, modeState.MaxY);
                 var featureCollection = await
                     GetFeatureInfoAsync(layerList, featureCount, srs, envelope, width, height, x, y);
+                _logger.LogInformation(
+                    $"Query features {displayUrl}, target layers: {string.Join(", ", layerList.Select(z => z.Name))}, count: {featureCollection.Count}");
                 return featureCollection;
             }
             catch (Exception e)
