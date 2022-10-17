@@ -32,8 +32,6 @@ public class CSharpDynamicCompiler : ICSharpDynamicCompiler
             }
 
             NatashaManagement.Preheating();
-            // NatashaInitializer.Preheating();
-            // NatashaManagement.AddGlobalReference()
             DynamicCompilationUtilities.Load(new CSharpDynamicCompiler());
         }
     }

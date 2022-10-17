@@ -19,7 +19,7 @@ namespace ZMap.SLD
                     {
                         case "OnlineResource" when reader.NodeType == XmlNodeType.Element:
                             var onlineResource = new OnlineResource();
-                            onlineResource.ReadXml(reader);
+                            // onlineResource.ReadXml(reader);
                             OnlineResource = onlineResource;
                             break;
                         case "Format" when reader.NodeType == XmlNodeType.Element:

@@ -4,8 +4,18 @@
                        xmlns:se="http://www.opengis.net/se"
                        xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd"
                        version="1.1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <se:Name>StyledLayerDescriptor1</se:Name>
+    <se:Description>
+        <se:Title>StyledLayerDescriptor_Title</se:Title>
+        <se:Abstract>StyledLayerDescriptor_Abstract</se:Abstract>
+    </se:Description>
     <NamedLayer>
         <se:Name>DI_规划道路中线</se:Name>
+        <se:LayerFeatureConstraints>
+            <se:FeatureTypeConstraint>
+                <se:FeatureTypeName>FeatureTypeName1</se:FeatureTypeName>
+            </se:FeatureTypeConstraint>
+        </se:LayerFeatureConstraints>
         <UserStyle>
             <se:Name>DI_规划道路中线</se:Name>
             <se:FeatureTypeStyle>
