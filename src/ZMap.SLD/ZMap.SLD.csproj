@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     
     <Import Project="../../package.props" />
-
-    <ItemGroup>
-      <ProjectReference Include="..\ZMap\ZMap.csproj" />
-    </ItemGroup>
+    
 
     <ItemGroup>
       <Folder Include="docs" />

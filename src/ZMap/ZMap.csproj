@@ -14,4 +14,7 @@
             <_Parameter1>ZServer.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ZMap.SLD\ZMap.SLD.csproj" />
+    </ItemGroup>
 </Project>

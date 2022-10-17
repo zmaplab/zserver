@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace ZMap.SLD
@@ -32,6 +31,11 @@ namespace ZMap.SLD
         public void Valid()
         {
             // TODO: 校验 NamedStyle 和 UserStyle 只有一种
+        }
+
+        public void Accept(IStyleVisitor visitor, object data)
+        {
+            visitor.Visit(this, data);
         }
 
         // public void ReadXml(XmlReader reader)

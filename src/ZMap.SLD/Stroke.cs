@@ -36,69 +36,69 @@ namespace ZMap.SLD
         public GraphicFill GraphicFill { get; set; }
         public GraphicStroke GraphicStroke { get; set; }
 
-        public void ReadXml(XmlReader reader)
-        {
-            while (reader.Read())
-            {
-                if (reader.LocalName == "Stroke" && reader.NodeType == XmlNodeType.EndElement)
-                {
-                    break;
-                }
-                else if (reader.LocalName == "SvgParameter" && reader.NodeType == XmlNodeType.Element)
-                {
-                    var attribute = reader.GetAttribute("name").ToLower();
-                    switch (attribute)
-                    {
-                        case "stroke":
-                        {
-                            Color = reader.ReadElementContentAsString();
-                            break;
-                        }
-                        case "stroke-width":
-                        {
-                            Width = reader.ReadElementContentAsInt();
-                            break;
-                        }
-                        case "stroke-opacity":
-                        {
-                            Opacity = reader.ReadElementContentAsFloat();
-                            break;
-                        }
-                        case "stroke-linejoin":
-                        {
-                            LineJoin = reader.ReadElementContentAsString();
-                            break;
-                        }
-                        case "stroke-linecap":
-                        {
-                            Linecap = reader.ReadElementContentAsString();
-                            break;
-                        }
-                        case "stroke-dasharray":
-                        {
-                            var val = reader.ReadElementContentAsString();
-                            DashArray = val?.Split(' ').Where(s => float.TryParse(s, out var x))
-                                ?.Select(s => float.Parse(s)).ToArray();
-                            break;
-                        }
-                        case "stroke-dashoffset":
-                        {
-                            DashOffset = reader.ReadElementContentAsFloat();
-                            break;
-                        }
-                        case "GraphicFill" when reader.NodeType == XmlNodeType.Element:
-                            var graphicFill = new GraphicFill();
-                            graphicFill.ReadXml(reader);
-                            GraphicFill = graphicFill;
-                            break;
-                        case "GraphicStroke" when reader.NodeType == XmlNodeType.Element:
-                            var graphicStroke = new GraphicStroke();
-                            graphicStroke.ReadXml(reader);
-                            GraphicStroke = graphicStroke;
-                            break;
-                    }
-                }
-            }
-        }
+        // public void ReadXml(XmlReader reader)
+        // {
+        //     while (reader.Read())
+        //     {
+        //         if (reader.LocalName == "Stroke" && reader.NodeType == XmlNodeType.EndElement)
+        //         {
+        //             break;
+        //         }
+        //         else if (reader.LocalName == "SvgParameter" && reader.NodeType == XmlNodeType.Element)
+        //         {
+        //             var attribute = reader.GetAttribute("name").ToLower();
+        //             switch (attribute)
+        //             {
+        //                 case "stroke":
+        //                 {
+        //                     Color = reader.ReadElementContentAsString();
+        //                     break;
+        //                 }
+        //                 case "stroke-width":
+        //                 {
+        //                     Width = reader.ReadElementContentAsInt();
+        //                     break;
+        //                 }
+        //                 case "stroke-opacity":
+        //                 {
+        //                     Opacity = reader.ReadElementContentAsFloat();
+        //                     break;
+        //                 }
+        //                 case "stroke-linejoin":
+        //                 {
+        //                     LineJoin = reader.ReadElementContentAsString();
+        //                     break;
+        //                 }
+        //                 case "stroke-linecap":
+        //                 {
+        //                     Linecap = reader.ReadElementContentAsString();
+        //                     break;
+        //                 }
+        //                 case "stroke-dasharray":
+        //                 {
+        //                     var val = reader.ReadElementContentAsString();
+        //                     DashArray = val?.Split(' ').Where(s => float.TryParse(s, out var x))
+        //                         ?.Select(s => float.Parse(s)).ToArray();
+        //                     break;
+        //                 }
+        //                 case "stroke-dashoffset":
+        //                 {
+        //                     DashOffset = reader.ReadElementContentAsFloat();
+        //                     break;
+        //                 }
+        //                 case "GraphicFill" when reader.NodeType == XmlNodeType.Element:
+        //                     var graphicFill = new GraphicFill();
+        //                     graphicFill.ReadXml(reader);
+        //                     GraphicFill = graphicFill;
+        //                     break;
+        //                 case "GraphicStroke" when reader.NodeType == XmlNodeType.Element:
+        //                     var graphicStroke = new GraphicStroke();
+        //                     graphicStroke.ReadXml(reader);
+        //                     GraphicStroke = graphicStroke;
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

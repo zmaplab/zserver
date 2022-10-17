@@ -35,38 +35,38 @@ namespace ZMap.SLD
             GraphicalSymbols = new List<GraphicalSymbol>();
         }
 
-        public void ReadXml(XmlReader reader)
-        {
-            while (reader.Read())
-            {
-                if (reader.LocalName == "Graphic" && reader.NodeType == XmlNodeType.EndElement)
-                {
-                    break;
-                }
-                else
-                    switch (reader.LocalName)
-                    {
-                        case "Opacity" when reader.NodeType == XmlNodeType.Element:
-                            Opacity = reader.ReadContentAsFloat();
-                            break;
-                        case "Size" when reader.NodeType == XmlNodeType.Element:
-                            Size = reader.ReadContentAsInt();
-                            break;
-                        case "Rotation" when reader.NodeType == XmlNodeType.Element:
-                            Rotation = reader.ReadContentAsFloat();
-                            break;
-                        case "ExternalGraphic" when reader.NodeType == XmlNodeType.Element:
-                            var graphicalSymbol = new ExternalGraphic();
-                            graphicalSymbol.ReadXml(reader);
-                            GraphicalSymbols.Add(graphicalSymbol);
-                            break;
-                        case "Mark" when reader.NodeType == XmlNodeType.Element:
-                            var mark = new Mark();
-                            mark.ReadXml(reader);
-                            GraphicalSymbols.Add(mark);
-                            break;
-                    }
-            }
-        }
+        // public void ReadXml(XmlReader reader)
+        // {
+        //     while (reader.Read())
+        //     {
+        //         if (reader.LocalName == "Graphic" && reader.NodeType == XmlNodeType.EndElement)
+        //         {
+        //             break;
+        //         }
+        //         else
+        //             switch (reader.LocalName)
+        //             {
+        //                 case "Opacity" when reader.NodeType == XmlNodeType.Element:
+        //                     Opacity = reader.ReadContentAsFloat();
+        //                     break;
+        //                 case "Size" when reader.NodeType == XmlNodeType.Element:
+        //                     Size = reader.ReadContentAsInt();
+        //                     break;
+        //                 case "Rotation" when reader.NodeType == XmlNodeType.Element:
+        //                     Rotation = reader.ReadContentAsFloat();
+        //                     break;
+        //                 case "ExternalGraphic" when reader.NodeType == XmlNodeType.Element:
+        //                     var graphicalSymbol = new ExternalGraphic();
+        //                     graphicalSymbol.ReadXml(reader);
+        //                     GraphicalSymbols.Add(graphicalSymbol);
+        //                     break;
+        //                 case "Mark" when reader.NodeType == XmlNodeType.Element:
+        //                     var mark = new Mark();
+        //                     mark.ReadXml(reader);
+        //                     GraphicalSymbols.Add(mark);
+        //                     break;
+        //             }
+        //     }
+        // }
     }
 }

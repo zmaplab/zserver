@@ -20,4 +20,9 @@ public class UserLayer : StyledLayer
     [XmlArray("LayerCoverageConstraints")]
     [XmlArrayItem("CoverageConstraint")]
     public List<CoverageConstraint> CoverageConstraints { get; set; }
+    
+    public void Accept(IStyleVisitor visitor, object data)
+    {
+        visitor.Visit(this, data);
+    }
 }
