@@ -14,21 +14,33 @@
         <se:LayerFeatureConstraints>
             <se:FeatureTypeConstraint>
                 <se:FeatureTypeName>FeatureTypeName1</se:FeatureTypeName>
+                <se:Extent>
+                    <Name>extent1</Name>
+                    <Value>extent_value1</Value>
+                </se:Extent>
             </se:FeatureTypeConstraint>
         </se:LayerFeatureConstraints>
         <UserStyle>
             <se:Name>DI_规划道路中线</se:Name>
             <se:FeatureTypeStyle>
+                <FeatureTypeName>FeatureTypeName1</FeatureTypeName>
                 <se:Rule>
                     <se:Name>规划道路中线L16</se:Name>
                     <se:Description>
                         <se:Title>规划道路中线L16</se:Title>
                     </se:Description>
-                    <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
-                        <ogc:PropertyIsEqualTo>
-                            <ogc:PropertyName>yzdydldj</ogc:PropertyName>
-                            <ogc:Literal>次干路</ogc:Literal>
-                        </ogc:PropertyIsEqualTo>
+                    <ElseFilter>true</ElseFilter>
+                    <ogc:Filter>
+                        <ogc:And>
+                            <ogc:PropertyIsGreaterThanOrEqualTo>
+                                <ogc:PropertyName>COMID</ogc:PropertyName>
+                                <ogc:Literal>510104024008</ogc:Literal>
+                            </ogc:PropertyIsGreaterThanOrEqualTo>
+                            <ogc:PropertyIsLessThan>
+                                <ogc:PropertyName>COMID</ogc:PropertyName>
+                                <ogc:Literal>510104024011</ogc:Literal>
+                            </ogc:PropertyIsLessThan>
+                        </ogc:And>
                     </ogc:Filter>
                     <se:MinScaleDenominator>6772</se:MinScaleDenominator>
                     <se:MaxScaleDenominator>10000000</se:MaxScaleDenominator>
@@ -308,11 +320,10 @@
                         </se:Fill>
                     </se:TextSymbolizer>
                 </se:Rule>
-
-
+                <VendorOption name="option1">option_value1</VendorOption>
+                <sld:VendorOption name="sortBy">z</sld:VendorOption>
+                <sld:VendorOption name="sortByGroup">roads</sld:VendorOption>
             </se:FeatureTypeStyle>
-
-
         </UserStyle>
     </NamedLayer>
     <NamedLayer>

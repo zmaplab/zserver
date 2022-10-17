@@ -29,6 +29,12 @@ namespace ZMap.SLD
         public Filter.Filter Filter { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        [XmlElement("ElseFilter")]
+        public bool ElseFilter { get; set; }
+
+        /// <summary>
         /// 特征
         /// </summary>
         // [XmlElement(ElementName = "NamedLayer", Type = typeof(NamedLayer))]

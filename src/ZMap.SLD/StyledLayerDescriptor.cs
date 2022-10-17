@@ -6,26 +6,17 @@ using System.Xml.Serialization;
 
 namespace ZMap.SLD
 {
-    public class NamespaceIgnorantXmlTextReader : XmlTextReader
-    {
-        public NamespaceIgnorantXmlTextReader(Stream stream) : base(stream)
-        {
-        }
-    
-        public override string NamespaceURI => "";
-    }
-
+    /// <summary>
+    /// https://schemas.opengis.net/sld/1.1/StyledLayerDescriptor.xsd
+    /// </summary>
     [XmlRoot(ElementName = "StyledLayerDescriptor")]
     public class StyledLayerDescriptor
     {
-        // public const string SE = "http://www.opengis.net/se";
-        // public const string SLD = "http://www.opengis.net/sld";
-
         /// <summary>
         /// Required: false
         /// 名称
         /// </summary>
-        [XmlElement("Name" )]
+        [XmlElement("Name")]
         public string Name { get; set; }
 
         /// <summary>
@@ -72,23 +63,18 @@ namespace ZMap.SLD
         {
         }
 
-        public static StyledLayerDescriptor Load(string path)
+        public static StyledLayerDescriptor Load(string file)
         {
             var serializer = new XmlSerializer(typeof(StyledLayerDescriptor));
+            var reader = new NamespaceIgnorantXmlTextReader(File.OpenRead(file));
+            return serializer.Deserialize(reader) as
+                StyledLayerDescriptor;
+        }
 
-            // var rdr = XmlReader.Create(stream, new XmlReaderSettings
-            // {
-            //     
-            //     XmlResolver = new XmlSecureResolver(new XmlUrlResolver(),
-            //         new System.Security.PermissionSet(System.Security.Permissions.PermissionState.None))
-            // });
-            // rdr.Namespaces = false;
-
-            // var namespaces = new XmlSerializerNamespaces();
-            // namespaces.Add("ac", "http://www.example.org/Standards/xyz/1");
-            // namespaces.Add("rlc", "http://www.example.org/Standards/def/1");
-            // namespaces.Add("def1", "http://www.lol.com/Standards/lol.xsd");
-            var reader = new NamespaceIgnorantXmlTextReader(File.OpenRead(path));
+        public static StyledLayerDescriptor Load(Stream stream)
+        {
+            var serializer = new XmlSerializer(typeof(StyledLayerDescriptor));
+            var reader = new NamespaceIgnorantXmlTextReader(stream);
             return serializer.Deserialize(reader) as
                 StyledLayerDescriptor;
         }
@@ -114,28 +100,6 @@ namespace ZMap.SLD
         // public override int GetHashCode()
         // {
         //     return Objects.hash(name, title, abstractStr, layers);
-        // }
-
-
-        // public void ReadXml(XmlReader reader)
-        // {
-        //     while (reader.Read())
-        //     {
-        //         if (reader.EOF || (reader.NodeType == XmlNodeType.EndElement && reader.Name == "StyledLayerDescriptor"))
-        //         {
-        //             break;
-        //         }
-        //         else if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "NamedLayer")
-        //         {
-        //             var namedLayer = new NamedLayer();
-        //             namedLayer.ReadXml(reader);
-        //             NamedLayers.Add(namedLayer);
-        //         }
-        //         else if (reader.LocalName == "StyledLayerDescriptor" && reader.NodeType == XmlNodeType.EndElement)
-        //         {
-        //             break;
-        //         }
-        //     }
         // }
     }
 }
