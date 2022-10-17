@@ -50,12 +50,29 @@ namespace ZServer.Tests
             Assert.Equal("1.1.0", styledLayerDescriptor1.Version);
             Assert.Equal("StyledLayerDescriptor_Title", styledLayerDescriptor1.Description.Title);
             Assert.Equal("StyledLayerDescriptor_Abstract", styledLayerDescriptor1.Description.Abstract);
+
+
             Assert.Equal("DI_规划道路中线", styledLayerDescriptor1.Layers[0].Name);
             Assert.Equal("NAME1", styledLayerDescriptor1.Layers[1].Name);
+
             var namedLayer = styledLayerDescriptor1.Layers[0] as NamedLayer;
+            Assert.NotNull(namedLayer);
+
             Assert.Equal("FeatureTypeName1", namedLayer.FeatureConstraints[0].FeatureTypeName);
-            // var styledLayerDescriptor2 = StyledLayerDescriptor.Load("sld.sld");
-            // Assert.Equal("usa:states", styledLayerDescriptor2.NamedLayers[0].Name);
+            Assert.Equal("extent1", namedLayer.FeatureConstraints[0].Extents[0].Name);
+            Assert.Equal("extent_value1", namedLayer.FeatureConstraints[0].Extents[0].Value);
+
+            var userStyle1 = namedLayer.Styles[0] as UserStyle;
+            Assert.NotNull(userStyle1);
+            Assert.Equal("DI_规划道路中线", userStyle1.Name);
+            
+            var featureTypeStyle = userStyle1.FeatureTypeStyles[0];
+            Assert.NotNull(featureTypeStyle);
+            
+            var vendorOption1 = featureTypeStyle.VendorOptions[0];
+            Assert.NotNull(vendorOption1);
+            Assert.Equal("option1", vendorOption1.Name);
+            Assert.Equal("option_value1", vendorOption1.Value);
         }
     }
 }

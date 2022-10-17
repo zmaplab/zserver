@@ -16,17 +16,5 @@ namespace ZMap.SLD
         /// </summary>
         [XmlText]
         public string Value { get; set; }
-        // public void ReadXml(XmlReader reader)
-        // {
-        //     var attribute = reader.GetAttribute("name").ToLower();
-        //     switch (attribute)
-        //     {
-        //         case "distance":
-        //             {
-        //                 Distance = reader.ReadElementContentAsString();
-        //                 break;
-        //             }
-        //     }
-        // }
     }
 }

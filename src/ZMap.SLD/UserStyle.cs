@@ -12,17 +12,17 @@ namespace ZMap.SLD
     public class UserStyle : Style
     {
         /// <summary>
+        /// 
+        /// </summary>
+        [XmlElement("IsDefault")]
+        public bool IsDefault { get; set; }
+
+        /// <summary>
         /// 1..N
         /// 定义用于呈现单个要素类型的符号。
         /// </summary>
         [XmlElement("FeatureTypeStyle")]
         public List<FeatureTypeStyle> FeatureTypeStyles { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [XmlElement("IsDefault")]
-        public bool IsDefault { get; set; }
 
         /// <summary>
         /// 
