@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace ZMap.SLD
@@ -26,6 +24,8 @@ namespace ZMap.SLD
         /// <summary>
         /// 过滤条件
         /// </summary>
+        [XmlElement("PropertyIsEqualTo")]
+        [XmlElement("PropertyIsGreaterThan")]
         public Filter.Filter Filter { get; set; }
 
         /// <summary>

@@ -8,7 +8,6 @@ using NetTopologySuite.Geometries;
 using Orleans;
 using Orleans.Configuration;
 using ZMap.SLD;
-using ZMap.Source;
 using ZServer.Interfaces.WMS;
 
 namespace Client
@@ -32,14 +31,14 @@ namespace Client
                 var name = "city";
              
                 // settings.Schemas.Add("urn:empl-hire", "hireDate.xsd");
-                Expression<Func<Feature, string>> expression = x =>
-                    ((object)x[name]).ToString();
-
-                var feature = new Feature(new Point(0, 0), new Dictionary<string, dynamic>
-                {
-                    { "city", "sh" }
-                });
-            
+                // Expression<Func<Feature, string>> expression = x =>
+                //     ((object)x[name]).ToString();
+                //
+                // var feature = new Feature(new Point(0, 0), new Dictionary<string, dynamic>
+                // {
+                //     { "city", "sh" }
+                // });
+                //
                 using var reader = XmlReader.Create("se.sld", settings);
                 var styledLayerDescriptor = new StyledLayerDescriptor();
                 // styledLayerDescriptor.ReadXml(reader);

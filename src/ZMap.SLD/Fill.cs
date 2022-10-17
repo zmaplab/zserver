@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using ZMap.Style;
+ 
 
 namespace ZMap.SLD
 {
@@ -28,71 +28,71 @@ namespace ZMap.SLD
         /// </summary>
         public int[] Translate { get; set; } = new int[2] { 0, 0 };
 
-        /// <summary>
-        /// 平移的锚点，即相对的参考物（可选，可选值为 map、viewport，默认为 map）
-        /// </summary>
-        public TranslateAnchor TranslateAnchor { get; set; } = TranslateAnchor.Map;
+        // /// <summary>
+        // /// 平移的锚点，即相对的参考物（可选，可选值为 map、viewport，默认为 map）
+        // /// </summary>
+        // public TranslateAnchor TranslateAnchor { get; set; } = TranslateAnchor.Map;
 
         /// <summary>
         /// TODO: 用于填充图案, 可以是线上图片
         /// </summary>
         public GraphicFill GraphicFill { get; set; }
 
-        public void ReadXml(XmlReader reader)
-        {
-            var translate = new List<int>();
-            while (reader.Read())
-            {
-                if (reader.LocalName == "Fill" && reader.NodeType == XmlNodeType.EndElement)
-                {
-                    break;
-                }
-                else if (reader.LocalName == "SvgParameter" && reader.NodeType == XmlNodeType.Element)
-                {
-                    var attribute = reader.GetAttribute("name").ToLower();
-                    switch (attribute)
-                    {
-                        case "fill":
-                            {
-                                Color = reader.ReadElementContentAsString();
-                                break;
-                            }
-                        case "fill-antialias":
-                            {
-                                Antialias = reader.ReadElementContentAsBoolean();
-                                break;
-                            }
-                        case "fill-opacity":
-                            {
-                                Opacity = reader.ReadElementContentAsFloat();
-                                break;
-                            }
-                        case "fill-translate":
-                            {
-                                var val = reader.ReadElementContentAsInt();
-                                translate.Add(val);
-                                break;
-                            }
-                        case "fill-translateanchor" when reader.NodeType == XmlNodeType.Element:
-                            {
-                                var val = reader.ReadElementContentAsString();
-                                if (Enum.TryParse<TranslateAnchor>(val, false, out var translateAnchor))
-                                {
-                                    TranslateAnchor = translateAnchor;
-                                }
-                                break;
-                            }
-                    }
-                }
-                else if (reader.LocalName == "GraphicFill" && reader.NodeType == XmlNodeType.Element)
-                {
-                    var graphicFill = new GraphicFill();
-                    graphicFill.ReadXml(reader);
-                    GraphicFill = graphicFill;
-                }
-            }
-            if (translate.Any())
-                Translate = translate.ToArray();
-        }
+        // public void ReadXml(XmlReader reader)
+        // {
+        //     var translate = new List<int>();
+        //     while (reader.Read())
+        //     {
+        //         if (reader.LocalName == "Fill" && reader.NodeType == XmlNodeType.EndElement)
+        //         {
+        //             break;
+        //         }
+        //         else if (reader.LocalName == "SvgParameter" && reader.NodeType == XmlNodeType.Element)
+        //         {
+        //             var attribute = reader.GetAttribute("name").ToLower();
+        //             switch (attribute)
+        //             {
+        //                 case "fill":
+        //                     {
+        //                         Color = reader.ReadElementContentAsString();
+        //                         break;
+        //                     }
+        //                 case "fill-antialias":
+        //                     {
+        //                         Antialias = reader.ReadElementContentAsBoolean();
+        //                         break;
+        //                     }
+        //                 case "fill-opacity":
+        //                     {
+        //                         Opacity = reader.ReadElementContentAsFloat();
+        //                         break;
+        //                     }
+        //                 case "fill-translate":
+        //                     {
+        //                         var val = reader.ReadElementContentAsInt();
+        //                         translate.Add(val);
+        //                         break;
+        //                     }
+        //                 case "fill-translateanchor" when reader.NodeType == XmlNodeType.Element:
+        //                     {
+        //                         var val = reader.ReadElementContentAsString();
+        //                         if (Enum.TryParse<TranslateAnchor>(val, false, out var translateAnchor))
+        //                         {
+        //                             TranslateAnchor = translateAnchor;
+        //                         }
+        //                         break;
+        //                     }
+        //             }
+        //         }
+        //         else if (reader.LocalName == "GraphicFill" && reader.NodeType == XmlNodeType.Element)
+        //         {
+        //             var graphicFill = new GraphicFill();
+        //             graphicFill.ReadXml(reader);
+        //             GraphicFill = graphicFill;
+        //         }
+        //     }
+        //     if (translate.Any())
+        //         Translate = translate.ToArray();
+        // }
     }
 }

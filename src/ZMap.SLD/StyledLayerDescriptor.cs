@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Security.Permissions;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace ZMap.SLD
@@ -59,7 +57,7 @@ namespace ZMap.SLD
             // TODO: 校验 NamedLayer 和 UserLayer 是否只有一种
         }
 
-        public void Accept(IStyleVisitor visitor)
+        public void Accept(IStyleVisitor visitor, object data)
         {
         }
 
