@@ -29,6 +29,7 @@
     <ItemGroup>
         <ProjectReference Include="..\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj" />
         <ProjectReference Include="..\ZMap.Renderer.SkiaSharp\ZMap.Renderer.SkiaSharp.csproj" />
+        <ProjectReference Include="..\ZMap.SLD\ZMap.SLD.csproj" />
         <ProjectReference Include="..\ZServer.Interfaces\ZServer.Interfaces.csproj" />
         <ProjectReference Include="..\ZMap.Source.Postgre\ZMap.Source.Postgre.csproj" />
         <ProjectReference Include="..\ZServer\ZServer.csproj" />
@@ -68,10 +69,10 @@
         <None Update="shapes\osmbuildings.shx">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="se.sld">
+        <None Update="se.xml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="sld.sld">
+        <None Update="sld.xml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="images\colorblocks1.png">

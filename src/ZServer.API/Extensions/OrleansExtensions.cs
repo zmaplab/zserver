@@ -7,9 +7,11 @@ using System.Net.Sockets;
 using System.Reflection;
 using Dapper;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Serilog;
 using ZServer.Grains.WMS;
 
 namespace ZServer.API.Extensions;
@@ -27,6 +29,7 @@ public static class OrleansExtensions
             {
                 siloBuilder.UseLocalhostClustering(11111, 30000, null, "zserver", "zserver");
                 siloBuilder.UseInMemoryReminderService();
+                Log.Logger.Information("Orleans standalone: true");
             }
             else
             {
