@@ -45,46 +45,9 @@ namespace ZMap.SLD
             // CoverageStyles = new List<CoverageStyle>();
         }
 
-        // public void ReadXml(XmlReader reader)
-        // {
-        //     while (reader.Read())
-        //     {
-        //         if (reader.LocalName == "UserStyle" && reader.NodeType == XmlNodeType.EndElement)
-        //         {
-        //             break;
-        //         }
-        //         else
-        //             switch (reader.LocalName)
-        //             {
-        //                 case "Name" when reader.NodeType == XmlNodeType.Element:
-        //                     Name = reader.ReadString();
-        //                     break;
-        //                 case "IsDefault" when reader.NodeType == XmlNodeType.Element:
-        //                     IsDefault = reader.ReadElementContentAsBoolean();
-        //                     break;
-        //                 case "FeatureTypeStyle" when reader.NodeType == XmlNodeType.Element:
-        //                     {
-        //                         var featureTypeStyle = new FeatureTypeStyle();
-        //                         featureTypeStyle.ReadXml(reader);
-        //                         FeatureTypeStyles.Add(featureTypeStyle);
-        //                         break;
-        //                     }
-        //                 case "OnlineResource" when reader.NodeType == XmlNodeType.Element:
-        //                     {
-        //                         var onlineResource = new OnlineResource();
-        //                         onlineResource.ReadXml(reader);
-        //                         OnlineResources.Add(onlineResource);
-        //                         break;
-        //                     }
-        //                 case "CoverageStyle" when reader.NodeType == XmlNodeType.Element:
-        //                     {
-        //                         var coverageStyle = new CoverageStyle();
-        //                         coverageStyle.ReadXml(reader);
-        //                         CoverageStyles.Add(coverageStyle);
-        //                         break;
-        //                     }
-        //             }
-        //     }
-        // }
+        public override void Accept(IStyleVisitor visitor, object data)
+        {
+            visitor.Visit((UserStyle)this, data);
+        }
     }
 }

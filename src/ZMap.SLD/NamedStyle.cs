@@ -5,4 +5,8 @@ namespace ZMap.SLD;
 /// </summary>
 public class NamedStyle : Style
 {
+    public override void Accept(IStyleVisitor visitor, object data)
+    {
+        visitor.Visit(this, data);
+    }
 }

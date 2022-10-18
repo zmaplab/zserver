@@ -18,6 +18,10 @@ namespace ZMap.SLD
         [XmlElement("Description")]
         public Description Description { get; set; }
 
-        // abstract object Accept(IStyleVisitor visitor, object extraData);
+        public virtual object Accept(IStyleVisitor visitor, object extraData)
+        {
+            visitor.Visit(this, extraData);
+            return null;
+        }
     }
 }

@@ -27,4 +27,9 @@ public class FeatureTypeConstraint : LayerConstraint
     /// </summary>
     [XmlElement("Filter")]
     public Filter.Filter Filter { get; set; }
+
+    public virtual void Accept(IStyleVisitor visitor, object data)
+    {
+        visitor.Visit(this, data);
+    }
 }
