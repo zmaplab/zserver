@@ -67,5 +67,10 @@ namespace ZMap.SLD
         {
             // TODO: Rule 和 OnlineResource 只能二选一
         }
+
+        public void Accept(IStyleVisitor styleVisitor, object data)
+        {
+            styleVisitor.Visit(this, data);
+        }
     }
 }

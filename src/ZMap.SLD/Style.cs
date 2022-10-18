@@ -2,7 +2,7 @@ using System.Xml.Serialization;
 
 namespace ZMap.SLD;
 
-public class Style
+public abstract class Style
 {
     /// <summary>
     /// Required: false
@@ -16,4 +16,6 @@ public class Style
     /// </summary>
     [XmlElement("Description")]
     public Description Description { get; set; }
+
+    public abstract void Accept(IStyleVisitor visitor, object data);
 }

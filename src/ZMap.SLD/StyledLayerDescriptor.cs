@@ -59,6 +59,7 @@ namespace ZMap.SLD
 
         public void Accept(IStyleVisitor visitor, object data)
         {
+            visitor.Visit(this, data);
         }
 
         public static StyledLayerDescriptor Load(string file)

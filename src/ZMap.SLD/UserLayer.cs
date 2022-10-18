@@ -21,6 +21,12 @@ public class UserLayer : StyledLayer
     [XmlArrayItem("CoverageConstraint")]
     public List<CoverageConstraint> CoverageConstraints { get; set; }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlElement(ElementName = "UserStyle")]
+    public List<UserStyle> Styles { get; set; }
+    
     public void Accept(IStyleVisitor visitor, object data)
     {
         visitor.Visit(this, data);
