@@ -8,7 +8,7 @@ namespace ZMap.SLD.Filter
             throw new System.NotImplementedException();
         }
 
-        public override void Accept(FilterVisitor visitor, object extraData)
+        public override object Accept(IFilterVisitor visitor, object extraData)
         {
             throw new System.NotImplementedException();
         }
