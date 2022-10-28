@@ -2,7 +2,7 @@ namespace ZMap.SLD.Expression;
 
 public class Function : BinaryOperator
 {
-    public override object Accept(ExpressionVisitor visitor, object extraData)
+    public override object Accept(IExpressionVisitor visitor, object extraData)
     {
         throw new System.NotImplementedException();
     }

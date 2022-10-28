@@ -74,5 +74,11 @@ namespace ZServer.Tests
             Assert.Equal("option1", vendorOption1.Name);
             Assert.Equal("option_value1", vendorOption1.Value);
         }
+
+        [Fact]
+        public void GenerateStyle()
+        {
+            var styledLayerDescriptor = StyledLayerDescriptor.Load("sld/PropertyIsEqualTo.xml");
+        }
     }
 }

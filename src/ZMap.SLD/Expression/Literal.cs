@@ -1,17 +1,24 @@
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
 namespace ZMap.SLD.Expression;
 
 public class Literal : Expression
 {
-    public object Value { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlText]
+    public string Value { get; set; }
 
-    public override object Accept(ExpressionVisitor visitor, object extraData)
+    public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        throw new System.NotImplementedException();
+        return visitor.Visit(this, extraData);
     }
 
     public override object Evaluate(object @object)
     {
-        throw new System.NotImplementedException();
+        return Value;
     }
 
     public override T Evaluate<T>(object @object)

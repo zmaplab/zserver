@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using ZMap.SLD.Filter;
 
@@ -22,12 +23,11 @@ namespace ZMap.SLD
         [XmlElement("Description")]
         public Description Description { get; set; }
 
-        // /// <summary>
-        // /// 过滤条件
-        // /// </summary>
-        [XmlElement("PropertyIsEqualTo", Type = typeof(PropertyIsEqualTo))]
-        [XmlElement("PropertyIsGreaterThan", Type = typeof(PropertyIsGreaterThan))]
-        public Filter.Filter[] Filter { get; set; }
+        /// <summary>
+        /// 过滤条件
+        /// </summary>
+        [XmlElement("Filter")]
+        public FilterType FilterType { get; set; }
 
         /// <summary>
         /// 
@@ -63,7 +63,7 @@ namespace ZMap.SLD
         public Rule()
         {
         }
-        
+
         public virtual void Accept(IStyleVisitor visitor, object data)
         {
             visitor.Visit(this, data);

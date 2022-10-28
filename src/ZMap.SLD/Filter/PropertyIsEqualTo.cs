@@ -5,14 +5,9 @@ namespace ZMap.SLD.Filter
 {
     public class PropertyIsEqualTo : BinaryComparisonOperator
     {
-        public override bool Evaluate(object obj)
+        public override object Accept(IFilterVisitor visitor, object extraData)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Accept(FilterVisitor visitor, object extraData)
-        {
-            throw new System.NotImplementedException();
+            return visitor.Visit(this, extraData);
         }
     }
 }

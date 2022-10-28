@@ -1,10 +1,14 @@
 using System;
+using System.Xml.Serialization;
 
 namespace ZMap.SLD.Filter;
 
 public abstract class Filter
 {
-    public abstract bool Evaluate(object obj);
+    public virtual bool Evaluate(object obj)
+    {
+        return false;
+    }
 
-    public abstract void Accept(FilterVisitor visitor, object extraData);
+    public abstract object Accept(IFilterVisitor visitor, object extraData);
 }
