@@ -44,6 +44,7 @@ namespace ZServer.API.Controllers
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="buffer"></param>
+        /// <param name="bordered"></param>
         [HttpGet]
         public async Task GetAsync(
             string request,
@@ -59,7 +60,7 @@ namespace ZServer.API.Controllers
             [FromQuery(Name = "CQL_FILTER")] string filter,
             [FromQuery(Name = "FORMAT_OPTIONS")] string formatOptions,
             string exceptions,
-            double x, double y, int featureCount = 1, int buffer = 0)
+            double x, double y, int featureCount = 1, int buffer = 0, bool bordered = false)
         {
             switch (request)
             {
@@ -72,7 +73,9 @@ namespace ZServer.API.Controllers
                             formatOptions, filter,
                             new Dictionary<string, object>
                             {
-                                { "TraceIdentifier", HttpContext.TraceIdentifier }
+                                { "TraceIdentifier", HttpContext.TraceIdentifier },
+                                { "Bordered", bordered },
+                                { "Buffer", buffer }
                             });
 
                     await HttpContext.WriteMapImageAsync(result, exceptions);

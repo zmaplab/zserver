@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NetTopologySuite.Geometries;
 
 namespace ZMap;
 
@@ -78,7 +79,7 @@ public class Map : IDisposable
             await layer.RenderAsync(graphicsService, viewport, _zoom, _srid);
         }
 
-        return graphicsService.GetImage(imageFormat);
+        return graphicsService.GetImage(imageFormat, viewport.Bordered);
     }
 
     public void Dispose()

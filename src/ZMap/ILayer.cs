@@ -17,6 +17,11 @@ namespace ZMap
         string Name { get; }
 
         /// <summary>
+        /// 栅格缓冲
+        /// </summary>
+        List<GridBuffer> Buffers { get; }
+
+        /// <summary>
         /// TODO: 移动到矢量图层中，比如 TIFF 之类是没有 STYLE 的
         /// </summary>
         IReadOnlyCollection<StyleGroup> StyleGroups { get; }

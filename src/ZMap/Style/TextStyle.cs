@@ -11,5 +11,6 @@ namespace ZMap.Style
         public Expression<float> Rotate { get; set; }
         public Expression<TextTransform> Transform { get; set; }
         public Expression<float[]> Offset { get; set; }
+        public Expression<int> OutlineSize { get; set; }
     }
 }

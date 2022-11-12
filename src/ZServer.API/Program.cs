@@ -1,21 +1,17 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
 using System.Text;
 using Dapper;
 using HarmonyLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
+using RemoteConfiguration.Json.Aliyun;
 using Serilog;
-using ZMap;
 using ZMap.DynamicCompiler;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
@@ -87,21 +83,39 @@ namespace ZServer.API
                 .ConfigureAppConfiguration((_, builder) =>
                 {
                     builder.AddCommandLine(args);
-                    builder.AddJsonFile($"serilog.json",
-                        optional: true, reloadOnChange: true);
-                    builder.AddJsonFile($"zserver.json",
-                        optional: true, reloadOnChange: true);
 
-                    if (File.Exists("nacos.json"))
+                    if (File.Exists("serilog.json"))
                     {
-                        var configurationBuilder = new ConfigurationBuilder();
-                        configurationBuilder.AddJsonFile("nacos.json");
-                        var configuration = configurationBuilder.Build();
-                        var section = configuration.GetSection("Nacos");
-                        if (section.GetChildren().Any())
+                        builder.AddJsonFile($"serilog.json",
+                            optional: true, reloadOnChange: true);
+                    }
+
+                    if (File.Exists("zserver.json"))
+                    {
+                        builder.AddJsonFile($"zserver.json",
+                            optional: true, reloadOnChange: true);
+                    }
+
+                    var configuration = builder.Build();
+
+                    // 1. 加载 nacos 配置
+                    var section = configuration.GetSection("Nacos");
+                    if (section.GetChildren().Any())
+                    {
+                        builder.AddNacosV2Configuration(section);
+                    }
+
+                    // 2. 加载 remote configuration 配置
+                    if (!string.IsNullOrWhiteSpace(configuration["RemoteConfiguration:Endpoint"]))
+                    {
+                        builder.AddAliyunJsonFile(source =>
                         {
-                            builder.AddNacosV2Configuration(section);
-                        }
+                            source.Endpoint = configuration["RemoteConfiguration:Endpoint"];
+                            source.BucketName = configuration["RemoteConfiguration:BucketName"];
+                            source.AccessKeyId = configuration["RemoteConfiguration:AccessKeyId"];
+                            source.AccessKeySecret = configuration["RemoteConfiguration:AccessKeySecret"];
+                            source.Key = configuration["RemoteConfiguration:Key"];
+                        });
                     }
 
                     Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Build()).CreateLogger();

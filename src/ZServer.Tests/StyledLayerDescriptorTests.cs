@@ -1,4 +1,3 @@
-using System.IO;
 using System.Xml.Serialization;
 using Xunit;
 using ZMap.SLD;

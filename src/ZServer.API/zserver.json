@@ -54,6 +54,7 @@
           ],
           "color": "#FF0000",
           "backgroundColor": "#00FA9A",
+          "outlineSize": 6,
           "size": 16
         }
       ]
@@ -75,6 +76,14 @@
       "sourceTable": "polygon",
       "sourceGeometry": "geom",
       "sourceSRID": 4326,
+      "buffers": [
+        {
+          "minZoom": 1,
+          "maxZoom": 300000,
+          "zoomUnit": "scale",
+          "size": 32
+        }
+      ],
       "styleGroups": [
         "polygon"
       ]

@@ -10,7 +10,7 @@ public interface IGraphicsService : IDisposable
     string MapId { get; }
     int Width { get; }
     int Height { get; }
-    byte[] GetImage(string imageFormat);
+    byte[] GetImage(string imageFormat, bool bordered = false);
     void Render(byte[] image, Style.RasterStyle style);
     void Render(Envelope extent, Feature feature, VectorStyle style);
 }

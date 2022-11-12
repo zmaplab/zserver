@@ -149,7 +149,7 @@ namespace ZMap.TileGrid
             var x = (lng + 180) / 360;
             var titleX = (int)Math.Floor(x * Math.Pow(2, level));
             var latRad = lat * Math.PI / 180;
-            var y = ((1 - Math.Log(Math.Truncate(latRad) + 1 / Math.Cos(latRad)) / Math.PI) / 2);
+            var y = (1 - Math.Log(Math.Truncate(latRad) + 1 / Math.Cos(latRad)) / Math.PI) / 2;
             var titleY = (int)Math.Floor(y * Math.Pow(2, level));
             return (titleX, titleY);
         }

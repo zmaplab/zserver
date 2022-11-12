@@ -53,6 +53,11 @@ namespace ZMap
         public Envelope Envelope { get; private set; }
 
         /// <summary>
+        /// 栅格缓冲
+        /// </summary>
+        public List<GridBuffer> Buffers { get; set; } = new();
+
+        /// <summary>
         /// 数据源
         /// </summary>
         public ISource Source { get; private set; }
@@ -174,7 +179,24 @@ namespace ZMap
             Zoom zoom,
             ICoordinateTransformation transformation)
         {
-            var features = await vectorSource.GetFeaturesInExtentAsync(sourceExtent);
+            Envelope queryEnvelope;
+            var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
+            if (buffer is { Size: > 0 })
+            {
+                var xPerPixel = sourceExtent.Width / sourceExtent.Width;
+                var yPerPixel = sourceExtent.Height / sourceExtent.Height;
+                var x = xPerPixel * buffer.Size;
+                var y = yPerPixel * buffer.Size;
+                queryEnvelope = new Envelope(sourceExtent.MinX - x, sourceExtent.MaxX + x,
+                    sourceExtent.MinY - y,
+                    sourceExtent.MaxY + y);
+            }
+            else
+            {
+                queryEnvelope = sourceExtent;
+            }
+
+            var features = await vectorSource.GetFeaturesInExtentAsync(queryEnvelope);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();

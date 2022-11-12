@@ -1,6 +1,3 @@
-using System.Linq;
-using System.Xml;
-
 namespace ZMap.SLD
 {
     public class Stroke
