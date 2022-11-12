@@ -128,7 +128,8 @@ namespace ZServer.Store.Configuration
                 Size = section.Get<int>("size"),
                 Rotate = section.Get<float>("rotate"),
                 Transform = section.Get<TextTransform>("transform"),
-                Offset = section.Get<float[]>("offset")
+                Offset = section.Get<float[]>("offset"),
+                OutlineSize = section.Get<int>("outlineSize")
             };
         }
 

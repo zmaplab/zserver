@@ -10,6 +10,17 @@ public class SkiaGraphicsService : IGraphicsService
 {
     private readonly SKBitmap _bitmap;
     private readonly SKCanvas _canvas;
+    private static readonly SKPaint BorderPaint;
+
+    static SkiaGraphicsService()
+    {
+        BorderPaint = new SKPaint
+        {
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 1,
+            Color = SKColors.Gray.WithAlpha(byte.MaxValue)
+        };
+    }
 
     public string MapId { get; }
     public int Width { get; }
@@ -24,8 +35,13 @@ public class SkiaGraphicsService : IGraphicsService
         MapId = mapId;
     }
 
-    public byte[] GetImage(string imageFormat)
+    public byte[] GetImage(string imageFormat, bool bordered = false)
     {
+        if (bordered)
+        {
+            _canvas.DrawRect(new SKRect(0, 0, Width, Height), BorderPaint);
+        }
+
         _canvas.Flush();
         return _bitmap.Encode(GetImageFormat(imageFormat), 80).ToArray();
     }

@@ -105,6 +105,7 @@ namespace ZServer.Store.Configuration
             var source = await RestoreSourceAsync(resourceGroup.Name, layerName, section);
             var styleGroups = await RestoreStyleGroupsAsync(section);
             var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups);
+            section.Bind(layer);
             return layer;
         }
 
@@ -118,6 +119,7 @@ namespace ZServer.Store.Configuration
             var source = await RestoreSourceAsync(resourceGroup?.Name, layerName, section);
             var styleGroups = await RestoreStyleGroupsAsync(section);
             var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups);
+            section.Bind(layer);
             return layer;
         }
 

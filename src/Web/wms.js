@@ -31,8 +31,8 @@ const map = new Map({
           VERSION: "1.1.1",
           TILED: true,
           LAYERS: "zserver:polygon",
+          bordered: true,
         },
-        gutter: 128,
         format: "image/png",
         tileGrid: new WMTSTileGrid({
           origin: getTopLeft(projection.getExtent()),

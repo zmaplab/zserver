@@ -31,10 +31,11 @@ namespace ZMap.Renderer.SkiaSharp
             var interiorPoint = feature.Geometry.InteriorPoint;
 
             var interiorCoordinate = new Coordinate(interiorPoint.X, interiorPoint.Y);
-            if (!extent.Contains(interiorCoordinate))
-            {
-                return;
-            }
+            // 不能过滤，缓存区外的数据也要绘制，如跨边界的文字
+            // if (!extent.Contains(interiorCoordinate))
+            // {
+            //     return;
+            // }
 
             string text;
 
@@ -94,7 +95,7 @@ namespace ZMap.Renderer.SkiaSharp
                 using var textPath = paint.GetTextPath(text, offsetX - rect.Width / 2, offsetY);
                 // Create a new path for the outlines of the path
                 using var outlinePath = new SKPath();
-                var framePaint = CreateBackgroundPaint(backgroundColor);
+                var framePaint = CreateBackgroundPaint(feature, backgroundColor);
                 framePaint.GetFillPath(textPath, outlinePath);
 
                 graphics.DrawPath(outlinePath, framePaint);
@@ -103,19 +104,24 @@ namespace ZMap.Renderer.SkiaSharp
             graphics.DrawText(text, offsetX, offsetY, paint);
         }
 
-        private SKPaint CreateBackgroundPaint(string color)
+        private SKPaint CreateBackgroundPaint(Feature feature, string color)
         {
-            var key = $"TEXT_STYLE_PAINT_{color}";
+            var size = _style.OutlineSize.Invoke(feature);
+            if (size <= 0)
+            {
+                size = 3;
+            }
+
+            var key = $"TEXT_BACKGROUND_STYLE_PAINT_{color}{size}";
 
             return Cache.GetOrCreate(key, entry =>
             {
-                var c = ((string)entry.Key).Replace("TEXT_STYLE_PAINT_", "");
                 var paint = new SKPaint
                 {
                     Style = SKPaintStyle.StrokeAndFill,
-                    StrokeWidth = 2,
+                    StrokeWidth = size,
                     IsAntialias = true,
-                    Color = ColorUtilities.GetColor(c),
+                    Color = ColorUtilities.GetColor(color)
                 };
                 entry.SetValue(paint);
                 entry.SetAbsoluteExpiration(TimeSpan.FromDays(1));

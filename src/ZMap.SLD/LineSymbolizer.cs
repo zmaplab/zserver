@@ -1,5 +1,3 @@
-using System.Xml;
-
 namespace ZMap.SLD
 {
     public class LineSymbolizer : Symbolizer

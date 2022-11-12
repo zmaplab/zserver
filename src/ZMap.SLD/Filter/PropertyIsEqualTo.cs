@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Xml;
-
 namespace ZMap.SLD.Filter
 {
     public class PropertyIsEqualTo : BinaryComparisonOperator

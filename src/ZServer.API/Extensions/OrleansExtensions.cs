@@ -7,7 +7,6 @@ using System.Net.Sockets;
 using System.Reflection;
 using Dapper;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;

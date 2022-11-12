@@ -273,51 +273,51 @@ namespace ZMap.Source.GDAL
         {
             // check for funky case
             if (_transform[2] < 0 && _transform[4] < 0 && _transform[5] < 0)
-                return Math.Abs((_transform[1] * imgWidth) + (_transform[2] * imgHeight));
-            return Math.Abs((_transform[1] * imgWidth) - (_transform[2] * imgHeight));
+                return Math.Abs(_transform[1] * imgWidth + _transform[2] * imgHeight);
+            return Math.Abs(_transform[1] * imgWidth - _transform[2] * imgHeight);
         }
 
         public double GndH(double imgWidth, double imgHeight)
         {
             // check for funky case
             if (_transform[2] < 0 && _transform[4] < 0 && _transform[5] < 0)
-                return Math.Abs((_transform[4] * imgWidth) - (_transform[5] * imgHeight));
-            return Math.Abs((_transform[4] * imgWidth) - (_transform[5] * imgHeight));
+                return Math.Abs(_transform[4] * imgWidth - _transform[5] * imgHeight);
+            return Math.Abs(_transform[4] * imgWidth - _transform[5] * imgHeight);
         }
 
         // finds leftmost pixel location (handles rotation)
         public double EnvelopeLeft(double imgWidth, double imgHeight)
         {
-            var left = Math.Min(_transform[0], _transform[0] + (_transform[1] * imgWidth));
-            left = Math.Min(left, _transform[0] + (_transform[2] * imgHeight));
-            left = Math.Min(left, _transform[0] + (_transform[1] * imgWidth) + (_transform[2] * imgHeight));
+            var left = Math.Min(_transform[0], _transform[0] + _transform[1] * imgWidth);
+            left = Math.Min(left, _transform[0] + _transform[2] * imgHeight);
+            left = Math.Min(left, _transform[0] + _transform[1] * imgWidth + _transform[2] * imgHeight);
             return left;
         }
 
         // finds rightmost pixel location (handles rotation)
         public double EnvelopeRight(double imgWidth, double imgHeight)
         {
-            var right = Math.Max(_transform[0], _transform[0] + (_transform[1] * imgWidth));
-            right = Math.Max(right, _transform[0] + (_transform[2] * imgHeight));
-            right = Math.Max(right, _transform[0] + (_transform[1] * imgWidth) + (_transform[2] * imgHeight));
+            var right = Math.Max(_transform[0], _transform[0] + _transform[1] * imgWidth);
+            right = Math.Max(right, _transform[0] + _transform[2] * imgHeight);
+            right = Math.Max(right, _transform[0] + _transform[1] * imgWidth + _transform[2] * imgHeight);
             return right;
         }
 
         // finds topmost pixel location (handles rotation)
         public double EnvelopeTop(double imgWidth, double imgHeight)
         {
-            var top = Math.Max(_transform[3], _transform[3] + (_transform[4] * imgWidth));
-            top = Math.Max(top, _transform[3] + (_transform[5] * imgHeight));
-            top = Math.Max(top, _transform[3] + (_transform[4] * imgWidth) + (_transform[5] * imgHeight));
+            var top = Math.Max(_transform[3], _transform[3] + _transform[4] * imgWidth);
+            top = Math.Max(top, _transform[3] + _transform[5] * imgHeight);
+            top = Math.Max(top, _transform[3] + _transform[4] * imgWidth + _transform[5] * imgHeight);
             return top;
         }
 
         // finds bottommost pixel location (handles rotation)
         public double EnvelopeBottom(double imgWidth, double imgHeight)
         {
-            var bottom = Math.Min(_transform[3], _transform[3] + (_transform[4] * imgWidth));
-            bottom = Math.Min(bottom, _transform[3] + (_transform[5] * imgHeight));
-            bottom = Math.Min(bottom, _transform[3] + (_transform[4] * imgWidth) + (_transform[5] * imgHeight));
+            var bottom = Math.Min(_transform[3], _transform[3] + _transform[4] * imgWidth);
+            bottom = Math.Min(bottom, _transform[3] + _transform[5] * imgHeight);
+            bottom = Math.Min(bottom, _transform[3] + _transform[4] * imgWidth + _transform[5] * imgHeight);
             return bottom;
         }
 

@@ -10,6 +10,7 @@ using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
 using ZMap;
+using ZMap.Extensions;
 using ZMap.Source;
 using ZMap.Utilities;
 using ZServer.Extensions;
@@ -129,7 +130,7 @@ namespace ZServer.Grains.WMS
                     Width = width,
                     Height = height,
                     Transparent = transparent,
-                    Bordered = false,
+                    Bordered = extras.TryGetValue("Bordered", out var b) && (bool)b,
                     BackgroundColor = bgColor
                 };
 
