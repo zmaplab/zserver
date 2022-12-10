@@ -9,6 +9,20 @@ namespace ZServer.Tests
     public class TransformTests
     {
         [Fact]
+        public void Transform4326To3857()
+        {
+            // 1389930.9223376447,5140129.298989603,1390236.6704507857,5140539.834725233
+
+            var envelope = new Envelope(12.4859619140625, 12.48870849609375, 41.86065673828125, 41.8634033203125);
+
+            var result = envelope.Transform(4326, 3857);
+            Assert.Equal(1389930.9223376447, result.MinX);
+            Assert.Equal(1390236.6704507857, result.MaxX);
+            Assert.Equal(5140129.298989603, result.MinY);
+            Assert.Equal(5140539.834725233, result.MaxY);
+        }
+
+        [Fact]
         public void Reproj()
         {
             // 4326 -> 4548

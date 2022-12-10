@@ -118,8 +118,11 @@ namespace ZMap
             if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
                     StringComparison.InvariantCultureIgnoreCase))
             {
-                Log.Logger.LogInformation(
-                    $"From viewport extent {viewport.Extent.MinX},{viewport.Extent.MinY},{viewport.Extent.MaxX},{viewport.Extent.MaxY} {srid} to {extent.MinX},{extent.MinY},{extent.MaxX},{extent.MaxY} {SRID}");
+                if (srid != SRID)
+                {
+                    Log.Logger.LogInformation(
+                        $"From viewport extent {viewport.Extent.MinX},{viewport.Extent.MinY},{viewport.Extent.MaxX},{viewport.Extent.MaxY} {srid} to {extent.MinX},{extent.MinY},{extent.MaxX},{extent.MaxY} {SRID}");
+                }
             }
 
             // 使用应用层投影转换的原因是规避数据库支持问题

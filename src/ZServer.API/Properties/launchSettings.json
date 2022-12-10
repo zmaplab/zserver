@@ -5,7 +5,8 @@
       "commandName": "Project",
       "environmentVariables": {
         "HOST_IP": "127.0.0.1",
-        "EnableSensitiveDataLogging": "true"
+        "EnableSensitiveDataLogging": "true",
+        "standalone": "true"
       }
     }
   }

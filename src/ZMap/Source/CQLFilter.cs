@@ -36,7 +36,7 @@ public class CQLFilter : IFeatureFilter
             var body = $"return {expression};";
 
             // xzq_dm >= 100 AND xzq_dm < 1000
-            var pieces = expression.Split(new[] { ">=", ">", "<=", "<", "AND", "OR", "=" },
+            var pieces = expression.Split(new[] { ">=", ">", "<=", "<", "AND", "and", "or", "OR", "=" },
                 StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
             var duplicate = new HashSet<string>();
@@ -55,7 +55,8 @@ public class CQLFilter : IFeatureFilter
                 }
             }
 
-            body = body.Replace("AND", " && ").Replace("OR", " || ");
+            body = body.Replace("and", " && ").Replace("AND", " && ")
+                .Replace("or", " || ").Replace("OR", " || ");
             var func = DynamicCompilationUtilities.GetAvailableFunc(body);
             return func;
         });

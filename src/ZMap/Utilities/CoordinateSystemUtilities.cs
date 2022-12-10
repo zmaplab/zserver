@@ -49,28 +49,12 @@ namespace ZMap.Utilities
 
         public static CoordinateSystem Get(int srid)
         {
-            return SRIDCache.TryGetValue(srid, out var coordinateSystem) ? coordinateSystem : null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        // ReSharper disable once InconsistentNaming
-        public static int GetSRID(string name)
-        {
-            if (name is "GCS_WGS_1984" or "WGS 84")
+            return srid switch
             {
-                return 4326;
-            }
-
-            if (NamedCache.TryGetValue(name, out var srid))
-            {
-                return srid;
-            }
-
-            return -1;
+                4326 => GeographicCoordinateSystem.WGS84,
+                3857 => ProjectedCoordinateSystem.WebMercator,
+                _ => SRIDCache.TryGetValue(srid, out var coordinateSystem) ? coordinateSystem : null
+            };
         }
     }
 }

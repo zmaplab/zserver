@@ -13,7 +13,6 @@ RUN rm -rf src/ZServer.API/out/runtimes/linux-x86
 RUN rm -rf src/ZServer.API/out/runtimes/linux-x64
 RUN rm -rf src/ZServer.API/out/shapes
 RUN rm -rf src/ZServer.API/out/Fonts
-RUN ls src/ZServer.API/out
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-focal-arm64v8 AS zserver-api
 WORKDIR /app
@@ -24,5 +23,6 @@ WORKDIR /app
 #RUN fc-cache -vf && fc-list
 ENV LANG zh_CN.UTF-8
 COPY --from=api-builder /app/src/ZServer.API/out .
+RUN mkdir /app/shapes && mkdir /app/Fonts
 ENTRYPOINT ["dotnet", "zapi.dll"]
 

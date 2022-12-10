@@ -25,8 +25,7 @@ namespace Client
                     ValidationType = ValidationType.None,
                     Async = true
                 };
-                var name = "city";
-             
+         
                 // settings.Schemas.Add("urn:empl-hire", "hireDate.xsd");
                 // Expression<Func<Feature, string>> expression = x =>
                 //     ((object)x[name]).ToString();
