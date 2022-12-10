@@ -6,7 +6,8 @@
         "build": "parcel build --public-url . index.html"
     },
     "dependencies": {
-        "ol": "6.6.1"
+        "ol": "6.6.1",
+        "proj4":"2.8.0"
     },
     "devDependencies": {
         "parcel-bundler": "^1.12.5"

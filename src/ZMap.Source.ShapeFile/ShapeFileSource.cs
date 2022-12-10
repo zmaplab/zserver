@@ -177,7 +177,7 @@ namespace ZMap.Source.ShapeFile
                 throw new Exception($"投影文件不正确 {prjPath}");
             }
 
-            return CoordinateSystemUtilities.GetSRID(coordinateSystem.Name.ToUpperInvariant());
+            return (int)coordinateSystem.AuthorityCode;
         }
 
         private List<SpatialIndexEntry> GetObjectIDsInView(ISpatialIndex<SpatialIndexEntry> tree, Envelope bbox)
@@ -216,15 +216,8 @@ namespace ZMap.Source.ShapeFile
 
                 geometryReader.BaseStream.Seek(0, 0);
 
-                try
-                {
-                    var geometry = handler.Read(geometryReader, entry.Length, _geometryFactory);
-                    return geometry;
-                }
-                catch
-                {
-                    throw;
-                }
+                var geometry = handler.Read(geometryReader, entry.Length, _geometryFactory);
+                return geometry;
             }
         }
     }

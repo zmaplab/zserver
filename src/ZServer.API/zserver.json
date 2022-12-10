@@ -17,9 +17,13 @@
       "database": "zserver_dev",
       "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=zserver_dev;Pooling=true;"
     },
-    "zserver_shp": {
+    "zserver_4326_shp": {
       "provider": "ZMap.Source.ShapeFile.ShapeFileSource, ZMap.Source.ShapeFile",
       "file": "shapes/polygon.shp"
+    },
+    "zserver_3857_shp": {
+      "provider": "ZMap.Source.ShapeFile.ShapeFileSource, ZMap.Source.ShapeFile",
+      "file": "shapes/polygon_3857.shp"
     }
   },
   "styleGroups": {
@@ -58,6 +62,15 @@
           "size": 16
         }
       ]
+    },
+    "3857zipfg7irhh0qi8": {
+      "zoomUnit": "scale",
+      "maxZoom": 9990000,
+      "description": "",
+      "minZoom": 100,
+      "styles": [
+        { "color": "#FF0000", "width": 2, "type": "line", "opacity": "1" }
+      ]
     }
   },
   "resourceGroups": {
@@ -72,10 +85,48 @@
       "resourceGroup": "zserver",
       "services": [],
       "extent": [],
-      "source": "zserver_shp",
+      "source": "zserver",
       "sourceTable": "polygon",
       "sourceGeometry": "geom",
       "sourceSRID": 4326,
+      "buffers": [
+        {
+          "minZoom": 1,
+          "maxZoom": 300000,
+          "zoomUnit": "scale",
+          "size": 32
+        }
+      ],
+      "styleGroups": [
+        "polygon"
+      ]
+    },
+    "polygon_4326_shp": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "zserver_4326_shp",
+      "sourceTable": "polygon",
+      "sourceGeometry": "geom",
+      "sourceSRID": 4326,
+      "buffers": [
+        {
+          "minZoom": 1,
+          "maxZoom": 300000,
+          "zoomUnit": "scale",
+          "size": 32
+        }
+      ],
+      "styleGroups": [
+        "polygon"
+      ]
+    },
+    "polygon_3857_shp": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "zserver_3857_shp",
+      "sourceSRID": 3857,
       "buffers": [
         {
           "minZoom": 1,

@@ -6,39 +6,20 @@ import { get as getProjection } from "ol/proj";
 import { getTopLeft, getWidth } from "ol/extent";
 import WMTS from "ol/source/WMTS";
 import WMTSTileGrid from "ol/tilegrid/WMTS";
-import proj4 from "./proj4";
+import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 
-const x = {
-  code: 4490,
-  name: "China Geodetic Coordinate System 2000",
-  def: "+proj=longlat +ellps=GRS80 +no_defs",
-  bbox: [53.56, 73.62, 16.7, 134.77],
-};
-setProjection(x.code, x.name, x.def, x.bbox);
-
-const projection = getProjection("EPSG:4490");
+const projection = getProjection('EPSG:3857');
 const projectionExtent = projection.getExtent();
 const size = getWidth(projectionExtent) / 256;
-const resolutions = new Array(22);
-const matrixIds = new Array(22);
-for (let z = 0; z < 22; ++z) {
+const resolutions = new Array(19);
+const matrixIds = new Array(19);
+for (let z = 0; z < 19; ++z) {
   // generate resolutions and matrixIds arrays for this WMTS
   resolutions[z] = size / Math.pow(2, z);
   matrixIds[z] = z;
 }
-
-const projection4326 = getProjection("EPSG:4326");
-const projection4326Extent = projection4326.getExtent();
-const size4326 = getWidth(projection4326Extent) / 256;
-const resolutions4326 = new Array(22);
-const matrixIds4326 = new Array(22);
-for (let z = 0; z < 22; ++z) {
-  // generate resolutions and matrixIds arrays for this WMTS
-  resolutions4326[z] = size4326 / Math.pow(2, z);
-  matrixIds4326[z] = z;
-}
-const centerXY = [12.477070574987795, 41.85776175318455];
+let centerXY = [1388941.1429993785, 5139696.600312929];
 
 const map = new Map({
   target: "map",
@@ -46,14 +27,14 @@ const map = new Map({
     new TileLayer({
       source: new WMTS({
         url: "http://localhost:8200/wmts",
-        layer: "zserver:polygon",
-        matrixSet: "EPSG:4326",
+        layer: "zserver:polygon_3857_shp",
+        matrixSet: "EPSG:3857",
         format: "image/png",
-        projection: projection4326,
+        projection: projection,
         tileGrid: new WMTSTileGrid({
-          origin: getTopLeft(projection4326Extent),
-          resolutions: resolutions4326.splice(1, 20),
-          matrixIds: matrixIds4326.slice(0, 20),
+          origin: getTopLeft(projectionExtent),
+          resolutions: resolutions,
+          matrixIds: matrixIds,
         }),
         style: "default",
         wrapX: true,
@@ -61,9 +42,9 @@ const map = new Map({
     }),
   ],
   view: new View({
-    projection: projection4326,
+    projection: projection,
     center: centerXY,
-    zoom: 17,
+    zoom: 16,
   }),
 });
 

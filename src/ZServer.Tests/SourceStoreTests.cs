@@ -30,9 +30,7 @@ namespace ZServer.Tests
             var dataSource = (ShapeFileSource)await sourceStore.FindAsync("berlin_shp");
 
             Assert.NotNull(dataSource);
-            Assert.Equal(
-                "shapes/osmbuildings.shp",
-                dataSource.File);
+            Assert.EndsWith("shapes/osmbuildings.shp", dataSource.File);
             Assert.Equal(4326, dataSource.SRID);
         }
 
