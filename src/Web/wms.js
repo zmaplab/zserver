@@ -30,21 +30,25 @@ const source = searchParams.get("source");
 let layer = "zserver:polygon";
 debugger;
 switch (source) {
+  case "3857": {
+    layer = "zserver:polygon_3857";
+    break;
+  }
   case "4326_shp": {
     layer = "zserver:polygon_4326_shp";
     break;
   }
   case "3857_shp": {
     layer = "zserver:polygon_3857_shp";
-    projection = getProjection("EPSG:3857");
-    projectionExtent = projection.getExtent();
-    size = getWidth(projectionExtent) / 256;
-    centerXY = [1388941.1429993785, 5139696.600312929];
-    for (let z = 0; z < 22; ++z) {
-      // generate resolutions and matrixIds arrays for this WMTS
-      resolutions[z] = size / Math.pow(2, z);
-      matrixIds[z] = z;
-    }
+    // projection = getProjection("EPSG:3857");
+    // projectionExtent = projection.getExtent();
+    // size = getWidth(projectionExtent) / 256;
+    // centerXY = [1388941.1429993785, 5139696.600312929];
+    // for (let z = 0; z < 22; ++z) {
+    //   // generate resolutions and matrixIds arrays for this WMTS
+    //   resolutions[z] = size / Math.pow(2, z);
+    //   matrixIds[z] = z;
+    // }
     break;
   }
 }

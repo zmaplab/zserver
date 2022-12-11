@@ -69,7 +69,12 @@
       "description": "",
       "minZoom": 100,
       "styles": [
-        { "color": "#FF0000", "width": 2, "type": "line", "opacity": "1" }
+        {
+          "color": "#FF0000",
+          "width": 2,
+          "type": "line",
+          "opacity": "1"
+        }
       ]
     }
   },
@@ -89,6 +94,26 @@
       "sourceTable": "polygon",
       "sourceGeometry": "geom",
       "sourceSRID": 4326,
+      "buffers": [
+        {
+          "minZoom": 1,
+          "maxZoom": 300000,
+          "zoomUnit": "scale",
+          "size": 32
+        }
+      ],
+      "styleGroups": [
+        "polygon"
+      ]
+    },
+    "polygon_3857": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "zserver",
+      "sourceTable": "polygon_3857",
+      "sourceGeometry": "geom",
+      "sourceSRID": 3857,
       "buffers": [
         {
           "minZoom": 1,

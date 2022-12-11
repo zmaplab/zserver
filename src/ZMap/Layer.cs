@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
-using ProjNet.CoordinateSystems.Transformations;
 using ZMap.Extensions;
 using ZMap.Source;
 using ZMap.Style;
@@ -106,7 +105,7 @@ namespace ZMap
             }
 
             // 由前端的 SRID 的 extent 转换成数据源的 extent
-
+            // 先转换成数据源的 SRID 数据， 才能做相交判断是否超出数据范围
             var extent = viewport.Extent.Transform(srid, SRID);
 
             // 不在当前图层的范围内，不需要渲染
@@ -125,21 +124,38 @@ namespace ZMap
                 }
             }
 
-            // 使用应用层投影转换的原因是规避数据库支持问题
-            // 假如只是使用数据库当成存储层，则不考虑空间计算问题，完全可以把矢量数据存成二进制，计算好图形的 extent 存为 minx, maxX, miny, maxy
-            // 则可以通过计算求出相交的所有图形
-            ICoordinateTransformation transformation = null;
-
-            if (SRID != srid)
-            {
-                transformation = CoordinateTransformUtilities.GetTransformation(SRID, srid);
-            }
+            // comments: Envelope 范围已经先全转成了数据源
+            // // 使用应用层投影转换的原因是规避数据库支持问题
+            // // 假如只是使用数据库当成存储层， 则不考虑空间计算问题， 完全可以把矢量数据存成二进制， 计算好图形的 extent 存为 minx, maxX, miny, maxy
+            // // 则可以通过计算求出相交的所有图形
+            // ICoordinateTransformation transformation = null;
+            //
+            // if (SRID != srid)
+            // {
+            //     transformation = CoordinateTransformUtilities.GetTransformation(SRID, srid);
+            // }
 
             switch (Source)
             {
                 case IVectorSource vectorSource:
-                    await RenderVectorAsync(graphicsService, vectorSource, extent, viewport.Extent, zoom,
-                        transformation);
+                    Envelope queryEnvelope;
+                    var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
+                    if (buffer is { Size: > 0 })
+                    {
+                        var xPerPixel = extent.Width / viewport.Width;
+                        var yPerPixel = extent.Height / viewport.Height;
+                        var x = xPerPixel * buffer.Size;
+                        var y = yPerPixel * buffer.Size;
+                        queryEnvelope = new Envelope(extent.MinX - x, extent.MaxX + x,
+                            extent.MinY - y,
+                            extent.MaxY + y);
+                    }
+                    else
+                    {
+                        queryEnvelope = extent;
+                    }
+
+                    await RenderVectorAsync(graphicsService, vectorSource, queryEnvelope, extent, zoom);
                     break;
                 case IRasterSource rasterSource:
                     await RenderRasterAsync(graphicsService, rasterSource, extent, zoom);
@@ -177,27 +193,28 @@ namespace ZMap
         }
 
         private async Task RenderVectorAsync(IGraphicsService service, IVectorSource vectorSource,
-            Envelope sourceExtent,
+            Envelope queryEnvelope,
             Envelope targetExtent,
-            Zoom zoom,
-            ICoordinateTransformation transformation)
+            Zoom zoom
+            // , ICoordinateTransformation transformation
+        )
         {
-            Envelope queryEnvelope;
-            var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
-            if (buffer is { Size: > 0 })
-            {
-                var xPerPixel = sourceExtent.Width / sourceExtent.Width;
-                var yPerPixel = sourceExtent.Height / sourceExtent.Height;
-                var x = xPerPixel * buffer.Size;
-                var y = yPerPixel * buffer.Size;
-                queryEnvelope = new Envelope(sourceExtent.MinX - x, sourceExtent.MaxX + x,
-                    sourceExtent.MinY - y,
-                    sourceExtent.MaxY + y);
-            }
-            else
-            {
-                queryEnvelope = sourceExtent;
-            }
+            // Envelope queryEnvelope;
+            // var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
+            // if (buffer is { Size: > 0 })
+            // {
+            //     var xPerPixel = sourceExtent.Width / sourceExtent.Width;
+            //     var yPerPixel = sourceExtent.Height / sourceExtent.Height;
+            //     var x = xPerPixel * buffer.Size;
+            //     var y = yPerPixel * buffer.Size;
+            //     queryEnvelope = new Envelope(sourceExtent.MinX - x, sourceExtent.MaxX + x,
+            //         sourceExtent.MinY - y,
+            //         sourceExtent.MaxY + y);
+            // }
+            // else
+            // {
+            //     queryEnvelope = sourceExtent;
+            // }
 
             var features = await vectorSource.GetFeaturesInExtentAsync(queryEnvelope);
 
@@ -217,10 +234,10 @@ namespace ZMap
                 // simplify 的算法要控制，消点效果不是很好
                 // feature.Simplify();
 
-                if (transformation != null)
-                {
-                    feature.Transform(transformation);
-                }
+                // if (transformation != null)
+                // {
+                //     feature.Transform(transformation);
+                // }
 
                 foreach (var styleGroup in StyleGroups)
                 {
