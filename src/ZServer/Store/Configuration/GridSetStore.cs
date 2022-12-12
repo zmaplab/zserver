@@ -33,7 +33,7 @@ namespace ZServer.Store.Configuration
                           {
                               var section = _configuration.GetSection($"gridSets:{name}");
                               var srid = section.GetSection("srid").Get<int>();
-                              var crs = CoordinateSystemUtilities.Get(srid);
+                              var crs = CoordinateReferenceSystem.Get(srid);
                               if (crs == null)
                               {
                                   throw new Exception($"SRID is not exists or supported");

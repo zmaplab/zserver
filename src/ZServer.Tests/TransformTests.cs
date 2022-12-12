@@ -32,8 +32,8 @@ namespace ZServer.Tests
             var factory = new GeometryFactory(new PrecisionModel(), 4326);
             var point = factory.CreatePoint(new Coordinate(117.36492919921875, 31.9448184967041));
 
-            var newPoint = (Point)CoordinateTransformUtilities.Transform(point,
-                CoordinateTransformUtilities.GetTransformation(4326, 4548));
+            var newPoint = (Point)CoordinateReferenceSystem.Transform(point,
+                CoordinateReferenceSystem.CreateTransformation(4326, 4548));
 
             Assert.Equal(534504.046374663, newPoint.X);
             Assert.Equal(3535791.7026292756, newPoint.Y);
@@ -48,8 +48,8 @@ namespace ZServer.Tests
             var extent2 = extent.Transform(3857, 4326);
             Assert.Equal(52.4978, extent2.MinX);
             Assert.Equal(52.509999999999998, extent2.MaxX);
-            Assert.Equal(13.25999999988822, extent2.MinY);
-            Assert.Equal(13.281399999888224, extent2.MaxY);
+            Assert.Equal(13.259999999999989, extent2.MinY);
+            Assert.Equal(13.281399999999989, extent2.MaxY);
         }
 
         public static Envelope ConvertToMercatore(Envelope extent)

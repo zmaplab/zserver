@@ -17,4 +17,10 @@
     <ItemGroup>
       <ProjectReference Include="..\ZMap.SLD\ZMap.SLD.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Utilities\proj.xml" />
+      <EmbeddedResource Include="Utilities\proj.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
 </Project>

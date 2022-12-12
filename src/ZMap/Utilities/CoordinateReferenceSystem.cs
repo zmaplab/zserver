@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Xml;
 using NetTopologySuite.Geometries;
+using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 
 namespace ZMap.Utilities
 {
-    public static class CoordinateTransformUtilities
+    public static class CoordinateReferenceSystem
     {
+        // ReSharper disable once InconsistentNaming
+        private static readonly ConcurrentDictionary<int, CoordinateSystem> SRIDCache;
+
         private static readonly GeometryFactory GeometryFactory =
             NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory();
 
@@ -17,25 +22,73 @@ namespace ZMap.Utilities
         private static readonly CoordinateTransformationFactory CoordinateTransformationFactory =
             new();
 
-        // [SuppressMessage("ReSharper", "InconsistentNaming")]
-        // public static (ICoordinateTransformation t1, ICoordinateTransformation t2) GetTransformationPair(int sourceSRID,
-        //     int targetSRID)
-        // {
-        //     var t1 = GetTransformation(sourceSRID, targetSRID);
-        //     var t2 = GetTransformation(targetSRID, sourceSRID);
-        //     return (t1, t2);
-        // }
+        static CoordinateReferenceSystem()
+        {
+            SRIDCache = new ConcurrentDictionary<int, CoordinateSystem>();
+            var names = typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
+            using var stream =
+                typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Utilities.proj.xml");
+            if (stream == null)
+            {
+                return;
+            }
 
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        internal static ICoordinateTransformation GetTransformation(int sourceSRID, int targetSRID)
+            var coordinateSystemFactory = new CoordinateSystemFactory();
+            var xml = new XmlDocument();
+            xml.Load(stream);
+            var nodes = xml.DocumentElement?.SelectNodes("/SpatialReference/*");
+            if (nodes == null)
+            {
+                return;
+            }
+
+            foreach (XmlNode referenceNode in nodes)
+            {
+                var sridNode = referenceNode?.SelectSingleNode("SRID");
+                if (sridNode == null)
+                {
+                    continue;
+                }
+
+                var wkt = referenceNode.LastChild?.InnerText;
+
+                if (string.IsNullOrWhiteSpace(wkt) || !int.TryParse(sridNode.InnerText, out var srid))
+                {
+                    continue;
+                }
+
+                var coordinateSystem = coordinateSystemFactory.CreateFromWkt(wkt);
+                SRIDCache.TryAdd(srid, coordinateSystem);
+            }
+        }
+
+        public static CoordinateSystem Get(int srid)
+        {
+            return srid switch
+            {
+                4326 => GeographicCoordinateSystem.WGS84,
+                3857 => ProjectedCoordinateSystem.WebMercator,
+                _ => SRIDCache.TryGetValue(srid, out var coordinateSystem) ? coordinateSystem : null
+            };
+        }
+
+        public static ICoordinateTransformation CreateTransformation(int sourceSRID, int targetSRID)
         {
             var key = $"{sourceSRID}:{targetSRID}";
             return CoordinateTransformations.GetOrAdd(key, _ =>
-                CoordinateTransformationFactory.CreateFromCoordinateSystems(CoordinateSystemUtilities.Get(sourceSRID),
-                    CoordinateSystemUtilities.Get(targetSRID)));
+            {
+                var source = Get(sourceSRID);
+                var target = Get(targetSRID);
+
+                if (source == null || target == null)
+                {
+                    return null;
+                }
+
+                return CoordinateTransformationFactory.CreateFromCoordinateSystems(source, target);
+            });
         }
 
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static Envelope Transform(this Envelope extent, int sourceSRID, int targetSRID)
         {
             if (extent == null)
@@ -53,7 +106,11 @@ namespace ZMap.Utilities
                 return extent.Copy();
             }
 
-            var transformation = GetTransformation(sourceSRID, targetSRID);
+            var transformation = CreateTransformation(sourceSRID, targetSRID);
+            if (transformation == null)
+            {
+                throw new ArgumentException("创建投影转换失败");
+            }
 
             var corners = new[]
             {
@@ -95,7 +152,7 @@ namespace ZMap.Utilities
                 MultiLineString lineString => Transform(lineString, transform),
                 MultiPolygon polygon => Transform(polygon, transform),
                 GeometryCollection collection => Transform(collection, transform),
-                _ => throw new ArgumentException("Could not transform geometry type '" + geometry.GetType() + "'")
+                _ => throw new ArgumentException("Can't transform geometry type '" + geometry.GetType() + "'")
             };
         }
 
@@ -167,7 +224,7 @@ namespace ZMap.Utilities
             return res;
         }
 
-        internal static Coordinate Transform(Coordinate coordinate, ICoordinateTransformation transform)
+        private static Coordinate Transform(Coordinate coordinate, ICoordinateTransformation transform)
         {
             var xy = transform.MathTransform.Transform(coordinate.X, coordinate.Y);
             return new Coordinate(xy.x, xy.y);

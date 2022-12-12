@@ -41,7 +41,7 @@ namespace ZServer.Tests
         }
 
 
-        [Fact]
+        [Fact(Skip = "")]
         public void ReadFromFile()
         {
             var styledLayerDescriptor1 = StyledLayerDescriptor.Load("se.xml");
