@@ -73,7 +73,7 @@ namespace ZServer.Tests
             Assert.True(layer.Source is ShapeFileSource);
             var source = (ShapeFileSource)layer.Source;
             Assert.Equal(4326, source.SRID);
-            Assert.Equal("shapes/osmbuildings.shp", source.File);
+            Assert.EndsWith("shapes/osmbuildings.shp", source.File);
 
             Assert.NotNull(layer.StyleGroups);
             Assert.Single(layer.StyleGroups);
@@ -163,7 +163,7 @@ namespace ZServer.Tests
             Assert.True(shpLayer.Source is ShapeFileSource);
             var source = (ShapeFileSource)shpLayer.Source;
             Assert.Equal(4326, source.SRID);
-            Assert.Equal("shapes/osmbuildings.shp", source.File);
+            Assert.EndsWith("shapes/osmbuildings.shp", source.File);
 
             Assert.NotNull(shpLayer.StyleGroups);
             Assert.Single(shpLayer.StyleGroups);

@@ -48,9 +48,7 @@ namespace ZServer.Tests
 
             var dataSource2 = (ShapeFileSource)dataSources[1];
             Assert.NotNull(dataSource2);
-            Assert.Equal(
-                "shapes/osmbuildings.shp",
-                dataSource2.File);
+            Assert.EndsWith("shapes/osmbuildings.shp", dataSource2.File);
             Assert.Equal(4326, dataSource2.SRID);
         }
     }

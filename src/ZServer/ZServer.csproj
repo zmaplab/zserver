@@ -10,13 +10,10 @@
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
         <PackageReference Include="Dapper" Version="2.0.123" />
         <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
-        <PackageReference Include="murmurhash" Version="1.0.3"/>
+        <PackageReference Include="murmurhash" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="proj.xml">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="location.svg">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

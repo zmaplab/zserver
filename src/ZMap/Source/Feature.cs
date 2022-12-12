@@ -52,7 +52,7 @@ namespace ZMap.Source
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public Feature Transform(ICoordinateTransformation transformation)
         {
-            Geometry = CoordinateTransformUtilities.Transform(Geometry, transformation);
+            Geometry = CoordinateReferenceSystem.Transform(Geometry, transformation);
             return this;
         }
 
@@ -65,7 +65,7 @@ namespace ZMap.Source
             }
 
             var srid = Geometry.SRID;
-            var coordinateSystem = CoordinateSystemUtilities.Get(srid);
+            var coordinateSystem = CoordinateReferenceSystem.Get(srid);
             if (coordinateSystem == null)
             {
                 return;
