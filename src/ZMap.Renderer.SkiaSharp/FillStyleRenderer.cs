@@ -1,7 +1,5 @@
 using SkiaSharp;
-using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZMap.Source;
 using ZMap.Style;
 using ZMap.Utilities;
 
@@ -16,10 +14,10 @@ namespace ZMap.Renderer.SkiaSharp
             Style = style;
         }
 
-        protected override SKPaint CreatePaint(Feature feature)
+        protected override SKPaint CreatePaint()
         {
-            var opacity = Style.Opacity.Invoke(feature);
-            var color = Style.Color?.Invoke(feature);
+            var opacity = Style.Opacity.Value;
+            var color = Style.Color.Value;
             var antialias = Style.Antialias;
 
             var key = $"FILL_STYLE_PAINT_{opacity}{color}{antialias}";
@@ -32,5 +30,8 @@ namespace ZMap.Renderer.SkiaSharp
                 Color = ColorUtilities.GetColor(color, opacity)
             });
         }
+
+
+     
     }
 }

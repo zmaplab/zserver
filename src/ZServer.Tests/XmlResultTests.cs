@@ -23,7 +23,7 @@ namespace ZServer.Tests
                     exception
                 }
             };
-            var xml = Encoding.UTF8.GetString(report.Serialize());
+            Encoding.UTF8.GetString(report.Serialize());
         }
     }
 }

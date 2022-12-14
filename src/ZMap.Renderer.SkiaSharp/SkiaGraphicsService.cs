@@ -1,7 +1,6 @@
 using System;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
-using ZMap.Source;
 using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
@@ -51,11 +50,11 @@ public class SkiaGraphicsService : IGraphicsService
         throw new NotImplementedException();
     }
 
-    public void Render(Envelope extent, Feature feature, VectorStyle style)
+    public void Render(Envelope extent, Geometry geometry, VectorStyle style)
     {
         if (Create(style) is IVectorRenderer<SKCanvas> renderer)
         {
-            renderer.Render(_canvas, feature, extent, Width, Height);
+            renderer.Render(_canvas, geometry, extent, Width, Height);
         }
     }
 

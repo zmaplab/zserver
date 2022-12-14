@@ -2,20 +2,19 @@ using System;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZMap.Source;
 
 namespace ZMap.Renderer.SkiaSharp;
 
 public abstract class SkiaRenderer
 {
-    protected abstract SKPaint CreatePaint(Feature feature);
+    protected abstract SKPaint CreatePaint();
 
-    public virtual void Render(SKCanvas graphics, Feature feature, Envelope extent, int width, int height)
+    public virtual void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
     {
-        var paint = CreatePaint(feature);
+        var paint = CreatePaint();
         if (paint != null)
         {
-            Draw(graphics, paint, feature.Geometry, extent, width, height);
+            Draw(graphics, paint, geometry, extent, width, height);
         }
     }
 

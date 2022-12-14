@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using NetTopologySuite.Geometries;
 using Xunit;
 using ZMap;
 using ZMap.Style;
@@ -31,7 +33,13 @@ namespace ZServer.Tests
             var lineStyle = (SpriteLineStyle)styleGroup.Styles[1];
             var textStyle = (TextStyle)styleGroup.Styles[2];
 
-            Assert.Equal("sprite filter", fillStyle.Filter.Value);
+            fillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(1, 1), new Dictionary<string, dynamic>
+            {
+                { "height", 11 }
+            }));
+            Assert.Equal(true, fillStyle.Filter.Value);
+            Assert.Equal(null, lineStyle.Filter.Value);
+            Assert.Equal(false, textStyle.Filter.Value);
             Assert.True(fillStyle.Antialias);
             Assert.Equal(1, fillStyle.Opacity.Value);
             Assert.Equal("feature[\"opacity\"]", fillStyle.Opacity.Body);
@@ -72,8 +80,8 @@ namespace ZServer.Tests
             Assert.Equal("sprite pattern", lineStyle.Pattern.Value);
             Assert.Equal("feature[\"sprite-pattern\"]", lineStyle.Pattern.Body);
 
-            Assert.Equal("property string", textStyle.Property.Value);
-            Assert.Equal("property expression", textStyle.Property.Body);
+            Assert.Equal("property string", textStyle.Label.Value);
+            Assert.Equal("property expression", textStyle.Label.Body);
             Assert.Equal("auto", textStyle.Align.Value);
             Assert.Equal(2, textStyle.Font.Value.Length);
             Assert.Equal("Open Sans Regular", textStyle.Font.Value[0]);
@@ -85,6 +93,7 @@ namespace ZServer.Tests
             Assert.Equal(2, textStyle.Offset.Value.Length);
             Assert.Equal(90, textStyle.Offset.Value[0]);
             Assert.Equal(90, textStyle.Offset.Value[1]);
+
         }
     }
 }

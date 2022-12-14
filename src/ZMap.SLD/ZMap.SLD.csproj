@@ -4,7 +4,12 @@
     
 
     <ItemGroup>
-      <Folder Include="docs" />
+      <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    </ItemGroup>
+    
+
+    <ItemGroup>
+      <None Remove="..\..\LICENSE.txt" />
     </ItemGroup>
     
 

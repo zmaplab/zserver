@@ -59,7 +59,7 @@ namespace ZServer.Tests
 
             var wgs84 = GeographicCoordinateSystem.WGS84 as CoordinateSystem;
             var mercatore = ProjectedCoordinateSystem.WebMercator as CoordinateSystem;
-            var cFac = new CoordinateSystemFactory();
+            new CoordinateSystemFactory();
 
             var SRID_wgs84 = Convert.ToInt32(wgs84.AuthorityCode); //WGS84 SRID
             var SRID_mercatore = Convert.ToInt32(mercatore.AuthorityCode); //Mercatore SRID

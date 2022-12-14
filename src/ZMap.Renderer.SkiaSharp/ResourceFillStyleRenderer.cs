@@ -1,9 +1,7 @@
 using System.IO;
 using SkiaSharp;
-using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZMap.Source;
 using ZMap.Style;
 using ZMap.Utilities;
 
@@ -24,18 +22,18 @@ namespace ZMap.Renderer.SkiaSharp
         {
         }
 
-        protected override SKPaint CreatePaint(Feature feature)
+        protected override SKPaint CreatePaint()
         {
             var style = (ResourceFillStyle)Style;
 
-            var opacity = style.Opacity.Invoke(feature);
-            var color = style.Color?.Invoke(feature);
-            var uri = style.Uri?.Invoke(feature);
+            var opacity = style.Opacity.Value;
+            var color = style.Color?.Value;
+            var uri = style.Uri?.Value;
             var antialias = Style.Antialias;
 
             if (uri == null)
             {
-                return base.CreatePaint(feature);
+                return base.CreatePaint();
             }
 
             var paint = Cache.GetOrCreate($"RESOURCE_FILL_STYLE_PAINT_{opacity}{color}{antialias}{uri}", _ =>

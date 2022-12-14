@@ -57,7 +57,7 @@ public class CQLFilter : IFeatureFilter
 
             body = body.Replace("and", " && ").Replace("AND", " && ")
                 .Replace("or", " || ").Replace("OR", " || ");
-            var func = DynamicCompilationUtilities.GetAvailableFunc(body);
+            var func = DynamicCompilationUtilities.GetFunc<bool>(body);
             return func;
         });
     }

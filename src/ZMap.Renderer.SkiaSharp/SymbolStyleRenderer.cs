@@ -1,9 +1,7 @@
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
-using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Extensions;
-using ZMap.Source;
 using ZMap.Style;
 using ZMap.Utilities;
 using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
@@ -25,7 +23,7 @@ namespace ZMap.Renderer.SkiaSharp
             _style = style;
         }
 
-        public override void Render(SKCanvas graphics, Feature feature, Envelope extent, int width, int height)
+        public override void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
         {
             //   *---    top     ---*
             //   |                  |
@@ -33,7 +31,7 @@ namespace ZMap.Renderer.SkiaSharp
             //   |                  |
             //   *---   bottom   ---*
 
-            var interiorPoint = feature.Geometry.InteriorPoint;
+            var interiorPoint = geometry.InteriorPoint;
             var centroid = new Coordinate(interiorPoint.X, interiorPoint.Y);
 
             if (!extent.Contains(centroid))
@@ -41,7 +39,7 @@ namespace ZMap.Renderer.SkiaSharp
                 return;
             }
 
-            var half = _style.Size.Invoke(feature) / 2;
+            var half = _style.Size.Value / 2;
 
             var centroidPoint = CoordinateTransformUtilities.WordToExtent(extent,
                 width, height, centroid);
@@ -79,14 +77,14 @@ namespace ZMap.Renderer.SkiaSharp
 
             var rect = new SKRect(left, top, right, bottom);
 
-            var image = GetImage(feature);
+            var image = GetImage();
             graphics.DrawBitmap(image, rect, new SKPaint());
         }
 
-        private SKBitmap GetImage(Feature feature)
+        private SKBitmap GetImage()
         {
             SKBitmap image;
-            var uri = _style.Uri?.Invoke(feature);
+            var uri = _style.Uri.Value;
             if (uri == null)
             {
                 image = DefaultImage;
@@ -113,7 +111,7 @@ namespace ZMap.Renderer.SkiaSharp
             return image;
         }
 
-        protected override SKPaint CreatePaint(Feature feature)
+        protected override SKPaint CreatePaint()
         {
             return null;
         }

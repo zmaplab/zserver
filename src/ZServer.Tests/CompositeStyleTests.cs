@@ -25,20 +25,29 @@ namespace ZServer.Tests
             {
                 Opacity = Expression<float>.New(1),
                 Width = Expression<int>.New(2),
-                Color = Expression<string>.New("#3ed53e")
+                Color = Expression<string>.New("#3ed53e"),
+                DashArray = Expression<float[]>.New(Array.Empty<float>()),
+                DashOffset = Expression<float>.New(0),
+                LineCap = Expression<string>.New("Round"),
+                LineJoin = Expression<string>.New("Round"),
+                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
+                GapWidth = Expression<int>.New(10),
+                Offset = Expression<int>.New(0),
+                Blur = Expression<int>.New(0),
+                Gradient = Expression<int>.New(0)
             };
 
 
-            var width = 256;
-            var height = 256;
-            var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+            var width = 1024;
+            var height = 1024;
+
             var graphicsService =
                 new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
             foreach (var feature in data)
             {
-                graphicsService.Render(Extent, feature, style1);
-                graphicsService.Render(Extent, feature, style2);
+                graphicsService.Render(Extent, feature.Geometry, style1);
+                graphicsService.Render(Extent, feature.Geometry, style2);
             }
 
             var bytes = graphicsService.GetImage("image/png");
@@ -61,17 +70,27 @@ namespace ZServer.Tests
             {
                 Opacity = Expression<float>.New(1),
                 Width = Expression<int>.New(2),
-                Color = Expression<string>.New("#3ed53e")
+                Color = Expression<string>.New("#3ed53e"),
+
+                DashArray = Expression<float[]>.New(Array.Empty<float>()),
+                DashOffset = Expression<float>.New(0),
+                LineCap = Expression<string>.New("Round"),
+                LineJoin = Expression<string>.New("Round"),
+                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
+                GapWidth = Expression<int>.New(10),
+                Offset = Expression<int>.New(0),
+                Blur = Expression<int>.New(0),
+                Gradient = Expression<int>.New(0)
             };
-            var width = 256;
-            var height = 256;
-            var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+            var width = 1024;
+            var height = 1024;
+
             var graphicsService =
                 new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
             foreach (var feature in data)
             {
-                graphicsService.Render(Extent, feature, style1);
-                graphicsService.Render(Extent, feature, style2);
+                graphicsService.Render(Extent, feature.Geometry, style1);
+                graphicsService.Render(Extent, feature.Geometry, style2);
             }
 
             var bytes = graphicsService.GetImage("image/png");

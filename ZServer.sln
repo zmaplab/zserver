@@ -54,8 +54,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.Source.ShapeFile", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.TileGrid", "src\ZMap.TileGrid\ZMap.TileGrid.csproj", "{ABD0647E-3C06-4042-A0E6-8CD23B064273}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.SLD", "src\ZMap.SLD\ZMap.SLD.csproj", "{BB4E98F1-4299-4A07-98C3-E5621FAD1DEA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.Renderer.SkiaSharp", "src\ZMap.Renderer.SkiaSharp\ZMap.Renderer.SkiaSharp.csproj", "{92CF792D-57B5-44FB-8453-ACD9B9374E5F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZServer.Benchmark", "src\ZServer.Benchmark\ZServer.Benchmark.csproj", "{B170CAB9-603D-4904-82D4-AE16B242187A}"
@@ -118,10 +116,6 @@ Global
 		{ABD0647E-3C06-4042-A0E6-8CD23B064273}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABD0647E-3C06-4042-A0E6-8CD23B064273}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABD0647E-3C06-4042-A0E6-8CD23B064273}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB4E98F1-4299-4A07-98C3-E5621FAD1DEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB4E98F1-4299-4A07-98C3-E5621FAD1DEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB4E98F1-4299-4A07-98C3-E5621FAD1DEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB4E98F1-4299-4A07-98C3-E5621FAD1DEA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{92CF792D-57B5-44FB-8453-ACD9B9374E5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{92CF792D-57B5-44FB-8453-ACD9B9374E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92CF792D-57B5-44FB-8453-ACD9B9374E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
