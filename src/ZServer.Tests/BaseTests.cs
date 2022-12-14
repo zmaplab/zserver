@@ -11,7 +11,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using ZMap.DynamicCompiler;
 using ZMap.Source.Postgre;
-using Feature = ZMap.Source.Feature;
+using Feature = ZMap.Feature;
 
 namespace ZServer.Tests
 {

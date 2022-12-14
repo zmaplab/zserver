@@ -39,7 +39,7 @@ namespace Console
             // 配置的存储
             serviceCollection.AddZServer(configuration);
 
-            var provider = serviceCollection.BuildServiceProvider();
+            serviceCollection.BuildServiceProvider();
 
             // ZOOM=14
             // var bytes = await renderingService.GetImageAsync(new List<(string Workspace, string Layer, string Filter)>
@@ -56,7 +56,6 @@ namespace Console
         static async Task Cut()
         {
             // 切片范围
-            var tileExtent = new[] { -180.00, -180.00, 180.00, 180.00 };
 
             // 切片原点
             var tileOrigin = new Point(-180.00, 180.00);
@@ -93,7 +92,7 @@ namespace Console
                     var leftTopXyz = XYZ.Caculate(tileOrigin, i, leftTop, tileSize);
                     var rightTopXyz = XYZ.Caculate(tileOrigin, i, rightTop, tileSize);
                     var leftBottomXyz = XYZ.Caculate(tileOrigin, i, leftBottom, tileSize);
-                    var rightBottomXyz = XYZ.Caculate(tileOrigin, i, rightBottom, tileSize);
+                    XYZ.Caculate(tileOrigin, i, rightBottom, tileSize);
 
                     for (var x = leftTopXyz.X; x <= rightTopXyz.X; ++x)
                     {

@@ -16,17 +16,18 @@ namespace ZServer.Store.Configuration
     {
         private readonly IConfiguration _configuration;
         private readonly ServerOptions _options;
+        private readonly string _version;
 
         public StyleGroupStore(IConfiguration configuration, IOptionsMonitor<ServerOptions> options)
         {
-            _configuration = configuration;
-
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _options = options.CurrentValue;
+            _version = configuration["Version"] ?? "1.0";
         }
 
         public Task<StyleGroup> FindAsync(string name)
         {
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return null;
             }
@@ -42,10 +43,11 @@ namespace ZServer.Store.Configuration
                         style = new StyleGroup
                         {
                             Name = name,
-                            Description = section.GetOrDefault<string>("description"),
-                            MinZoom = section.GetOrDefault<float>("minZoom"),
-                            MaxZoom = section.GetOrDefault<float>("maxZoom"),
-                            ZoomUnit = section.GetOrDefault<ZoomUnits>("zoomUnit"),
+                            Filter = section.GetExpression<bool?>("filter"),
+                            Description = section.GetValue<string>("description"),
+                            MinZoom = section.GetValue<float>("minZoom"),
+                            MaxZoom = section.GetValue<float>("maxZoom"),
+                            ZoomUnit = section.GetValue<ZoomUnits>("zoomUnit"),
                             Styles = GetStyles(section.GetSection("styles"))
                         };
                     }
@@ -63,7 +65,7 @@ namespace ZServer.Store.Configuration
             var styles = new List<Style>();
             foreach (var styleSection in section.GetChildren())
             {
-                var style = styleSection.GetOrDefault<string>("type");
+                var style = styleSection.GetValue<string>("type");
                 var result = style switch
                 {
                     "fill" => GetFillStyle(styleSection),
@@ -73,14 +75,16 @@ namespace ZServer.Store.Configuration
                     _ => null
                 };
 
-                if (result != null)
+                if (result == null)
                 {
-                    result.Filter = styleSection.Get<string>("filter");
-                    result.MinZoom = styleSection.GetOrDefault<float>("minZoom");
-                    result.MaxZoom = styleSection.GetOrDefault<float>("maxZoom");
-                    result.ZoomUnit = styleSection.GetOrDefault<ZoomUnits>("zoomUnit");
-                    styles.Add(result);
+                    continue;
                 }
+
+                result.Filter = styleSection.GetExpression<bool?>("filter");
+                result.MinZoom = styleSection.GetValue<float>("minZoom");
+                result.MaxZoom = styleSection.GetValue<float>("maxZoom");
+                result.ZoomUnit = styleSection.GetValue<ZoomUnits>("zoomUnit");
+                styles.Add(result);
             }
 
             return styles;
@@ -90,8 +94,8 @@ namespace ZServer.Store.Configuration
         {
             return new SymbolStyle
             {
-                Size = section.Get<int>("size"),
-                Uri = section.Get<Uri>("uri")
+                Size = section.GetExpression<int>("size"),
+                Uri = section.GetExpression<Uri>("uri")
             };
         }
 
@@ -99,55 +103,66 @@ namespace ZServer.Store.Configuration
         {
             return new SpriteLineStyle
             {
-                Opacity = section.Get<float>("opacity"),
-                Width = section.Get<int>("width"),
-                Color = section.Get<string>("color"),
-                DashArray = section.Get<float[]>("dashArray"),
-                DashOffset = section.Get<float>("dashOffset"),
-                LineJoin = section.Get<string>("lineJoin"),
-                Cap = section.Get<string>("cap"),
-                Translate = section.Get<double[]>("translate"),
-                TranslateAnchor = section.Get<TranslateAnchor>("translateAnchor"),
-                GapWidth = section.Get<int>("gapWidth"),
-                Offset = section.Get<int>("offset"),
-                Blur = section.Get<int>("blur"),
-                Gradient = section.Get<int>("gradient"),
-                Pattern = section.Get<string>("pattern")
+                Opacity = section.GetExpression<float>("opacity"),
+                Width = section.GetExpression<int>("width"),
+                Color = section.GetExpression<string>("color"),
+                DashArray = section.GetExpression<float[]>("dashArray"),
+                DashOffset = section.GetExpression<float>("dashOffset"),
+                LineJoin = section.GetExpression<string>("lineJoin"),
+                LineCap = section.GetExpression<string>("lineCap"),
+                Translate = section.GetExpression<double[]>("translate"),
+                TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor"),
+                GapWidth = section.GetExpression<int>("gapWidth"),
+                Offset = section.GetExpression<int>("offset"),
+                Blur = section.GetExpression<int>("blur"),
+                Gradient = section.GetExpression<int>("gradient"),
+                Pattern = section.GetExpression<string>("pattern"),
+                Uri = section.GetExpression<Uri>("uri")
             };
         }
 
         private Style GetTextStyle(IConfigurationSection section)
         {
+            var label = _version == "1.0"
+                ? section.GetExpression<string>("property")
+                : section.GetExpression<string>("label");
             return new TextStyle
             {
-                Property = section.Get<string>("property"),
-                Align = section.Get<string>("align"),
-                Color = section.Get<string>("color"),
-                BackgroundColor = section.Get<string>("backgroundColor"),
-                Font = section.Get<string[]>("font"),
-                Size = section.Get<int>("size"),
-                Rotate = section.Get<float>("rotate"),
-                Transform = section.Get<TextTransform>("transform"),
-                Offset = section.Get<float[]>("offset"),
-                OutlineSize = section.Get<int>("outlineSize")
+                Label = label,
+                Align = section.GetExpression<string>("align"),
+                Color = section.GetExpression<string>("color"),
+                Opacity = section.GetExpression<float>("opacity"),
+                BackgroundColor = section.GetExpression<string>("backgroundColor"),
+                BackgroundOpacity = section.GetExpression<float>("backgroundOpacity"),
+                Radius = section.GetExpression<float>("radius"),
+                RadiusColor = section.GetExpression<string>("radiusColor"),
+                RadiusOpacity = section.GetExpression<float>("radiusOpacity"),
+                Style = section.GetExpression<string>("style"),
+                Font = section.GetExpression<string[]>("font"),
+                Size = section.GetExpression<int>("size"),
+                Weight = section.GetExpression<string>("weight"),
+                Rotate = section.GetExpression<float>("rotate"),
+                Transform = section.GetExpression<TextTransform>("transform"),
+                Offset = section.GetExpression<float[]>("offset"),
+                OutlineSize = section.GetExpression<int>("outlineSize")
             };
         }
 
         private Style GetFillStyle(IConfigurationSection section)
         {
             FillStyle symbol;
-            var pattern = section.GetOrDefault<string>("pattern");
-            var patternExpression = section.CreateExpression<string>("pattern");
+            var pattern = section.GetValue<string>("pattern");
+            var patternExpression = section.GetExpression<string>("pattern");
 
-            var resource = section.GetOrDefault<string>("resource");
-            var resourceExpression = section.CreateExpression<Uri>("resource");
+            var resource = section.GetValue<string>("resource");
+            var resourceExpression = section.GetExpression<Uri>("resource");
 
             if (patternExpression != null)
             {
                 symbol = new SpriteFillStyle
                 {
                     Pattern = patternExpression,
-                    Uri = section.Get<Uri>("uri")
+                    Uri = section.GetExpression<Uri>("uri")
                 };
             }
             else if (!string.IsNullOrWhiteSpace(pattern))
@@ -155,7 +170,7 @@ namespace ZServer.Store.Configuration
                 symbol = new SpriteFillStyle
                 {
                     Pattern = Expression<string>.New(pattern),
-                    Uri = section.Get<Uri>("uri")
+                    Uri = section.GetExpression<Uri>("uri")
                 };
             }
             else if (resourceExpression != null)
@@ -184,11 +199,11 @@ namespace ZServer.Store.Configuration
                 symbol = new FillStyle();
             }
 
-            symbol.Opacity = section.Get<float>("opacity");
+            symbol.Opacity = section.GetExpression<float>("opacity");
             symbol.Antialias = section.GetValue<bool>("antialias");
-            symbol.Color = section.Get<string>("color");
-            symbol.Translate = section.Get<double[]>("translate");
-            symbol.TranslateAnchor = section.Get<TranslateAnchor>("translateAnchor");
+            symbol.Color = section.GetExpression<string>("color");
+            symbol.Translate = section.GetExpression<double[]>("translate");
+            symbol.TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor");
             return symbol;
         }
 

@@ -1,5 +1,4 @@
 using SkiaSharp;
-using ZMap.Source;
 using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp
@@ -10,7 +9,7 @@ namespace ZMap.Renderer.SkiaSharp
         {
         }
 
-        protected override SKPaint CreatePaint(Feature feature)
+        protected override SKPaint CreatePaint()
         {
             return new SKPaint();
         }

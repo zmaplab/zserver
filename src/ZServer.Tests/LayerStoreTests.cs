@@ -50,7 +50,7 @@ namespace ZServer.Tests
             Assert.Equal(1, lineStyle.Opacity.Value);
             Assert.Equal("#DC143C", lineStyle.Color.Value);
 
-            Assert.Equal("city", textStyle.Property.Value);
+            Assert.Equal("city", textStyle.Label.Value);
             Assert.Equal("#008000", textStyle.Color.Value);
             Assert.Equal(2, textStyle.Font.Value.Length);
             Assert.Equal("Open Sans Regular", textStyle.Font.Value.ElementAt(0));
@@ -97,7 +97,7 @@ namespace ZServer.Tests
             Assert.Equal(1, lineStyle.Opacity.Value);
             Assert.Equal("#DC143C", lineStyle.Color.Value);
 
-            Assert.Equal("city", textStyle.Property.Value);
+            Assert.Equal("city", textStyle.Label.Value);
             Assert.Equal("#008000", textStyle.Color.Value);
             Assert.Equal(2, textStyle.Font.Value.Length);
             Assert.Equal("Open Sans Regular", textStyle.Font.Value.ElementAt(0));
@@ -148,7 +148,7 @@ namespace ZServer.Tests
             Assert.Equal(1, pgLineStyle.Opacity.Value);
             Assert.Equal("#DC143C", pgLineStyle.Color.Value);
 
-            Assert.Equal("city", pgTextStyle.Property.Value);
+            Assert.Equal("city", pgTextStyle.Label.Value);
             Assert.Equal("#008000", pgTextStyle.Color.Value);
             Assert.Equal(2, pgTextStyle.Font.Value.Length);
             Assert.Equal("Open Sans Regular", pgTextStyle.Font.Value.ElementAt(0));
@@ -187,7 +187,7 @@ namespace ZServer.Tests
             Assert.Equal(1, shpLineStyle.Opacity.Value);
             Assert.Equal("#DC143C", shpLineStyle.Color.Value);
 
-            Assert.Equal("city", shpTextStyle.Property.Value);
+            Assert.Equal("city", shpTextStyle.Label.Value);
             Assert.Equal("#008000", shpTextStyle.Color.Value);
             Assert.Equal(2, shpTextStyle.Font.Value.Length);
             Assert.Equal("Open Sans Regular", shpTextStyle.Font.Value.ElementAt(0));

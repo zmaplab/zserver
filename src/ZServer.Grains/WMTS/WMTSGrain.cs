@@ -143,7 +143,7 @@ namespace ZServer.Grains.WMTS
                     Width = gridSet.TileWidth,
                     Height = gridSet.TileHeight,
                     Transparent = true,
-                    Bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b,
+                    Bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b
                 };
 
                 var map = new Map();

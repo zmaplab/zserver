@@ -1,8 +1,8 @@
-using ZMap.Source;
+using NetTopologySuite.Geometries;
 
 namespace ZMap.Renderer
 {
-    public interface IVectorRenderer<in TGraphics> : IRenderer<TGraphics, Feature>
+    public interface IVectorRenderer<in TGraphics> : IRenderer<TGraphics, Geometry>
     {
     }
 }

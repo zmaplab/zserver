@@ -23,13 +23,13 @@ namespace ZServer.Tests
 
             var width = 512;
             var height = 512;
-            var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+            new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
             var graphicsService =
                 new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
             foreach (var feature in data)
             {
-                graphicsService.Render(Extent, feature, style);
+                graphicsService.Render(Extent, feature.Geometry, style);
             }
 
             var bytes = graphicsService.GetImage("image/png");

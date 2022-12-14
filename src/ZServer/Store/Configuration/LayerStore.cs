@@ -14,7 +14,6 @@ using ZMap.Source;
 using ZMap.Style;
 using ZMap.Utilities;
 using ZServer.Entity;
-using ZServer.Extensions;
 
 namespace ZServer.Store.Configuration
 {
@@ -61,7 +60,7 @@ namespace ZServer.Store.Configuration
 
                     var section =
                         _configuration.GetSection($"layers:{layerName}");
-                    var configResourceGroupName = section.GetOrDefault<string>("resourceGroup");
+                    var configResourceGroupName = section.GetValue<string>("resourceGroup");
 
                     Layer layer = null;
                     if (configResourceGroupName == resourceGroupName)
@@ -146,7 +145,7 @@ namespace ZServer.Store.Configuration
 
         private async Task<ISource> RestoreSourceAsync(string resourceGroup, string name, IConfigurationSection section)
         {
-            var sourceName = section.GetOrDefault<string>("source");
+            var sourceName = section.GetValue<string>("source");
             if (string.IsNullOrWhiteSpace(sourceName))
             {
                 _logger.LogError($"图层 {resourceGroup}:{name} 未配置数据源");

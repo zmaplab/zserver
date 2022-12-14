@@ -1,8 +1,6 @@
 using System;
 using SkiaSharp;
-using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZMap.Source;
 using ZMap.Style;
 using ZMap.Utilities;
 
@@ -17,21 +15,21 @@ namespace ZMap.Renderer.SkiaSharp
             _style = style;
         }
 
-        protected override SKPaint CreatePaint(Feature feature)
+        protected override SKPaint CreatePaint()
         {
-            var opacity = _style.Opacity.Invoke(feature);
-            var width = _style.Width.Invoke(feature);
-            var color = _style.Color?.Invoke(feature);
-            var dashArray = _style.DashArray?.Invoke(feature);
-            var dashOffset = _style.DashOffset?.Invoke(feature) ?? 0;
-            var lineJoin = _style.LineJoin?.Invoke(feature);
-            var cap = _style.Cap?.Invoke(feature);
-            var translate = _style.Translate?.Invoke(feature);
-            var translateAnchor = _style.TranslateAnchor?.Invoke(feature);
-            var gapWidth = _style.GapWidth?.Invoke(feature);
-            var offset = _style.Offset?.Invoke(feature);
-            var blur = _style.Blur?.Invoke(feature);
-            var gradient = _style.Gradient?.Invoke(feature);
+            var opacity = _style.Opacity.Value;
+            var width = _style.Width.Value;
+            var color = _style.Color.Value;
+            var dashArray = _style.DashArray.Value;
+            var dashOffset = _style.DashOffset.Value;
+            var lineJoin = _style.LineJoin.Value;
+            var cap = _style.LineCap.Value;
+            var translate = _style.Translate.Value;
+            var translateAnchor = _style.TranslateAnchor?.Value;
+            var gapWidth = _style.GapWidth.Value;
+            var offset = _style.Offset.Value;
+            var blur = _style.Blur.Value;
+            var gradient = _style.Gradient.Value;
 
             var dashArrayKey = dashArray is { Length: 2 } ? $"{dashArray[0]}{dashArray[1]}" : "";
             var key =
@@ -62,9 +60,9 @@ namespace ZMap.Renderer.SkiaSharp
                     paint.PathEffect = SKPathEffect.CreateDash(dashArray, dashOffset);
                 }
 
-                if (blur is > 0)
+                if (blur > 0)
                 {
-                    paint.ImageFilter = SKImageFilter.CreateBlur(blur.Value, blur.Value);
+                    paint.ImageFilter = SKImageFilter.CreateBlur(blur, blur);
                 }
 
                 return paint;

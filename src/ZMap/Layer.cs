@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Force.DeepCloner;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using ZMap.Extensions;
@@ -15,6 +16,7 @@ namespace ZMap
     public class Layer : ILayer
     {
         private readonly List<StyleGroup> _styleGroups;
+        private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
 
         /// <summary>
         /// 图层名称
@@ -199,22 +201,7 @@ namespace ZMap
             // , ICoordinateTransformation transformation
         )
         {
-            // Envelope queryEnvelope;
-            // var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
-            // if (buffer is { Size: > 0 })
-            // {
-            //     var xPerPixel = sourceExtent.Width / sourceExtent.Width;
-            //     var yPerPixel = sourceExtent.Height / sourceExtent.Height;
-            //     var x = xPerPixel * buffer.Size;
-            //     var y = yPerPixel * buffer.Size;
-            //     queryEnvelope = new Envelope(sourceExtent.MinX - x, sourceExtent.MaxX + x,
-            //         sourceExtent.MinY - y,
-            //         sourceExtent.MaxY + y);
-            // }
-            // else
-            // {
-            //     queryEnvelope = sourceExtent;
-            // }
+            // 需要考虑 CRS 的 AxisOrder.NORTH_EAST， 影响 Feature -> Word 的转换算法
 
             var features = await vectorSource.GetFeaturesInExtentAsync(queryEnvelope);
 
@@ -222,6 +209,7 @@ namespace ZMap
             stopwatch.Start();
 
             var count = 0;
+
 
             foreach (var feature in features)
             {
@@ -241,12 +229,21 @@ namespace ZMap
 
                 foreach (var styleGroup in StyleGroups)
                 {
+                    // 若有配置过滤表达式， 则计算
+                    if (styleGroup.Filter.Value.HasValue && styleGroup.Filter.Value.Value)
+                    {
+                        continue;
+                    }
+
                     if (!styleGroup.IsVisible(zoom))
                     {
                         continue;
                     }
 
-                    foreach (var style in styleGroup.Styles)
+                    var styleGroup1 = styleGroup.DeepClone();
+                    styleGroup1.Accept(StyleVisitor, feature);
+
+                    foreach (var style in styleGroup1.Styles)
                     {
                         if (!style.IsVisible(zoom) || style is not VectorStyle vectorStyle)
                         {
@@ -254,14 +251,12 @@ namespace ZMap
                         }
 
                         // 若有配置过滤表达式， 则计算
-                        var expression = style.Filter?.Invoke(feature);
-                        var func = DynamicCompilationUtilities.GetAvailableFunc(expression);
-                        if (func != null && !func(feature))
+                        if (style.Filter.Value.HasValue && style.Filter.Value.Value)
                         {
                             continue;
                         }
 
-                        service.Render(targetExtent, feature, vectorStyle);
+                        service.Render(targetExtent, feature.Geometry, vectorStyle);
                     }
                 }
 

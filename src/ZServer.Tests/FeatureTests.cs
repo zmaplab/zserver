@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NetTopologySuite.Geometries;
 using Xunit;
-using ZMap.Source;
+using ZMap;
 
 namespace ZServer.Tests
 {

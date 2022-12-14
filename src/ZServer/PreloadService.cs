@@ -70,7 +70,7 @@ namespace ZServer
             var shapeFileSource = new ShapeFileSource(path);
 
             // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
-            var features = (await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326)).ToList();
+            (await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326)).ToList();
             _logger.LogInformation($"Load {path} success");
         }
 

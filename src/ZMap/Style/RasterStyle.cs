@@ -31,5 +31,9 @@ namespace ZMap.Style
         /// 增加或者减少图片的对比度。默认为 0.
         /// </summary>
         public Expression<float> Contrast { get; set; }
+
+        public override void Accept(IZMapStyleVisitor visitor, Feature feature)
+        {
+        }
     }
 }

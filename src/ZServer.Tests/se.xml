@@ -46,7 +46,9 @@
                     <se:MaxScaleDenominator>10000000</se:MaxScaleDenominator>
                     <se:LineSymbolizer>
                         <se:Stroke>
-                            <se:SvgParameter name="stroke">#f8f8f8</se:SvgParameter>
+                            <se:SvgParameter name="stroke">
+                                <PropertyName>color</PropertyName>
+                            </se:SvgParameter>
                             <se:SvgParameter name="stroke-width">2</se:SvgParameter>
                             <se:SvgParameter name="stroke-linejoin">round</se:SvgParameter>
                             <se:SvgParameter name="stroke-linecap">round</se:SvgParameter>
@@ -61,6 +63,38 @@
                             <se:SvgParameter name="stroke-dasharray">4 2</se:SvgParameter>
                         </se:Stroke>
                     </se:LineSymbolizer>
+                    <se:LineSymbolizer>
+                        <se:Stroke>
+                            <se:SvgParameter name="stroke">#dd302d</se:SvgParameter>
+                            <se:SvgParameter name="stroke-width">1</se:SvgParameter>
+                            <se:SvgParameter name="stroke-linejoin">round</se:SvgParameter>
+                            <se:SvgParameter name="stroke-linecap">round</se:SvgParameter>
+                            <se:SvgParameter name="stroke-dasharray">
+                                <PropertyName>
+                                    dasharray
+                                </PropertyName>
+                            </se:SvgParameter>
+                        </se:Stroke>
+                    </se:LineSymbolizer>
+                    <se:PointSymbolizer>
+                        <se:Graphic>
+                            <se:Mark>
+                                <se:WellKnownName>circle</se:WellKnownName>
+                                <se:Fill>
+                                    <se:SvgParameter name="fill">#db1e2a</se:SvgParameter>
+                                </se:Fill>
+                                <se:Stroke>
+                                    <se:SvgParameter name="stroke">#801119</se:SvgParameter>
+                                    <se:SvgParameter name="stroke-width">1</se:SvgParameter>
+                                </se:Stroke>
+                            </se:Mark>
+                            <se:Size>14</se:Size>
+                            <se:Rotation>
+                                <ogc:Literal>1</ogc:Literal>
+                                <ogc:Literal>2</ogc:Literal>
+                            </se:Rotation>
+                        </se:Graphic>
+                    </se:PointSymbolizer>
                 </se:Rule>
                 <se:Rule>
                     <se:Name>规划道路中线L17</se:Name>
@@ -189,6 +223,7 @@
 
 
                 <se:Rule>
+                    <se:Name>文字1</se:Name>
                     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
                         <ogc:PropertyIsEqualTo>
                             <ogc:PropertyName>yzdydldj</ogc:PropertyName>
@@ -200,10 +235,13 @@
                     <se:TextSymbolizer>
                         <se:Label>
                             <ogc:PropertyName>dlmc</ogc:PropertyName>
+                            <ogc:Expression>feature["aaa"]</ogc:Expression>
                         </se:Label>
                         <se:Font>
                             <se:SvgParameter name="font-family">微软雅黑</se:SvgParameter>
                             <se:SvgParameter name="font-size">13</se:SvgParameter>
+                            <se:SvgParameter name="font-weight">100</se:SvgParameter>
+                            <se:SvgParameter name="font-style">style1</se:SvgParameter>
                         </se:Font>
                         <se:LabelPlacement>
                             <se:LinePlacement>
@@ -251,6 +289,26 @@
                         </se:Halo>
                         <se:Fill>
                             <se:SvgParameter name="fill">#000000</se:SvgParameter>
+                        </se:Fill>
+                    </se:TextSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Polygon1</se:Name>
+                    <se:PolygonSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FF0000</CssParameter>
+                            <CssParameter name="stroke-width">2</CssParameter>
+                        </Stroke>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#200000</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                    <se:TextSymbolizer>
+                        <se:Label>
+                            <ogc:PropertyName>title</ogc:PropertyName>
+                        </se:Label>
+                        <se:Fill>
+                            <se:CssParameter name="fill">#FF0000</se:CssParameter>
                         </se:Fill>
                     </se:TextSymbolizer>
                 </se:Rule>
@@ -321,8 +379,8 @@
                     </se:TextSymbolizer>
                 </se:Rule>
                 <VendorOption name="option1">option_value1</VendorOption>
-                <sld:VendorOption name="sortBy">z</sld:VendorOption>
-                <sld:VendorOption name="sortByGroup">roads</sld:VendorOption>
+                <se:VendorOption name="sortBy">z</se:VendorOption>
+                <se:VendorOption name="sortByGroup">roads</se:VendorOption>
             </se:FeatureTypeStyle>
         </UserStyle>
     </NamedLayer>

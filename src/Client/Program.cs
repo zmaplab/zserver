@@ -4,7 +4,6 @@ using System.Xml;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
-using ZMap.SLD;
 using ZServer.Interfaces.WMS;
 
 namespace Client
@@ -36,7 +35,6 @@ namespace Client
                 // });
                 //
                 using var reader = XmlReader.Create("se.sld", settings);
-                var styledLayerDescriptor = new StyledLayerDescriptor();
                 // styledLayerDescriptor.ReadXml(reader);
         
              
@@ -125,7 +123,7 @@ namespace Client
         private static Task DoClientWork(IClusterClient client)
         {
             // example of calling grains from the initialized client
-            var friend = client.GetGrain<IWMSGrain>(Guid.NewGuid().ToString("N"));
+            client.GetGrain<IWMSGrain>(Guid.NewGuid().ToString("N"));
 
             // foreach (var layer in layers.Split(',', StringSplitOptions.RemoveEmptyEntries))
             // {

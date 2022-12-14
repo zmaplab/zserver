@@ -19,18 +19,26 @@ namespace ZServer.Tests
             {
                 Opacity = Expression<float>.New(1),
                 Width = Expression<int>.New(2),
-                Color = Expression<string>.New("#3ed53e")
+                Color = Expression<string>.New("#3ed53e"),
+                LineJoin = Expression<string>.New("Round"),
+                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
+                DashArray = Expression<float[]>.New(Array.Empty<float>()),
+                DashOffset = Expression<float>.New(0),
+                LineCap = Expression<string>.New("Round"),
+                GapWidth = Expression<int>.New(10),
+                Offset = Expression<int>.New(0),
+                Blur = Expression<int>.New(0),
+                Gradient = Expression<int>.New(0)
             };
 
-            var width = 256;
-            var height = 256;
-            var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+            var width = 1024;
+            var height = 1024;
             var graphicsService =
                 new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
             foreach (var feature in data)
             {
-                graphicsService.Render(Extent, feature, style);
+                graphicsService.Render(Extent, feature.Geometry, style);
             }
 
             var bytes = graphicsService.GetImage("image/png");
@@ -47,19 +55,25 @@ namespace ZServer.Tests
                 Opacity = Expression<float>.New(1),
                 Width = Expression<int>.New(2),
                 Color = Expression<string>.New("#3ed53e"),
-                DashArray = Expression<float[]>.New(new[] { 10, 10f }),
-                DashOffset = Expression<float>.New(10)
+                DashArray = Expression<float[]>.New(new[] { 20, 20f }),
+                DashOffset = Expression<float>.New(20),
+                LineCap = Expression<string>.New("Round"),
+                LineJoin = Expression<string>.New("Round"),
+                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
+                GapWidth = Expression<int>.New(10),
+                Offset = Expression<int>.New(0),
+                Blur = Expression<int>.New(0),
+                Gradient = Expression<int>.New(0)
             };
 
-            var width = 256;
-            var height = 256;
-            var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+            var width = 1024;
+            var height = 1024;
             var graphicsService =
                 new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
             foreach (var feature in data)
             {
-                graphicsService.Render(Extent, feature, style);
+                graphicsService.Render(Extent, feature.Geometry, style);
             }
 
             var bytes = graphicsService.GetImage("image/png");
@@ -78,18 +92,23 @@ namespace ZServer.Tests
                 Color = Expression<string>.New("#3ed53e"),
                 DashArray = Expression<float[]>.New(new[] { 5, 5f }),
                 DashOffset = Expression<float>.New(10),
-                Cap = Expression<string>.New("Round")
+                LineCap = Expression<string>.New("Round"),
+                LineJoin = Expression<string>.New("Round"),
+                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
+                GapWidth = Expression<int>.New(10),
+                Offset = Expression<int>.New(0),
+                Blur = Expression<int>.New(0),
+                Gradient = Expression<int>.New(0)
             };
 
-            var width = 256;
-            var height = 256;
-            var memoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+            var width = 1024;
+            var height = 1024;
             var graphicsService =
                 new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
             foreach (var feature in data)
             {
-                graphicsService.Render(Extent, feature, style);
+                graphicsService.Render(Extent, feature.Geometry, style);
             }
 
             var bytes = graphicsService.GetImage("image/png");

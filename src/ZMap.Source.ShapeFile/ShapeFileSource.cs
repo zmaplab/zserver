@@ -51,7 +51,7 @@ namespace ZMap.Source.ShapeFile
         {
             var features = new List<Feature>();
 
-            Func<Feature, bool> filterFunc = Filter?.GetFunc();
+            var filterFunc = Filter?.GetFunc();
 
             var tuple = Cache.GetOrCreate(File,
                 entry =>

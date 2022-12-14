@@ -4,6 +4,8 @@ namespace ZMap.Style
 {
     public class StyleGroup : IVisibleLimit
     {
+        public Expression<bool?> Filter { get; set; }
+
         /// <summary>
         /// 样式组名称
         /// </summary>
@@ -32,6 +34,21 @@ namespace ZMap.Style
         /// <summary>
         /// 样式列表
         /// </summary>
-        public List<Style> Styles { get; set; }
+        public List<Style> Styles { get; set; } = new();
+
+        public void Accept(IZMapStyleVisitor visitor, Feature feature)
+        {
+            if (Styles == null)
+            {
+                return;
+            }
+
+            Filter?.Invoke(feature);
+
+            foreach (var style in Styles)
+            {
+                style.Accept(visitor, feature);
+            }
+        }
     }
 }

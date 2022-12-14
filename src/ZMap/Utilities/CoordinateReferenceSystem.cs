@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Xml;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
@@ -25,7 +24,7 @@ namespace ZMap.Utilities
         static CoordinateReferenceSystem()
         {
             SRIDCache = new ConcurrentDictionary<int, CoordinateSystem>();
-            var names = typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
+            typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
             using var stream =
                 typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Utilities.proj.xml");
             if (stream == null)
@@ -117,7 +116,7 @@ namespace ZMap.Utilities
                 Transform(new Coordinate(extent.MinX, extent.MinY), transformation),
                 Transform(new Coordinate(extent.MinX, extent.MaxY), transformation),
                 Transform(new Coordinate(extent.MaxX, extent.MinY), transformation),
-                Transform(new Coordinate(extent.MaxX, extent.MaxY), transformation),
+                Transform(new Coordinate(extent.MaxX, extent.MaxY), transformation)
             };
 
             var result = new Envelope(corners[0]);

@@ -4,7 +4,7 @@ using System.Linq;
 using Natasha.CSharp;
 using NetTopologySuite.Geometries;
 using Xunit;
-using ZMap.Source;
+using ZMap;
 
 namespace ZServer.Tests
 {

@@ -1,9 +1,7 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Dapper;
-using HarmonyLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +10,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
+using ZMap;
 using ZMap.DynamicCompiler;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
@@ -26,9 +25,13 @@ namespace ZServer.API
 {
     public static class Program
     {
+        public static object R(Feature feature)
+        {
+          return  () => { var v = feature["dasharray"]?.ToString() as string; return v?.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).Select(x => (System.Single)System.Convert.ChangeType(x, typeof(System.Single))).ToArray(); };
+        }
         public static void Main(string[] args)
         {
-            FixOrleansPublishSingleFileIssue();
+            // FixOrleansPublishSingleFileIssue();
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             NtsGeometryServices.Instance = new NtsGeometryServices(
@@ -48,35 +51,35 @@ namespace ZServer.API
             CreateHostBuilder(args).Build().Run();
         }
 
-        private static void FixOrleansPublishSingleFileIssue()
-        {
-            var assembly = typeof(Orleans.Runtime.SiloStatus).Assembly;
+        // private static void FixOrleansPublishSingleFileIssue()
+        // {
+        //     var assembly = typeof(Orleans.Runtime.SiloStatus).Assembly;
+        //
+        //     if (!string.IsNullOrWhiteSpace(assembly.Location))
+        //     {
+        //         return;
+        //     }
+        //
+        //     var type = typeof(Orleans.Runtime.SiloStatus).Assembly.GetTypes()
+        //         .First(
+        //             x => x.FullName == "Orleans.Runtime.RuntimeVersion");
+        //     var method = type.GetProperty("Current")?.GetMethod;
+        //     if (method == null)
+        //     {
+        //         return;
+        //     }
+        //
+        //     var harmony = new Harmony("orleans.publishSingleFile");
+        //     var prefix = typeof(Program).GetMethod("Prefix");
+        //     harmony.Patch(method, new HarmonyMethod(prefix));
+        //     Console.WriteLine("Patch Orleans completed");
+        // }
 
-            if (!string.IsNullOrWhiteSpace(assembly.Location))
-            {
-                return;
-            }
-
-            var type = typeof(Orleans.Runtime.SiloStatus).Assembly.GetTypes()
-                .First(
-                    x => x.FullName == "Orleans.Runtime.RuntimeVersion");
-            var method = type.GetProperty("Current")?.GetMethod;
-            if (method == null)
-            {
-                return;
-            }
-
-            var harmony = new Harmony("orleans.publishSingleFile");
-            var prefix = typeof(Program).GetMethod("Prefix");
-            harmony.Patch(method, new HarmonyMethod(prefix));
-            Console.WriteLine("Patch Orleans completed");
-        }
-
-        public static bool Prefix(ref string __result)
-        {
-            __result = "3.6.5";
-            return false; // make sure you only skip if really necessary
-        }
+        // public static bool Prefix(ref string __result)
+        // {
+        //     __result = "3.6.5";
+        //     return false; // make sure you only skip if really necessary
+        // }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
