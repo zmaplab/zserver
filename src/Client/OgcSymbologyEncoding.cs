@@ -21,8 +21,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Description", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Description", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class DescriptionType
     {
 
@@ -58,12 +58,12 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FeatureIdType))]
+    [XmlIncludeAttribute(typeof(FeatureIdType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public abstract partial class AbstractIdType
     {
     }
@@ -73,15 +73,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("FeatureId", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("FeatureId", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class FeatureIdType : AbstractIdType
     {
 
         private string fidField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        [XmlAttributeAttribute(DataType = "ID")]
         public string fid
         {
             get
@@ -96,13 +96,13 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnaryLogicOpType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BinaryLogicOpType))]
+    [XmlIncludeAttribute(typeof(UnaryLogicOpType))]
+    [XmlIncludeAttribute(typeof(BinaryLogicOpType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public abstract partial class LogicOpsType
     {
     }
@@ -112,8 +112,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("Not", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("Not", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class UnaryLogicOpType : LogicOpsType
     {
 
@@ -122,21 +122,21 @@ namespace SharpMap.Symbology.Serialization
         private ItemChoiceType3 itemElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("And", typeof(BinaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("Not", typeof(UnaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("Or", typeof(BinaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsBetween", typeof(PropertyIsBetweenType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsGreaterThan", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsGreaterThanOrEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLessThan", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLessThanOrEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLike", typeof(PropertyIsLikeType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsNotEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsNull", typeof(PropertyIsNullType))]
-        [System.Xml.Serialization.XmlElementAttribute("comparisonOps", typeof(ComparisonOpsType))]
-        [System.Xml.Serialization.XmlElementAttribute("logicOps", typeof(LogicOpsType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        [XmlElementAttribute("And", typeof(BinaryLogicOpType))]
+        [XmlElementAttribute("Not", typeof(UnaryLogicOpType))]
+        [XmlElementAttribute("Or", typeof(BinaryLogicOpType))]
+        [XmlElementAttribute("PropertyIsBetween", typeof(PropertyIsBetweenType))]
+        [XmlElementAttribute("PropertyIsEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsGreaterThan", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsGreaterThanOrEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLessThan", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLessThanOrEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLike", typeof(PropertyIsLikeType))]
+        [XmlElementAttribute("PropertyIsNotEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsNull", typeof(PropertyIsNullType))]
+        [XmlElementAttribute("comparisonOps", typeof(ComparisonOpsType))]
+        [XmlElementAttribute("logicOps", typeof(LogicOpsType))]
+        [XmlChoiceIdentifierAttribute("ItemElementName")]
         public object Item
         {
             get
@@ -150,7 +150,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public ItemChoiceType3 ItemElementName
         {
             get
@@ -169,8 +169,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("And", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("And", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class BinaryLogicOpType : LogicOpsType
     {
 
@@ -179,21 +179,21 @@ namespace SharpMap.Symbology.Serialization
         private ItemsChoiceType6[] itemsElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("And", typeof(BinaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("Not", typeof(UnaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("Or", typeof(BinaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsBetween", typeof(PropertyIsBetweenType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsGreaterThan", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsGreaterThanOrEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLessThan", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLessThanOrEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLike", typeof(PropertyIsLikeType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsNotEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsNull", typeof(PropertyIsNullType))]
-        [System.Xml.Serialization.XmlElementAttribute("comparisonOps", typeof(ComparisonOpsType))]
-        [System.Xml.Serialization.XmlElementAttribute("logicOps", typeof(LogicOpsType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("And", typeof(BinaryLogicOpType))]
+        [XmlElementAttribute("Not", typeof(UnaryLogicOpType))]
+        [XmlElementAttribute("Or", typeof(BinaryLogicOpType))]
+        [XmlElementAttribute("PropertyIsBetween", typeof(PropertyIsBetweenType))]
+        [XmlElementAttribute("PropertyIsEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsGreaterThan", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsGreaterThanOrEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLessThan", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLessThanOrEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLike", typeof(PropertyIsLikeType))]
+        [XmlElementAttribute("PropertyIsNotEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsNull", typeof(PropertyIsNullType))]
+        [XmlElementAttribute("comparisonOps", typeof(ComparisonOpsType))]
+        [XmlElementAttribute("logicOps", typeof(LogicOpsType))]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public object[] Items
         {
             get
@@ -207,8 +207,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName")]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType6[] ItemsElementName
         {
             get
@@ -227,8 +227,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("PropertyIsBetween", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("PropertyIsBetween", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class PropertyIsBetweenType : ComparisonOpsType
     {
 
@@ -241,14 +241,14 @@ namespace SharpMap.Symbology.Serialization
         private UpperBoundaryType upperBoundaryField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1))]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType))]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Function", typeof(FunctionType1))]
+        [XmlElementAttribute("Literal", typeof(LiteralType))]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
+        [XmlChoiceIdentifierAttribute("ItemElementName")]
         public ExpressionType Item
         {
             get
@@ -262,7 +262,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public ItemChoiceType ItemElementName
         {
             get
@@ -307,8 +307,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("Add", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("Add", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class BinaryOperatorType : ExpressionType
     {
 
@@ -317,14 +317,14 @@ namespace SharpMap.Symbology.Serialization
         private ItemsChoiceType1[] itemsElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType), Order = 0)]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType), Order = 0)]
+        [XmlElementAttribute("Function", typeof(FunctionType1), Order = 0)]
+        [XmlElementAttribute("Literal", typeof(LiteralType), Order = 0)]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType), Order = 0)]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType), Order = 0)]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType), Order = 0)]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public ExpressionType[] Items
         {
             get
@@ -338,8 +338,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName", Order = 1)]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName", Order = 1)]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType1[] ItemsElementName
         {
             get
@@ -358,8 +358,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName = "FunctionType", Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("Function", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(TypeName = "FunctionType", Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("Function", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class FunctionType1 : ExpressionType
     {
 
@@ -370,14 +370,14 @@ namespace SharpMap.Symbology.Serialization
         private string nameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType), Order = 0)]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType), Order = 0)]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType), Order = 0)]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType), Order = 0)]
+        [XmlElementAttribute("Function", typeof(FunctionType1), Order = 0)]
+        [XmlElementAttribute("Literal", typeof(LiteralType), Order = 0)]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType), Order = 0)]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType), Order = 0)]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType), Order = 0)]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public ExpressionType[] Items
         {
             get
@@ -391,8 +391,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName", Order = 1)]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName", Order = 1)]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType[] ItemsElementName
         {
             get
@@ -406,7 +406,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string name
         {
             get
@@ -425,16 +425,16 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("Literal", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("Literal", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class LiteralType : ExpressionType
     {
 
         private System.Xml.XmlNode[] anyField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute()]
-        [System.Xml.Serialization.XmlAnyElementAttribute(Order = 0)]
+        [XmlTextAttribute()]
+        [XmlAnyElementAttribute(Order = 0)]
         public System.Xml.XmlNode[] Any
         {
             get
@@ -449,29 +449,29 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MapItemType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InterpolationPointType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LiteralType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FunctionType1))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PropertyNameType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BinaryOperatorType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FunctionType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecodeType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InterpolateType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(CategorizeType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(StringLengthType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(StringPositionType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(TrimType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ChangeCaseType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ConcatenateType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SubstringType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FormatDateType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FormatNumberType))]
+    [XmlIncludeAttribute(typeof(MapItemType))]
+    [XmlIncludeAttribute(typeof(InterpolationPointType))]
+    [XmlIncludeAttribute(typeof(LiteralType))]
+    [XmlIncludeAttribute(typeof(FunctionType1))]
+    [XmlIncludeAttribute(typeof(PropertyNameType))]
+    [XmlIncludeAttribute(typeof(BinaryOperatorType))]
+    [XmlIncludeAttribute(typeof(FunctionType))]
+    [XmlIncludeAttribute(typeof(RecodeType))]
+    [XmlIncludeAttribute(typeof(InterpolateType))]
+    [XmlIncludeAttribute(typeof(CategorizeType))]
+    [XmlIncludeAttribute(typeof(StringLengthType))]
+    [XmlIncludeAttribute(typeof(StringPositionType))]
+    [XmlIncludeAttribute(typeof(TrimType))]
+    [XmlIncludeAttribute(typeof(ChangeCaseType))]
+    [XmlIncludeAttribute(typeof(ConcatenateType))]
+    [XmlIncludeAttribute(typeof(SubstringType))]
+    [XmlIncludeAttribute(typeof(FormatDateType))]
+    [XmlIncludeAttribute(typeof(FormatNumberType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public abstract partial class ExpressionType
     {
     }
@@ -481,15 +481,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("PropertyName", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("PropertyName", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class PropertyNameType : ExpressionType
     {
 
         private string[] textField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute()]
+        [XmlTextAttribute()]
         public string[] Text
         {
             get
@@ -504,29 +504,29 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecodeType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InterpolateType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(CategorizeType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(StringLengthType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(StringPositionType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(TrimType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ChangeCaseType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ConcatenateType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SubstringType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FormatDateType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FormatNumberType))]
+    [XmlIncludeAttribute(typeof(RecodeType))]
+    [XmlIncludeAttribute(typeof(InterpolateType))]
+    [XmlIncludeAttribute(typeof(CategorizeType))]
+    [XmlIncludeAttribute(typeof(StringLengthType))]
+    [XmlIncludeAttribute(typeof(StringPositionType))]
+    [XmlIncludeAttribute(typeof(TrimType))]
+    [XmlIncludeAttribute(typeof(ChangeCaseType))]
+    [XmlIncludeAttribute(typeof(ConcatenateType))]
+    [XmlIncludeAttribute(typeof(SubstringType))]
+    [XmlIncludeAttribute(typeof(FormatDateType))]
+    [XmlIncludeAttribute(typeof(FormatNumberType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public abstract partial class FunctionType : ExpressionType
     {
 
         private string fallbackValueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string fallbackValue
         {
             get
@@ -543,7 +543,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemsChoiceType
     {
 
@@ -572,7 +572,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemsChoiceType1
     {
 
@@ -601,7 +601,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemChoiceType
     {
 
@@ -632,7 +632,7 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class LowerBoundaryType
     {
 
@@ -641,15 +641,15 @@ namespace SharpMap.Symbology.Serialization
         private ItemChoiceType1 itemElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1))]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType))]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("expression", typeof(ExpressionType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Function", typeof(FunctionType1))]
+        [XmlElementAttribute("Literal", typeof(LiteralType))]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("expression", typeof(ExpressionType))]
+        [XmlChoiceIdentifierAttribute("ItemElementName")]
         public ExpressionType Item
         {
             get
@@ -663,7 +663,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public ItemChoiceType1 ItemElementName
         {
             get
@@ -680,7 +680,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemChoiceType1
     {
 
@@ -714,7 +714,7 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class UpperBoundaryType
     {
 
@@ -723,14 +723,14 @@ namespace SharpMap.Symbology.Serialization
         private ItemChoiceType2 itemElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1))]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType))]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Function", typeof(FunctionType1))]
+        [XmlElementAttribute("Literal", typeof(LiteralType))]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
+        [XmlChoiceIdentifierAttribute("ItemElementName")]
         public ExpressionType Item
         {
             get
@@ -744,7 +744,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public ItemChoiceType2 ItemElementName
         {
             get
@@ -761,7 +761,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemChoiceType2
     {
 
@@ -788,15 +788,15 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PropertyIsBetweenType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PropertyIsNullType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PropertyIsLikeType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BinaryComparisonOpType))]
+    [XmlIncludeAttribute(typeof(PropertyIsBetweenType))]
+    [XmlIncludeAttribute(typeof(PropertyIsNullType))]
+    [XmlIncludeAttribute(typeof(PropertyIsLikeType))]
+    [XmlIncludeAttribute(typeof(BinaryComparisonOpType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public abstract partial class ComparisonOpsType
     {
     }
@@ -806,8 +806,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("PropertyIsNull", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("PropertyIsNull", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class PropertyIsNullType : ComparisonOpsType
     {
 
@@ -832,8 +832,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("PropertyIsLike", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("PropertyIsLike", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class PropertyIsLikeType : ComparisonOpsType
     {
 
@@ -874,7 +874,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string wildCard
         {
             get
@@ -888,7 +888,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string singleChar
         {
             get
@@ -902,7 +902,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string escapeChar
         {
             get
@@ -921,8 +921,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("PropertyIsEqualTo", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("PropertyIsEqualTo", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class BinaryComparisonOpType : ComparisonOpsType
     {
 
@@ -938,14 +938,14 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1))]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType))]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("Function", typeof(FunctionType1))]
+        [XmlElementAttribute("Literal", typeof(LiteralType))]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType))]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType))]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType))]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public ExpressionType[] Items
         {
             get
@@ -959,8 +959,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName")]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType5[] ItemsElementName
         {
             get
@@ -974,7 +974,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         [System.ComponentModel.DefaultValueAttribute(true)]
         public bool matchCase
         {
@@ -992,7 +992,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemsChoiceType5
     {
 
@@ -1021,7 +1021,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemsChoiceType6
     {
 
@@ -1071,7 +1071,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemChoiceType3
     {
 
@@ -1123,8 +1123,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("Filter", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("Filter", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class FilterType
     {
 
@@ -1133,23 +1133,23 @@ namespace SharpMap.Symbology.Serialization
         private ItemsChoiceType7[] itemsElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("And", typeof(BinaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("FeatureId", typeof(FeatureIdType))]
-        [System.Xml.Serialization.XmlElementAttribute("Not", typeof(UnaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("Or", typeof(BinaryLogicOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsBetween", typeof(PropertyIsBetweenType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsGreaterThan", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsGreaterThanOrEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLessThan", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLessThanOrEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsLike", typeof(PropertyIsLikeType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsNotEqualTo", typeof(BinaryComparisonOpType))]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyIsNull", typeof(PropertyIsNullType))]
-        [System.Xml.Serialization.XmlElementAttribute("_Id", typeof(AbstractIdType))]
-        [System.Xml.Serialization.XmlElementAttribute("comparisonOps", typeof(ComparisonOpsType))]
-        [System.Xml.Serialization.XmlElementAttribute("logicOps", typeof(LogicOpsType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("And", typeof(BinaryLogicOpType))]
+        [XmlElementAttribute("FeatureId", typeof(FeatureIdType))]
+        [XmlElementAttribute("Not", typeof(UnaryLogicOpType))]
+        [XmlElementAttribute("Or", typeof(BinaryLogicOpType))]
+        [XmlElementAttribute("PropertyIsBetween", typeof(PropertyIsBetweenType))]
+        [XmlElementAttribute("PropertyIsEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsGreaterThan", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsGreaterThanOrEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLessThan", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLessThanOrEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsLike", typeof(PropertyIsLikeType))]
+        [XmlElementAttribute("PropertyIsNotEqualTo", typeof(BinaryComparisonOpType))]
+        [XmlElementAttribute("PropertyIsNull", typeof(PropertyIsNullType))]
+        [XmlElementAttribute("_Id", typeof(AbstractIdType))]
+        [XmlElementAttribute("comparisonOps", typeof(ComparisonOpsType))]
+        [XmlElementAttribute("logicOps", typeof(LogicOpsType))]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public object[] Items
         {
             get
@@ -1163,8 +1163,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName")]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType7[] ItemsElementName
         {
             get
@@ -1181,7 +1181,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc", IncludeInSchema = false)]
     public enum ItemsChoiceType7
     {
 
@@ -1235,16 +1235,16 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RasterSymbolizerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(TextSymbolizerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PointSymbolizerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PolygonSymbolizerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LineSymbolizerType))]
+    [XmlIncludeAttribute(typeof(RasterSymbolizerType))]
+    [XmlIncludeAttribute(typeof(TextSymbolizerType))]
+    [XmlIncludeAttribute(typeof(PointSymbolizerType))]
+    [XmlIncludeAttribute(typeof(PolygonSymbolizerType))]
+    [XmlIncludeAttribute(typeof(LineSymbolizerType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public abstract partial class SymbolizerType
     {
 
@@ -1300,7 +1300,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public VersionType version
         {
             get
@@ -1314,7 +1314,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool versionSpecified
         {
             get
@@ -1328,7 +1328,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        [XmlAttributeAttribute(DataType = "anyURI")]
         public string uom
         {
             get
@@ -1347,8 +1347,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("BaseSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("BaseSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class BaseSymbolizerType
     {
 
@@ -1373,8 +1373,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("OnlineResource", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("OnlineResource", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class OnlineResourceType
     {
 
@@ -1402,7 +1402,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
         public string type
         {
             get
@@ -1416,7 +1416,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink", DataType = "anyURI")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink", DataType = "anyURI")]
         public string href
         {
             get
@@ -1430,7 +1430,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink", DataType = "anyURI")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink", DataType = "anyURI")]
         public string role
         {
             get
@@ -1444,7 +1444,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink", DataType = "anyURI")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink", DataType = "anyURI")]
         public string arcrole
         {
             get
@@ -1458,7 +1458,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
         public string title
         {
             get
@@ -1472,7 +1472,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
         public OnlineResourceTypeShow show
         {
             get
@@ -1486,7 +1486,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool showSpecified
         {
             get
@@ -1500,7 +1500,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
+        [XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/1999/xlink")]
         public OnlineResourceTypeActuate actuate
         {
             get
@@ -1514,7 +1514,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool actuateSpecified
         {
             get
@@ -1531,7 +1531,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/1999/xlink")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/1999/xlink")]
     public enum OnlineResourceTypeShow
     {
 
@@ -1554,7 +1554,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/1999/xlink")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/1999/xlink")]
     public enum OnlineResourceTypeActuate
     {
 
@@ -1574,12 +1574,12 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum VersionType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1.1.0")]
+        [XmlEnumAttribute("1.1.0")]
         Item110,
     }
 
@@ -1588,8 +1588,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("InlineContent", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("InlineContent", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class InlineContentType
     {
 
@@ -1598,8 +1598,8 @@ namespace SharpMap.Symbology.Serialization
         private InlineContentTypeEncoding encodingField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute()]
-        [System.Xml.Serialization.XmlAnyElementAttribute()]
+        [XmlTextAttribute()]
+        [XmlAnyElementAttribute()]
         public System.Xml.XmlNode[] Any
         {
             get
@@ -1613,7 +1613,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public InlineContentTypeEncoding encoding
         {
             get
@@ -1630,7 +1630,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/se")]
     public enum InlineContentTypeEncoding
     {
 
@@ -1646,8 +1646,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("LineSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("LineSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class LineSymbolizerType : SymbolizerType
     {
 
@@ -1702,15 +1702,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Geometry", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Geometry", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class GeometryType
     {
 
         private PropertyNameType propertyNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute(Namespace = "http://www.opengis.net/ogc")]
         public PropertyNameType PropertyName
         {
             get
@@ -1729,8 +1729,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Stroke", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Stroke", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class StrokeType
     {
 
@@ -1739,8 +1739,8 @@ namespace SharpMap.Symbology.Serialization
         private SvgParameterType[] svgParameterField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("GraphicFill", typeof(GraphicFillType))]
-        [System.Xml.Serialization.XmlElementAttribute("GraphicStroke", typeof(GraphicStrokeType))]
+        [XmlElementAttribute("GraphicFill", typeof(GraphicFillType))]
+        [XmlElementAttribute("GraphicStroke", typeof(GraphicStrokeType))]
         public object Item
         {
             get
@@ -1754,7 +1754,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SvgParameter")]
+        [XmlElementAttribute("SvgParameter")]
         public SvgParameterType[] SvgParameter
         {
             get
@@ -1773,8 +1773,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("GraphicFill", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("GraphicFill", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class GraphicFillType
     {
 
@@ -1799,8 +1799,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Graphic", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Graphic", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class GraphicType
     {
 
@@ -1817,8 +1817,8 @@ namespace SharpMap.Symbology.Serialization
         private DisplacementType displacementField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ExternalGraphic", typeof(ExternalGraphicType))]
-        [System.Xml.Serialization.XmlElementAttribute("Mark", typeof(MarkType))]
+        [XmlElementAttribute("ExternalGraphic", typeof(ExternalGraphicType))]
+        [XmlElementAttribute("Mark", typeof(MarkType))]
         public object[] Items
         {
             get
@@ -1902,8 +1902,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ExternalGraphic", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ExternalGraphic", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ExternalGraphicType
     {
 
@@ -1914,8 +1914,8 @@ namespace SharpMap.Symbology.Serialization
         private ColorReplacementType[] colorReplacementField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("InlineContent", typeof(InlineContentType))]
-        [System.Xml.Serialization.XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
+        [XmlElementAttribute("InlineContent", typeof(InlineContentType))]
+        [XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
         public object Item
         {
             get
@@ -1942,7 +1942,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ColorReplacement")]
+        [XmlElementAttribute("ColorReplacement")]
         public ColorReplacementType[] ColorReplacement
         {
             get
@@ -1961,8 +1961,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ColorReplacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ColorReplacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ColorReplacementType
     {
 
@@ -1987,8 +1987,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Recode", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Recode", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class RecodeType : FunctionType
     {
 
@@ -1997,7 +1997,7 @@ namespace SharpMap.Symbology.Serialization
         private MapItemType[] mapItemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType LookupValue
         {
             get
@@ -2011,7 +2011,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("MapItem", Order = 1)]
+        [XmlElementAttribute("MapItem", Order = 1)]
         public MapItemType[] MapItem
         {
             get
@@ -2026,13 +2026,13 @@ namespace SharpMap.Symbology.Serialization
     }
 
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SvgParameterType))]
+    [XmlIncludeAttribute(typeof(SvgParameterType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("InitialGap", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("InitialGap", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ParameterValueType
     {
 
@@ -2043,14 +2043,14 @@ namespace SharpMap.Symbology.Serialization
         private string[] textField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Add", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("Div", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("Function", typeof(FunctionType1), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("Literal", typeof(LiteralType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("Mul", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("PropertyName", typeof(PropertyNameType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("Sub", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("Add", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("Div", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("Function", typeof(FunctionType1), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("Literal", typeof(LiteralType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("Mul", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("PropertyName", typeof(PropertyNameType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("Sub", typeof(BinaryOperatorType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public ExpressionType[] Items
         {
             get
@@ -2064,8 +2064,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName")]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType2[] ItemsElementName
         {
             get
@@ -2079,7 +2079,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute()]
+        [XmlTextAttribute()]
         public string[] Text
         {
             get
@@ -2096,36 +2096,36 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se", IncludeInSchema = false)]
     public enum ItemsChoiceType2
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:Add")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:Add")]
         Add,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:Div")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:Div")]
         Div,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:Function")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:Function")]
         Function,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:Literal")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:Literal")]
         Literal,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:Mul")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:Mul")]
         Mul,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:PropertyName")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:PropertyName")]
         PropertyName,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("http://www.opengis.net/ogc:Sub")]
+        [XmlEnumAttribute("http://www.opengis.net/ogc:Sub")]
         Sub,
     }
 
@@ -2134,8 +2134,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("MapItem", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("MapItem", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class MapItemType : ExpressionType
     {
 
@@ -2144,7 +2144,7 @@ namespace SharpMap.Symbology.Serialization
         private ParameterValueType valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public double Data
         {
             get
@@ -2158,7 +2158,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public ParameterValueType Value
         {
             get
@@ -2177,8 +2177,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Mark", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Mark", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class MarkType
     {
 
@@ -2191,12 +2191,12 @@ namespace SharpMap.Symbology.Serialization
         private StrokeType strokeField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Format", typeof(string))]
-        [System.Xml.Serialization.XmlElementAttribute("InlineContent", typeof(InlineContentType))]
-        [System.Xml.Serialization.XmlElementAttribute("MarkIndex", typeof(string), DataType = "integer")]
-        [System.Xml.Serialization.XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
-        [System.Xml.Serialization.XmlElementAttribute("WellKnownName", typeof(string))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("Format", typeof(string))]
+        [XmlElementAttribute("InlineContent", typeof(InlineContentType))]
+        [XmlElementAttribute("MarkIndex", typeof(string), DataType = "integer")]
+        [XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
+        [XmlElementAttribute("WellKnownName", typeof(string))]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public object[] Items
         {
             get
@@ -2210,8 +2210,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName")]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType3[] ItemsElementName
         {
             get
@@ -2254,7 +2254,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se", IncludeInSchema = false)]
     public enum ItemsChoiceType3
     {
 
@@ -2279,8 +2279,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Fill", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Fill", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class FillType
     {
 
@@ -2302,7 +2302,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SvgParameter")]
+        [XmlElementAttribute("SvgParameter")]
         public SvgParameterType[] SvgParameter
         {
             get
@@ -2321,15 +2321,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("SvgParameter", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("SvgParameter", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class SvgParameterType : ParameterValueType
     {
 
         private string nameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string name
         {
             get
@@ -2348,8 +2348,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("AnchorPoint", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("AnchorPoint", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class AnchorPointType
     {
 
@@ -2389,8 +2389,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Displacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Displacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class DisplacementType
     {
 
@@ -2430,8 +2430,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("GraphicStroke", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("GraphicStroke", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class GraphicStrokeType
     {
 
@@ -2486,8 +2486,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("PolygonSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("PolygonSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class PolygonSymbolizerType : SymbolizerType
     {
 
@@ -2572,8 +2572,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("PointSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("PointSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class PointSymbolizerType : SymbolizerType
     {
 
@@ -2613,8 +2613,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("TextSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("TextSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class TextSymbolizerType : SymbolizerType
     {
 
@@ -2657,7 +2657,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("SvgParameter", IsNullable = false)]
+        [XmlArrayItemAttribute("SvgParameter", IsNullable = false)]
         public SvgParameterType[] Font
         {
             get
@@ -2715,16 +2715,16 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("LabelPlacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("LabelPlacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class LabelPlacementType
     {
 
         private object itemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("LinePlacement", typeof(LinePlacementType))]
-        [System.Xml.Serialization.XmlElementAttribute("PointPlacement", typeof(PointPlacementType))]
+        [XmlElementAttribute("LinePlacement", typeof(LinePlacementType))]
+        [XmlElementAttribute("PointPlacement", typeof(PointPlacementType))]
         public object Item
         {
             get
@@ -2743,8 +2743,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("LinePlacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("LinePlacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class LinePlacementType
     {
 
@@ -2793,7 +2793,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IsRepeatedSpecified
         {
             get
@@ -2846,7 +2846,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IsAlignedSpecified
         {
             get
@@ -2873,7 +2873,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool GeneralizeLineSpecified
         {
             get
@@ -2892,8 +2892,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("PointPlacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("PointPlacement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class PointPlacementType
     {
 
@@ -2948,8 +2948,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Halo", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Halo", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class HaloType
     {
 
@@ -2989,15 +2989,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Font", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Font", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class FontType
     {
 
         private SvgParameterType[] svgParameterField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SvgParameter")]
+        [XmlElementAttribute("SvgParameter")]
         public SvgParameterType[] SvgParameter
         {
             get
@@ -3016,8 +3016,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("RasterSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("RasterSymbolizer", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class RasterSymbolizerType : SymbolizerType
     {
 
@@ -3092,7 +3092,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool OverlapBehaviorSpecified
         {
             get
@@ -3163,8 +3163,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ChannelSelection", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ChannelSelection", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ChannelSelectionType
     {
 
@@ -3173,11 +3173,11 @@ namespace SharpMap.Symbology.Serialization
         private ItemsChoiceType4[] itemsElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("BlueChannel", typeof(SelectedChannelType))]
-        [System.Xml.Serialization.XmlElementAttribute("GrayChannel", typeof(SelectedChannelType))]
-        [System.Xml.Serialization.XmlElementAttribute("GreenChannel", typeof(SelectedChannelType))]
-        [System.Xml.Serialization.XmlElementAttribute("RedChannel", typeof(SelectedChannelType))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        [XmlElementAttribute("BlueChannel", typeof(SelectedChannelType))]
+        [XmlElementAttribute("GrayChannel", typeof(SelectedChannelType))]
+        [XmlElementAttribute("GreenChannel", typeof(SelectedChannelType))]
+        [XmlElementAttribute("RedChannel", typeof(SelectedChannelType))]
+        [XmlChoiceIdentifierAttribute("ItemsElementName")]
         public SelectedChannelType[] Items
         {
             get
@@ -3191,8 +3191,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlElementAttribute("ItemsElementName")]
+        [XmlIgnoreAttribute()]
         public ItemsChoiceType4[] ItemsElementName
         {
             get
@@ -3211,8 +3211,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("RedChannel", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("RedChannel", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class SelectedChannelType
     {
 
@@ -3252,8 +3252,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ContrastEnhancement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ContrastEnhancement", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ContrastEnhancementType
     {
 
@@ -3264,8 +3264,8 @@ namespace SharpMap.Symbology.Serialization
         private bool gammaValueFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Histogram", typeof(HistogramType))]
-        [System.Xml.Serialization.XmlElementAttribute("Normalize", typeof(NormalizeType))]
+        [XmlElementAttribute("Histogram", typeof(HistogramType))]
+        [XmlElementAttribute("Normalize", typeof(NormalizeType))]
         public object Item
         {
             get
@@ -3292,7 +3292,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool GammaValueSpecified
         {
             get
@@ -3311,8 +3311,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Histogram", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Histogram", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class HistogramType
     {
     }
@@ -3322,8 +3322,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Normalize", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Normalize", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class NormalizeType
     {
     }
@@ -3331,7 +3331,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se", IncludeInSchema = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se", IncludeInSchema = false)]
     public enum ItemsChoiceType4
     {
 
@@ -3351,8 +3351,8 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute(Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public enum OverlapBehavior
     {
 
@@ -3374,16 +3374,16 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ColorMap", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ColorMap", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ColorMapType
     {
 
         private FunctionType itemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Categorize", typeof(CategorizeType))]
-        [System.Xml.Serialization.XmlElementAttribute("Interpolate", typeof(InterpolateType))]
+        [XmlElementAttribute("Categorize", typeof(CategorizeType))]
+        [XmlElementAttribute("Interpolate", typeof(InterpolateType))]
         public FunctionType Item
         {
             get
@@ -3402,8 +3402,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Categorize", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Categorize", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class CategorizeType : FunctionType
     {
 
@@ -3420,7 +3420,7 @@ namespace SharpMap.Symbology.Serialization
         private bool threshholdsBelongToFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType LookupValue
         {
             get
@@ -3434,7 +3434,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public ParameterValueType Value
         {
             get
@@ -3448,7 +3448,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Threshold", Order = 2)]
+        [XmlElementAttribute("Threshold", Order = 2)]
         public ParameterValueType[] Threshold
         {
             get
@@ -3462,7 +3462,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Value", Order = 3)]
+        [XmlElementAttribute("Value", Order = 3)]
         public ParameterValueType[] Value1
         {
             get
@@ -3476,7 +3476,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public ThreshholdsBelongToType threshholdsBelongTo
         {
             get
@@ -3490,7 +3490,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool threshholdsBelongToSpecified
         {
             get
@@ -3507,7 +3507,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum ThreshholdsBelongToType
     {
 
@@ -3523,8 +3523,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Interpolate", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Interpolate", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class InterpolateType : FunctionType
     {
 
@@ -3541,7 +3541,7 @@ namespace SharpMap.Symbology.Serialization
         private bool methodFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType LookupValue
         {
             get
@@ -3555,7 +3555,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("InterpolationPoint", Order = 1)]
+        [XmlElementAttribute("InterpolationPoint", Order = 1)]
         public InterpolationPointType[] InterpolationPoint
         {
             get
@@ -3569,7 +3569,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public ModeType mode
         {
             get
@@ -3583,7 +3583,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool modeSpecified
         {
             get
@@ -3597,7 +3597,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public MethodType method
         {
             get
@@ -3611,7 +3611,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool methodSpecified
         {
             get
@@ -3630,8 +3630,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("InterpolationPoint", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("InterpolationPoint", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class InterpolationPointType : ExpressionType
     {
 
@@ -3640,7 +3640,7 @@ namespace SharpMap.Symbology.Serialization
         private ParameterValueType valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public double Data
         {
             get
@@ -3654,7 +3654,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public ParameterValueType Value
         {
             get
@@ -3671,7 +3671,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum ModeType
     {
 
@@ -3688,7 +3688,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum MethodType
     {
 
@@ -3704,8 +3704,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ShadedRelief", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ShadedRelief", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ShadedReliefType
     {
 
@@ -3731,7 +3731,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool BrightnessOnlySpecified
         {
             get
@@ -3758,7 +3758,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool ReliefFactorSpecified
         {
             get
@@ -3777,16 +3777,16 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ImageOutline", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ImageOutline", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ImageOutlineType
     {
 
         private SymbolizerType itemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("LineSymbolizer", typeof(LineSymbolizerType))]
-        [System.Xml.Serialization.XmlElementAttribute("PolygonSymbolizer", typeof(PolygonSymbolizerType))]
+        [XmlElementAttribute("LineSymbolizer", typeof(LineSymbolizerType))]
+        [XmlElementAttribute("PolygonSymbolizer", typeof(PolygonSymbolizerType))]
         public SymbolizerType Item
         {
             get
@@ -3805,8 +3805,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("FormatNumber", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("FormatNumber", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class FormatNumberType : FunctionType
     {
 
@@ -3827,7 +3827,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType NumericValue
         {
             get
@@ -3841,7 +3841,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public string Pattern
         {
             get
@@ -3855,7 +3855,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 2)]
+        [XmlElementAttribute(Order = 2)]
         public string NegativePattern
         {
             get
@@ -3869,7 +3869,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         [System.ComponentModel.DefaultValueAttribute(".")]
         public string decimalPoint
         {
@@ -3884,7 +3884,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         [System.ComponentModel.DefaultValueAttribute(",")]
         public string groupingSeparator
         {
@@ -3904,8 +3904,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("FormatDate", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("FormatDate", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class FormatDateType : FunctionType
     {
 
@@ -3914,7 +3914,7 @@ namespace SharpMap.Symbology.Serialization
         private string patternField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType DateValue
         {
             get
@@ -3928,7 +3928,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public string Pattern
         {
             get
@@ -3947,8 +3947,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Substring", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Substring", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class SubstringType : FunctionType
     {
 
@@ -3959,7 +3959,7 @@ namespace SharpMap.Symbology.Serialization
         private ParameterValueType lengthField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType StringValue
         {
             get
@@ -3973,7 +3973,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public ParameterValueType Position
         {
             get
@@ -3987,7 +3987,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 2)]
+        [XmlElementAttribute(Order = 2)]
         public ParameterValueType Length
         {
             get
@@ -4006,15 +4006,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Concatenate", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Concatenate", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ConcatenateType : FunctionType
     {
 
         private ParameterValueType[] stringValueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("StringValue", Order = 0)]
+        [XmlElementAttribute("StringValue", Order = 0)]
         public ParameterValueType[] StringValue
         {
             get
@@ -4033,8 +4033,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ChangeCase", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ChangeCase", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ChangeCaseType : FunctionType
     {
 
@@ -4045,7 +4045,7 @@ namespace SharpMap.Symbology.Serialization
         private bool directionFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType StringValue
         {
             get
@@ -4059,7 +4059,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public directionType direction
         {
             get
@@ -4073,7 +4073,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool directionSpecified
         {
             get
@@ -4090,7 +4090,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum directionType
     {
 
@@ -4106,8 +4106,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Trim", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Trim", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class TrimType : FunctionType
     {
 
@@ -4120,7 +4120,7 @@ namespace SharpMap.Symbology.Serialization
         private string stripOffCharField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType StringValue
         {
             get
@@ -4134,7 +4134,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public stripOffPositionType stripOffPosition
         {
             get
@@ -4148,7 +4148,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool stripOffPositionSpecified
         {
             get
@@ -4162,7 +4162,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string stripOffChar
         {
             get
@@ -4179,7 +4179,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum stripOffPositionType
     {
 
@@ -4198,8 +4198,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("StringPosition", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("StringPosition", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class StringPositionType : FunctionType
     {
 
@@ -4212,7 +4212,7 @@ namespace SharpMap.Symbology.Serialization
         private bool searchDirectionFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType LookupString
         {
             get
@@ -4226,7 +4226,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
+        [XmlElementAttribute(Order = 1)]
         public ParameterValueType StringValue
         {
             get
@@ -4240,7 +4240,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public searchDirectionType searchDirection
         {
             get
@@ -4254,7 +4254,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool searchDirectionSpecified
         {
             get
@@ -4271,7 +4271,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
     public enum searchDirectionType
     {
 
@@ -4287,15 +4287,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("StringLength", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("StringLength", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class StringLengthType : FunctionType
     {
 
         private ParameterValueType stringValueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
+        [XmlElementAttribute(Order = 0)]
         public ParameterValueType StringValue
         {
             get
@@ -4314,8 +4314,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("FeatureTypeStyle", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("FeatureTypeStyle", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class FeatureTypeStyleType
     {
 
@@ -4373,7 +4373,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SemanticTypeIdentifier")]
+        [XmlElementAttribute("SemanticTypeIdentifier")]
         public string[] SemanticTypeIdentifier
         {
             get
@@ -4387,8 +4387,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
-        [System.Xml.Serialization.XmlElementAttribute("Rule", typeof(RuleType))]
+        [XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
+        [XmlElementAttribute("Rule", typeof(RuleType))]
         public object[] Items
         {
             get
@@ -4402,7 +4402,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public VersionType version
         {
             get
@@ -4416,7 +4416,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool versionSpecified
         {
             get
@@ -4435,8 +4435,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("Rule", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("Rule", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class RuleType
     {
 
@@ -4498,8 +4498,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Filter", typeof(FilterType), Namespace = "http://www.opengis.net/ogc")]
-        [System.Xml.Serialization.XmlElementAttribute("ElseFilter", typeof(ElseFilterType))]
+        [XmlElementAttribute("Filter", typeof(FilterType), Namespace = "http://www.opengis.net/ogc")]
+        [XmlElementAttribute("ElseFilter", typeof(ElseFilterType))]
         public object Item
         {
             get
@@ -4526,7 +4526,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MinScaleDenominatorSpecified
         {
             get
@@ -4553,7 +4553,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MaxScaleDenominatorSpecified
         {
             get
@@ -4567,11 +4567,11 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("LineSymbolizer", typeof(LineSymbolizerType))]
-        [System.Xml.Serialization.XmlElementAttribute("PointSymbolizer", typeof(PointSymbolizerType))]
-        [System.Xml.Serialization.XmlElementAttribute("PolygonSymbolizer", typeof(PolygonSymbolizerType))]
-        [System.Xml.Serialization.XmlElementAttribute("RasterSymbolizer", typeof(RasterSymbolizerType))]
-        [System.Xml.Serialization.XmlElementAttribute("TextSymbolizer", typeof(TextSymbolizerType))]
+        [XmlElementAttribute("LineSymbolizer", typeof(LineSymbolizerType))]
+        [XmlElementAttribute("PointSymbolizer", typeof(PointSymbolizerType))]
+        [XmlElementAttribute("PolygonSymbolizer", typeof(PolygonSymbolizerType))]
+        [XmlElementAttribute("RasterSymbolizer", typeof(RasterSymbolizerType))]
+        [XmlElementAttribute("TextSymbolizer", typeof(TextSymbolizerType))]
         public SymbolizerType[] Items
         {
             get
@@ -4590,8 +4590,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("LegendGraphic", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("LegendGraphic", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class LegendGraphicType
     {
 
@@ -4616,8 +4616,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("ElseFilter", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("ElseFilter", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class ElseFilterType
     {
     }
@@ -4627,8 +4627,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
-    [System.Xml.Serialization.XmlRootAttribute("CoverageStyle", Namespace = "http://www.opengis.net/se", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/se")]
+    [XmlRootAttribute("CoverageStyle", Namespace = "http://www.opengis.net/se", IsNullable = false)]
     public partial class CoverageStyleType
     {
 
@@ -4686,7 +4686,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SemanticTypeIdentifier")]
+        [XmlElementAttribute("SemanticTypeIdentifier")]
         public string[] SemanticTypeIdentifier
         {
             get
@@ -4700,8 +4700,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
-        [System.Xml.Serialization.XmlElementAttribute("Rule", typeof(RuleType))]
+        [XmlElementAttribute("OnlineResource", typeof(OnlineResourceType))]
+        [XmlElementAttribute("Rule", typeof(RuleType))]
         public object[] Items
         {
             get
@@ -4715,7 +4715,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public VersionType version
         {
             get
@@ -4729,7 +4729,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool versionSpecified
         {
             get
@@ -4748,15 +4748,15 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute("SortBy", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute("SortBy", Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class SortByType
     {
 
         private SortPropertyType[] sortPropertyField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SortProperty")]
+        [XmlElementAttribute("SortProperty")]
         public SortPropertyType[] SortProperty
         {
             get
@@ -4775,7 +4775,7 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class SortPropertyType
     {
 
@@ -4812,7 +4812,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SortOrderSpecified
         {
             get
@@ -4829,7 +4829,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public enum SortOrderType
     {
 
@@ -4845,8 +4845,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class Filter_Capabilities
     {
 
@@ -4868,8 +4868,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("EID", typeof(EID), IsNullable = false)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FID", typeof(FID), IsNullable = false)]
+        [XmlArrayItemAttribute("EID", typeof(EID), IsNullable = false)]
+        [XmlArrayItemAttribute("FID", typeof(FID), IsNullable = false)]
         public object[] Id_Capabilities
         {
             get
@@ -4888,7 +4888,7 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class Scalar_CapabilitiesType
     {
 
@@ -4925,8 +4925,8 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("Functions", typeof(FunctionsType), IsNullable = false)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("SimpleArithmetic", typeof(SimpleArithmetic), IsNullable = false)]
+        [XmlArrayItemAttribute("Functions", typeof(FunctionsType), IsNullable = false)]
+        [XmlArrayItemAttribute("SimpleArithmetic", typeof(SimpleArithmetic), IsNullable = false)]
         public object[] ArithmeticOperators
         {
             get
@@ -4945,8 +4945,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class LogicalOperators
     {
     }
@@ -4956,14 +4956,14 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class ComparisonOperatorsType
     {
 
         private ComparisonOperatorType[] comparisonOperatorField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ComparisonOperator")]
+        [XmlElementAttribute("ComparisonOperator")]
         public ComparisonOperatorType[] ComparisonOperator
         {
             get
@@ -4980,7 +4980,7 @@ namespace SharpMap.Symbology.Serialization
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "2.0.50727.1432")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public enum ComparisonOperatorType
     {
 
@@ -5017,7 +5017,7 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class FunctionsType
     {
 
@@ -5042,14 +5042,14 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class FunctionNamesType
     {
 
         private FunctionNameType[] functionNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("FunctionName")]
+        [XmlElementAttribute("FunctionName")]
         public FunctionNameType[] FunctionName
         {
             get
@@ -5068,7 +5068,7 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
+    [XmlTypeAttribute(Namespace = "http://www.opengis.net/ogc")]
     public partial class FunctionNameType
     {
 
@@ -5077,7 +5077,7 @@ namespace SharpMap.Symbology.Serialization
         private string valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string nArgs
         {
             get
@@ -5091,7 +5091,7 @@ namespace SharpMap.Symbology.Serialization
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute()]
+        [XmlTextAttribute()]
         public string Value
         {
             get
@@ -5110,8 +5110,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class SimpleArithmetic
     {
     }
@@ -5121,8 +5121,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class EID
     {
     }
@@ -5132,8 +5132,8 @@ namespace SharpMap.Symbology.Serialization
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.opengis.net/ogc")]
+    [XmlRootAttribute(Namespace = "http://www.opengis.net/ogc", IsNullable = false)]
     public partial class FID
     {
     }

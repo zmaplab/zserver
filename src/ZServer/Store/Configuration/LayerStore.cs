@@ -28,16 +28,18 @@ namespace ZServer.Store.Configuration
         private readonly ISourceStore _sourceStore;
         private readonly ServerOptions _options;
         private readonly ILogger<LayerStore> _logger;
+        private readonly ISldStore _sldStore;
 
         public LayerStore(IConfiguration configuration, IStyleGroupStore styleStore,
             IResourceGroupStore resourceGroupStore, ISourceStore sourceStore,
-            IOptionsMonitor<ServerOptions> options, ILogger<LayerStore> logger)
+            IOptionsMonitor<ServerOptions> options, ILogger<LayerStore> logger, ISldStore sldStore)
         {
             _configuration = configuration;
             _styleStore = styleStore;
             _resourceGroupStore = resourceGroupStore;
             _sourceStore = sourceStore;
             _logger = logger;
+            _sldStore = sldStore;
             _options = options.CurrentValue;
         }
 
@@ -136,6 +138,12 @@ namespace ZServer.Store.Configuration
                     if (styleGroup != null)
                     {
                         group.Add(styleGroup);
+                    }
+
+                    var sldStyleGroups = await _sldStore.FindAsync(name);
+                    if (sldStyleGroups != null)
+                    {
+                        group.AddRange(sldStyleGroups);
                     }
                 }
             }

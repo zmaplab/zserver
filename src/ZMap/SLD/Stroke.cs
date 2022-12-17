@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
 using ZMap.Style;
 
@@ -67,13 +65,13 @@ namespace ZMap.SLD
                 return;
             }
 
-            parent.Color = Accept<string>(Color, "stroke", visitor, extraData);
-            parent.Width = Accept<int>(Width, "stroke-width", visitor, extraData);
-            parent.Opacity = Accept<float>(Width, "stroke-opacity", visitor, extraData);
-            parent.LineJoin = Accept<string>(LineJoin, "stroke-linejoin", visitor, extraData);
-            parent.LineCap = Accept<string>(LineCap, "stroke-linecap", visitor, extraData);
-            parent.DashArray = GetArrayExpression<float>(DashArray, "stroke-dasharray", visitor, extraData);
-            parent.DashOffset = Accept<float>(DashOffset, "stroke-dashoffset", visitor, extraData);
+            parent.Color = Accept<string>(Color, visitor, extraData);
+            parent.Width = Accept<int>(Width, visitor, extraData);
+            parent.Opacity = Accept<float>(Opacity, visitor, extraData);
+            parent.LineJoin = Accept<string>(LineJoin, visitor, extraData);
+            parent.LineCap = Accept<string>(LineCap, visitor, extraData);
+            parent.DashArray = GetArrayExpression<float>(DashArray, visitor, extraData);
+            parent.DashOffset = Accept<float>(DashOffset, visitor, extraData);
 
             visitor.Push(parent);
         }

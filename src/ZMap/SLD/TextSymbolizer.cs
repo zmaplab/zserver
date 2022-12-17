@@ -1,4 +1,6 @@
+using System;
 using System.Xml.Serialization;
+using ZMap.Style;
 
 namespace ZMap.SLD
 {
@@ -20,6 +22,7 @@ namespace ZMap.SLD
         /// <summary>
         /// 标签文本的填充样式。
         /// </summary>
+        [XmlElement("Fill")]
         public Fill Fill { get; set; }
 
         /// <summary>
@@ -44,11 +47,32 @@ namespace ZMap.SLD
         /// 要在标签文本后面显示的图形。
         /// </summary>
         public Graphic Graphic { get; set; }
-        
+
         public override object Accept(IStyleVisitor visitor, object extraData)
         {
-            // visitor.Visit(Halo, extraData);
-            // visitor.Visit(Graphic, extraData);
+            var textStyle = new TextStyle
+            {
+                MinZoom = 0,
+                MaxZoom = Defaults.MaxZoomValue,
+                Filter = Expression<bool?>.New(null),
+                Label = Expression<string>.New(null, $"feature[\"{Label.PropertyName}\"]"),
+                Offset = Expression<float[]>.New(Array.Empty<float>()),
+                Color = Expression<string>.New("#000000"),
+                Opacity = Expression<float>.New(1),
+                BackgroundColor = Expression<string>.New(null),
+                BackgroundOpacity = Expression<float>.New(1),
+                Radius = Expression<float>.New(0),
+                RadiusColor = Expression<string>.New(null),
+                RadiusOpacity = Expression<float>.New(0),
+                Weight = Expression<string>.New(null),
+                Align = Expression<string>.New(null),
+                Rotate = Expression<float>.New(0),
+                Transform = Expression<TextTransform>.New(TextTransform.Lowercase),
+                OutlineSize = Expression<int>.New(0)
+            };
+            visitor.Push(textStyle);
+            Font?.Accept(visitor, extraData);
+            Fill?.Accept(visitor, extraData);
             return null;
         }
     }

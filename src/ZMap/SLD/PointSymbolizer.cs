@@ -21,7 +21,8 @@ namespace ZMap.SLD
             var symbolStyle = new SymbolStyle
             {
                 MinZoom = 0,
-                MaxZoom = Defaults.MaxZoomValue
+                MaxZoom = Defaults.MaxZoomValue,
+                Filter = Expression<bool?>.New(null)
             };
             visitor.Push(symbolStyle);
             visitor.Visit(Graphic, extraData);

@@ -1,9 +1,10 @@
 namespace ZMap.Style
 {
-    public class TextStyle : VectorStyle
+    public class TextStyle : VectorStyle, IFillStyle
     {
         public Expression<string> Label { get; set; }
         public Expression<string> Color { get; set; }
+        public Expression<double[]> Translate { get; set; }
         public Expression<float> Opacity { get; set; }
         public Expression<string> BackgroundColor { get; set; }
         public Expression<float> BackgroundOpacity { get; set; }

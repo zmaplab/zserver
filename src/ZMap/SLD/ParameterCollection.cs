@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using ZMap.Style;
 
 namespace ZMap.SLD;
 
@@ -74,24 +75,26 @@ public abstract class ParameterCollection
 
             var parameterValue = new ParameterValue
             {
-                Text = value?.ToString()
+                Text = value?.ToString(),
+                Name = name
             };
             _cache.TryAdd(name, parameterValue);
             return parameterValue;
         }
         else
         {
+            parameter.Name = name;
             _cache.TryAdd(name, parameter);
             return parameter;
         }
     }
 
-    protected ZMap.Style.Expression<T> Accept<T>(ParameterValue parameterValue, string name, IStyleVisitor visitor,
+    protected Expression<T> Accept<T>(ParameterValue parameterValue, IStyleVisitor visitor,
         object extraData)
     {
-        if (parameterValue == null || (parameterValue.Text == null && parameterValue.Expression == null))
+        if (parameterValue.Text == null && parameterValue.Expression == null)
         {
-            return ZMap.Style.Expression<T>.New(GetDefault<T>(name));
+            return Expression<T>.New(GetDefault<T>(parameterValue.Name));
         }
 
         if (parameterValue.Text != null)
@@ -99,25 +102,26 @@ public abstract class ParameterCollection
             var value = typeof(T) == typeof(string)
                 ? parameterValue.Text
                 : Convert.ChangeType(parameterValue.Text, typeof(T));
-            return ZMap.Style.Expression<T>.New(value == null ? default : (T)value);
+            return Expression<T>.New(value == null ? default : (T)value);
         }
 
         visitor.Visit(parameterValue, extraData);
-        return visitor.Pop();
+        Expression expression = visitor.Pop();
+
+        return Expression<T>.New(GetDefault<T>(parameterValue.Name), expression.Body);
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="parameterValue"></param>
-    /// <param name="name"></param>
     /// <param name="visitor"></param>
     /// <param name="extraData"></param>
     /// <returns></returns>
-    protected ZMap.Style.Expression<T[]> GetArrayExpression<T>(ParameterValue parameterValue, string name,
+    protected Expression<T[]> GetArrayExpression<T>(ParameterValue parameterValue,
         IStyleVisitor visitor, object extraData)
     {
-        var expression = Accept<string>(parameterValue, name, visitor, extraData);
+        var expression = Accept<string>(parameterValue, visitor, extraData);
         if (expression == null)
         {
             return null;
@@ -127,7 +131,7 @@ public abstract class ParameterCollection
 
         if (expression.Value != null)
         {
-            return ZMap.Style.Expression<T[]>.New(expression.Value
+            return Expression<T[]>.New(expression.Value
                 .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => (T)Convert.ChangeType(x, type)).ToArray());
         }
@@ -136,38 +140,38 @@ public abstract class ParameterCollection
         var separator = "new[] { ' ' }";
 
         return !string.IsNullOrWhiteSpace(expression.Body)
-            ? ZMap.Style.Expression<T[]>.New(null,
+            ? Expression<T[]>.New(null,
                 $"var v = {expression.Body}?.ToString() as string; return v?.Split({separator}, System.StringSplitOptions.RemoveEmptyEntries).Select(x => ({typeName})System.Convert.ChangeType(x, typeof({typeName}))).ToArray();")
             : null;
     }
 
-    protected T Get<T>(string name)
-    {
-        var type = typeof(T);
-        if (type.IsGenericType)
-        {
-            throw new ArgumentException("不支持泛型数据转换");
-        }
-
-        if (_cache.ContainsKey(name))
-        {
-            return _cache[name];
-        }
-
-        var text = Parameters.FirstOrDefault(x => x.Name == name)?.Text?.Trim();
-        if (string.IsNullOrEmpty(text))
-        {
-            var result = GetDefault<T>(name);
-            _cache.TryAdd(name, result);
-            return result;
-        }
-        else
-        {
-            var obj = typeof(T) == typeof(string)
-                ? text
-                : Convert.ChangeType(text, typeof(T));
-            _cache.TryAdd(name, obj);
-            return obj == null ? default : (T)obj;
-        }
-    }
+    // protected T Get<T>(string name)
+    // {
+    //     var type = typeof(T);
+    //     if (type.IsGenericType)
+    //     {
+    //         throw new ArgumentException("不支持泛型数据转换");
+    //     }
+    //
+    //     if (_cache.ContainsKey(name))
+    //     {
+    //         return _cache[name];
+    //     }
+    //
+    //     var text = Parameters.FirstOrDefault(x => x.Name == name)?.Text?.Trim();
+    //     if (string.IsNullOrEmpty(text))
+    //     {
+    //         var result = GetDefault<T>(name);
+    //         _cache.TryAdd(name, result);
+    //         return result;
+    //     }
+    //     else
+    //     {
+    //         var obj = typeof(T) == typeof(string)
+    //             ? text
+    //             : Convert.ChangeType(text, typeof(T));
+    //         _cache.TryAdd(name, obj);
+    //         return obj == null ? default : (T)obj;
+    //     }
+    // }
 }

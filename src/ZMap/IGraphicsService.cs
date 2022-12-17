@@ -10,6 +10,6 @@ public interface IGraphicsService : IDisposable
     int Width { get; }
     int Height { get; }
     byte[] GetImage(string imageFormat, bool bordered = false);
-    void Render(byte[] image, Style.RasterStyle style);
+    void Render(byte[] image, RasterStyle style);
     void Render(Envelope extent, Geometry geometry, VectorStyle style);
 }

@@ -2,11 +2,9 @@ using ZMap.Utilities;
 
 namespace ZMap.Style
 {
-    public class Expression<TV>
+    public class Expression<TV> : Expression
     {
         public TV Value { get; internal set; }
-
-        public string Body { get; private set; }
 
         public static Expression<TV> New(TV v, string body = null)
         {
@@ -39,6 +37,19 @@ namespace ZMap.Style
                 var result = func.Invoke(feature);
                 Value = result is TV tv ? tv : defaultValue;
             }
+        }
+    }
+
+    public class Expression
+    {
+        public string Body { get; protected set; }
+
+        public static Expression New(string body = null)
+        {
+            return new Expression
+            {
+                Body = body
+            };
         }
     }
 }

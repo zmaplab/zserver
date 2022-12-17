@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-using ZMap.SLD.Expression;
 using ZMap.SLD.Filter;
+using ZMap.SLD.Filter.Expression;
 
 namespace ZMap.SLD;
 
@@ -26,10 +25,11 @@ public interface IStyleVisitor
     object Visit(Halo halo, object data);
     object Visit(LinePlacement linePlacement, object data);
     object Visit(Mark mark, object data);
+    object Visit(Font font, object data);
     object Visit(PointPlacement pointPlacement, object data);
     object Visit(ParameterValue parameterValue, object data);
-    object Visit(Literal literal, object data);
-    object Visit(PropertyIsEqualTo propertyIsEqualTo, object data);
-    object Visit(Expression.Expression expression, object data);
+    object Visit(LiteralType literal, object data);
+    object Visit(PropertyIsEqualToType propertyIsEqualToType, object data);
+    object Visit(ExpressionType expression, object data);
 
 }
