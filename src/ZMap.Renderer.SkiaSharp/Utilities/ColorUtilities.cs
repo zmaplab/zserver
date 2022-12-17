@@ -21,6 +21,7 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
                 }
                 else
                 {
+                    opacity = opacity > 1 ? 1 : opacity;
                     var alpha = Convert.ToByte(Math.Round(opacity / 0.0039215, 0));
                     return color.WithAlpha(alpha);
                 }

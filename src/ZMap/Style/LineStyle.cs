@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace ZMap.Style
 {
     public class LineStyle : VectorStyle, IStrokeStyle

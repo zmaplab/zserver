@@ -101,12 +101,6 @@
                     <se:Description>
                         <se:Title>规划道路中线L17</se:Title>
                     </se:Description>
-                    <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
-                        <ogc:PropertyIsGreaterThan>
-                            <ogc:PropertyName>yzdydldj</ogc:PropertyName>
-                            <ogc:Literal>次干路</ogc:Literal>
-                        </ogc:PropertyIsGreaterThan>
-                    </ogc:Filter>
                     <se:MinScaleDenominator>3387</se:MinScaleDenominator>
                     <se:MaxScaleDenominator>6771</se:MaxScaleDenominator>
                     <se:LineSymbolizer>
@@ -220,8 +214,6 @@
                         </se:Stroke>
                     </se:LineSymbolizer>
                 </se:Rule>
-
-
                 <se:Rule>
                     <se:Name>文字1</se:Name>
                     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">

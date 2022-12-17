@@ -1,22 +1,33 @@
 ﻿using System;
 using System.IO;
+using System.Xml;
 using System.Xml.Serialization;
+using SharpMap.Symbology.Serialization;
 
-namespace SharpMap.Symbology.Serialization
+namespace Client
 {
+    public class NamespaceIgnorantXmlTextReader : XmlTextReader
+    {
+        public NamespaceIgnorantXmlTextReader(Stream stream) : base(stream)
+        {
+        }
+
+        public override string NamespaceURI => "";
+    }
+    
     public class FeatureTypeStyleSerializer
     {
-        private static readonly XmlSerializer _serializer = new XmlSerializer(typeof(FeatureTypeStyleType));
+        private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(FeatureTypeStyleType));
 
         public static FeatureTypeStyleType Deserialize(String xml)
         {
-            return _serializer.Deserialize(new StringReader(xml)) as FeatureTypeStyleType;
+            return Serializer.Deserialize(new StringReader(xml)) as FeatureTypeStyleType;
         }
 
         public static String Serialize(FeatureTypeStyleType featureTypeStyle)
         {
             var writer = new StringWriter();
-            _serializer.Serialize(writer, featureTypeStyle);
+            Serializer.Serialize(writer, featureTypeStyle);
             return writer.ToString();
         }
     }

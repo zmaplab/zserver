@@ -42,7 +42,7 @@
           ],
           "dashOffset": 0,
           "width": 2,
-          "color": "#e0861a"
+          "color": "#E0861A"
         },
         {
           "type": "text",
@@ -143,7 +143,7 @@
         }
       ],
       "styleGroups": [
-        "polygon"
+        "polygon_sld"
       ]
     },
     "polygon_3857_shp": {

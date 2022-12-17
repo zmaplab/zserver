@@ -2,6 +2,7 @@ using System.Xml.Serialization;
 
 namespace ZMap.SLD
 {
+    [XmlRoot("Mark")]
     public class Mark : GraphicalSymbol
     {
         /// <summary>
@@ -13,6 +14,7 @@ namespace ZMap.SLD
         /// <summary>
         /// 
         /// </summary>
+        [XmlElement("Fill")]
         public Fill Fill { get; set; }
 
         /// <summary>

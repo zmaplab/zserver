@@ -1,6 +1,6 @@
 using System;
 using System.Xml.Serialization;
-using ZMap.SLD.Expression;
+using ZMap.SLD.Filter.Expression;
 
 namespace ZMap.SLD;
 
@@ -11,15 +11,15 @@ public class ParameterValue
     /// <summary>
     /// 说明： 暂时只支持单个表达式， GeoServer 亦是如此， 后续看为什么对 SLD 的支持不完整
     /// </summary>
-    [XmlElement("Add", typeof(BinaryOperator))]
-    [XmlElement("Div", typeof(BinaryOperator))]
-    [XmlElement("Function", typeof(Function))]
-    [XmlElement("Literal", typeof(Literal))]
-    [XmlElement("Mul", typeof(BinaryOperator))]
-    [XmlElement("PropertyName", typeof(PropertyName))]
-    [XmlElement("Sub", typeof(BinaryOperator))]
+    [XmlElement("Add", typeof(BinaryOperatorType))]
+    [XmlElement("Div", typeof(BinaryOperatorType))]
+    [XmlElement("Function", typeof(FunctionType1))]
+    [XmlElement("Literal", typeof(LiteralType))]
+    [XmlElement("Mul", typeof(BinaryOperatorType))]
+    [XmlElement("PropertyName", typeof(PropertyNameType))]
+    [XmlElement("Sub", typeof(BinaryOperatorType))]
     [XmlChoiceIdentifier("ExpressionElementName")]
-    public Expression.Expression Expression { get; set; }
+    public ExpressionType Expression { get; set; }
 
     /// <remarks/>
     [XmlElement("ExpressionElementName")]
@@ -29,6 +29,12 @@ public class ParameterValue
     /// <remarks/>
     [XmlText]
     public string Text { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlIgnore]
+    public string Name { get; set; }
 
     public enum ExpressionChoiceType
     {

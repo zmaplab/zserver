@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using ZMap.SLD.Filter;
 
 namespace ZMap.SLD;
 
@@ -26,7 +27,7 @@ public class FeatureTypeConstraint : LayerConstraint, IStyle
     /// 
     /// </summary>
     [XmlElement("Filter")]
-    public Filter.Filter Filter { get; set; }
+    public FilterType Filter { get; set; }
 
     public virtual object Accept(IStyleVisitor visitor, object data)
     {

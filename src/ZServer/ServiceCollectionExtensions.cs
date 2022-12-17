@@ -32,6 +32,7 @@ namespace ZServer
             serviceCollection.TryAddScoped<IGridSetStore, GridSetStore>();
             serviceCollection.TryAddScoped<IStyleGroupStore, StyleGroupStore>();
             serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
+            serviceCollection.TryAddScoped<ISldStore, SldStore>();
 
             serviceCollection.TryAddSingleton<IHashAlgorithmService, MurmurHashAlgorithmService>();
 
