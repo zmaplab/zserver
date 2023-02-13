@@ -1,11 +1,11 @@
 using System;
+using System.Linq;
 using System.Xml.Serialization;
 using ZMap.SLD.Filter.Expression;
 
 namespace ZMap.SLD;
 
 [Serializable]
-[XmlRoot("InitialGap")]
 public class ParameterValue
 {
     /// <summary>
@@ -18,23 +18,23 @@ public class ParameterValue
     [XmlElement("Mul", typeof(BinaryOperatorType))]
     [XmlElement("PropertyName", typeof(PropertyNameType))]
     [XmlElement("Sub", typeof(BinaryOperatorType))]
-    [XmlChoiceIdentifier("ExpressionElementName")]
-    public ExpressionType Expression { get; set; }
+    [XmlChoiceIdentifier("ItemsElementName")]
+    public ExpressionType[] Items { get; set; }
 
     /// <remarks/>
-    [XmlElement("ExpressionElementName")]
+    [XmlElement("ItemsElementName")]
     [XmlIgnore]
-    public ExpressionChoiceType ExpressionElementName { get; set; }
+    public ExpressionChoiceType[] ItemsElementName { get; set; }
 
     /// <remarks/>
     [XmlText]
-    public string Text { get; set; }
+    public string[] Text { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    [XmlIgnore]
-    public string Name { get; set; }
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // [XmlIgnore]
+    // public string Name { get; set; }
 
     public enum ExpressionChoiceType
     {
@@ -60,7 +60,7 @@ public class ParameterValue
         [XmlEnum] Sub
     }
 
-    public object Accept(IStyleVisitor visitor, object extraData)
+    public virtual object Accept(IStyleVisitor visitor, object extraData)
     {
         if (Text != null)
         {
@@ -68,7 +68,10 @@ public class ParameterValue
         }
         else
         {
-            visitor.Visit(Expression, extraData);
+            foreach (var expressionType in Items)
+            {
+                visitor.Visit(expressionType, extraData);
+            }
         }
 
         return null;
@@ -84,6 +87,21 @@ public class NamedParameter : ParameterValue
     /// </summary>
     [XmlAttribute("name")]
     public string Name { get; set; }
+
+    public override object Accept(IStyleVisitor visitor, object extraData)
+    {
+        visitor.Push(Text?.ElementAtOrDefault(0));
+        return null;
+    }
+
+    public enum NamedParameterChoiceType
+    {
+        /// <remarks/>
+        [XmlEnum] SvgParameter,
+
+        /// <remarks/>
+        [XmlEnum] CssParameter
+    }
 }
 
 [XmlRoot("SvgParameter")]

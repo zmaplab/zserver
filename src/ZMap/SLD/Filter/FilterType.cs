@@ -1,5 +1,4 @@
 using System.Xml.Serialization;
-using ZMap.Style;
 
 namespace ZMap.SLD.Filter;
 

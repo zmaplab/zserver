@@ -6,12 +6,15 @@ namespace ZMap.SLD
 {
     public class LineSymbolizer : Symbolizer
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        [XmlElement("OnlineResource")]
         public OnlineResource OnlineResource { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        [XmlElement("Stroke")]
         public Stroke Stroke { get; set; }
 
         /// <summary>

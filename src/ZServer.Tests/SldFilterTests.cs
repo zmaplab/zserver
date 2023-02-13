@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using Xunit;
-using ZMap.SLD;
-using ZMap.SLD.Filter;
 
 
 namespace ZServer.Tests;

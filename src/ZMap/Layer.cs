@@ -17,6 +17,7 @@ namespace ZMap
     {
         private readonly List<StyleGroup> _styleGroups;
         private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
+        private readonly Dictionary<string, object> _environments;
 
         /// <summary>
         /// 图层名称
@@ -86,6 +87,7 @@ namespace ZMap
             }
 
             _styleGroups = styleGroups;
+            _environments = new Dictionary<string, object>();
         }
 
         public async Task RenderAsync(IGraphicsService graphicsService, Viewport viewport, Zoom zoom, int srid)
@@ -136,6 +138,8 @@ namespace ZMap
             // {
             //     transformation = CoordinateTransformUtilities.GetTransformation(SRID, srid);
             // }
+
+            _environments.Add(Defaults.WmsScaleKey, zoom.Value);
 
             switch (Source)
             {
@@ -210,7 +214,6 @@ namespace ZMap
 
             var count = 0;
 
-
             foreach (var feature in features)
             {
                 if (feature == null || feature.IsEmpty)
@@ -226,6 +229,8 @@ namespace ZMap
                 // {
                 //     feature.Transform(transformation);
                 // }
+
+                feature.SetEnvironment(_environments);
 
                 foreach (var styleGroup in StyleGroups)
                 {

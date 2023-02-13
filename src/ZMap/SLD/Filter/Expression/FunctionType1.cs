@@ -1,4 +1,5 @@
 using System.Xml.Serialization;
+using ZMap.SLD.Filter.Functions;
 
 namespace ZMap.SLD.Filter.Expression;
 
@@ -30,9 +31,32 @@ public class FunctionType1 : ExpressionType
 
     public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        throw new System.NotImplementedException();
+        // TODO: 登录反射来注册，不再使用 Switch
+        switch (Name)
+        {
+            case "ToArray":
+            {
+                var func = new ToArray(this);
+                func.Accept(visitor, extraData);
+                break;
+            }
+            case "ToString":
+            {
+                var func = new ToString(this);
+                func.Accept(visitor, extraData);
+                break;
+            }
+            case "Env":
+            {
+                var func = new Env(this);
+                func.Accept(visitor, extraData);
+                break;
+            }
+        }
+
+        return null;
     }
-    
+
     /// <remarks/>
     [System.SerializableAttribute]
     [XmlType]

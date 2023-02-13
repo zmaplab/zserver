@@ -3,7 +3,13 @@ using System.Xml.Serialization;
 
 namespace ZMap.SLD
 {
-    public class Symbolizer
+    [XmlInclude(typeof(RasterSymbolizer))]
+    [XmlInclude(typeof(TextSymbolizer))]
+    [XmlInclude(typeof(PointSymbolizer))]
+    [XmlInclude(typeof(PolygonSymbolizer))]
+    [XmlInclude(typeof(LineSymbolizer))]
+    [XmlType]
+    public abstract class Symbolizer
     {
         /// <summary>
         /// Returns the name of the geometry feature attribute to use for drawing. May return null (or

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using ZMap.Style;
 
@@ -20,16 +22,11 @@ namespace ZMap.SLD
         public Label Label { get; set; }
 
         /// <summary>
-        /// 标签文本的填充样式。
-        /// </summary>
-        [XmlElement("Fill")]
-        public Fill Fill { get; set; }
-
-        /// <summary>
         /// 标签的字体信息。
         /// </summary>
-        [XmlElement("Font")]
-        public Font Font { get; set; }
+        [XmlArrayItem("SvgParameter", typeof(SvgParameter))]
+        [XmlArrayItem("CssParameter", typeof(CssParameter))]
+        public NamedParameter[] Font { get; set; } = Array.Empty<NamedParameter>();
 
         /// <summary>
         /// 设置标签相对于其关联几何图形的位置。
@@ -44,9 +41,15 @@ namespace ZMap.SLD
         public Halo Halo { get; set; }
 
         /// <summary>
-        /// 要在标签文本后面显示的图形。
+        /// 标签文本的填充样式。
         /// </summary>
-        public Graphic Graphic { get; set; }
+        [XmlElement("Fill")]
+        public Fill Fill { get; set; }
+
+        // /// <summary>
+        // /// 要在标签文本后面显示的图形。
+        // /// </summary>
+        // public Graphic Graphic { get; set; }
 
         public override object Accept(IStyleVisitor visitor, object extraData)
         {
@@ -68,10 +71,25 @@ namespace ZMap.SLD
                 Align = Expression<string>.New(null),
                 Rotate = Expression<float>.New(0),
                 Transform = Expression<TextTransform>.New(TextTransform.Lowercase),
-                OutlineSize = Expression<int>.New(0)
+                OutlineSize = Expression<int>.New(0),
+                Font = Expression<List<string>>.New(new List<string>())
             };
-            visitor.Push(textStyle);
-            Font?.Accept(visitor, extraData);
+
+            var size = Font.GetOrDefault("font-size");
+            textStyle.Size =
+                size.BuildExpression(visitor, extraData, (int)FontType.Defaults["font-size"]);
+
+            var families = Font.Where(x => x.Name == "font-family").ToList();
+            foreach (var family in families)
+            {
+                family.Accept(visitor, extraData);
+                var value = visitor.Pop();
+                if (value != null)
+                {
+                    textStyle.Font.Value.Add(value);
+                }
+            }
+
             Fill?.Accept(visitor, extraData);
             return null;
         }

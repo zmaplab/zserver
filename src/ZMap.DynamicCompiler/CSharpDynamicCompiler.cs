@@ -7,7 +7,7 @@ public class CSharpDynamicCompiler : ICSharpDynamicCompiler
 {
     public Func<Feature, dynamic> Build(string script)
     {
-        var body = script.Contains("return")
+        var body = script.EndsWith(";")
             ? script
             : $"""
 return {script};

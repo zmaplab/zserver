@@ -22,7 +22,7 @@ for (let z = 0; z < 19; ++z) {
 let centerXY = [1388941.1429993785, 5139696.600312929];
 
 const map = new Map({
-  target: "map",
+  target: 'map',
   layers: [
     new TileLayer({
       source: new WMTS({

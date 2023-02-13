@@ -1,9 +1,5 @@
-using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Xml.Serialization;
 using NetTopologySuite.Geometries;
 using Xunit;
@@ -93,7 +89,7 @@ namespace ZServer.Tests
             var pointSymbolizer1 = (PointSymbolizer)rule1.Symbolizers[3];
             // var a = pointSymbolizer1.Graphic.Rotation[0].Accept(new DefaultFilterVisitor(), null);
             var size = pointSymbolizer1.Graphic.Size;
-            Assert.Equal("14", size.Text);
+            Assert.Equal("14", size.Text[0]);
             // Assert.Equal("14", pointSymbolizer1.Graphic.Rotation);
             var rule2 = rules[1];
             Assert.Equal("规划道路中线L17", rule2.Name);
@@ -108,30 +104,39 @@ namespace ZServer.Tests
             var lineSymbolizer1 = (LineSymbolizer)symbolizer1;
             var stroke1 = lineSymbolizer1.Stroke;
             // Assert.Equal("#f8f8f8", stroke1.Color.Text);
-            Assert.Equal("2", stroke1.Width.Text);
-            Assert.Equal("1", stroke1.Opacity.Text);
-            Assert.Equal("round", stroke1.LineCap.Text);
-            Assert.Equal("round", stroke1.LineJoin.Text);
-            Assert.Equal(null, stroke1.DashArray.Text);
-            Assert.Equal("0", stroke1.DashOffset.Text);
+            Assert.Equal("2", stroke1.Width.Text[0]);
+            Assert.Null(stroke1.Opacity);
+            Assert.Equal("round", stroke1.LineCap.Text[0]);
+            Assert.Equal("round", stroke1.LineJoin.Text[0]);
+            Assert.Null(stroke1.DashArray);
+            Assert.Null(stroke1.DashOffset);
 
             var lineSymbolizer2 = (LineSymbolizer)rule1.Symbolizers[1];
             var stroke2 = lineSymbolizer2.Stroke;
             // Assert.Equal("#dd302d", stroke2.Color.Text);
-            Assert.Equal("1", stroke2.Width.Text);
-            Assert.Equal("1", stroke2.Opacity.Text);
-            Assert.Equal("round", stroke2.LineCap.Text);
-            Assert.Equal("round", stroke2.LineJoin.Text);
-            Assert.Equal("4 2", stroke2.DashArray.Text);
-            Assert.Equal("0", stroke2.DashOffset.Text);
+            Assert.Equal("1", stroke2.Width.Text[0]);
+            Assert.Null(stroke2.Opacity);
+            Assert.Equal("round", stroke2.LineCap.Text[0]);
+            Assert.Equal("round", stroke2.LineJoin.Text[0]);
+            Assert.Equal("4 2", stroke2.DashArray.Text[0]);
+            Assert.Null(stroke2.DashOffset);
 
-
+            // var lineSymbolizer3 = (LineSymbolizer)rule1.Symbolizers[2];
+            // var stroke3 = lineSymbolizer3.Stroke;
+            // // Assert.Equal("#dd302d", stroke2.Color.Text);
+            // Assert.Equal("1", stroke2.Width.Text[0]);
+            // Assert.Null(stroke2.Opacity);
+            // Assert.Equal("round", stroke2.LineCap.Text[0]);
+            // Assert.Equal("round", stroke2.LineJoin.Text[0]);
+            // Assert.Equal("4 2", stroke2.DashArray.Text[0]);
+            // Assert.Null(stroke2.DashOffset);
+            
             var ruleFont1 = rules.First(x => x.Name == "文字1");
             var textSymbolizer1 = (TextSymbolizer)ruleFont1.Symbolizers[0];
-            // Assert.Equal("微软雅黑", textSymbolizer1.Font.Family);
-            // Assert.Equal(13, textSymbolizer1.Font.Size);
-            // Assert.Equal("100", textSymbolizer1.Font.Weight);
-            // Assert.Equal("style1", textSymbolizer1.Font.Style);
+            Assert.Equal("微软雅黑", textSymbolizer1.Font.GetOrDefault("font-family").Text[0]);
+            Assert.Equal("13", textSymbolizer1.Font.GetOrDefault("font-size").Text[0]);
+            Assert.Equal("100", textSymbolizer1.Font.GetOrDefault("font-weight").Text[0]);
+            Assert.Equal("style1", textSymbolizer1.Font.GetOrDefault("font-style").Text[0]);
             Assert.Equal("dlmc", textSymbolizer1.Label.PropertyName);
             Assert.Equal(2, textSymbolizer1.Halo.Radius);
             Assert.Equal(true, textSymbolizer1.LabelPlacement.LinePlacement.GeneralizeLine);
@@ -139,8 +144,8 @@ namespace ZServer.Tests
             var rulePolygon1 = rules.First(x => x.Name == "Polygon1");
             var polygonSymbolizer1 = (PolygonSymbolizer)rulePolygon1.Symbolizers[0];
             // Assert.Equal("#FF0000", polygonSymbolizer1.Stroke.Color.Text);
-            Assert.Equal("2", polygonSymbolizer1.Stroke.Width.Text);
-            Assert.Equal("#200000", polygonSymbolizer1.Fill.Color.Text);
+            Assert.Equal("2", polygonSymbolizer1.Stroke.Width.Text[0]);
+            Assert.Equal("#200000", polygonSymbolizer1.Fill.Color.Text[0]);
 
             var visitor = new SldStyleVisitor();
             visitor.Visit(styledLayerDescriptor1, null);

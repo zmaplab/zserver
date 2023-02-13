@@ -129,8 +129,9 @@ namespace ZMap.Renderer.SkiaSharp
 
         protected override SKPaint CreatePaint()
         {
-            var fontFamily = _style.Font.Value;
-            var size = _style.Size.Value;
+            // TODO: 暂时只取第一个字体
+            var fontFamily = _style.Font.Value.ElementAtOrDefault(0);
+            var size = _style.Size.Value == 0 ? 13 : _style.Size.Value;
             var rotate = _style.Rotate.Value;
             var color = _style.Color?.Value;
             var align = Enum.TryParse<SKTextAlign>(_style.Align?.Value, out var a)

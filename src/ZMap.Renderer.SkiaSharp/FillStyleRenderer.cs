@@ -30,8 +30,5 @@ namespace ZMap.Renderer.SkiaSharp
                 Color = ColorUtilities.GetColor(color, opacity)
             });
         }
-
-
-     
     }
 }
