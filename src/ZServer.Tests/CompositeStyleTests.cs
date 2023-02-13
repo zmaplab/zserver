@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Xunit;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;

@@ -83,7 +83,7 @@ namespace ZServer.Tests
             Assert.Equal("property string", textStyle.Label.Value);
             Assert.Equal("property expression", textStyle.Label.Body);
             Assert.Equal("auto", textStyle.Align.Value);
-            Assert.Equal(2, textStyle.Font.Value.Length);
+            Assert.Equal(2, textStyle.Font.Value.Count);
             Assert.Equal("Open Sans Regular", textStyle.Font.Value[0]);
             Assert.Equal("Arial Unicode MS Regular", textStyle.Font.Value[1]);
             Assert.Equal("#3ed53e", textStyle.Color.Value);

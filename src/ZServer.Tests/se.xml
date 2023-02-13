@@ -70,9 +70,14 @@
                             <se:SvgParameter name="stroke-linejoin">round</se:SvgParameter>
                             <se:SvgParameter name="stroke-linecap">round</se:SvgParameter>
                             <se:SvgParameter name="stroke-dasharray">
-                                <PropertyName>
-                                    dasharray
-                                </PropertyName>
+                                <ogc:Function name="ToArray">
+                                    <ogc:Function name="ToString">
+                                        <PropertyName>
+                                            dasharray
+                                        </PropertyName>
+                                    </ogc:Function>
+                                    <ogc:Literal>float</ogc:Literal>
+                                </ogc:Function>
                             </se:SvgParameter>
                         </se:Stroke>
                     </se:LineSymbolizer>

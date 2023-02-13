@@ -15,6 +15,19 @@ namespace ZMap.Style
             };
         }
 
+        public static Expression<TV> From(dynamic value, TV defaultValue)
+        {
+            if (value == null)
+            {
+                return New(defaultValue);
+            }
+            else
+            {
+                var v = ConvertUtilities.ToObject<TV>(value);
+                return New(Equals(v, default(TV)) ? defaultValue : v);
+            }
+        }
+
         public void Invoke(Feature feature, TV defaultValue = default)
         {
             if (string.IsNullOrWhiteSpace(Body))

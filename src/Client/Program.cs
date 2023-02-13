@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
-using SharpMap.Symbology.Serialization;
 using ZServer.Interfaces.WMS;
 
 namespace Client

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -139,7 +138,7 @@ namespace ZServer.Store.Configuration
                 RadiusColor = section.GetExpression<string>("radiusColor"),
                 RadiusOpacity = section.GetExpression<float>("radiusOpacity"),
                 Style = section.GetExpression<string>("style"),
-                Font = section.GetExpression<string[]>("font"),
+                Font = section.GetExpression<List<string>>("font"),
                 Size = section.GetExpression<int>("size"),
                 Weight = section.GetExpression<string>("weight"),
                 Rotate = section.GetExpression<float>("rotate"),
@@ -201,8 +200,10 @@ namespace ZServer.Store.Configuration
             }
 
             symbol.Opacity = section.GetExpression<float>("opacity");
+            symbol.Pattern = section.GetExpression<string>("pattern");
             symbol.Antialias = section.GetValue<bool>("antialias");
             symbol.Color = section.GetExpression<string>("color");
+            symbol.OutlineColor = section.GetExpression<string>("outlineColor");
             symbol.Translate = section.GetExpression<double[]>("translate");
             symbol.TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor");
             return symbol;

@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 
 namespace ZMap.SLD
 {
+    [XmlRoot("Graphic")]
     public class Graphic
     {
         /// <summary>

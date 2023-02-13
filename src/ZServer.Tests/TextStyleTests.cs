@@ -1,7 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Xunit;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
@@ -19,7 +18,7 @@ namespace ZServer.Tests
             {
                 Align = Expression<string>.New("center"),
                 Label = Expression<string>.New("name"),
-                Font = Expression<string[]>.New(new[] { "宋体" }),
+                Font = Expression<List<string>>.New(new List<string> { "宋体" }),
                 Size = Expression<int>.New(12),
                 Rotate = Expression<float>.New(0),
                 Transform = Expression<TextTransform>.New(TextTransform.Uppercase),

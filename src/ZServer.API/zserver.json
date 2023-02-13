@@ -59,7 +59,10 @@
           "color": "#FF0000",
           "backgroundColor": "#00FA9A",
           "outlineSize": 6,
-          "size": 16
+          "size": {
+            "value": null,
+            "expression": "ZMap.Methods.Categorize(feature.GetEnvValue(\"wms_scale_denominator\"), 12, 300, 10, 2500,8)"
+          }
         }
       ]
     },
@@ -143,7 +146,7 @@
         }
       ],
       "styleGroups": [
-        "polygon_sld"
+        "polygon"
       ]
     },
     "polygon_3857_shp": {

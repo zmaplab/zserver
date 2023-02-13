@@ -25,7 +25,7 @@ public interface IStyleVisitor
     object Visit(Halo halo, object data);
     object Visit(LinePlacement linePlacement, object data);
     object Visit(Mark mark, object data);
-    object Visit(Font font, object data);
+    // object Visit(Font font, object data);
     object Visit(PointPlacement pointPlacement, object data);
     object Visit(ParameterValue parameterValue, object data);
     object Visit(LiteralType literal, object data);

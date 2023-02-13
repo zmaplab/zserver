@@ -205,12 +205,6 @@ public class SldStyleVisitor : IStyleVisitor, IFilterVisitor
         throw new NotImplementedException();
     }
 
-    public object Visit(Font font, object data)
-    {
-        font.Accept(this, data);
-        return null;
-    }
-
     public object Visit(PointPlacement pointPlacement, object data)
     {
         throw new NotImplementedException();

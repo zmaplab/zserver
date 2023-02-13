@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ZMap.Style
 {
     public class TextStyle : VectorStyle, IFillStyle
@@ -11,7 +13,7 @@ namespace ZMap.Style
         public Expression<float> Radius { get; set; }
         public Expression<string> RadiusColor { get; set; }
         public Expression<float> RadiusOpacity { get; set; }
-        public Expression<string[]> Font { get; set; }
+        public Expression<List<string>> Font { get; set; }
         public Expression<int> Size { get; set; }
         public Expression<string> Weight { get; set; }
 

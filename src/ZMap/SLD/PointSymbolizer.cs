@@ -1,5 +1,4 @@
-﻿using System.Xml.Serialization;
-using ZMap.Style;
+﻿using ZMap.Style;
 
 namespace ZMap.SLD
 {
@@ -13,7 +12,6 @@ namespace ZMap.SLD
         /// <summary>
         /// 指定点符号的样式
         /// </summary>
-        [XmlElement("Graphic")]
         public Graphic Graphic { get; set; }
 
         public override object Accept(IStyleVisitor visitor, object extraData)

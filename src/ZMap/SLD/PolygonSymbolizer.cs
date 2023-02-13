@@ -17,9 +17,14 @@ namespace ZMap.SLD
         /// <summary>
         /// 
         /// </summary>
+        [XmlElement("Fill")]
         public Fill Fill { get; set; }
 
-        [XmlElement("Displacement")] public Displacement Displacement { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        [XmlElement("Displacement")]
+        public Displacement Displacement { get; set; }
 
         public override object Accept(IStyleVisitor visitor, object extraData)
         {
