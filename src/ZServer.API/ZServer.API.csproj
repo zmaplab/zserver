@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>preview</LangVersion>
         <AssemblyName>zapi</AssemblyName>
         <!-- Warning: setting the below switch is *NOT* recommended in web apps -->
         <!-- See: https://aka.ms/binaryformatter -->
