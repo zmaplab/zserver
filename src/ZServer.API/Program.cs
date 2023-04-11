@@ -25,10 +25,6 @@ namespace ZServer.API
 {
     public static class Program
     {
-        public static object R(Feature feature)
-        {
-          return  () => { var v = feature["dasharray"]?.ToString() as string; return v?.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).Select(x => (System.Single)System.Convert.ChangeType(x, typeof(System.Single))).ToArray(); };
-        }
         public static void Main(string[] args)
         {
             // FixOrleansPublishSingleFileIssue();
