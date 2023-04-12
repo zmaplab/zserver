@@ -82,9 +82,11 @@ namespace ZServer.Grains.WMTS
                 var layerKey = BitConverter.ToString(_hashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(layers)))
                     .Replace("-", string.Empty);
 
+                var cqlFilterHash = CryptographyUtilities.ComputeMD5(cqlFilter);
+                
                 // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
                 var path = Path.Combine(AppContext.BaseDirectory,
-                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{ImageFormatUtilities.GetExtension(format)}");
+                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{cqlFilterHash}{ImageFormatUtilities.GetExtension(format)}");
                 var folder = Path.GetDirectoryName(path);
                 if (folder != null && !Directory.Exists(folder))
                 {

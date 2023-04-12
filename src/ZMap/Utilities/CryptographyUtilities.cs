@@ -1,3 +1,4 @@
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,5 +17,20 @@ public class CryptographyUtilities
         }
 
         return builder.ToString();
+    }
+
+    public static string ComputeMD5(string value, Encoding encoding = null)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new NullReferenceException("Compute MD5 value is null");
+        }
+
+        if (encoding == null)
+        {
+            encoding = Encoding.UTF8;
+        }
+
+        return ComputeMD5(encoding.GetBytes(value));
     }
 }
