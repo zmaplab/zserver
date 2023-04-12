@@ -17,7 +17,7 @@ namespace ZMap
     {
         private readonly List<StyleGroup> _styleGroups;
         private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
-        private readonly Dictionary<string, object> _environments;
+        private readonly Dictionary<string, dynamic> _environments;
 
         /// <summary>
         /// 图层名称
@@ -138,8 +138,7 @@ namespace ZMap
             // {
             //     transformation = CoordinateTransformUtilities.GetTransformation(SRID, srid);
             // }
-
-            _environments.Add(Defaults.WmsScaleKey, zoom.Value);
+            _environments[Defaults.WmsScaleKey] = zoom.Value;
 
             switch (Source)
             {
@@ -172,6 +171,11 @@ namespace ZMap
                 //     break;
                 // }
             }
+        }
+
+        public void ClearEnvironments()
+        {
+            _environments?.Clear();
         }
 
         private async Task RenderRasterAsync(IGraphicsService service, IRasterSource rasterSource, Envelope extent,

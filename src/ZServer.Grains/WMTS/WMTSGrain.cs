@@ -40,7 +40,7 @@ namespace ZServer.Grains.WMTS
         public async Task<MapResult> GetTileAsync(string layers, string styles, string format,
             string tileMatrixSet,
             string tileMatrix, int tileRow,
-            int tileCol, IDictionary<string, object> arguments, string cqlFilter = default)
+            int tileCol, string cqlFilter, IDictionary<string, object> arguments)
         {
             var traceIdentifier = arguments.GetTraceIdentifier();
             var displayUrl =
@@ -82,11 +82,13 @@ namespace ZServer.Grains.WMTS
                 var layerKey = BitConverter.ToString(_hashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(layers)))
                     .Replace("-", string.Empty);
 
-                var cqlFilterHash = CryptographyUtilities.ComputeMD5(cqlFilter);
-                
+                var cqlFilterHash = string.IsNullOrWhiteSpace(cqlFilter)
+                    ? string.Empty
+                    : CryptographyUtilities.ComputeMd5(Encoding.UTF8.GetBytes(cqlFilter));
+
                 // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
                 var path = Path.Combine(AppContext.BaseDirectory,
-                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{cqlFilterHash}{ImageFormatUtilities.GetExtension(format)}");
+                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{ImageFormatUtilities.GetExtension(format)}");
                 var folder = Path.GetDirectoryName(path);
                 if (folder != null && !Directory.Exists(folder))
                 {
@@ -114,7 +116,7 @@ namespace ZServer.Grains.WMTS
 
                 var layerQueries =
                     new List<QueryLayerParams>();
-                
+
                 var splitLayers = layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 for (var i = 0; i < splitLayers.Length; i++)

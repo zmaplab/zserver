@@ -45,5 +45,7 @@ namespace ZMap
 
         // Task PaintAsync(RenderContext context, string filter = null, string traceId = null);
         Task RenderAsync(IGraphicsService service, Viewport viewport, Zoom zoom, int targetSRID);
+
+        void ClearEnvironments();
     }
 }
