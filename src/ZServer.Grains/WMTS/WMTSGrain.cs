@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -39,7 +40,7 @@ namespace ZServer.Grains.WMTS
         public async Task<MapResult> GetTileAsync(string layers, string styles, string format,
             string tileMatrixSet,
             string tileMatrix, int tileRow,
-            int tileCol, IDictionary<string, object> arguments)
+            int tileCol, IDictionary<string, object> arguments, string cqlFilter)
         {
             var traceIdentifier = arguments.GetTraceIdentifier();
             var displayUrl =
@@ -104,11 +105,20 @@ namespace ZServer.Grains.WMTS
                     return MapResult.EmptyMap(format);
                 }
 
+                // 如果有多个图层过滤条件
+                var filters = string.IsNullOrWhiteSpace(cqlFilter)
+                    ? Array.Empty<string>()
+                    : cqlFilter.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
                 var layerQueries =
                     new List<QueryLayerParams>();
-                foreach (var layer in layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                
+                var splitLayers = layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (var i = 0; i < splitLayers.Length; i++)
                 {
-                    var layerQuery = layer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                    var currentLayer = splitLayers[i];
+                    var layerQuery = currentLayer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
                     switch (layerQuery.Length)
                     {
@@ -116,20 +126,20 @@ namespace ZServer.Grains.WMTS
                             layerQueries.Add(new QueryLayerParams(layerQuery[0], layerQuery[1],
                                 new Dictionary<string, object>
                                 {
-                                    { Constants.AdditionalFilter, string.Empty }
+                                    { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
                                 }));
                             break;
                         case 1:
                             layerQueries.Add(new QueryLayerParams(null, layerQuery[0], new Dictionary<string, object>
                             {
-                                { Constants.AdditionalFilter, string.Empty }
+                                { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
                             }));
                             break;
                         default:
                         {
-                            var msg = $"{displayUrl}, layer format is incorrect {layer}";
+                            var msg = $"{displayUrl}, layer format is incorrect {currentLayer}";
                             _logger.LogError(msg);
-                            return MapResult.Failed($"Could not find layer {layer}",
+                            return MapResult.Failed($"Could not find layer {currentLayer}",
                                 "LayerNotDefined");
                         }
                     }
