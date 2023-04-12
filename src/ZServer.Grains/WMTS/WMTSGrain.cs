@@ -40,7 +40,7 @@ namespace ZServer.Grains.WMTS
         public async Task<MapResult> GetTileAsync(string layers, string styles, string format,
             string tileMatrixSet,
             string tileMatrix, int tileRow,
-            int tileCol, IDictionary<string, object> arguments, string cqlFilter)
+            int tileCol, IDictionary<string, object> arguments, string cqlFilter = default)
         {
             var traceIdentifier = arguments.GetTraceIdentifier();
             var displayUrl =
