@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -39,7 +40,7 @@ namespace ZServer.Grains.WMTS
         public async Task<MapResult> GetTileAsync(string layers, string styles, string format,
             string tileMatrixSet,
             string tileMatrix, int tileRow,
-            int tileCol, IDictionary<string, object> arguments)
+            int tileCol, IDictionary<string, object> arguments, string cqlFilter = default)
         {
             var traceIdentifier = arguments.GetTraceIdentifier();
             var displayUrl =
@@ -81,9 +82,11 @@ namespace ZServer.Grains.WMTS
                 var layerKey = BitConverter.ToString(_hashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(layers)))
                     .Replace("-", string.Empty);
 
+                var cqlFilterHash = CryptographyUtilities.ComputeMD5(cqlFilter);
+                
                 // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
                 var path = Path.Combine(AppContext.BaseDirectory,
-                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{ImageFormatUtilities.GetExtension(format)}");
+                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{cqlFilterHash}{ImageFormatUtilities.GetExtension(format)}");
                 var folder = Path.GetDirectoryName(path);
                 if (folder != null && !Directory.Exists(folder))
                 {
@@ -104,11 +107,20 @@ namespace ZServer.Grains.WMTS
                     return MapResult.EmptyMap(format);
                 }
 
+                // 如果有多个图层过滤条件
+                var filters = string.IsNullOrWhiteSpace(cqlFilter)
+                    ? Array.Empty<string>()
+                    : cqlFilter.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
                 var layerQueries =
                     new List<QueryLayerParams>();
-                foreach (var layer in layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                
+                var splitLayers = layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (var i = 0; i < splitLayers.Length; i++)
                 {
-                    var layerQuery = layer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                    var currentLayer = splitLayers[i];
+                    var layerQuery = currentLayer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
                     switch (layerQuery.Length)
                     {
@@ -116,20 +128,20 @@ namespace ZServer.Grains.WMTS
                             layerQueries.Add(new QueryLayerParams(layerQuery[0], layerQuery[1],
                                 new Dictionary<string, object>
                                 {
-                                    { Constants.AdditionalFilter, string.Empty }
+                                    { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
                                 }));
                             break;
                         case 1:
                             layerQueries.Add(new QueryLayerParams(null, layerQuery[0], new Dictionary<string, object>
                             {
-                                { Constants.AdditionalFilter, string.Empty }
+                                { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
                             }));
                             break;
                         default:
                         {
-                            var msg = $"{displayUrl}, layer format is incorrect {layer}";
+                            var msg = $"{displayUrl}, layer format is incorrect {currentLayer}";
                             _logger.LogError(msg);
-                            return MapResult.Failed($"Could not find layer {layer}",
+                            return MapResult.Failed($"Could not find layer {currentLayer}",
                                 "LayerNotDefined");
                         }
                     }
