@@ -57,6 +57,7 @@ namespace ZServer.API.Controllers
             var friend = _clusterClient.Value.GetGrain<IWMTSGrain>(key);
             var result =
                 await friend.GetTileAsync(layer, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
+                    null,
                     new Dictionary<string, object>
                     {
                         { "TraceIdentifier", HttpContext.TraceIdentifier }

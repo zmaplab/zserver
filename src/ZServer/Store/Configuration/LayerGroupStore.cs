@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Force.DeepCloner;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -73,7 +74,17 @@ namespace ZServer.Store.Configuration
                     return layerGroup;
                 });
 
-            return result;
+            if (result == null)
+            {
+                return null;
+            }
+            var layerGroup= result.DeepClone();
+            foreach (var layer in layerGroup.Layers)
+            {
+                layer.ClearEnvironments();
+            }
+
+            return layerGroup;
         }
 
         public async Task<LayerGroup> FindAsync(string layerGroupName)
