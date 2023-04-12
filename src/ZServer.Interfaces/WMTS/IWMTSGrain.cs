@@ -12,6 +12,7 @@ namespace ZServer.Interfaces.WMTS
     public interface IWMTSGrain : IGrainWithStringKey
     {
         Task<MapResult> GetTileAsync(string layers, string styles, string format,
-            string tileMatrixSet, string tileMatrix, int tileRow, int tileCol, IDictionary<string, object> arguments);
+            string tileMatrixSet, string tileMatrix, int tileRow, int tileCol, IDictionary<string, object> arguments,
+            string cqlFilter = default);
     }
 }
