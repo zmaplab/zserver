@@ -1,7 +1,7 @@
 using System.Linq;
+using ZMap.Infrastructure;
 using ZMap.SLD.Filter.Expression;
 using ZMap.Style;
-using ZMap.Utilities;
 
 namespace ZMap.SLD;
 

@@ -1,5 +1,5 @@
 ﻿using Natasha.CSharp;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZMap.DynamicCompiler;
 

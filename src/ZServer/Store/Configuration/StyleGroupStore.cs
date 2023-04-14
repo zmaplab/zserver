@@ -6,8 +6,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Style;
-using ZMap.Utilities;
 using ZServer.Extensions;
 
 namespace ZServer.Store.Configuration

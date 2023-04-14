@@ -2,7 +2,7 @@ using System;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using Xunit;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZServer.Tests
 {

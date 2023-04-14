@@ -4,8 +4,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
+using ZMap.Infrastructure;
 using ZMap.TileGrid;
-using ZMap.Utilities;
 
 namespace ZServer.Store.Configuration
 {

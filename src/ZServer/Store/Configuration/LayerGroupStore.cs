@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZMap;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 using ZServer.Entity;
 
 namespace ZServer.Store.Configuration

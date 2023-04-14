@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 using ZServer.Entity;
 
 namespace ZServer.Store.Configuration

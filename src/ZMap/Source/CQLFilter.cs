@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 // ReSharper disable InconsistentNaming
 
@@ -57,7 +57,7 @@ public class CQLFilter : IFeatureFilter
 
             body = body.Replace("and", " && ").Replace("AND", " && ")
                 .Replace("or", " || ").Replace("OR", " || ");
-            var func = DynamicCompilationUtilities.GetFunc<bool>(body);
+            var func = DynamicCompilationUtilities.GetOrCreateFunc<bool>(body);
             return func;
         });
     }

@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using NetTopologySuite.Geometries;
 
-namespace ZMap.Utilities
+namespace ZMap.Infrastructure
 {
-    public static class GeoUtilities
+    public static class GeometryUtilities
     {
         public const double Tolerance = 0.0001;
 

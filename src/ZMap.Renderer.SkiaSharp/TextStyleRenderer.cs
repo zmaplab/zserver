@@ -3,9 +3,9 @@ using System.Linq;
 using Microsoft.Extensions.Caching.Memory;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
-using ZMap.Utilities;
 using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 
 namespace ZMap.Renderer.SkiaSharp

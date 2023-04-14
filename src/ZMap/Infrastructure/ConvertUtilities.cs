@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace ZMap.Utilities;
+namespace ZMap.Infrastructure;
 
 public static class ConvertUtilities
 {

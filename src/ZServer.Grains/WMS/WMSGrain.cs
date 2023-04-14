@@ -10,8 +10,8 @@ using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Source;
-using ZMap.Utilities;
 using ZServer.Extensions;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMS;
@@ -86,18 +86,12 @@ namespace ZServer.Grains.WMS
                     ModeStateUtilities.VerifyWmsGetMapArguments(layers, srs, bbox, width, height, format);
                 if (!modeState.IsValid)
                 {
+                    var msg = $"{displayUrl}, arguments error";
+                    _logger.LogError(msg);
                     return MapResult.Failed(modeState.Text, modeState.Code);
                 }
 
-                var dpi = 96;
-                if (!string.IsNullOrWhiteSpace(formatOptions))
-                {
-                    var match = Regex.Match(formatOptions, "dpi:\\d+");
-                    if (match.Success)
-                    {
-                        int.TryParse(match.Value.Replace("dpi:", ""), out dpi);
-                    }
-                }
+                var dpi = CommonUtilities.GetDpi(formatOptions);
 
                 var filters = string.IsNullOrWhiteSpace(cqlFilter)
                     ? Array.Empty<string>()
@@ -129,11 +123,10 @@ namespace ZServer.Grains.WMS
                     Width = width,
                     Height = height,
                     Transparent = transparent,
-                    Bordered = extras.TryGetValue("Bordered", out var b) && (bool)b,
-                    BackgroundColor = bgColor
+                    Bordered = extras.TryGetValue("Bordered", out var b) && (bool)b
                 };
 
-                var scale = GeoUtilities.CalculateOGCScale(envelope, modeState.SRID, width, dpi);
+                var scale = GeometryUtilities.CalculateOGCScale(envelope, modeState.SRID, width, dpi);
                 var map = new Map();
                 map.SetId(traceIdentifier)
                     .SetSRID(modeState.SRID)
@@ -175,6 +168,8 @@ namespace ZServer.Grains.WMS
                         featureCount);
                 if (!modeState.IsValid)
                 {
+                    var msg = $"{displayUrl}, arguments error";
+                    _logger.LogError(msg);
                     return new FeatureCollection();
                 }
 
@@ -218,7 +213,7 @@ namespace ZServer.Grains.WMS
             var pixelHeight = (bbox.MaxY - bbox.MinY) / height;
             var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
 
-            var latLon = GeoUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
+            var latLon = GeometryUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
 
             var minX = latLon.Lon - pixelSensitivity * pixelWidth;
             var maxX = latLon.Lon + pixelSensitivity * pixelWidth;

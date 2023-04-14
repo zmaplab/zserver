@@ -71,7 +71,7 @@ namespace ZServer.Interfaces
                     {
                         // todo: 重新描述错误
                         return new ModeState(
-                            $"Could not find layer {layer}",
+                            $"can not find layer {layer}",
                             "LayerNotDefined");
                     }
                 }
@@ -80,7 +80,7 @@ namespace ZServer.Interfaces
             if (list.Count == 0)
             {
                 return new ModeState(
-                    $"Could not find layer {layers}",
+                    $"can not find layer {layers}",
                     "LayerNotDefined");
             }
 
