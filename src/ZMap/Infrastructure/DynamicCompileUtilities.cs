@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace ZMap.Utilities
+namespace ZMap.Infrastructure
 {
     public static class DynamicCompilationUtilities
     {
@@ -20,17 +20,7 @@ namespace ZMap.Utilities
             Compiler = compiler;
         }
 
-        // public static Func<Feature, bool> GetAvailableFunc(string expression)
-        // {
-        //     if (string.IsNullOrWhiteSpace(expression) || Compiler == null)
-        //     {
-        //         return null;
-        //     }
-        //
-        //     return FuncCache.GetOrAdd(expression, _ => GetFunc<bool>(expression));
-        // }
-
-        public static Func<Feature, dynamic> GetFunc(string expression)
+        public static Func<Feature, dynamic> GetOrCreateFunc(string expression)
         {
             if (string.IsNullOrWhiteSpace(expression) || Compiler == null)
             {
@@ -40,7 +30,7 @@ namespace ZMap.Utilities
             return FuncCache.GetOrAdd(expression, _ => Compiler.Build(expression));
         }
 
-        public static Func<Feature, T> GetFunc<T>(string expression)
+        public static Func<Feature, T> GetOrCreateFunc<T>(string expression)
         {
             if (string.IsNullOrWhiteSpace(expression) || Compiler == null)
             {

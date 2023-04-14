@@ -1,6 +1,6 @@
 using System;
+using ZMap.Infrastructure;
 using ZMap.SLD.Filter.Expression;
-using ZMap.Utilities;
 
 namespace ZMap.SLD.Filter.Functions;
 
@@ -58,7 +58,7 @@ public class ToArray
 """);
         }
 
-        DynamicCompilationUtilities.GetFunc(resultExpression.Body);
+        DynamicCompilationUtilities.GetOrCreateFunc(resultExpression.Body);
         visitor.Push(resultExpression);
         return null;
     }

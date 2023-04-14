@@ -1,4 +1,4 @@
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZMap.Style
 {
@@ -40,7 +40,7 @@ namespace ZMap.Style
                 return;
             }
 
-            var func = DynamicCompilationUtilities.GetFunc(Body);
+            var func = DynamicCompilationUtilities.GetOrCreateFunc(Body);
             if (func == null)
             {
                 Value = defaultValue;

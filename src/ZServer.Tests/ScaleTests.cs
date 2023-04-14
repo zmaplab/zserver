@@ -1,6 +1,6 @@
 using NetTopologySuite.Geometries;
 using Xunit;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZServer.Tests
 {
@@ -19,7 +19,7 @@ namespace ZServer.Tests
 
             Get(117.3402099609375, 31.906367187500003, 117.345703125, 31.911860351562503);
 
-            var scale = GeoUtilities.CalculateOGCScale(
+            var scale = GeometryUtilities.CalculateOGCScale(
                 Get(117.3402099609375, 31.906367187500003, 117.345703125, 31.911860351562503), 1024, 180);
             Assert.Equal(4231, (int)scale);
         }

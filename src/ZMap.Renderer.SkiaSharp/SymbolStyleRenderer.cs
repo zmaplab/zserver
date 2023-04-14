@@ -1,9 +1,9 @@
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Style;
-using ZMap.Utilities;
 using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 
 namespace ZMap.Renderer.SkiaSharp

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ZMap.Renderer.SkiaSharp;
-using ZServer.HashAlgorithm;
 using ZServer.Store;
 using ZServer.Store.Configuration;
 
@@ -33,8 +32,6 @@ namespace ZServer
             serviceCollection.TryAddScoped<IStyleGroupStore, StyleGroupStore>();
             serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
             serviceCollection.TryAddScoped<ISldStore, SldStore>();
-
-            serviceCollection.TryAddSingleton<IHashAlgorithmService, MurmurHashAlgorithmService>();
 
             serviceCollection.AddHostedService<PreloadService>();
             serviceCollection.TryAddScoped<ILayerQuerier, LayerQuerier>();

@@ -5,7 +5,7 @@ using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 
-namespace ZMap.Utilities
+namespace ZMap.Infrastructure
 {
     public static class CoordinateReferenceSystem
     {
@@ -26,7 +26,7 @@ namespace ZMap.Utilities
             SRIDCache = new ConcurrentDictionary<int, CoordinateSystem>();
             typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
             using var stream =
-                typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Utilities.proj.xml");
+                typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Infrastructure.proj.xml");
             if (stream == null)
             {
                 return;

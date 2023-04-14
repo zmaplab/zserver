@@ -4,7 +4,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Simplify;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZMap
 {

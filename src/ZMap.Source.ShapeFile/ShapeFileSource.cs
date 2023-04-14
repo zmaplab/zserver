@@ -14,7 +14,7 @@ using NetTopologySuite.IO;
 using NetTopologySuite.IO.ShapeFile.Extended;
 using ProjNet.CoordinateSystems;
 using ZMap.Indexing;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZMap.Source.ShapeFile
 {

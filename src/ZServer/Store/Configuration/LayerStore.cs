@@ -10,9 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Source;
 using ZMap.Style;
-using ZMap.Utilities;
 using ZServer.Entity;
 
 namespace ZServer.Store.Configuration

@@ -7,9 +7,9 @@ using Force.DeepCloner;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using ZMap.Extensions;
+using ZMap.Infrastructure;
 using ZMap.Source;
 using ZMap.Style;
-using ZMap.Utilities;
 
 namespace ZMap
 {

@@ -9,6 +9,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
         <PackageReference Include="DeepCloner" Version="0.10.4" />
+        <PackageReference Include="murmurhash" Version="1.0.3" />
     </ItemGroup>
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
@@ -17,7 +18,9 @@
     </ItemGroup>
     <ItemGroup>
       <None Remove="Utilities\proj.xml" />
-      <EmbeddedResource Include="Utilities\proj.xml">
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="Infrastructure\proj.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
