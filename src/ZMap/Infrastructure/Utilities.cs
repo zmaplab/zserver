@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace ZMap.Infrastructure;
 
-public static class CommonUtilities
+public static class Utilities
 {
     public static int GetDpi(string formatOptions)
     {
