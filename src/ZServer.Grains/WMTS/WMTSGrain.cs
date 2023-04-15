@@ -77,7 +77,7 @@ namespace ZServer.Grains.WMTS
 
                 // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
                 var path = Path.Combine(AppContext.BaseDirectory,
-                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{CommonUtilities.GetImageExtension(format)}");
+                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{Utilities.GetImageExtension(format)}");
                 var folder = Path.GetDirectoryName(path);
                 if (folder != null && !Directory.Exists(folder))
                 {

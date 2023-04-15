@@ -18,16 +18,7 @@ namespace ZMap.Source
         /// <returns></returns>
         public abstract Task<byte[]> GetImageInExtentAsync(Envelope extent);
 
-        public void SetFilter(IFeatureFilter filter)
-        {
-        }
-
         public abstract Envelope GetEnvelope();
-
-        public ISource Clone()
-        {
-            return (ISource)MemberwiseClone();
-        }
 
         public abstract void Dispose();
     }

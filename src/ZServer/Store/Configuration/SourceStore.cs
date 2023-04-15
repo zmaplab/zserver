@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Force.DeepCloner;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -49,7 +50,7 @@ namespace ZServer.Store.Configuration
                     entry.SetValue(source);
                     entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
                     return Task.FromResult(source);
-                })).Clone();
+                })).DeepClone();
         }
 
         public async Task<List<ISource>> GetAllAsync()

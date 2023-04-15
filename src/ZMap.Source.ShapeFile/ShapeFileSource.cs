@@ -47,7 +47,7 @@ namespace ZMap.Source.ShapeFile
             public ISpatialIndex<SpatialIndexEntry> Tree { get; set; }
         }
 
-        public override ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
+        public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
         {
             var features = new List<Feature>();
 
@@ -75,7 +75,7 @@ namespace ZMap.Source.ShapeFile
             var spatialIndexItems = GetObjectIDsInView(tuple.Tree, extent);
             if (spatialIndexItems.Count == 0)
             {
-                return new ValueTask<IEnumerable<Feature>>(Array.Empty<Feature>());
+                return Task.FromResult<IEnumerable<Feature>>(Array.Empty<Feature>());
             }
 
             // ISpatialIndex<SpatialIndexEntry> _tree;
@@ -100,7 +100,7 @@ namespace ZMap.Source.ShapeFile
                 }
             }
 
-            return new ValueTask<IEnumerable<Feature>>(features);
+            return Task.FromResult<IEnumerable<Feature>>(features);
         }
 
         public override Envelope GetEnvelope()

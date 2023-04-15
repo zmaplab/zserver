@@ -91,7 +91,7 @@ namespace ZServer.Grains.WMS
                     return MapResult.Failed(modeState.Text, modeState.Code);
                 }
 
-                var dpi = CommonUtilities.GetDpi(formatOptions);
+                var dpi = Utilities.GetDpi(formatOptions);
 
                 var filters = string.IsNullOrWhiteSpace(cqlFilter)
                     ? Array.Empty<string>()

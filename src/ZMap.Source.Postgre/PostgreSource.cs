@@ -22,7 +22,7 @@ namespace ZMap.Source.Postgre
         {
         }
 
-        public override async ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
+        public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
         {
             if (string.IsNullOrWhiteSpace(Geometry))
             {

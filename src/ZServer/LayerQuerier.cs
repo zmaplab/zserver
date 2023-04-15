@@ -99,7 +99,7 @@ public class LayerQuerier : ILayerQuerier
         var filter = layerQuery.Arguments[Constants.AdditionalFilter].ToString();
         if (!string.IsNullOrWhiteSpace(filter))
         {
-            vectorSource.SetFilter(new CQLFilter(filter));
+            vectorSource.Filter = new CQLFilter(filter);
         }
     }
 }
