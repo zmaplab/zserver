@@ -22,7 +22,7 @@ namespace ZServer.Tests
 
         static BaseTests()
         {
-            CSharpDynamicCompiler.Load();
+            CSharpDynamicCompiler.Initialize();
 
             PostgreSource.Initialize();
 

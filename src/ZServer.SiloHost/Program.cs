@@ -33,7 +33,7 @@ namespace ZServer.SiloHost
         public static Task Main(string[] args)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            CSharpDynamicCompiler.Load();
+            CSharpDynamicCompiler.Initialize();
 
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddEnvironmentVariables();

@@ -5,7 +5,7 @@ namespace ZMap.DynamicCompiler;
 
 public class CSharpDynamicCompiler : ICSharpDynamicCompiler
 {
-    public Func<Feature, dynamic> Build(string script)
+    public Func<Feature, dynamic> BuildFunc(string script)
     {
         var body = script.EndsWith(";")
             ? script
@@ -20,7 +20,15 @@ return {script};
         return f;
     }
 
-    public Func<Feature, T> Build<T>(string script)
+    public Type BuildType(string script)
+    {
+        var nClass = NClass.DefaultDomain();
+
+        nClass.Body(script);
+        return nClass.GetType();
+    }
+
+    public Func<Feature, T> BuildFunc<T>(string script)
     {
         var body = $"""
 return {script};
@@ -33,7 +41,7 @@ return {script};
         return f;
     }
 
-    public static void Load()
+    public static void Initialize()
     {
         if (DynamicCompilationUtilities.Compiler != null)
         {

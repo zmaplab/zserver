@@ -36,7 +36,7 @@ namespace ZServer.API
                 4490, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
             PostgreSource.Initialize();
             FontUtilities.Load();
-            CSharpDynamicCompiler.Load();
+            CSharpDynamicCompiler.Initialize();
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             if (!Directory.Exists("cache"))
