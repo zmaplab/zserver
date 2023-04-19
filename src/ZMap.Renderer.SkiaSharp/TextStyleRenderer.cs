@@ -29,7 +29,7 @@ namespace ZMap.Renderer.SkiaSharp
             var interiorPoint = geometry.InteriorPoint;
 
             var interiorCoordinate = new Coordinate(interiorPoint.X, interiorPoint.Y);
-            // 不能过滤，缓存区外的数据也要绘制，如跨边界的文字
+            // comments: 不能过滤， 缓存区外的数据也要绘制，如跨边界的文字
             // if (!extent.Contains(interiorCoordinate))
             // {
             //     return;

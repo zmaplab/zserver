@@ -12,6 +12,9 @@ namespace ZMap.Source.Postgre
 {
     public sealed class PostgreSource : SpatialDatabaseSource
     {
+        // private static readonly ConcurrentDictionary<string, DbContext> DbContexts =
+        //     new ConcurrentDictionary<string, DbContext>();
+
         public static void Initialize()
         {
             NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
@@ -20,6 +23,7 @@ namespace ZMap.Source.Postgre
         public PostgreSource(string connectionString, string database) : base(connectionString,
             database)
         {
+            // DbContexts.GetOrAdd($"{database}_{Table}", (key) => new BridgeDbContext(connectionString, database, Table));
         }
 
         public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
@@ -30,7 +34,7 @@ namespace ZMap.Source.Postgre
             }
 
             // todo: Filter 怎么才能保证没有 SQL 注入: 不真接暴露地图接口，由后端服务构造请求
-            var filter = Filter?.GetSql();
+            var filter = Filter?.ToQuerySql();
             var where = string.IsNullOrWhiteSpace(filter) ? string.Empty : $"{filter} AND ";
 
             // todo: 使用 PG 的 Simplify 达不到效果, 需要继续研究

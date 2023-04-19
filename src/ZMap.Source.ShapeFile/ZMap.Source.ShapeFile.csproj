@@ -2,7 +2,7 @@
 
     <Import Project="../../package.props" />
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="2.4.59" />
+        <PackageReference Include="MessagePack" Version="2.5.108" />
         <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.1.0" />
     </ItemGroup>
     <ItemGroup>

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -27,9 +26,6 @@ namespace ZMap.Source.ShapeFile
 
         private static readonly CoordinateSystemFactory CoordinateSystemFactory = new();
 
-        private static readonly ConcurrentDictionary<string, Func<Feature, bool>>
-            FilterCache = new();
-
         private readonly GeometryFactory _geometryFactory;
 
         // ReSharper disable once InconsistentNaming
@@ -51,7 +47,7 @@ namespace ZMap.Source.ShapeFile
         {
             var features = new List<Feature>();
 
-            var filterFunc = Filter?.GetFunc();
+            var predicate = Filter?.ToPredicate();
 
             var tuple = Cache.GetOrCreate(File,
                 entry =>
@@ -87,9 +83,9 @@ namespace ZMap.Source.ShapeFile
             {
                 var feature = GetOrCreate(extent, tuple.Reader, dbaseFile, spatialIndexItem);
 
-                if (filterFunc != null)
+                if (predicate != null)
                 {
-                    if (filterFunc(feature))
+                    if (predicate(feature))
                     {
                         features.Add(feature);
                     }

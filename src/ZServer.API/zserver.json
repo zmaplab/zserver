@@ -49,7 +49,7 @@
           "minZoom": 100,
           "maxZoom": 3000,
           "zoomUnit": "scale",
-          "property": {
+          "label": {
             "value": null,
             "expression": "feature[\"name\"]"
           },

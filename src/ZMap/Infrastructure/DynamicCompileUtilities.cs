@@ -27,7 +27,7 @@ namespace ZMap.Infrastructure
                 return null;
             }
 
-            return FuncCache.GetOrAdd(expression, _ => Compiler.Build(expression));
+            return FuncCache.GetOrAdd(expression, _ => Compiler.BuildFunc(expression));
         }
 
         public static Func<Feature, T> GetOrCreateFunc<T>(string expression)
@@ -37,7 +37,7 @@ namespace ZMap.Infrastructure
                 return null;
             }
 
-            return FuncCache.GetOrAdd(expression, _ => Compiler.Build<T>(expression));
+            return FuncCache.GetOrAdd(expression, _ => Compiler.BuildFunc<T>(expression));
         }
     }
 }

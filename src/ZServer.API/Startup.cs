@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -13,6 +14,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Serilog;
+using ZMap.Source.Postgre;
 using ZServer.API.Filters;
 
 namespace ZServer.API
@@ -105,6 +107,12 @@ namespace ZServer.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             ZMap.Log.Logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("ZServer");
+
+            // BridgeDbContext dbContext = new BridgeDbContext(
+            //     "User ID=postgres;Password=oVkr7GiT29CAkw;Host=hdy.dev;Port=1921;Database=szsf_dev;Pooling=true;",
+            //     "szsf_dev", "xiao_hui");
+            // dbContext.GetType().GetMethod("Set", BindingFlags.Public)
+            //     .Invoke(dbContext, new object[] {   });
 
             if (env.IsDevelopment())
             {
