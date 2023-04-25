@@ -15,7 +15,7 @@ namespace ZMap.Extensions
                 return true;
             }
 
-            return min <= zoom && zoom <= max;
+            return min <= zoom && zoom < max;
         }
     }
 }

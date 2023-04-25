@@ -19,13 +19,19 @@ namespace ZServer.Tests
             var layer = await store.FindAsync("resourceGroup1", "berlin_db");
             Assert.NotNull(layer);
             Assert.Equal("berlin_db", layer.Name);
+            Assert.NotNull(layer.Envelope);
+            Assert.Equal(112.8, layer.Envelope.MinX);
+            Assert.Equal(120.1, layer.Envelope.MaxX);
+            Assert.Equal(21.4, layer.Envelope.MinY);
+            Assert.Equal(23.2, layer.Envelope.MaxY);
 
             Assert.NotNull(layer.Source);
             Assert.True(layer.Source is SpatialDatabaseSource);
             var source = (SpatialDatabaseSource)layer.Source;
             Assert.Equal("geom", source.Geometry);
             Assert.Equal("osmbuildings", source.Table);
-            Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;", source.ConnectionString);
+            Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
+                source.ConnectionString);
             Assert.Equal(4326, source.SRID);
 
             Assert.NotNull(layer.StyleGroups);
@@ -57,6 +63,7 @@ namespace ZServer.Tests
             Assert.Equal("Arial Unicode MS Regular", textStyle.Font.Value[1]);
             Assert.Equal(16, textStyle.Size.Value);
         }
+
         [Fact]
         public async Task GetShapeFileLayer()
         {
@@ -123,7 +130,8 @@ namespace ZServer.Tests
             var pgSource = (SpatialDatabaseSource)pgLayer.Source;
             Assert.Equal("geom", pgSource.Geometry);
             Assert.Equal("osmbuildings", pgSource.Table);
-            Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;", pgSource.ConnectionString);
+            Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
+                pgSource.ConnectionString);
             Assert.Equal(4326, pgSource.SRID);
 
             Assert.NotNull(pgLayer.StyleGroups);
