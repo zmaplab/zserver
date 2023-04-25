@@ -16,13 +16,11 @@ namespace ZServer.Store.Configuration
     {
         private readonly IConfiguration _configuration;
         private readonly ServerOptions _options;
-        private readonly string _version;
 
         public StyleGroupStore(IConfiguration configuration, IOptionsMonitor<ServerOptions> options)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _options = options.CurrentValue;
-            _version = configuration["Version"] ?? "1.0";
         }
 
         public Task<StyleGroup> FindAsync(string name)
@@ -123,9 +121,17 @@ namespace ZServer.Store.Configuration
 
         private Style GetTextStyle(IConfigurationSection section)
         {
-            var label = _version == "1.0"
-                ? section.GetExpression<string>("property")
-                : section.GetExpression<string>("label");
+            Expression<string> label;
+            if (string.IsNullOrWhiteSpace(section.GetSection("label").Value) &&
+                !section.GetSection("label").GetChildren().Any())
+            {
+                label = section.GetExpression<string>("property");
+            }
+            else
+            {
+                label = section.GetExpression<string>("label");
+            }
+            
             return new TextStyle
             {
                 Label = label,

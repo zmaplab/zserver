@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NetTopologySuite.Geometries;
 using ZMap;
 using ZMap.Infrastructure;
 using ZMap.Source;
@@ -105,7 +106,14 @@ namespace ZServer.Store.Configuration
             var services = section.GetSection("services").Get<HashSet<ServiceType>>();
             var source = await RestoreSourceAsync(resourceGroup.Name, layerName, section);
             var styleGroups = await RestoreStyleGroupsAsync(section);
-            var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups);
+            var extent = section.GetSection("extent").Get<double[]>();
+            Envelope envelope = null;
+            if (extent.Length == 4)
+            {
+                envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
+            }
+
+            var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups, envelope);
             section.Bind(layer);
             return layer;
         }
@@ -119,7 +127,15 @@ namespace ZServer.Store.Configuration
             var services = section.GetSection("services").Get<HashSet<ServiceType>>();
             var source = await RestoreSourceAsync(resourceGroup?.Name, layerName, section);
             var styleGroups = await RestoreStyleGroupsAsync(section);
-            var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups);
+            var extent = section.GetSection("extent").Get<double[]>();
+            Envelope envelope = null;
+            if (extent.Length == 4)
+            {
+                envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
+            }
+
+            var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups, envelope);
+
             section.Bind(layer);
             return layer;
         }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NetTopologySuite.Geometries;
 using ZMap;
 using ZMap.Source;
 using ZMap.Style;
@@ -18,8 +19,8 @@ namespace ZServer.Entity
         public ResourceGroup ResourceGroup { get; private set; }
 
         public LayerEntity(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name, ISource source,
-            List<StyleGroup> styleGroups) :
-            base(name, source, styleGroups)
+            List<StyleGroup> styleGroups, Envelope envelope = null) :
+            base(name, source, styleGroups, envelope)
         {
             ResourceGroup = resourceGroup;
             Services = services;
