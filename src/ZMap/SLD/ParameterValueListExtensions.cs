@@ -12,29 +12,29 @@ public static class ParameterValueListExtensions
         return parameters.FirstOrDefault(x => x.Name == name);
     }
 
-    public static Expression<T> BuildExpression<T>(this ParameterValue parameter, IStyleVisitor visitor,
+    public static CSharpExpression<T> BuildExpression<T>(this ParameterValue parameter, IStyleVisitor visitor,
         object extraData,
         T defaultValue)
     {
         if (parameter == null)
         {
-            return Expression<T>.New(defaultValue);
+            return CSharpExpression<T>.New(defaultValue);
         }
         else
         {
             parameter.Accept(visitor, extraData);
             var value = visitor.Pop();
-            return value == null ? Expression<T>.New(defaultValue) : Expression<T>.From(value, defaultValue);
+            return value == null ? CSharpExpression<T>.New(defaultValue) : CSharpExpression<T>.From(value, defaultValue);
         }
     }
 
-    public static Expression<T[]> BuildArrayExpression<T>(this ParameterValue parameter, IExpressionVisitor visitor,
+    public static CSharpExpression<T[]> BuildArrayExpression<T>(this ParameterValue parameter, IExpressionVisitor visitor,
         object extraData,
         T[] defaultValue)
     {
         if (parameter == null)
         {
-            return Expression<T[]>.New(defaultValue);
+            return CSharpExpression<T[]>.New(defaultValue);
         }
         else
         {
@@ -47,9 +47,9 @@ public static class ParameterValueListExtensions
                 }
 
                 var result = visitor.Pop();
-                if (result is Expression expression)
+                if (result is CSharpExpression expression)
                 {
-                    return result as Expression<T[]> ?? Expression<T[]>.New(null, expression.Body);
+                    return result as CSharpExpression<T[]> ?? CSharpExpression<T[]>.New(null, expression.Body);
                 }
                 else
                 {
@@ -59,12 +59,12 @@ public static class ParameterValueListExtensions
 
             if (string.IsNullOrWhiteSpace(text))
             {
-                return Expression<T[]>.New(defaultValue);
+                return CSharpExpression<T[]>.New(defaultValue);
             }
             else
             {
                 var array = ConvertUtilities.ToArray<T>(text);
-                return Expression<T[]>.New(array);
+                return CSharpExpression<T[]>.New(array);
             }
         }
     }

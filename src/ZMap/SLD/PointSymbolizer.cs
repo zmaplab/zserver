@@ -20,7 +20,7 @@ namespace ZMap.SLD
             {
                 MinZoom = 0,
                 MaxZoom = Defaults.MaxZoomValue,
-                Filter = Expression<bool?>.New(null)
+                Filter = CSharpExpression<bool?>.New(null)
             };
             visitor.Push(symbolStyle);
             visitor.Visit(Graphic, extraData);

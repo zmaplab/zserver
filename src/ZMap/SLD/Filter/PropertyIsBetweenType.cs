@@ -21,15 +21,15 @@ namespace ZMap.SLD.Filter
         public override object Accept(IFilterVisitor visitor, object extraData)
         {
             visitor.VisitObject(Item, extraData);
-            var propertyExpression = (ZMap.Style.Expression)visitor.Pop();
+            var propertyExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
             visitor.VisitObject(LowerBoundary, extraData);
-            var lowerBoundaryExpression = (ZMap.Style.Expression)visitor.Pop();
+            var lowerBoundaryExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
             visitor.VisitObject(UpperBoundary, extraData);
-            var upperBoundaryExpression = (ZMap.Style.Expression)visitor.Pop();
+            var upperBoundaryExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-            visitor.Push(ZMap.Style.Expression.New(
+            visitor.Push(ZMap.Style.CSharpExpression.New(
                 $"ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({propertyExpression.Body}, {lowerBoundaryExpression.Body}, {upperBoundaryExpression.Body})"));
 
             return null;

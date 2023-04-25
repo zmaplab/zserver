@@ -25,11 +25,11 @@ public class PropertyIsGreaterThanOrEqualTo
         var compareExpression = Items[index == 0 ? 1 : 0];
 
         visitor.VisitObject(propertyExpression, extraData);
-        var leftExpression = (ZMap.Style.Expression)visitor.Pop();
+        var leftExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
         visitor.VisitObject(compareExpression, extraData);
-        var rightExpression = (ZMap.Style.Expression)visitor.Pop();
+        var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-        visitor.Push(ZMap.Style.Expression.New(
+        visitor.Push(ZMap.Style.CSharpExpression.New(
             $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({leftExpression.Body}, {rightExpression.Body})"));
 
         return null;

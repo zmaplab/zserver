@@ -122,15 +122,15 @@ public class SldStyleVisitor : IStyleVisitor, IFilterVisitor
             ZoomUnit = ZoomUnits.Scale,
             Name = rule.Name,
             Description = rule.Description?.Title,
-            Filter = Expression<bool?>.New(null)
+            Filter = CSharpExpression<bool?>.New(null)
         };
 
         if (rule.FilterType != null)
         {
             rule.FilterType.Accept(this, data);
-            if (_stack.Pop() is Expression filterExpression)
+            if (_stack.Pop() is CSharpExpression filterExpression)
             {
-                styleGroup.Filter = Expression<bool?>.New(null,
+                styleGroup.Filter = CSharpExpression<bool?>.New(null,
                     $"{(rule.ElseFilter ? "!" : string.Empty)}{filterExpression.Body}");
             }
         }
