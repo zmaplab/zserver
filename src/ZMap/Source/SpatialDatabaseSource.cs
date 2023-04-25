@@ -8,6 +8,8 @@ namespace ZMap.Source
     {
         /// <summary>
         /// 连接字符串
+        /// todo: 要换成 db, port, user, password 的配置方式
+        /// 字符串太 Tec 了，后面做 UI 不合适
         /// </summary>
         public string ConnectionString { get; }
 

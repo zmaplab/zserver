@@ -21,17 +21,17 @@ public class SkiaGraphicsService : IGraphicsService
         };
     }
 
-    public string MapId { get; }
+    public string Identifier { get; }
     public int Width { get; }
     public int Height { get; }
 
-    public SkiaGraphicsService(string mapId, int width, int height)
+    public SkiaGraphicsService(string identifier, int width, int height)
     {
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         Width = width;
         Height = height;
-        MapId = mapId;
+        Identifier = identifier;
     }
 
     public byte[] GetImage(string imageFormat, bool bordered = false)

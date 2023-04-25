@@ -278,7 +278,7 @@ namespace ZMap
                     StringComparison.InvariantCultureIgnoreCase))
             {
                 Log.Logger.LogInformation(
-                    $"[{service.MapId}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}");
+                    $"[{service.Identifier}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}");
             }
         }
 

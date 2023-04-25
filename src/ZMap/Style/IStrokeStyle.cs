@@ -2,11 +2,11 @@ namespace ZMap.Style;
 
 public interface IStrokeStyle
 {
-    Expression<float> Opacity { get; set; }
-    Expression<int> Width { get; set; }
-    Expression<string> Color { get; set; }
-    Expression<float[]> DashArray { get; set; }
-    Expression<float> DashOffset { get; set; }
-    Expression<string> LineJoin { get; set; }
-    Expression<string> LineCap { get; set; }
+    CSharpExpression<float> Opacity { get; set; }
+    CSharpExpression<int> Width { get; set; }
+    CSharpExpression<string> Color { get; set; }
+    CSharpExpression<float[]> DashArray { get; set; }
+    CSharpExpression<float> DashOffset { get; set; }
+    CSharpExpression<string> LineJoin { get; set; }
+    CSharpExpression<string> LineCap { get; set; }
 }

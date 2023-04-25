@@ -4,7 +4,7 @@ namespace ZMap.Style
 {
     public class StyleGroup : IVisibleLimit
     {
-        public Expression<bool?> Filter { get; set; }
+        public CSharpExpression<bool?> Filter { get; set; }
 
         /// <summary>
         /// 样式组名称

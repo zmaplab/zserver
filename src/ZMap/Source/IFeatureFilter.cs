@@ -8,7 +8,7 @@ namespace ZMap.Source;
 public interface IFeatureFilter
 {
     /// <summary>
-    /// 编译成 PG 的 SQL
+    /// 编译成 SQL
     /// </summary>
     /// <returns></returns>
     string ToQuerySql();

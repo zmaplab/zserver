@@ -6,7 +6,7 @@ namespace ZMap;
 
 public interface IGraphicsService : IDisposable
 {
-    string MapId { get; }
+    string Identifier { get; }
     int Width { get; }
     int Height { get; }
     byte[] GetImage(string imageFormat, bool bordered = false);

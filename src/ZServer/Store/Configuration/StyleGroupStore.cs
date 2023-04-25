@@ -169,7 +169,7 @@ namespace ZServer.Store.Configuration
             {
                 symbol = new SpriteFillStyle
                 {
-                    Pattern = Expression<string>.New(pattern),
+                    Pattern = CSharpExpression<string>.New(pattern),
                     Uri = section.GetExpression<Uri>("uri")
                 };
             }
@@ -186,7 +186,7 @@ namespace ZServer.Store.Configuration
                 {
                     symbol = new ResourceFillStyle
                     {
-                        Uri = Expression<Uri>.New(uri)
+                        Uri = CSharpExpression<Uri>.New(uri)
                     };
                 }
                 else
@@ -203,7 +203,7 @@ namespace ZServer.Store.Configuration
             symbol.Pattern = section.GetExpression<string>("pattern");
             symbol.Antialias = section.GetValue<bool>("antialias");
             symbol.Color = section.GetExpression<string>("color");
-            symbol.OutlineColor = section.GetExpression<string>("outlineColor");
+            // symbol.OutlineColor = section.GetExpression<string>("outlineColor");
             symbol.Translate = section.GetExpression<double[]>("translate");
             symbol.TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor");
             return symbol;

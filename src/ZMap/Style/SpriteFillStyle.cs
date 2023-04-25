@@ -2,7 +2,7 @@ namespace ZMap.Style
 {
     public class SpriteFillStyle : ResourceFillStyle
     {
-        public Expression<string> Pattern { get; set; }
+        public CSharpExpression<string> Pattern { get; set; }
         
         public override void Accept(IZMapStyleVisitor visitor, Feature feature)
         {

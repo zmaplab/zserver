@@ -16,10 +16,10 @@ public class ToString
     {
         visitor.Visit(_functionType1.Items[0], extraData);
 
-        var expression = (ZMap.Style.Expression)visitor.Pop();
+        var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
         var guid = Guid.NewGuid().ToString("N");
 
-        var resultExpression = ZMap.Style.Expression.New($$"""
+        var resultExpression = ZMap.Style.CSharpExpression.New($$"""
 ((Func<string>)(() =>
 {
     var value_{{guid}} = {{expression.Body}};

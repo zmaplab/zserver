@@ -5,18 +5,18 @@ namespace ZServer.Extensions
 {
     public static class ConfigurationSectionExtensions
     {
-        public static Expression<T> GetExpression<T>(this IConfigurationSection section, string name)
+        public static CSharpExpression<T> GetExpression<T>(this IConfigurationSection section, string name)
         {
             if (name == "filter" && typeof(T) == typeof(bool?))
             {
                 var expression = section.GetValue<string>(name);
                 if (bool.TryParse(expression, out var result))
                 {
-                    return Expression<bool?>.New(result) as Expression<T>;
+                    return CSharpExpression<bool?>.New(result) as CSharpExpression<T>;
                 }
                 else
                 {
-                    return Expression<bool?>.New(null, expression) as Expression<T>;
+                    return CSharpExpression<bool?>.New(null, expression) as CSharpExpression<T>;
                 }
             }
 
@@ -25,12 +25,12 @@ namespace ZServer.Extensions
             if ((expressionValue != null && !expressionValue.Equals(default(T))) ||
                 !string.IsNullOrWhiteSpace(expressionBody))
             {
-                return Expression<T>.New(default, expressionBody);
+                return CSharpExpression<T>.New(default, expressionBody);
             }
 
             var targetSection = section.GetSection(name);
             var value = targetSection.Get<T>();
-            return Expression<T>.New(value);
+            return CSharpExpression<T>.New(value);
         }
 
         // public static T GetOrDefault<T>(this IConfigurationSection section, string name)

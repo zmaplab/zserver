@@ -22,8 +22,8 @@ namespace ZServer.Tests
                 var style = new FillStyle
                 {
                     Antialias = true,
-                    Opacity = Expression<float>.New(1),
-                    Color = Expression<string>.New("#3ed53e")
+                    Opacity = CSharpExpression<float>.New(1),
+                    Color = CSharpExpression<string>.New("#3ed53e")
                 };
 
                 using var bitmap = new SKBitmap(256, 256);
@@ -54,8 +54,8 @@ namespace ZServer.Tests
             var style = new FillStyle
             {
                 Antialias = true,
-                Opacity = Expression<float>.New(1),
-                Color = Expression<string>.New("#3ed53e")
+                Opacity = CSharpExpression<float>.New(1),
+                Color = CSharpExpression<string>.New("#3ed53e")
             };
 
             var width = 256;
@@ -81,8 +81,8 @@ namespace ZServer.Tests
             var style = new FillStyle
             {
                 Antialias = true,
-                Opacity = Expression<float>.New(0.5f),
-                Color = Expression<string>.New("#3ed53e")
+                Opacity = CSharpExpression<float>.New(0.5f),
+                Color = CSharpExpression<string>.New("#3ed53e")
             };
 
             using var bitmap = new SKBitmap(256, 256);
@@ -114,9 +114,9 @@ namespace ZServer.Tests
             var style = new ResourceFillStyle
             {
                 Antialias = true,
-                Opacity = Expression<float>.New(0.5f),
-                Color = Expression<string>.New("#3ed53e"),
-                Uri = Expression<Uri>.New(uri)
+                Opacity = CSharpExpression<float>.New(0.5f),
+                Color = CSharpExpression<string>.New("#3ed53e"),
+                Uri = CSharpExpression<Uri>.New(uri)
             };
 
             var width = 256;

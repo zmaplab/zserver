@@ -2,20 +2,20 @@ using ZMap.Infrastructure;
 
 namespace ZMap.Style
 {
-    public class Expression<TV> : Expression
+    public class CSharpExpression<TV> : CSharpExpression
     {
         public TV Value { get; internal set; }
 
-        public static Expression<TV> New(TV v, string body = null)
+        public static CSharpExpression<TV> New(TV v, string body = null)
         {
-            return new Expression<TV>
+            return new CSharpExpression<TV>
             {
                 Value = v,
                 Body = body
             };
         }
 
-        public static Expression<TV> From(dynamic value, TV defaultValue)
+        public static CSharpExpression<TV> From(dynamic value, TV defaultValue)
         {
             if (value == null)
             {
@@ -53,13 +53,13 @@ namespace ZMap.Style
         }
     }
 
-    public class Expression
+    public class CSharpExpression
     {
         public string Body { get; protected set; }
 
-        public static Expression New(string body = null)
+        public static CSharpExpression New(string body = null)
         {
-            return new Expression
+            return new CSharpExpression
             {
                 Body = body
             };
