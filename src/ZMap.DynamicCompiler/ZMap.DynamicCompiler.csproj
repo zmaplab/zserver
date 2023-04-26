@@ -1,14 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+    <Import Project="../../version.props" />
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.5</Version>
-        <FileVersion>1.1.5</FileVersion>
         <Authors>zmap lab;</Authors>
-        <Copyright>Copyright 2019 zmap lab</Copyright>
+        <Copyright>Copyright 2023 zmap lab</Copyright>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <IsPackable>true</IsPackable>
         <LangVersion>preview</LangVersion>

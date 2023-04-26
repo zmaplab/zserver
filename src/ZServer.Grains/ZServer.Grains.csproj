@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <Import Project="../../package.props" />
-
+    <Import Project="../../version.props" />
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
         <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />

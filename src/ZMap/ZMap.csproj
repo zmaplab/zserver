@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <Import Project="../../package.props" />
+    <Import Project="../../version.props" />
     <ItemGroup>
         <PackageReference Include="MessagePack.Annotations" Version="2.4.59" />
         <PackageReference Include="NetTopologySuite" Version="2.5.0" />

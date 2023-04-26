@@ -3,8 +3,6 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.8</Version>
-        <FileVersion>1.1.8</FileVersion>
         <Authors>zmap lab;</Authors>
         <Copyright>Copyright 2023 zmap lab</Copyright>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
