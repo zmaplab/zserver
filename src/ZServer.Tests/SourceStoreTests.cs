@@ -12,8 +12,6 @@ namespace ZServer.Tests
         [Fact]
         public async Task GetPgSource()
         {
-            PostgreSource.Initialize();
-
             var sourceStore = GetScopedService<ISourceStore>();
             var dataSource = (PostgreSource)await sourceStore.FindAsync("berlin_db");
 

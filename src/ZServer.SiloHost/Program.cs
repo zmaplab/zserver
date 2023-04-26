@@ -65,11 +65,8 @@ namespace ZServer.SiloHost
             }
 
             Log.Logger = loggerConfiguration.CreateLogger();
-
-            PostgreSource.Initialize();
+            
             FontUtilities.Load();
-
-            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 

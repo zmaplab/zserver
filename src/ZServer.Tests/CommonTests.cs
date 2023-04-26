@@ -14,4 +14,11 @@ public class CommonTests
         var dpi2 = Utilities.GetDpi("dpi:90");
         Assert.Equal(90, dpi2);
     }
+
+    [Fact]
+    public void Convert()
+    {
+        var result = ConvertUtilities.ToObject<int?>("2");
+        Assert.Equal(2, result);
+    }
 }

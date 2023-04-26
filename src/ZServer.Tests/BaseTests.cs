@@ -23,9 +23,6 @@ namespace ZServer.Tests
         static BaseTests()
         {
             CSharpDynamicCompiler.Initialize();
-
-            PostgreSource.Initialize();
-
             var serviceCollection = new ServiceCollection();
             var configuration = GetConfiguration();
             serviceCollection.AddMemoryCache();

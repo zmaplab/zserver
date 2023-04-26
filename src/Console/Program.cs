@@ -22,9 +22,6 @@ namespace Console
     {
         static void Main(string[] args)
         {
-            PostgreSource.Initialize();
-
-            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 

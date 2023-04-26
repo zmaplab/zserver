@@ -34,7 +34,6 @@ namespace ZServer.API
                 CoordinateArraySequenceFactory.Instance,
                 PrecisionModel.Floating.Value,
                 4490, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
-            PostgreSource.Initialize();
             FontUtilities.Load();
             CSharpDynamicCompiler.Initialize();
             DefaultTypeMap.MatchNamesWithUnderscores = true;

@@ -15,11 +15,6 @@ namespace ZMap.Source.Postgre
         // private static readonly ConcurrentDictionary<string, DbContext> DbContexts =
         //     new ConcurrentDictionary<string, DbContext>();
 
-        public static void Initialize()
-        {
-            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
-        }
-
         public PostgreSource(string connectionString, string database) : base(connectionString,
             database)
         {
@@ -100,11 +95,13 @@ namespace ZMap.Source.Postgre
 
         private IDbConnection CreateDbConnection()
         {
-            var builder =
-                new NpgsqlConnectionStringBuilder(ConnectionString)
-                    { Database = Database };
+            var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
+                { Database = Database };
             var connectionString = builder.ToString();
-            return new NpgsqlConnection(connectionString);
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.UseNetTopologySuite();
+            var dataSource = dataSourceBuilder.Build();
+            return dataSource.CreateConnection();
         }
     }
 }
