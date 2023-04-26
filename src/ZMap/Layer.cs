@@ -15,9 +15,9 @@ namespace ZMap
 {
     public class Layer : ILayer
     {
-        private readonly List<StyleGroup> _styleGroups;
         private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
-        private readonly Dictionary<string, dynamic> _environments;
+        private readonly List<StyleGroup> _styleGroups;
+        private readonly Dictionary<string, dynamic> _environments = new();
 
         /// <summary>
         /// 图层名称
@@ -87,7 +87,6 @@ namespace ZMap
             }
 
             _styleGroups = styleGroups;
-            _environments = new Dictionary<string, object>();
         }
 
         public async Task RenderAsync(IGraphicsService graphicsService, Viewport viewport, Zoom zoom, int srid)
@@ -138,6 +137,10 @@ namespace ZMap
             // {
             //     transformation = CoordinateTransformUtilities.GetTransformation(SRID, srid);
             // }
+            if (_environments.ContainsKey(Defaults.WmsScaleKey))
+            {
+                
+            }
             _environments[Defaults.WmsScaleKey] = zoom.Value;
 
             switch (Source)
@@ -165,18 +168,13 @@ namespace ZMap
                 case IRasterSource rasterSource:
                     await RenderRasterAsync(graphicsService, rasterSource, extent, zoom);
                     break;
-                // case IWMTSSource wmts:
-                // {
-                //     await RenderWMTSAsync(graphicsService, wmts, extent, zoom);
-                //     break;
-                // }
             }
         }
 
-        public void ClearEnvironments()
-        {
-            _environments?.Clear();
-        }
+        // public void ClearEnvironments()
+        // {
+        //     _environments?.Clear();
+        // }
 
         private async Task RenderRasterAsync(IGraphicsService service, IRasterSource rasterSource, Envelope extent,
             Zoom zoom)

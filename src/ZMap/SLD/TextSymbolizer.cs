@@ -61,23 +61,23 @@ namespace ZMap.SLD
                 Label = CSharpExpression<string>.New(null, $"feature[\"{Label.PropertyName}\"]"),
                 Offset = CSharpExpression<float[]>.New(Array.Empty<float>()),
                 Color = CSharpExpression<string>.New("#000000"),
-                Opacity = CSharpExpression<float>.New(1),
+                Opacity = CSharpExpression<float?>.New(1),
                 BackgroundColor = CSharpExpression<string>.New(null),
-                BackgroundOpacity = CSharpExpression<float>.New(1),
-                Radius = CSharpExpression<float>.New(0),
+                BackgroundOpacity = CSharpExpression<float?>.New(1),
+                Radius = CSharpExpression<float?>.New(0),
                 RadiusColor = CSharpExpression<string>.New(null),
-                RadiusOpacity = CSharpExpression<float>.New(0),
+                RadiusOpacity = CSharpExpression<float?>.New(0),
                 Weight = CSharpExpression<string>.New(null),
                 Align = CSharpExpression<string>.New(null),
-                Rotate = CSharpExpression<float>.New(0),
+                Rotate = CSharpExpression<float?>.New(0),
                 Transform = CSharpExpression<TextTransform>.New(TextTransform.Lowercase),
-                OutlineSize = CSharpExpression<int>.New(0),
+                OutlineSize = CSharpExpression<int?>.New(0),
                 Font = CSharpExpression<List<string>>.New(new List<string>())
             };
 
             var size = Font.GetOrDefault("font-size");
             textStyle.Size =
-                size.BuildExpression(visitor, extraData, (int)FontType.Defaults["font-size"]);
+                size.BuildExpression(visitor, extraData, (int?)FontType.Defaults["font-size"]);
 
             var families = Font.Where(x => x.Name == "font-family").ToList();
             foreach (var family in families)

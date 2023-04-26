@@ -1,7 +1,15 @@
+using System;
 using ZMap.Infrastructure;
 
 namespace ZMap.Style
 {
+    /// <summary>
+    /// 1.若有 value，没有表达式，则使用 value
+    /// 2.若有 value，有表达式，表达式的值不为空，则使用表达式的值
+    /// 3.若无 value，没有表达式，则使用表达式的值
+    /// 4.若无 value，有表达式，则使用表达式的值
+    /// </summary>
+    /// <typeparam name="TV"></typeparam>
     public class CSharpExpression<TV> : CSharpExpression
     {
         public TV Value { get; internal set; }
@@ -30,25 +38,44 @@ namespace ZMap.Style
 
         public void Invoke(Feature feature, TV defaultValue = default)
         {
-            if (string.IsNullOrWhiteSpace(Body))
+            if (Value != null)
             {
-                return;
-            }
-
-            if (Value != null && !Value.Equals(default))
-            {
-                return;
-            }
-
-            var func = DynamicCompilationUtilities.GetOrCreateFunc(Body);
-            if (func == null)
-            {
-                Value = defaultValue;
+                if (string.IsNullOrWhiteSpace(Body))
+                {
+                }
+                else
+                {
+                    var func = DynamicCompilationUtilities.GetOrCreateFunc(Body);
+                    if (func == null)
+                    {
+                        return;
+                    }
+                    var output = func.Invoke(feature);
+                    if (output != null)
+                    {
+                        Value = output;
+                    }
+                }
             }
             else
             {
-                var result = func.Invoke(feature);
-                Value = result is TV tv ? tv : defaultValue;
+                if (string.IsNullOrWhiteSpace(Body))
+                {
+                    Value =  defaultValue;
+                }
+                else
+                {
+                    var func = DynamicCompilationUtilities.GetOrCreateFunc(Body);
+                    if (func != null)
+                    {
+                        var output = func.Invoke(feature);
+                        Value = output != null ? (TV)output : defaultValue;
+                    }
+                    else
+                    {
+                        Value =  defaultValue;
+                    }
+                }
             }
         }
     }

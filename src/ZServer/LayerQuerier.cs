@@ -30,7 +30,7 @@ public class LayerQuerier : ILayerQuerier
         {
             if (layerQuery.ResourceGroup == null)
             {
-                var layer = await _layerStore.FindAsync(layerQuery.Layer);
+                var layer = await _layerStore.FindAsync(null, layerQuery.Layer);
                 if (layer != null)
                 {
                     TryAdd(hashSet, list, layerQuery, layer);

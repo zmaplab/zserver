@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ZMap.Source.Postgre;
 using ZServer.Store;
@@ -30,7 +31,7 @@ namespace ZServer.Tests
             var dataSource = (ShapeFileSource)await sourceStore.FindAsync("berlin_shp");
 
             Assert.NotNull(dataSource);
-            Assert.EndsWith("shapes/osmbuildings.shp", dataSource.File);
+            Assert.EndsWith("osmbuildings.shp", dataSource.File);
             Assert.Equal(4326, dataSource.SRID);
         }
 
@@ -48,7 +49,8 @@ namespace ZServer.Tests
 
             var dataSource2 = (ShapeFileSource)dataSources[1];
             Assert.NotNull(dataSource2);
-            Assert.EndsWith("shapes/osmbuildings.shp", dataSource2.File);
+        
+            Assert.EndsWith("osmbuildings.shp", dataSource2.File);
             Assert.Equal(4326, dataSource2.SRID);
         }
     }

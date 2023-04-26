@@ -17,18 +17,18 @@ namespace ZMap.Renderer.SkiaSharp
 
         protected override SKPaint CreatePaint()
         {
-            var opacity = _style.Opacity.Value;
-            var width = _style.Width.Value;
+            var opacity = _style.Opacity.Value ?? 1;
+            var width = _style.Width.Value ?? 1;
             var color = _style.Color.Value;
-            var dashArray = _style.DashArray.Value;
-            var dashOffset = _style.DashOffset.Value;
+            var dashArray = _style.DashArray.Value ?? Array.Empty<float>();
+            var dashOffset = _style.DashOffset.Value ?? 1;
             var lineJoin = _style.LineJoin.Value;
             var cap = _style.LineCap.Value;
             var translate = _style.Translate.Value;
             var translateAnchor = _style.TranslateAnchor?.Value;
             var gapWidth = _style.GapWidth.Value;
             var offset = _style.Offset.Value;
-            var blur = _style.Blur.Value;
+            var blur = _style.Blur.Value ?? 0;
             var gradient = _style.Gradient.Value;
 
             var dashArrayKey = dashArray is { Length: 2 } ? $"{dashArray[0]}{dashArray[1]}" : "";

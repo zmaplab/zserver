@@ -25,6 +25,9 @@ namespace ZServer.Tests
             Assert.Equal(21.4, layer.Envelope.MinY);
             Assert.Equal(23.2, layer.Envelope.MaxY);
 
+            Assert.Single(layer.Buffers);
+            Assert.Equal(32, layer.Buffers[0].Size);
+
             Assert.NotNull(layer.Source);
             Assert.True(layer.Source is SpatialDatabaseSource);
             var source = (SpatialDatabaseSource)layer.Source;
@@ -68,7 +71,7 @@ namespace ZServer.Tests
         public async Task GetShapeFileLayer()
         {
             var store = GetScopedService<ILayerStore>();
-            var layer = await store.FindAsync("berlin_shp") as LayerEntity;
+            var layer = await store.FindAsync(null, "berlin_shp") as LayerEntity;
             Assert.NotNull(layer);
             Assert.Equal("berlin_shp", layer.Name);
 
@@ -80,7 +83,7 @@ namespace ZServer.Tests
             Assert.True(layer.Source is ShapeFileSource);
             var source = (ShapeFileSource)layer.Source;
             Assert.Equal(4326, source.SRID);
-            Assert.EndsWith("shapes/osmbuildings.shp", source.File);
+            Assert.EndsWith("osmbuildings.shp", source.File);
 
             Assert.NotNull(layer.StyleGroups);
             Assert.Single(layer.StyleGroups);
@@ -171,7 +174,7 @@ namespace ZServer.Tests
             Assert.True(shpLayer.Source is ShapeFileSource);
             var source = (ShapeFileSource)shpLayer.Source;
             Assert.Equal(4326, source.SRID);
-            Assert.EndsWith("shapes/osmbuildings.shp", source.File);
+            Assert.EndsWith("osmbuildings.shp", source.File);
 
             Assert.NotNull(shpLayer.StyleGroups);
             Assert.Single(shpLayer.StyleGroups);

@@ -19,12 +19,12 @@ namespace ZServer.Tests
                 Align = CSharpExpression<string>.New("center"),
                 Label = CSharpExpression<string>.New("name"),
                 Font = CSharpExpression<List<string>>.New(new List<string> { "宋体" }),
-                Size = CSharpExpression<int>.New(12),
-                Rotate = CSharpExpression<float>.New(0),
+                Size = CSharpExpression<int?>.New(12),
+                Rotate = CSharpExpression<float?>.New(0),
                 Transform = CSharpExpression<TextTransform>.New(TextTransform.Uppercase),
                 Offset = CSharpExpression<float[]>.New(Array.Empty<float>()),
                 BackgroundColor = CSharpExpression<string>.New("#FFFFFF"),
-                OutlineSize = CSharpExpression<int>.New(1)
+                OutlineSize = CSharpExpression<int?>.New(1)
             };
             var width = 603 * 2;
             var height = 450 * 2;

@@ -46,7 +46,7 @@ namespace ZServer.Store.Configuration
 
         public async Task<ILayer> FindAsync(string resourceGroupName, string layerName)
         {
-            if (string.IsNullOrWhiteSpace(resourceGroupName) || string.IsNullOrWhiteSpace(layerName))
+            if (string.IsNullOrWhiteSpace(resourceGroupName) && string.IsNullOrWhiteSpace(layerName))
             {
                 return null;
             }
@@ -54,23 +54,40 @@ namespace ZServer.Store.Configuration
             var result = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerName}",
                 async entry =>
                 {
-                    var resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
-                    if (resourceGroup == null)
+                    ResourceGroup resourceGroup = null;
+                    // 若传的资源组不为空，才需要查询资源组信息
+                    if (!string.IsNullOrEmpty(resourceGroupName))
                     {
-                        _logger.LogError($"资源组 {resourceGroupName} 不存在");
-                        return null;
+                        // 若资源组不存在，则返回空
+                        resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
+                        if (resourceGroup == null)
+                        {
+                            _logger.LogError($"资源组 {resourceGroupName} 不存在");
+                            return null;
+                        }
                     }
 
                     var section =
                         _configuration.GetSection($"layers:{layerName}");
                     var configResourceGroupName = section.GetValue<string>("resourceGroup");
 
-                    Layer layer = null;
-                    if (configResourceGroupName == resourceGroupName)
+                    // 若传的资源组不为空，并且代码执行到此处，说明资源组存在
+                    if (!string.IsNullOrEmpty(resourceGroupName))
                     {
-                        layer = await BindLayerAsync(layerName, resourceGroup);
+                        // 若配置的资源组与查询资源组不一致，则返回空
+                        if (configResourceGroupName != resourceGroupName)
+                        {
+                            return null;
+                        }
                     }
 
+                    if (resourceGroup == null && !string.IsNullOrEmpty(configResourceGroupName))
+                    {
+                        resourceGroup = await _resourceGroupStore.FindAsync(configResourceGroupName);
+                    }
+
+                    var layer = await BindLayerAsync(layerName, resourceGroup);
+
                     entry.SetValue(layer);
                     entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
                     return layer;
@@ -79,24 +96,24 @@ namespace ZServer.Store.Configuration
             return result?.DeepClone();
         }
 
-        public async Task<ILayer> FindAsync(string layerName)
-        {
-            if (string.IsNullOrWhiteSpace(layerName))
-            {
-                return null;
-            }
-
-            var result = await Cache.GetOrCreate($"{GetType().FullName}:{layerName}",
-                async entry =>
-                {
-                    var layer = await BindLayerAsync(layerName);
-                    entry.SetValue(layer);
-                    entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
-                    return layer;
-                });
-
-            return result?.DeepClone();
-        }
+        // public async Task<ILayer> FindAsync(string layerName)
+        // {
+        //     if (string.IsNullOrWhiteSpace(layerName))
+        //     {
+        //         return null;
+        //     }
+        //
+        //     var result = await Cache.GetOrCreate($"{GetType().FullName}:{layerName}",
+        //         async entry =>
+        //         {
+        //             var layer = await BindLayerAsync(layerName);
+        //             entry.SetValue(layer);
+        //             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
+        //             return layer;
+        //         });
+        //
+        //     return result?.DeepClone();
+        // }
 
         private async Task<Layer> BindLayerAsync(string layerName, ResourceGroup resourceGroup)
         {
@@ -104,38 +121,16 @@ namespace ZServer.Store.Configuration
                 _configuration.GetSection($"layers:{layerName}");
 
             var services = section.GetSection("services").Get<HashSet<ServiceType>>();
-            var source = await RestoreSourceAsync(resourceGroup.Name, layerName, section);
-            var styleGroups = await RestoreStyleGroupsAsync(section);
-            var extent = section.GetSection("extent").Get<double[]>();
-            Envelope envelope = null;
-            if (extent.Length == 4)
-            {
-                envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
-            }
-
-            var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups, envelope);
-            section.Bind(layer);
-            return layer;
-        }
-
-        private async Task<Layer> BindLayerAsync(string layerName)
-        {
-            var section =
-                _configuration.GetSection($"layers:{layerName}");
-            var resourceGroupName = section.GetSection("resourceGroup").Get<string>();
-            var resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
-            var services = section.GetSection("services").Get<HashSet<ServiceType>>();
             var source = await RestoreSourceAsync(resourceGroup?.Name, layerName, section);
             var styleGroups = await RestoreStyleGroupsAsync(section);
             var extent = section.GetSection("extent").Get<double[]>();
             Envelope envelope = null;
-            if (extent.Length == 4)
+            if (extent is { Length: 4 })
             {
                 envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
             }
 
             var layer = new LayerEntity(resourceGroup, services, layerName, source, styleGroups, envelope);
-
             section.Bind(layer);
             return layer;
         }
@@ -197,14 +192,15 @@ namespace ZServer.Store.Configuration
                 }
 
                 var propertyName = child.Key.Replace("source", string.Empty);
-                if (properties.ContainsKey(propertyName))
+                if (!properties.TryGetValue(propertyName, out var property))
                 {
-                    var property = properties[propertyName];
-                    var value = child.Get(property.PropertyType);
-                    if (value != null)
-                    {
-                        property.SetValue(source, value);
-                    }
+                    continue;
+                }
+
+                var value = child.Get(property.PropertyType);
+                if (value != null)
+                {
+                    property.SetValue(source, value);
                 }
             }
 
@@ -216,7 +212,7 @@ namespace ZServer.Store.Configuration
             var result = new List<ILayer>();
             foreach (var child in _configuration.GetSection("layers").GetChildren())
             {
-                result.Add(await FindAsync(child.Key));
+                result.Add(await FindAsync(null, child.Key));
             }
 
             return result;
