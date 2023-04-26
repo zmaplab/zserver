@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <Import Project="../../package.props" />
-
+    <Import Project="../../version.props" />
     <ItemGroup>
         <ProjectReference Include="..\ZServer\ZServer.csproj" />
     </ItemGroup>
