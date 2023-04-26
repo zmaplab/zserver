@@ -22,7 +22,7 @@ namespace ZServer.Tests
                 var style = new FillStyle
                 {
                     Antialias = true,
-                    Opacity = CSharpExpression<float>.New(1),
+                    Opacity = CSharpExpression<float?>.New(1),
                     Color = CSharpExpression<string>.New("#3ed53e")
                 };
 
@@ -54,7 +54,7 @@ namespace ZServer.Tests
             var style = new FillStyle
             {
                 Antialias = true,
-                Opacity = CSharpExpression<float>.New(1),
+                Opacity = CSharpExpression<float?>.New(1),
                 Color = CSharpExpression<string>.New("#3ed53e")
             };
 
@@ -81,7 +81,7 @@ namespace ZServer.Tests
             var style = new FillStyle
             {
                 Antialias = true,
-                Opacity = CSharpExpression<float>.New(0.5f),
+                Opacity = CSharpExpression<float?>.New(0.5f),
                 Color = CSharpExpression<string>.New("#3ed53e")
             };
 
@@ -114,7 +114,7 @@ namespace ZServer.Tests
             var style = new ResourceFillStyle
             {
                 Antialias = true,
-                Opacity = CSharpExpression<float>.New(0.5f),
+                Opacity = CSharpExpression<float?>.New(0.5f),
                 Color = CSharpExpression<string>.New("#3ed53e"),
                 Uri = CSharpExpression<Uri>.New(uri)
             };

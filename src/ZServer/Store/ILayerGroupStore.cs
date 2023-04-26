@@ -14,12 +14,12 @@ namespace ZServer.Store
         /// <returns></returns>
         Task<LayerGroup> FindAsync(string resourceGroup, string layerGroupName);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="layerGroupName"></param>
-        /// <returns></returns>
-        Task<LayerGroup> FindAsync(string layerGroupName);
+        // /// <summary>
+        // /// 
+        // /// </summary>
+        // /// <param name="layerGroupName"></param>
+        // /// <returns></returns>
+        // Task<LayerGroup> FindAsync(string layerGroupName);
 
         /// <summary>
         /// 查询所有图层配置

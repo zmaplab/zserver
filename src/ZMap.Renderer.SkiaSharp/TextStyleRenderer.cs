@@ -104,7 +104,7 @@ namespace ZMap.Renderer.SkiaSharp
 
         private SKPaint CreateBackgroundPaint(string color)
         {
-            var size = _style.OutlineSize.Value;
+            var size = _style.OutlineSize.Value ?? 2;
             if (size <= 0)
             {
                 size = 3;
@@ -131,8 +131,8 @@ namespace ZMap.Renderer.SkiaSharp
         {
             // TODO: 暂时只取第一个字体
             var fontFamily = _style.Font.Value.ElementAtOrDefault(0);
-            var size = _style.Size.Value == 0 ? 13 : _style.Size.Value;
-            var rotate = _style.Rotate.Value;
+            var size = _style.Size.Value ?? 14;
+            var rotate = _style.Rotate.Value ?? 1;
             var color = _style.Color?.Value;
             var align = Enum.TryParse<SKTextAlign>(_style.Align?.Value, out var a)
                 ? a

@@ -26,7 +26,7 @@ namespace ZMap.Renderer.SkiaSharp
         {
             var style = (ResourceFillStyle)Style;
 
-            var opacity = style.Opacity.Value;
+            var opacity = style.Opacity.Value ?? 1;
             var color = style.Color?.Value;
             var uri = style.Uri?.Value;
             var antialias = Style.Antialias;

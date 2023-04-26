@@ -16,8 +16,8 @@ namespace ZMap.Renderer.SkiaSharp
 
         protected override SKPaint CreatePaint()
         {
-            var opacity = Style.Opacity.Value;
-            var color = Style.Color.Value;
+            var opacity = Style.Opacity.Value ?? 1;
+            var color = Style.Color.Value ?? "#000000";
             var antialias = Style.Antialias;
 
             var key = $"FILL_STYLE_PAINT_{opacity}{color}{antialias}";

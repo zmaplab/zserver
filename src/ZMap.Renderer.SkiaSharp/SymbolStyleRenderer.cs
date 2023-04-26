@@ -39,7 +39,7 @@ namespace ZMap.Renderer.SkiaSharp
                 return;
             }
 
-            var half = _style.Size.Value / 2;
+            var half = (_style.Size.Value ?? 14) / 2;
 
             var centroidPoint = CoordinateTransformUtilities.WordToExtent(extent,
                 width, height, centroid);

@@ -22,10 +22,11 @@ namespace ZServer.Extensions
 
             var expressionValue = section.GetSection($"{name}:value").Get<T>();
             var expressionBody = section.GetSection($"{name}:expression").Get<string>();
+            // 若表达示值不为空，或者配置的值是默认值
             if ((expressionValue != null && !expressionValue.Equals(default(T))) ||
                 !string.IsNullOrWhiteSpace(expressionBody))
             {
-                return CSharpExpression<T>.New(default, expressionBody);
+                return CSharpExpression<T>.New(expressionValue, expressionBody);
             }
 
             var targetSection = section.GetSection(name);

@@ -77,15 +77,15 @@ namespace ZMap.SLD
             strokeStyle.Color =
                 Color.BuildExpression(visitor, extraData, (string)DefaultValues["stroke"]);
             strokeStyle.Width =
-                Width.BuildExpression(visitor, extraData, (int)DefaultValues["stroke-width"]);
+                Width.BuildExpression(visitor, extraData, (int?)DefaultValues["stroke-width"]);
             strokeStyle.Opacity =
-                Opacity.BuildExpression(visitor, extraData, (float)DefaultValues["stroke-opacity"]);
+                Opacity.BuildExpression(visitor, extraData, (float?)DefaultValues["stroke-opacity"]);
             strokeStyle.LineJoin =
                 LineJoin.BuildExpression(visitor, extraData, (string)DefaultValues["stroke-linejoin"]);
             strokeStyle.LineCap =
                 LineCap.BuildExpression(visitor, extraData, (string)DefaultValues["stroke-linecap"]);
             strokeStyle.DashOffset =
-                DashOffset.BuildExpression(visitor, extraData, (float)DefaultValues["stroke-dashoffset"]);
+                DashOffset.BuildExpression(visitor, extraData, (float?)DefaultValues["stroke-dashoffset"]);
             strokeStyle.DashArray =
                 DashArray.BuildArrayExpression<float>(visitor as IExpressionVisitor, extraData, null);
 

@@ -12,7 +12,7 @@ namespace ZMap.Style
         /// <summary>
         /// 填充的不透明度（可选，取值范围为 0 ~ 1，默认值为 1）
         /// </summary>
-        public CSharpExpression<float> Opacity { get; set; }
+        public CSharpExpression<float?> Opacity { get; set; }
 
         /// <summary>
         /// 填充用的图案（可选，这里填写在 sprite 雪碧图中图标名称。为了图案能无缝填充，图标的高宽需要是 2 的倍数）
@@ -38,7 +38,7 @@ namespace ZMap.Style
         /// <summary>
         /// 填充的平移的锚点，即相对的参考物（可选，可选值为 map、viewport，默认为 map）
         /// </summary>
-        public CSharpExpression<TranslateAnchor> TranslateAnchor { get; set; }
+        public CSharpExpression<TranslateAnchor?> TranslateAnchor { get; set; }
 
         public override void Accept(IZMapStyleVisitor visitor, Feature feature)
         {

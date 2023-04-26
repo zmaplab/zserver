@@ -15,18 +15,18 @@ namespace ZServer.Tests
 
             var style = new LineStyle
             {
-                Opacity = CSharpExpression<float>.New(1),
-                Width = CSharpExpression<int>.New(2),
+                Opacity = CSharpExpression<float?>.New(1),
+                Width = CSharpExpression<int?>.New(2),
                 Color = CSharpExpression<string>.New("#3ed53e"),
                 LineJoin = CSharpExpression<string>.New("Round"),
                 Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
                 DashArray = CSharpExpression<float[]>.New(Array.Empty<float>()),
-                DashOffset = CSharpExpression<float>.New(0),
+                DashOffset = CSharpExpression<float?>.New(0),
                 LineCap = CSharpExpression<string>.New("Round"),
-                GapWidth = CSharpExpression<int>.New(10),
-                Offset = CSharpExpression<int>.New(0),
-                Blur = CSharpExpression<int>.New(0),
-                Gradient = CSharpExpression<int>.New(0)
+                GapWidth = CSharpExpression<int?>.New(10),
+                Offset = CSharpExpression<int?>.New(0),
+                Blur = CSharpExpression<int?>.New(0),
+                Gradient = CSharpExpression<int?>.New(0)
             };
 
             var width = 1024;
@@ -50,18 +50,18 @@ namespace ZServer.Tests
 
             var style = new LineStyle
             {
-                Opacity = CSharpExpression<float>.New(1),
-                Width = CSharpExpression<int>.New(2),
+                Opacity = CSharpExpression<float?>.New(1),
+                Width = CSharpExpression<int?>.New(2),
                 Color = CSharpExpression<string>.New("#3ed53e"),
                 DashArray = CSharpExpression<float[]>.New(new[] { 20, 20f }),
-                DashOffset = CSharpExpression<float>.New(20),
+                DashOffset = CSharpExpression<float?>.New(20),
                 LineCap = CSharpExpression<string>.New("Round"),
                 LineJoin = CSharpExpression<string>.New("Round"),
                 Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
-                GapWidth = CSharpExpression<int>.New(10),
-                Offset = CSharpExpression<int>.New(0),
-                Blur = CSharpExpression<int>.New(0),
-                Gradient = CSharpExpression<int>.New(0)
+                GapWidth = CSharpExpression<int?>.New(10),
+                Offset = CSharpExpression<int?>.New(0),
+                Blur = CSharpExpression<int?>.New(0),
+                Gradient = CSharpExpression<int?>.New(0)
             };
 
             var width = 1024;
@@ -85,18 +85,18 @@ namespace ZServer.Tests
 
             var style = new LineStyle
             {
-                Opacity = CSharpExpression<float>.New(1),
-                Width = CSharpExpression<int>.New(2),
+                Opacity = CSharpExpression<float?>.New(1),
+                Width = CSharpExpression<int?>.New(2),
                 Color = CSharpExpression<string>.New("#3ed53e"),
                 DashArray = CSharpExpression<float[]>.New(new[] { 5, 5f }),
-                DashOffset = CSharpExpression<float>.New(10),
+                DashOffset = CSharpExpression<float?>.New(10),
                 LineCap = CSharpExpression<string>.New("Round"),
                 LineJoin = CSharpExpression<string>.New("Round"),
                 Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
-                GapWidth = CSharpExpression<int>.New(10),
-                Offset = CSharpExpression<int>.New(0),
-                Blur = CSharpExpression<int>.New(0),
-                Gradient = CSharpExpression<int>.New(0)
+                GapWidth = CSharpExpression<int?>.New(10),
+                Offset = CSharpExpression<int?>.New(0),
+                Blur = CSharpExpression<int?>.New(0),
+                Gradient = CSharpExpression<int?>.New(0)
             };
 
             var width = 1024;

@@ -23,6 +23,7 @@ namespace ZServer.Store.Configuration
 
         public async Task<ResourceGroup> FindAsync(string name)
         {
+            // Group 只是一个逻辑组织，没有逻辑，即对象状态不会变化，因此不需要克隆
             return string.IsNullOrWhiteSpace(name)
                 ? null
                 : await Cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>

@@ -35,13 +35,13 @@ namespace ZMap.SLD
                 Filter = CSharpExpression<bool?>.New(null),
                 Translate = CSharpExpression<double[]>.New(Array.Empty<double>()),
                 TranslateAnchor = CSharpExpression<TranslateAnchor>.New(TranslateAnchor.Map),
-                GapWidth = CSharpExpression<int>.New(0),
-                Gradient = CSharpExpression<int>.New(0),
-                Offset = CSharpExpression<int>.New(0),
+                GapWidth = CSharpExpression<int?>.New(0),
+                Gradient = CSharpExpression<int?>.New(0),
+                Offset = CSharpExpression<int?>.New(0),
                 LineCap = CSharpExpression<string>.New("round"),
                 LineJoin = CSharpExpression<string>.New("round"),
-                Opacity = CSharpExpression<float>.New(1),
-                Blur = CSharpExpression<int>.New(0),
+                Opacity = CSharpExpression<float?>.New(1),
+                Blur = CSharpExpression<int?>.New(0),
             };
             visitor.Push(lineStyle);
 
@@ -52,9 +52,9 @@ namespace ZMap.SLD
                 MinZoom = 0,
                 MaxZoom = Defaults.MaxZoomValue,
                 Filter = CSharpExpression<bool?>.New(null),
-                Opacity = CSharpExpression<float>.New(1),
+                Opacity = CSharpExpression<float?>.New(1),
                 Translate = CSharpExpression<double[]>.New(Array.Empty<double>()),
-                TranslateAnchor = CSharpExpression<TranslateAnchor>.New(TranslateAnchor.Map),
+                TranslateAnchor = CSharpExpression<TranslateAnchor?>.New(TranslateAnchor.Map),
             };
             visitor.Push(fillStyle);
             visitor.Visit(Fill, extraData);

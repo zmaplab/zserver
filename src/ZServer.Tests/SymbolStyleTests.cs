@@ -18,7 +18,7 @@ namespace ZServer.Tests
             var style = new SymbolStyle
             {
                 Uri = CSharpExpression<Uri>.New(new Uri("file://108.png", UriKind.Absolute)),
-                Size = CSharpExpression<int>.New(30)
+                Size = CSharpExpression<int?>.New(30)
             };
 
             var width = 512;
