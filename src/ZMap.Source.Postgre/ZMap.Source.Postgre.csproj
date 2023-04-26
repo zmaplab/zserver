@@ -7,6 +7,6 @@
     </ItemGroup>
     <ItemGroup>
 <!--        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.8" />-->
-        <PackageReference Include="Npgsql.NetTopologySuite" Version="6.0.9" />
+        <PackageReference Include="Npgsql.NetTopologySuite" Version="7.0.4" />
     </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="DotNetCore.Natasha.CSharp" Version="5.0.2" />
+        <PackageReference Include="DotNetCore.Natasha.CSharp" Version="5.2.2.1" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     </ItemGroup>
     <ItemGroup>
