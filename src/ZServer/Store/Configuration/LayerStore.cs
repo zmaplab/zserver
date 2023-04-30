@@ -108,7 +108,7 @@ namespace ZServer.Store.Configuration
             var styleGroups = await RestoreStyleGroupsAsync(section);
             var extent = section.GetSection("extent").Get<double[]>();
             Envelope envelope = null;
-            if (extent.Length == 4)
+            if (extent?.Length == 4)
             {
                 envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
             }
