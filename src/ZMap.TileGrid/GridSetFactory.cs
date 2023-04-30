@@ -6,8 +6,8 @@ namespace ZMap.TileGrid
 {
     public static class GridSetFactory
     {
-        public const double EPSG4326_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360.0;
-        public const double EPSG3857_TO_METERS = 1;
+        private const double EPSG4326_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360.0;
+        private const double EPSG3857_TO_METERS = 1;
 
         /**
      * Note that you should provide EITHER resolutions or scales. Providing both will cause a

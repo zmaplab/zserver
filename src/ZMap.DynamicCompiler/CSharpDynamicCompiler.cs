@@ -1,5 +1,4 @@
-﻿using Natasha.CSharp;
-using ZMap.Infrastructure;
+﻿using ZMap.Infrastructure;
 
 namespace ZMap.DynamicCompiler;
 
@@ -23,7 +22,6 @@ return {script};
     public Type BuildType(string script)
     {
         var nClass = NClass.DefaultDomain();
-
         nClass.Body(script);
         return nClass.GetType();
     }
