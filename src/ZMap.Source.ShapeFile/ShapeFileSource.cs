@@ -48,25 +48,28 @@ namespace ZMap.Source.ShapeFile
             var features = new List<Feature>();
 
             var predicate = Filter?.ToPredicate();
-
-            var tuple = Cache.GetOrCreate(File,
-                entry =>
-                {
-                    var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
-
-                    var stream = mmf.CreateViewStream();
-                    var reader = new BinaryReader(stream, Encoding.Unicode);
-                    var tree = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
-
-                    var result = new FileReader
+            FileReader tuple;
+            lock (typeof(ShapeFileSource))
+            {
+                tuple = Cache.GetOrCreate(File,
+                    entry =>
                     {
-                        Reader = reader,
-                        Tree = tree
-                    };
-                    entry.SetValue(result);
-                    entry.SetSlidingExpiration(TimeSpan.FromHours(1));
-                    return result;
-                });
+                        var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
+
+                        var stream = mmf.CreateViewStream();
+                        var reader = new BinaryReader(stream, Encoding.Unicode);
+                        var tree = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
+
+                        var result = new FileReader
+                        {
+                            Reader = reader,
+                            Tree = tree
+                        };
+                        entry.SetValue(result);
+                        entry.SetSlidingExpiration(TimeSpan.FromHours(1));
+                        return result;
+                    });
+            }
 
             var spatialIndexItems = GetObjectIDsInView(tuple.Tree, extent);
             if (spatialIndexItems.Count == 0)
