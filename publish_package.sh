@@ -3,7 +3,6 @@ export NUGET_SERVER=https://api.nuget.org/v3/index.json
 
 rm -rf src/ZMap/bin/Release
 rm -rf src/ZMap.Renderer.SkiaSharp/bin/Release
-rm -rf src/ZMap.SLD/bin/Release
 rm -rf src/ZMap.Source.Postgre/bin/Release
 rm -rf src/ZMap.Source.ShapeFile/bin/Release
 rm -rf src/ZMap.TileGrid/bin/Release
@@ -16,7 +15,6 @@ dotnet build -c Release ZServer.sln
 dotnet pack -c Release ZServer.sln
 dotnet nuget push src/ZMap/bin/Release/*.nupkg --source $NUGET_SERVER  --skip-duplicate --api-key $NUGET_KEY
 dotnet nuget push src/ZMap.Renderer.SkiaSharp/bin/Release/*.nupkg   --source $NUGET_SERVER  --skip-duplicate --api-key $NUGET_KEY
-dotnet nuget push src/ZMap.SLD/bin/Release/*.nupkg   --source $NUGET_SERVER  --skip-duplicate --api-key $NUGET_KEY
 dotnet nuget push src/ZMap.Source.Postgre/bin/Release/*.nupkg   --source $NUGET_SERVER  --skip-duplicate --api-key $NUGET_KEY
 dotnet nuget push src/ZMap.Source.ShapeFile/bin/Release/*.nupkg --source $NUGET_SERVER  --skip-duplicate --api-key $NUGET_KEY
 dotnet nuget push src/ZMap.TileGrid/bin/Release/*.nupkg   --source $NUGET_SERVER  --skip-duplicate --api-key $NUGET_KEY
