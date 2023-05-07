@@ -6,7 +6,7 @@ namespace ZMap.TileGrid
 {
     public class GridSet
     {
-        const int DECIMALS = 5;
+        const int Decimals = 5;
 
         /// <summary>
         /// 名称
@@ -122,13 +122,13 @@ namespace ZMap.TileGrid
 
             if (reverseIntersectionPolicy)
             {
-                tileCoordX = Ceil(tileCoordX, DECIMALS) - 1;
-                tileCoordY = Ceil(tileCoordY, DECIMALS) - 1;
+                tileCoordX = Ceil(tileCoordX, Decimals) - 1;
+                tileCoordY = Ceil(tileCoordY, Decimals) - 1;
             }
             else
             {
-                tileCoordX = Floor(tileCoordX, DECIMALS);
-                tileCoordY = Floor(tileCoordY, DECIMALS);
+                tileCoordX = Floor(tileCoordX, Decimals);
+                tileCoordY = Floor(tileCoordY, Decimals);
             }
 
             return (z, (int)tileCoordX, (int)tileCoordY);

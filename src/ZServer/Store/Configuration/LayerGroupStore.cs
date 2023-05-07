@@ -48,7 +48,7 @@ namespace ZServer.Store.Configuration
                         resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
                         if (resourceGroup == null)
                         {
-                            _logger.LogError($"资源组 {resourceGroupName} 不存在");
+                            _logger.LogError("资源组 {ResourceGroupName} 不存在", resourceGroupName);
                             return null;
                         }
                     }
@@ -83,7 +83,7 @@ namespace ZServer.Store.Configuration
 
                     if (layerGroup.Layers.Count == 0)
                     {
-                        _logger.LogWarning($"图层组 {layerGroupName} 中的没有有效图层");
+                        _logger.LogWarning("图层组 {LayerGroupName} 中的没有有效图层", layerGroupName);
                     }
 
                     entry.SetValue(layerGroup);
@@ -179,7 +179,7 @@ namespace ZServer.Store.Configuration
                             layer = await _layerStore.FindAsync(parts[0], parts[1]);
                             break;
                         default:
-                            _logger.LogError($"图层组 {layerGroup.Name} 中的图层 {layerName} 不存在");
+                            _logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
                             break;
                     }
 

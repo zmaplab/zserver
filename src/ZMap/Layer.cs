@@ -67,7 +67,7 @@ namespace ZMap
         /// <summary>
         /// 空间标识符
         /// </summary>
-        public int SRID => Source.SRID;
+        public int Srid => Source.SRID;
 
         public Layer(string name, ISource source, List<StyleGroup> styleGroups, Envelope envelope = null)
         {
@@ -109,7 +109,7 @@ namespace ZMap
 
             // 由前端的 SRID 的 extent 转换成数据源的 extent
             // 先转换成数据源的 SRID 数据， 才能做相交判断是否超出数据范围
-            var extent = viewport.Extent.Transform(srid, SRID);
+            var extent = viewport.Extent.Transform(srid, Srid);
 
             // 不在当前图层的范围内，不需要渲染
             if (Envelope != null && !Envelope.Intersects(extent))
@@ -117,15 +117,14 @@ namespace ZMap
                 return;
             }
 
-            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (srid != SRID)
-                {
-                    Log.Logger.LogInformation(
-                        $"From viewport extent {viewport.Extent.MinX},{viewport.Extent.MinY},{viewport.Extent.MaxX},{viewport.Extent.MaxY} {srid} to {extent.MinX},{extent.MinY},{extent.MaxX},{extent.MaxY} {SRID}");
-                }
-            }
+            // if (EnvironmentVariables.EnableSensitiveDataLogging)
+            // {
+            //     if (srid != Srid)
+            //     {
+            //         Log.Logger.LogInformation(
+            //             $"From viewport extent {viewport.Extent.MinX},{viewport.Extent.MinY},{viewport.Extent.MaxX},{viewport.Extent.MaxY} {srid} to {extent.MinX},{extent.MinY},{extent.MaxX},{extent.MaxY} {Srid}");
+            //     }
+            // }
 
             // comments: Envelope 范围已经先全转成了数据源
             // // 使用应用层投影转换的原因是规避数据库支持问题
@@ -139,8 +138,8 @@ namespace ZMap
             // }
             if (_environments.ContainsKey(Defaults.WmsScaleKey))
             {
-                
             }
+
             _environments[Defaults.WmsScaleKey] = zoom.Value;
 
             switch (Source)
@@ -272,11 +271,12 @@ namespace ZMap
 
             stopwatch.Stop();
 
-            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
-                    StringComparison.InvariantCultureIgnoreCase))
+            if (EnvironmentVariables.EnableSensitiveDataLogging)
             {
                 Log.Logger.LogInformation(
-                    $"[{service.Identifier}] layer: {this}, width: {service.Width}, height: {service.Height}, filter: {vectorSource.Filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}");
+                    "[{Identifier}] layer: {Name}, width: {Width}, height: {Height}, filter: {Filter}, feature count: {Count}, rendering: {ElapsedMilliseconds}",
+                    service.Identifier, this.Name, service.Width, service.Height, vectorSource.Filter, count,
+                    stopwatch.ElapsedMilliseconds);
             }
         }
 
@@ -288,7 +288,7 @@ namespace ZMap
 //             IEnumerable<Feature> features;
 //
 //             var fetching = string.Empty;
-//             if (string.Equals(Environment.GetEnvironmentVariable("TRACE_FETCH"), "true",
+//             if (string.Equals("TRACE_FETCH", "true",
 //                     StringComparison.InvariantCultureIgnoreCase))
 //             {
 //                 var stopwatch1 = new Stopwatch();

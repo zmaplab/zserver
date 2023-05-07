@@ -103,7 +103,7 @@ namespace ZServer.Store.Configuration
                                           ? null
                                           : scaleDenominators,
                                       metersPerUnit,
-                                      pixelSize ?? DefaultGridSets.DEFAULT_PIXEL_SIZE_METER,
+                                      pixelSize ?? DefaultGridSets.DefaultPixelSizeMeter,
                                       null,
                                       tileWidth,
                                       tileHeight,
@@ -118,7 +118,7 @@ namespace ZServer.Store.Configuration
                                       alignTopLeft,
                                       levels.Value,
                                       metersPerUnit,
-                                      pixelSize ?? DefaultGridSets.DEFAULT_PIXEL_SIZE_METER,
+                                      pixelSize ?? DefaultGridSets.DefaultPixelSizeMeter,
                                       tileWidth,
                                       tileHeight,
                                       yCoordinateFirst);

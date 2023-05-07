@@ -13,9 +13,9 @@ namespace ZMap.TileGrid
         /// <summary>
         /// Default pixel size in meters, producing a default of 90.7 DPI
         /// </summary>
-        public const double DEFAULT_PIXEL_SIZE_METER = 0.00028;
+        public const double DefaultPixelSizeMeter = 0.00028;
 
-        public const int DEFAULT_LEVELS = 22;
+        public const int DefaultLevels = 22;
 
         static DefaultGridSets()
         {
@@ -25,9 +25,9 @@ namespace ZMap.TileGrid
                 "EPSG:4326",
                 4326, World4326,
                 false,
-                DEFAULT_LEVELS,
+                DefaultLevels,
                 null,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 256,
                 256,
                 true);
@@ -38,9 +38,9 @@ namespace ZMap.TileGrid
                 4326,
                 World4326,
                 false,
-                DEFAULT_LEVELS,
+                DefaultLevels,
                 null,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 512,
                 512,
                 true);
@@ -54,7 +54,7 @@ namespace ZMap.TileGrid
                 GetCommonPractice900913Resolutions(),
                 null,
                 1.0D,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 null,
                 256,
                 256,
@@ -69,7 +69,7 @@ namespace ZMap.TileGrid
                 GetCommonPractice900913Resolutions(),
                 null,
                 1.0D,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 null,
                 512,
                 512,
@@ -84,7 +84,7 @@ namespace ZMap.TileGrid
                 GetScalesCRS84PixelResolutions(),
                 null,
                 null,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 null,
                 256,
                 256,
@@ -99,7 +99,7 @@ namespace ZMap.TileGrid
                 null,
                 GetScalesCRS84ScaleDenominators(),
                 null,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 null,
                 256,
                 256,
@@ -114,7 +114,7 @@ namespace ZMap.TileGrid
                 null,
                 GetScalesCRS84QuadScaleDenominators(),
                 null,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 null,
                 256,
                 256,
@@ -125,9 +125,9 @@ namespace ZMap.TileGrid
                 "EPSG:4490",
                 4490, World4490,
                 false,
-                DEFAULT_LEVELS,
+                DefaultLevels,
                 null,
-                DEFAULT_PIXEL_SIZE_METER,
+                DefaultPixelSizeMeter,
                 256,
                 256,
                 true);

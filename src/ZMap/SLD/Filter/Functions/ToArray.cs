@@ -58,7 +58,7 @@ public class ToArray
 """);
         }
 
-        DynamicCompilationUtilities.GetOrCreateFunc(resultExpression.Body);
+        CSharpDynamicCompiler.GetOrCreateFunc(resultExpression.Body);
         visitor.Push(resultExpression);
         return null;
     }

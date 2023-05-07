@@ -1,5 +1,6 @@
 using System.IO;
 using SkiaSharp;
+using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;

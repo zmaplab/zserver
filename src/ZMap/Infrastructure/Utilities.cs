@@ -2,6 +2,9 @@ using System.Text.RegularExpressions;
 
 namespace ZMap.Infrastructure;
 
+/// <summary>
+/// 常用的方法
+/// </summary>
 public static class Utilities
 {
     public static int GetDpi(string formatOptions)

@@ -39,12 +39,12 @@ namespace ZMap
         /// <summary>
         /// 空间标识符
         /// </summary>
-        int SRID { get; }
+        int Srid { get; }
 
         ISource Source { get; }
 
         // Task PaintAsync(RenderContext context, string filter = null, string traceId = null);
-        Task RenderAsync(IGraphicsService service, Viewport viewport, Zoom zoom, int targetSRID);
+        Task RenderAsync(IGraphicsService service, Viewport viewport, Zoom zoom, int targetSrid);
 
         // void ClearEnvironments();
     }

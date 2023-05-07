@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
@@ -86,8 +85,7 @@ namespace ZServer.Grains.WMS
                     ModeStateUtilities.VerifyWmsGetMapArguments(layers, srs, bbox, width, height, format);
                 if (!modeState.IsValid)
                 {
-                    var msg = $"{displayUrl}, arguments error";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, arguments error", displayUrl);
                     return MapResult.Failed(modeState.Text, modeState.Code);
                 }
 
@@ -126,10 +124,10 @@ namespace ZServer.Grains.WMS
                     Bordered = extras.TryGetValue("Bordered", out var b) && (bool)b
                 };
 
-                var scale = GeometryUtilities.CalculateOGCScale(envelope, modeState.SRID, width, dpi);
+                var scale = GeographicUtilities.CalculateOGCScale(envelope, modeState.SRID, width, dpi);
                 var map = new Map();
                 map.SetId(traceIdentifier)
-                    .SetSRID(modeState.SRID)
+                    .SetSrid(modeState.SRID)
                     .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                     .SetLogger(_logger)
                     .SetGraphicsContextFactory(_graphicsServiceProvider)
@@ -140,8 +138,7 @@ namespace ZServer.Grains.WMS
             }
             catch (Exception e)
             {
-                var msg = $"{displayUrl}, {e}";
-                _logger.LogError(msg);
+                _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
                 return MapResult.Failed(e.Message, "InternalError");
             }
         }
@@ -168,8 +165,7 @@ namespace ZServer.Grains.WMS
                         featureCount);
                 if (!modeState.IsValid)
                 {
-                    var msg = $"{displayUrl}, arguments error";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, arguments error", displayUrl);
                     return new FeatureCollection();
                 }
 
@@ -186,14 +182,13 @@ namespace ZServer.Grains.WMS
                 var envelope = new Envelope(modeState.MinX, modeState.MaxX, modeState.MinY, modeState.MaxY);
                 var featureCollection = await
                     GetFeatureInfoAsync(layerList, featureCount, srs, envelope, width, height, x, y);
-                _logger.LogInformation(
-                    $"Query features {displayUrl}, target layers: {string.Join(", ", layerList.Select(z => z.Name))}, count: {featureCollection.Count}");
+                _logger.LogInformation("Query features {Url}, target layers: {Layers}, count: {Count}", displayUrl,
+                    string.Join(", ", layerList.Select(z => z.Name)), featureCollection.Count);
                 return featureCollection;
             }
             catch (Exception e)
             {
-                var msg = $"{displayUrl}, {e}";
-                _logger.LogError(msg);
+                _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
                 return new FeatureCollection();
             }
         }
@@ -213,7 +208,7 @@ namespace ZServer.Grains.WMS
             var pixelHeight = (bbox.MaxY - bbox.MinY) / height;
             var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
 
-            var latLon = GeometryUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
+            var latLon = GeographicUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
 
             var minX = latLon.Lon - pixelSensitivity * pixelWidth;
             var maxX = latLon.Lon + pixelSensitivity * pixelWidth;

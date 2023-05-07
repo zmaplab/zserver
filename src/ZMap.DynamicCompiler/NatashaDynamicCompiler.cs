@@ -2,9 +2,9 @@
 
 namespace ZMap.DynamicCompiler;
 
-public class CSharpDynamicCompiler : ICSharpDynamicCompiler
+public class NatashaDynamicCompiler : CSharpDynamicCompiler
 {
-    public Func<Feature, dynamic> BuildFunc(string script)
+    protected override Func<Feature, dynamic> BuildFunc(string script)
     {
         var body = script.EndsWith(";")
             ? script
@@ -19,14 +19,14 @@ return {script};
         return f;
     }
 
-    public Type BuildType(string script)
+    public override Type BuildType(string script)
     {
         var nClass = NClass.DefaultDomain();
         nClass.Body(script);
         return nClass.GetType();
     }
 
-    public Func<Feature, T> BuildFunc<T>(string script)
+    protected override Func<Feature, T> BuildFunc<T>(string script)
     {
         var body = $"""
 return {script};
@@ -39,22 +39,8 @@ return {script};
         return f;
     }
 
-    public static void Initialize()
+    protected override void Initialize()
     {
-        if (DynamicCompilationUtilities.Compiler != null)
-        {
-            return;
-        }
-
-        lock (typeof(DynamicCompilationUtilities))
-        {
-            if (DynamicCompilationUtilities.Compiler != null)
-            {
-                return;
-            }
-
-            NatashaManagement.Preheating();
-            DynamicCompilationUtilities.Load(new CSharpDynamicCompiler());
-        }
+        NatashaManagement.Preheating();
     }
 }

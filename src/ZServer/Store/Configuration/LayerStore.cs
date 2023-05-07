@@ -62,7 +62,7 @@ namespace ZServer.Store.Configuration
                         resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
                         if (resourceGroup == null)
                         {
-                            _logger.LogError($"资源组 {resourceGroupName} 不存在");
+                            _logger.LogError("资源组 {ResourceGroupName} 不存在", resourceGroupName);
                             return null;
                         }
                     }
@@ -167,14 +167,14 @@ namespace ZServer.Store.Configuration
             var sourceName = section.GetValue<string>("source");
             if (string.IsNullOrWhiteSpace(sourceName))
             {
-                _logger.LogError($"图层 {resourceGroup}:{name} 未配置数据源");
+                _logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
                 return null;
             }
 
             var source = await _sourceStore.FindAsync(sourceName);
             if (source == null)
             {
-                _logger.LogError($"图层 {resourceGroup}:{name} 的数据源 {sourceName} 不存在");
+                _logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
                 return null;
             }
 

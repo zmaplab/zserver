@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Npgsql;
 using ZServer;
-using ZMap.Source.Postgre;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable 649

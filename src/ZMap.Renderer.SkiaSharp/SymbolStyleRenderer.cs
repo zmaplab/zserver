@@ -1,8 +1,8 @@
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Extensions;
 using ZMap.Infrastructure;
-using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Style;
 using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 

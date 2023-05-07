@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -14,7 +13,6 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Serilog;
-using ZMap.Source.Postgre;
 using ZServer.API.Filters;
 using Log = ZMap.Infrastructure.Log;
 

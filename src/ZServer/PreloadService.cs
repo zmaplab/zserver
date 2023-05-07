@@ -41,7 +41,7 @@ namespace ZServer
         {
             if (!Directory.Exists(directory))
             {
-                _logger.LogInformation($"目录不存在: {directory}");
+                _logger.LogInformation("目录不存在: {Directory}", directory);
                 return;
             }
 
@@ -63,7 +63,7 @@ namespace ZServer
 
         private async Task LoadShape(string path)
         {
-            _logger.LogInformation($"Start loading {path}");
+            _logger.LogInformation("Start loading {Path}", path);
             var shapeFileSource = new ShapeFileSource(path);
 
             // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
@@ -73,7 +73,7 @@ namespace ZServer
                 
             }
 
-            _logger.LogInformation($"Load {path} success");
+            _logger.LogInformation("Load {Path} success", path);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

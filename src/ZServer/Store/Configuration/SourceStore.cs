@@ -72,14 +72,14 @@ namespace ZServer.Store.Configuration
             var provider = section.GetSection("provider").Get<string>();
             if (string.IsNullOrWhiteSpace(provider))
             {
-                _logger.LogError($"数据源 {name} 不存在或驱动为空");
+                _logger.LogError("数据源 {Name} 不存在或驱动为空", name);
                 return null;
             }
 
             var type = Type.GetType(provider);
             if (type == null)
             {
-                _logger.LogError($"数据源 {name} 的驱动 {provider} 不存在");
+                _logger.LogError("数据源 {Name} 的驱动 {Provider} 不存在", name, provider);
                 return null;
             }
 
@@ -87,7 +87,7 @@ namespace ZServer.Store.Configuration
             {
                 if (!typeof(IVectorSource).IsAssignableFrom(x))
                 {
-                    _logger.LogError($"数据源 {name} 的驱动 {provider} 不是有效的驱动");
+                    _logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", name, provider);
                     return null;
                 }
 

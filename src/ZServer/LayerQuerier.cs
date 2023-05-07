@@ -37,9 +37,7 @@ public class LayerQuerier : ILayerQuerier
                     continue;
                 }
 
-                var msg =
-                    $"[{traceIdentifier}] Layer {layerQuery.Layer} is not exists";
-                _logger.LogError(msg);
+                _logger.LogError("[{TraceIdentifier}] Layer {Layer} is not exists", traceIdentifier, layerQuery.Layer);
             }
             else
             {
@@ -62,10 +60,8 @@ public class LayerQuerier : ILayerQuerier
                         continue;
                     }
                 }
-
-                var msg =
-                    $"[{traceIdentifier}] Layer {layerQuery.ResourceGroup}:{layerQuery.Layer} is not exists";
-                _logger.LogError(msg);
+ 
+                _logger.LogError("[{TraceIdentifier}] Layer {ResourceGroup}:{Layer} is not exists", traceIdentifier, layerQuery.ResourceGroup, layerQuery.Layer);
             }
         }
 
