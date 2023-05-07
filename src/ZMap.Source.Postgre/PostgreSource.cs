@@ -7,6 +7,7 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Npgsql;
+using ZMap.Infrastructure;
 
 namespace ZMap.Source.Postgre
 {
