@@ -47,15 +47,13 @@ namespace ZServer.Grains.WMTS
             {
                 if (string.IsNullOrWhiteSpace(layers))
                 {
-                    var msg = $"{displayUrl}, no layers have been requested";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, no layers have been requested", displayUrl);
                     return MapResult.Failed("No layers have been requested", "LayerNotDefined");
                 }
 
                 if (string.IsNullOrWhiteSpace(tileMatrixSet))
                 {
-                    var msg = $"{displayUrl}, no tile matrix set requested";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, no tile matrix set requested", displayUrl);
                     return MapResult.Failed("No tile matrix set requested", "InvalidTileMatrixSet");
                 }
 
@@ -63,8 +61,7 @@ namespace ZServer.Grains.WMTS
 
                 if (gridSet == null)
                 {
-                    var msg = $"{displayUrl}, could not find tile matrix set";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, could not find tile matrix set", displayUrl);
                     return MapResult.Failed($"Could not find tile matrix set {tileMatrixSet}",
                         "TileMatrixSetNotDefined");
                 }
@@ -96,8 +93,7 @@ namespace ZServer.Grains.WMTS
                 var tuple = gridSet.GetEnvelope(tileMatrix, tileCol, tileRow);
                 if (tuple == default)
                 {
-                    var msg = $"{displayUrl}, could not get envelope from grid set";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, could not get envelope from grid set", displayUrl);
                     return MapResult.EmptyMap(format);
                 }
 
@@ -133,8 +129,7 @@ namespace ZServer.Grains.WMTS
                             break;
                         default:
                         {
-                            var msg = $"{displayUrl}, layer format is incorrect {layerName}";
-                            _logger.LogError(msg);
+                            _logger.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
                             return MapResult.Failed($"layer format is incorrect {layerName}",
                                 "LayerFormatIncorrect");
                         }
@@ -154,7 +149,7 @@ namespace ZServer.Grains.WMTS
 
                 var map = new Map();
                 map.SetId(traceIdentifier)
-                    .SetSRID(gridSet.SRID)
+                    .SetSrid(gridSet.SRID)
                     .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                     .SetLogger(_logger)
                     .SetGraphicsContextFactory(_graphicsServiceProvider)
@@ -166,8 +161,7 @@ namespace ZServer.Grains.WMTS
             }
             catch (Exception e)
             {
-                var msg = $"{displayUrl}, {e}";
-                _logger.LogError(msg);
+                _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
                 return MapResult.Failed(e.Message, "InternalError");
             }
         }

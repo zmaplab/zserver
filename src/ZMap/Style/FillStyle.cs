@@ -1,5 +1,3 @@
-using System;
-
 namespace ZMap.Style
 {
     public class FillStyle : VectorStyle, IFillStyle

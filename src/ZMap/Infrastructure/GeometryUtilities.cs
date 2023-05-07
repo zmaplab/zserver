@@ -1,33 +1,15 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using NetTopologySuite.Geometries;
 
 namespace ZMap.Infrastructure
 {
+    /// <summary>
+    /// 图形计算相关的方法
+    /// </summary>
     public static class GeometryUtilities
     {
         public const double Tolerance = 0.0001;
-
-        /// <summary>
-        /// Conversion factor degrees to radians
-        /// </summary>
-        public const double DegToRad = Math.PI / 180d; //0.01745329252; // Convert Degrees to Radians
-
-        /// <summary>
-        /// Meters per degree at equator
-        /// </summary>
-        public const double MetersPerDegreeAtEquator = MetersPerMile * MilesPerDegreeAtEquator;
-
-        /// <summary>
-        /// Meters per mile
-        /// </summary>
-        public const double MetersPerMile = 1609.347219;
-
-        /// <summary>
-        /// Miles per degree at equator
-        /// </summary>
-        public const double MilesPerDegreeAtEquator = 69.171;
-
+        
         /// <summary>
         /// Gets the bottom-left coordinate of the <see cref="Envelope"/>
         /// </summary>
@@ -133,99 +115,5 @@ namespace ZMap.Infrastructure
         //     var distanceTolerance = coordinateSystem is GeographicCoordinateSystem ? 0.00001 : 0.0001;
         //     feature.Geometry = VWSimplifier.Simplify(feature.Geometry, distanceTolerance);
         // }
-
-        /// <summary>
-        /// 经纬度坐标系的比例尺计算
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="width"></param>
-        /// <param name="dpi"></param>
-        /// <returns></returns>
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public static double CalculateOGCScale(Envelope envelope, int width, double dpi)
-        {
-            var widthMeters = envelope.Width * MetersPerDegreeAtEquator;
-            return widthMeters / (width / dpi * 0.0254D);
-        }
-
-        /// <summary>
-        /// 经纬度坐标系的比例尺计算
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="srid"></param>
-        /// <param name="width"></param>
-        /// <param name="dpi"></param>
-        /// <returns></returns>
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public static double CalculateOGCScale(Envelope envelope, int srid, int width, double dpi)
-        {
-            var envelope4326 = envelope.Transform(srid, 4326);
-            return CalculateOGCScale(envelope4326, width, dpi);
-        }
-
-
-        /// <summary>
-        /// Calculate the Representative Fraction Scale for a Lat/Long map.
-        /// </summary>
-        /// <param name="lon1">LowerLeft Longitude</param>
-        /// <param name="lon2">LowerRight Longitude</param>
-        /// <param name="lat">LowerLeft Latitude</param>
-        /// <param name="widthPage">The width of the display area</param>
-        /// <param name="dpi">DPI used to render the map</param>
-        /// <returns></returns>
-        public static double CalculateScaleLatLong(double lon1, double lon2, double lat, double widthPage, int dpi)
-        {
-            var distance = GreatCircleDistanceReflex(lon1, lon2, lat);
-            var scale = CalculateScaleNonLatLong(distance, widthPage, 1, dpi);
-            return scale;
-        }
-
-        public static double GreatCircleDistanceReflex(double lon1, double lon2, double lat)
-        {
-            var lonDistance = Math.Abs(lon2 - lon1);
-            lat = Math.Abs(lat);
-            if (lat >= 90.0)
-            {
-                lat = 89.999;
-            }
-
-            var distance = Math.Cos(lat * DegToRad) * MetersPerDegreeAtEquator * lonDistance;
-            return distance;
-        }
-
-        public static double CalculateScaleNonLatLong(double mapWidthMeters, double mapSizeWidth, double mapUnitFactor,
-            int dpi)
-        {
-            var pixelPerInch = dpi;
-            double ratio;
-
-            if (mapSizeWidth <= 0)
-            {
-                return 0.0;
-            }
-
-            var mapWidth = mapWidthMeters * mapUnitFactor;
-            try
-            {
-                // todo: 去掉 try?
-                var pageWidth = mapSizeWidth / pixelPerInch * 0.0254;
-                ratio = Math.Abs(mapWidth / pageWidth);
-            }
-            catch
-            {
-                ratio = 0.0;
-            }
-
-            return ratio;
-        }
-
-        public static (double Lat, double Lon) CalculateLatLongFromGrid(Envelope bbox, double pixelWidth,
-            double pixelHeight, int x,
-            int y)
-        {
-            var lon = bbox.MinX + pixelWidth * x;
-            var lat = bbox.MinY + pixelHeight * y;
-            return (lat, lon);
-        }
     }
 }

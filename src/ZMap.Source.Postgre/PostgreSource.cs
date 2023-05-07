@@ -41,7 +41,7 @@ namespace ZMap.Source.Postgre
             if (Properties == null || Properties.Count == 0)
             {
                 sql =
-                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
             else
             {
@@ -50,13 +50,12 @@ namespace ZMap.Source.Postgre
                     : $" , {string.Join(", ", Properties.Where(x => x != "geom"))}";
 
                 sql =
-                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
 
-            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
-                    StringComparison.InvariantCultureIgnoreCase))
+            if (EnvironmentVariables.EnableSensitiveDataLogging)
             {
-                Log.Logger.LogInformation(sql);
+                Log.Logger.LogInformation("{Sql}", sql);
             }
 
             using var conn = CreateDbConnection();

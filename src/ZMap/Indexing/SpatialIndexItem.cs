@@ -5,7 +5,7 @@ namespace ZMap.Indexing
 {
     [Serializable]
     [MessagePackObject]
-    public record SpatialIndexEntry
+    public record SpatialIndexItem
     {
         /// <summary>
         /// 

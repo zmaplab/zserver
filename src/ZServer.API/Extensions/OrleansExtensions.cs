@@ -11,6 +11,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Serilog;
+using ZMap;
 using ZServer.Grains.WMS;
 
 namespace ZServer.API.Extensions;
@@ -94,7 +95,7 @@ public static class OrleansExtensions
                         options.GatewayPort = gatewayPort;
                         options.SiloPort = siloPort;
 
-                        var hostIp = Environment.GetEnvironmentVariable("HOST_IP");
+                        var hostIp = EnvironmentVariables.HostIp;
                         IPAddress ipAddress;
                         if (string.IsNullOrWhiteSpace(hostIp))
                         {

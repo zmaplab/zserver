@@ -1,4 +1,3 @@
-using System;
 using ZMap.Infrastructure;
 
 namespace ZMap.Style
@@ -45,7 +44,7 @@ namespace ZMap.Style
                 }
                 else
                 {
-                    var func = DynamicCompilationUtilities.GetOrCreateFunc(Body);
+                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Body);
                     if (func == null)
                     {
                         return;
@@ -65,7 +64,7 @@ namespace ZMap.Style
                 }
                 else
                 {
-                    var func = DynamicCompilationUtilities.GetOrCreateFunc(Body);
+                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Body);
                     if (func != null)
                     {
                         var output = func.Invoke(feature);

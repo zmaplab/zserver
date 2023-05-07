@@ -40,7 +40,7 @@ namespace ZMap.Source.ShapeFile
         record FileReader
         {
             public BinaryReader Reader { get; set; }
-            public ISpatialIndex<SpatialIndexEntry> Tree { get; set; }
+            public ISpatialIndex<SpatialIndexItem> Tree { get; set; }
         }
 
         public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
@@ -108,12 +108,12 @@ namespace ZMap.Source.ShapeFile
         }
 
         private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
-            SpatialIndexEntry spatialIndexEntry)
+            SpatialIndexItem spatialIndexItem)
         {
-            return Cache.GetOrCreate($"ShapeFile:{File}:{spatialIndexEntry.Index}", entry =>
+            return Cache.GetOrCreate($"ShapeFile:{File}:{spatialIndexItem.Index}", entry =>
             {
-                var attributes = GetAttribute(dbaseFile, (int)spatialIndexEntry.Index);
-                var geometry = ReadGeometry(spatialIndexEntry, binaryReader);
+                var attributes = GetAttribute(dbaseFile, (int)spatialIndexItem.Index);
+                var geometry = ReadGeometry(spatialIndexItem, binaryReader);
 
                 if (geometry == null
                     || !geometry.IsValid
@@ -179,29 +179,29 @@ namespace ZMap.Source.ShapeFile
             return (int)coordinateSystem.AuthorityCode;
         }
 
-        private List<SpatialIndexEntry> GetObjectIDsInView(ISpatialIndex<SpatialIndexEntry> tree, Envelope bbox)
+        private List<SpatialIndexItem> GetObjectIDsInView(ISpatialIndex<SpatialIndexItem> tree, Envelope bbox)
         {
             //Use the spatial index to get a list of features whose boundingbox intersects bbox
             var res = tree.Query(bbox);
 
             /*Sort oids so we get a forward only read of the shapefile*/
-            var ret = new List<SpatialIndexEntry>(res);
+            var ret = new List<SpatialIndexItem>(res);
             ret.Sort((a, b) => (int)(a.Index - b.Index));
 
             return ret;
         }
 
-        private Geometry ReadGeometry(SpatialIndexEntry entry, BinaryReader reader)
+        private Geometry ReadGeometry(SpatialIndexItem item, BinaryReader reader)
         {
             lock (typeof(ShapeFileSource))
             {
-                var diff = entry.Offset - reader.BaseStream.Position;
+                var diff = item.Offset - reader.BaseStream.Position;
                 reader.BaseStream.Seek(diff, SeekOrigin.Current);
 
                 //Skip record number
                 reader.BaseStream.Seek(8, SeekOrigin.Current);
 
-                var bytes = reader.ReadBytes(entry.Length);
+                var bytes = reader.ReadBytes(item.Length);
                 using var geometryReader = new BigEndianBinaryReader(new MemoryStream(bytes));
 
                 var typeValue = geometryReader.ReadInt32();
@@ -215,7 +215,7 @@ namespace ZMap.Source.ShapeFile
 
                 geometryReader.BaseStream.Seek(0, 0);
 
-                var geometry = handler.Read(geometryReader, entry.Length, _geometryFactory);
+                var geometry = handler.Read(geometryReader, item.Length, _geometryFactory);
                 return geometry;
             }
         }

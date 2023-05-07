@@ -26,16 +26,16 @@ public class SldStore : ISldStore
             var visitor = new SldStyleVisitor();
             sld.Accept(visitor, null);
 
-            if (!string.IsNullOrWhiteSpace(sld.Name) && !Cache.ContainsKey(sld.Name))
+            if (!string.IsNullOrWhiteSpace(sld.Name))
             {
-                Cache.Add(sld.Name, visitor.StyleGroups);
+                Cache.TryAdd(sld.Name, visitor.StyleGroups);
             }
         }
     }
 
     public Task<List<StyleGroup>> FindAsync(string name)
     {
-        var result = Cache.ContainsKey(name) ? Cache[name] : null;
+        var result = Cache.TryGetValue(name, out var value) ? value : null;
         return Task.FromResult(result);
     }
 }

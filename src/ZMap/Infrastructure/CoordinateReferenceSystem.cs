@@ -71,13 +71,13 @@ namespace ZMap.Infrastructure
             };
         }
 
-        public static ICoordinateTransformation CreateTransformation(int sourceSRID, int targetSRID)
+        public static ICoordinateTransformation CreateTransformation(int sourceSrid, int targetSrid)
         {
-            var key = $"{sourceSRID}:{targetSRID}";
+            var key = $"{sourceSrid}:{targetSrid}";
             return CoordinateTransformations.GetOrAdd(key, _ =>
             {
-                var source = Get(sourceSRID);
-                var target = Get(targetSRID);
+                var source = Get(sourceSrid);
+                var target = Get(targetSrid);
 
                 if (source == null || target == null)
                 {
@@ -88,7 +88,7 @@ namespace ZMap.Infrastructure
             });
         }
 
-        public static Envelope Transform(this Envelope extent, int sourceSRID, int targetSRID)
+        public static Envelope Transform(this Envelope extent, int sourceSrid, int targetSrid)
         {
             if (extent == null)
             {
@@ -100,12 +100,12 @@ namespace ZMap.Infrastructure
                 return extent;
             }
 
-            if (sourceSRID == targetSRID)
+            if (sourceSrid == targetSrid)
             {
                 return extent.Copy();
             }
 
-            var transformation = CreateTransformation(sourceSRID, targetSRID);
+            var transformation = CreateTransformation(sourceSrid, targetSrid);
             if (transformation == null)
             {
                 throw new ArgumentException("创建投影转换失败");
