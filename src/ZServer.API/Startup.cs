@@ -16,6 +16,7 @@ using Orleans.Hosting;
 using Serilog;
 using ZMap.Source.Postgre;
 using ZServer.API.Filters;
+using Log = ZMap.Infrastructure.Log;
 
 namespace ZServer.API
 {
@@ -106,7 +107,7 @@ namespace ZServer.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            ZMap.Log.Logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("ZServer");
+            Log.Logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("ZServer");
 
             // BridgeDbContext dbContext = new BridgeDbContext(
             //     "User ID=postgres;Password=oVkr7GiT29CAkw;Host=hdy.dev;Port=1921;Database=szsf_dev;Pooling=true;",

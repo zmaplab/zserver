@@ -203,7 +203,7 @@ namespace ZServer.SiloHost
                 .ConfigureLogging(builder =>
                 {
                     var builder2 = builder.AddSerilog();
-                    ZMap.Log.Logger =
+                    ZMap.Infrastructure.Log.Logger =
                         builder2.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>()
                             .CreateLogger("Default");
                 })

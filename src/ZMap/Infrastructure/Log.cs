@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace ZMap;
+namespace ZMap.Infrastructure;
 
 public static class Log
 {

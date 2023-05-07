@@ -13,13 +13,16 @@
 //     private readonly string _connectionString;
 //     private readonly string _table;
 //     private readonly string _database;
-//
+//     
+//   
 //     public PgDbContext(string connectionString, string database, string table)
 //     {
 //         _connectionString = connectionString;
 //         _table = table;
 //         _database = database;
 //     }
+//
+//  
 //
 //     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 //     {
@@ -29,6 +32,13 @@
 //
 //     protected override void OnModelCreating(ModelBuilder modelBuilder)
 //     {
+//         var entityMethod = modelBuilder.GetType().GetMethod(nameof(modelBuilder.Entity),
+//             Array.Empty<Type>());
+//         if (entityMethod == null)
+//         {
+//             throw new ArgumentNullException(nameof(entityMethod));
+//         }
+//
 //         using var conn = new NpgsqlConnection(_connectionString);
 //         if (conn.Database != _database)
 //         {
@@ -38,7 +48,7 @@
 //         using var reader = conn.ExecuteReader($"SELECT * FROM {_table} LIMIT 1");
 //
 //         var sb = new StringBuilder("public class ");
-//         sb.AppendLine(_table);
+//         sb.Append("c_").AppendLine(_table);
 //         sb.AppendLine("{");
 //
 //         for (var i = 0; i < reader.FieldCount; ++i)
@@ -49,21 +59,34 @@
 //         }
 //
 //         sb.AppendLine("}");
-//         DynamicCompilationUtilities.Compiler.BuildType(sb.ToString());
-//         var entityTypeConfigurationBuilder = new StringBuilder();
-//         entityTypeConfigurationBuilder.Append(
-//                 "public class EntityConfiguration<").Append(_table).Append("> : IEntityTypeConfiguration<")
-//             .Append(_table)
-//             .Append(">").AppendLine();
-//         entityTypeConfigurationBuilder.AppendLine("{");
-//         entityTypeConfigurationBuilder.Append("    public void Configure(EntityTypeBuilder<").Append(_table)
-//             .Append("> builder)").AppendLine();
-//         entityTypeConfigurationBuilder.AppendLine("    {");
-//         entityTypeConfigurationBuilder.AppendLine("    }");
-//         entityTypeConfigurationBuilder.AppendLine("}");
-//         var type = DynamicCompilationUtilities.Compiler.BuildType(entityTypeConfigurationBuilder.ToString());
+//         var entityType = DynamicCompilationUtilities.Compiler.BuildType(sb.ToString());
 //
-//         modelBuilder.ApplyConfigurationsFromAssembly(type.Assembly);
+//         var entityBuilder = entityMethod
+//             .MakeGenericMethod(entityType)
+//             .Invoke(modelBuilder, Array.Empty<object>()) as EntityTypeBuilder;
+//         if (entityBuilder == null)
+//         {
+//             return;
+//         }
+//
+//         entityBuilder.ToTable(_table);
+//
+//         modelBuilder.ApplyConfigurationsFromAssembly(entityType.Assembly);
+//
+//         // var entityTypeConfigurationBuilder = new StringBuilder();
+//         // entityTypeConfigurationBuilder.Append(
+//         //         "public class EntityConfiguration<").Append(_table).Append("> : IEntityTypeConfiguration<")
+//         //     .Append(_table)
+//         //     .Append(">").AppendLine();
+//         // entityTypeConfigurationBuilder.AppendLine("{");
+//         // entityTypeConfigurationBuilder.Append("    public void Configure(EntityTypeBuilder<").Append(_table)
+//         //     .Append("> builder)").AppendLine();
+//         // entityTypeConfigurationBuilder.AppendLine("    {");
+//         // entityTypeConfigurationBuilder.AppendLine("    }");
+//         // entityTypeConfigurationBuilder.AppendLine("}");
+//         // var type = DynamicCompilationUtilities.Compiler.BuildType(entityTypeConfigurationBuilder.ToString());
+//         //
+//         // modelBuilder.ApplyConfigurationsFromAssembly(type.Assembly);
 //     }
 //
 //     // public string BuildQuerySql(string filter)

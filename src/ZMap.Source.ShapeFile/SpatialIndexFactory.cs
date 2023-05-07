@@ -11,6 +11,7 @@ using NetTopologySuite.Index.Quadtree;
 using NetTopologySuite.Index.Strtree;
 using NetTopologySuite.IO;
 using ZMap.Indexing;
+using ZMap.Infrastructure;
 
 namespace ZMap.Source.ShapeFile
 {
