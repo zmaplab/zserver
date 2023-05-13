@@ -16,15 +16,15 @@ namespace ZServer.Tests
 
             var style = new TextStyle
             {
-                Align = Expression<string>.New("center"),
-                Label = Expression<string>.New("name"),
-                Font = Expression<List<string>>.New(new List<string> { "宋体" }),
-                Size = Expression<int>.New(12),
-                Rotate = Expression<float>.New(0),
-                Transform = Expression<TextTransform>.New(TextTransform.Uppercase),
-                Offset = Expression<float[]>.New(Array.Empty<float>()),
-                BackgroundColor = Expression<string>.New("#FFFFFF"),
-                OutlineSize = Expression<int>.New(1)
+                Align = CSharpExpression<string>.New("center"),
+                Label = CSharpExpression<string>.New("name"),
+                Font = CSharpExpression<List<string>>.New(new List<string> { "宋体" }),
+                Size = CSharpExpression<int?>.New(12),
+                Rotate = CSharpExpression<float?>.New(0),
+                Transform = CSharpExpression<TextTransform>.New(TextTransform.Uppercase),
+                Offset = CSharpExpression<float[]>.New(Array.Empty<float>()),
+                BackgroundColor = CSharpExpression<string>.New("#FFFFFF"),
+                OutlineSize = CSharpExpression<int?>.New(1)
             };
             var width = 603 * 2;
             var height = 450 * 2;

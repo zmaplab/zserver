@@ -49,7 +49,7 @@
           "minZoom": 100,
           "maxZoom": 3000,
           "zoomUnit": "scale",
-          "property": {
+          "label": {
             "value": null,
             "expression": "feature[\"name\"]"
           },
@@ -59,10 +59,7 @@
           "color": "#FF0000",
           "backgroundColor": "#00FA9A",
           "outlineSize": 6,
-          "size": {
-            "value": null,
-            "expression": "ZMap.Methods.Categorize(feature.GetEnvValue(\"wms_scale_denominator\"), 12, 300, 10, 2500,8)"
-          }
+          "size": 14
         }
       ]
     },

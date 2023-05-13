@@ -6,7 +6,7 @@
         <ProjectReference Include="..\ZServer\ZServer.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Npgsql" Version="6.0.7" />
-        <PackageReference Include="Npgsql.NetTopologySuite" Version="6.0.7" />
+<!--        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.8" />-->
+        <PackageReference Include="Npgsql.NetTopologySuite" Version="7.0.4" />
     </ItemGroup>
 </Project>

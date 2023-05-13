@@ -3,12 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Force.DeepCloner;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ZMap.Infrastructure;
 using ZMap.Source;
-using ZMap.Utilities;
 
 namespace ZServer.Store.Configuration
 {
@@ -49,7 +50,7 @@ namespace ZServer.Store.Configuration
                     entry.SetValue(source);
                     entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
                     return Task.FromResult(source);
-                })).Clone();
+                })).DeepClone();
         }
 
         public async Task<List<ISource>> GetAllAsync()
@@ -71,14 +72,14 @@ namespace ZServer.Store.Configuration
             var provider = section.GetSection("provider").Get<string>();
             if (string.IsNullOrWhiteSpace(provider))
             {
-                _logger.LogError($"数据源 {name} 不存在或驱动为空");
+                _logger.LogError("数据源 {Name} 不存在或驱动为空", name);
                 return null;
             }
 
             var type = Type.GetType(provider);
             if (type == null)
             {
-                _logger.LogError($"数据源 {name} 的驱动 {provider} 不存在");
+                _logger.LogError("数据源 {Name} 的驱动 {Provider} 不存在", name, provider);
                 return null;
             }
 
@@ -86,7 +87,7 @@ namespace ZServer.Store.Configuration
             {
                 if (!typeof(IVectorSource).IsAssignableFrom(x))
                 {
-                    _logger.LogError($"数据源 {name} 的驱动 {provider} 不是有效的驱动");
+                    _logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", name, provider);
                     return null;
                 }
 

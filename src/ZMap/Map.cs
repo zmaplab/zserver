@@ -23,7 +23,7 @@ public class Map : IDisposable
         return this;
     }
 
-    public Map SetSRID(int srid)
+    public Map SetSrid(int srid)
     {
         _srid = srid;
         return this;

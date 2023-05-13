@@ -11,8 +11,6 @@ namespace ZServer.Tests
         [Fact]
         public async Task GetPgSource()
         {
-            PostgreSource.Initialize();
-
             var sourceStore = GetScopedService<ISourceStore>();
             var dataSource = (PostgreSource)await sourceStore.FindAsync("berlin_db");
 
@@ -30,7 +28,7 @@ namespace ZServer.Tests
             var dataSource = (ShapeFileSource)await sourceStore.FindAsync("berlin_shp");
 
             Assert.NotNull(dataSource);
-            Assert.EndsWith("shapes/osmbuildings.shp", dataSource.File);
+            Assert.EndsWith("osmbuildings.shp", dataSource.File);
             Assert.Equal(4326, dataSource.SRID);
         }
 
@@ -48,7 +46,8 @@ namespace ZServer.Tests
 
             var dataSource2 = (ShapeFileSource)dataSources[1];
             Assert.NotNull(dataSource2);
-            Assert.EndsWith("shapes/osmbuildings.shp", dataSource2.File);
+        
+            Assert.EndsWith("osmbuildings.shp", dataSource2.File);
             Assert.Equal(4326, dataSource2.SRID);
         }
     }

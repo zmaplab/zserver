@@ -1,9 +1,10 @@
 using System.IO;
 using SkiaSharp;
+using ZMap.Extensions;
+using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
-using ZMap.Utilities;
 
 namespace ZMap.Renderer.SkiaSharp
 {
@@ -26,7 +27,7 @@ namespace ZMap.Renderer.SkiaSharp
         {
             var style = (ResourceFillStyle)Style;
 
-            var opacity = style.Opacity.Value;
+            var opacity = style.Opacity.Value ?? 1;
             var color = style.Color?.Value;
             var uri = style.Uri?.Value;
             var antialias = Style.Antialias;

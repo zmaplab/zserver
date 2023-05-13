@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
+using ZMap;
 
 namespace ZServer.API;
 
@@ -21,7 +22,7 @@ public class LoggerMiddleware
     {
         try
         {
-            var hostIp = Environment.GetEnvironmentVariable("HOST_IP");
+            var hostIp = EnvironmentVariables.HostIp;
             if (!string.IsNullOrWhiteSpace(hostIp))
             {
                 LogContext.PushProperty("HOST_IP", hostIp); //traceId

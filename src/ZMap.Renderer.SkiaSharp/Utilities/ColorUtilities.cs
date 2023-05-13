@@ -5,7 +5,7 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
 {
     public static class ColorUtilities
     {
-        public static readonly SKColor DefaultColor = SKColors.ForestGreen;
+        private static readonly SKColor DefaultColor = SKColors.ForestGreen;
 
         public static SKColor GetColor(string hexString, float opacity = 1)
         {

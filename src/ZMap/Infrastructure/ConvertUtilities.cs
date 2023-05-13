@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace ZMap.Utilities;
+namespace ZMap.Infrastructure;
 
 public static class ConvertUtilities
 {
@@ -20,6 +20,17 @@ public static class ConvertUtilities
         }
         else
         {
+            if (targetType.IsGenericType
+                && (targetType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+            {
+                targetType = Nullable.GetUnderlyingType(targetType);
+            }
+
+            if (targetType == null)
+            {
+                return default;
+            }
+
             return targetType == typeof(string) ? (T)v.ToString() : (T)Convert.ChangeType(v, targetType);
         }
     }

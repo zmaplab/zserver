@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NetTopologySuite.Geometries;
 
 namespace ZMap.Source
 {
@@ -11,10 +12,7 @@ namespace ZMap.Source
         /// <summary>
         /// 设置过滤器
         /// </summary>
-        /// <param name="filter"></param>
-        void SetFilter(IFeatureFilter filter);
-
-        IFeatureFilter Filter { get; }
+        IFeatureFilter Filter { get; set; }
 
         /// <summary>
         /// 获取指定区域的图斑
@@ -22,6 +20,6 @@ namespace ZMap.Source
         /// </summary>
         /// <param name="extent">区域</param>
         /// <returns></returns>
-        ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(NetTopologySuite.Geometries.Envelope extent);
+        Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
     }
 }

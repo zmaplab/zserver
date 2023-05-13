@@ -11,6 +11,7 @@ using NetTopologySuite.Index.Quadtree;
 using NetTopologySuite.Index.Strtree;
 using NetTopologySuite.IO;
 using ZMap.Indexing;
+using ZMap.Infrastructure;
 
 namespace ZMap.Source.ShapeFile
 {
@@ -19,10 +20,10 @@ namespace ZMap.Source.ShapeFile
         private static readonly MessagePackSerializerOptions SerializerOptions =
             MessagePackSerializer.Typeless.DefaultOptions.WithCompression(MessagePackCompression.Lz4Block);
 
-        public static ISpatialIndex<SpatialIndexEntry> Create(string shapeFile, BinaryReader reader,
+        public static ISpatialIndex<SpatialIndexItem> Create(string shapeFile, BinaryReader reader,
             SpatialIndexType type)
         {
-            ISpatialIndex<SpatialIndexEntry> tree;
+            ISpatialIndex<SpatialIndexItem> tree;
 
             var sidxPath = Path.ChangeExtension(shapeFile, ".sidx");
 
@@ -40,15 +41,15 @@ namespace ZMap.Source.ShapeFile
             return tree;
         }
 
-        private static void Save(IEnumerable<SpatialIndexEntry> entries, string path)
+        private static void Save(IEnumerable<SpatialIndexItem> entries, string path)
         {
             File.WriteAllBytes(path, MessagePackSerializer.Serialize(entries, SerializerOptions));
         }
 
-        public static ISpatialIndex<SpatialIndexEntry> Load(string filename, SpatialIndexType type)
+        public static ISpatialIndex<SpatialIndexItem> Load(string filename, SpatialIndexType type)
         {
             using var stream = File.OpenRead(filename);
-            var entries = MessagePackSerializer.Deserialize<IEnumerable<SpatialIndexEntry>>(stream,
+            var entries = MessagePackSerializer.Deserialize<IEnumerable<SpatialIndexItem>>(stream,
                 SerializerOptions);
             return CreateSpatialIndex(type, entries);
         }
@@ -64,7 +65,7 @@ namespace ZMap.Source.ShapeFile
         /// Reads all boundingboxes of features in the shapefile. This is used for spatial indexing.
         /// </summary>
         /// <returns></returns>
-        private static IEnumerable<SpatialIndexEntry> GetAllFeatureBoundingBoxes(BinaryReader shapeFileReader)
+        private static IEnumerable<SpatialIndexItem> GetAllFeatureBoundingBoxes(BinaryReader shapeFileReader)
         {
             // var headerBuffer = new byte[100];
             // shapeFileStream.Read(headerBuffer, 0, 100);
@@ -76,7 +77,7 @@ namespace ZMap.Source.ShapeFile
                 if (shapeFileStream.Position >= shapeFileStream.Length ||
                     shapeFileStream.Length - shapeFileStream.Position < 24)
                 {
-                    Log.Logger.LogInformation($"Read end stream at: {shapeFileStream.Position}, stream length: {shapeFileStream.Length}");
+                    Log.Logger.LogInformation("Read end stream at: {Position}, stream length: {Length}", shapeFileStream.Position, shapeFileStream.Length);
                     break;
                 }
 
@@ -103,7 +104,7 @@ namespace ZMap.Source.ShapeFile
 
                     shapeFileStream.Seek(recordLength - 20, SeekOrigin.Current);
 
-                    yield return new SpatialIndexEntry
+                    yield return new SpatialIndexItem
                     {
                         Index = (uint)a /*+1*/,
                         Offset = recordOffset,
@@ -121,7 +122,7 @@ namespace ZMap.Source.ShapeFile
                     var x2 = shapeFileReader.ReadDouble();
                     var y2 = shapeFileReader.ReadDouble();
                     shapeFileStream.Seek(recordLength - 36, SeekOrigin.Current);
-                    yield return new SpatialIndexEntry
+                    yield return new SpatialIndexItem
                     {
                         Index = (uint)a /*+1*/,
                         Offset = recordOffset,
@@ -138,14 +139,14 @@ namespace ZMap.Source.ShapeFile
         /// <summary>
         /// Generates a spatial index for a specified shape file.
         /// </summary>
-        private static ISpatialIndex<SpatialIndexEntry> CreateSpatialIndex(SpatialIndexType type,
-            IEnumerable<SpatialIndexEntry> entries)
+        private static ISpatialIndex<SpatialIndexItem> CreateSpatialIndex(SpatialIndexType type,
+            IEnumerable<SpatialIndexItem> entries)
         {
-            ISpatialIndex<SpatialIndexEntry> tree = type switch
+            ISpatialIndex<SpatialIndexItem> tree = type switch
             {
-                SpatialIndexType.Quadtree => new Quadtree<SpatialIndexEntry>(),
-                SpatialIndexType.STRTree => new STRtree<SpatialIndexEntry>(),
-                SpatialIndexType.HPRTree => new HPRtree<SpatialIndexEntry>(),
+                SpatialIndexType.Quadtree => new Quadtree<SpatialIndexItem>(),
+                SpatialIndexType.STRTree => new STRtree<SpatialIndexItem>(),
+                SpatialIndexType.HPRTree => new HPRtree<SpatialIndexItem>(),
                 _ => throw new ArgumentException("unsupported index type")
             };
 

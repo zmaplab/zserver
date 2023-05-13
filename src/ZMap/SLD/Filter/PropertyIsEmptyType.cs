@@ -16,9 +16,9 @@ public class PropertyIsEmptyType : ComparisonOpsType
     {
         visitor.VisitObject(PropertyName, extraData);
 
-        var expression = (ZMap.Style.Expression)visitor.Pop();
+        var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-        visitor.Push(ZMap.Style.Expression.New($"string.IsNullOrWhiteSpace({expression.Body}?.ToString())"));
+        visitor.Push(ZMap.Style.CSharpExpression.New($"string.IsNullOrWhiteSpace({expression.Body}?.ToString())"));
 
         return null;
     }

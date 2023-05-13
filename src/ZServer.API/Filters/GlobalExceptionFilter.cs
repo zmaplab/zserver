@@ -20,6 +20,6 @@ public class GlobalExceptionFilter : IExceptionFilter
             code = 500
         });
 
-        _logger.LogError(context.Exception.ToString());
+        _logger.LogError("{Exception}", context.Exception.ToString());
     }
 }

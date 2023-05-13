@@ -32,7 +32,7 @@ public class FilterType
     {
         if (Items == null || Items.Length == 0)
         {
-            visitor.Push(default(ZMap.Style.Expression));
+            visitor.Push(default(ZMap.Style.CSharpExpression));
             return null;
         }
 

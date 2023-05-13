@@ -30,16 +30,14 @@ public class LayerQuerier : ILayerQuerier
         {
             if (layerQuery.ResourceGroup == null)
             {
-                var layer = await _layerStore.FindAsync(layerQuery.Layer);
+                var layer = await _layerStore.FindAsync(null, layerQuery.Layer);
                 if (layer != null)
                 {
                     TryAdd(hashSet, list, layerQuery, layer);
                     continue;
                 }
 
-                var msg =
-                    $"[{traceIdentifier}] Layer {layerQuery.Layer} is not exists";
-                _logger.LogError(msg);
+                _logger.LogError("[{TraceIdentifier}] Layer {Layer} is not exists", traceIdentifier, layerQuery.Layer);
             }
             else
             {
@@ -62,10 +60,8 @@ public class LayerQuerier : ILayerQuerier
                         continue;
                     }
                 }
-
-                var msg =
-                    $"[{traceIdentifier}] Layer {layerQuery.ResourceGroup}:{layerQuery.Layer} is not exists";
-                _logger.LogError(msg);
+ 
+                _logger.LogError("[{TraceIdentifier}] Layer {ResourceGroup}:{Layer} is not exists", traceIdentifier, layerQuery.ResourceGroup, layerQuery.Layer);
             }
         }
 
@@ -99,7 +95,7 @@ public class LayerQuerier : ILayerQuerier
         var filter = layerQuery.Arguments[Constants.AdditionalFilter].ToString();
         if (!string.IsNullOrWhiteSpace(filter))
         {
-            vectorSource.SetFilter(new CQLFilter(filter));
+            vectorSource.Filter = new CQLFilter(filter);
         }
     }
 }

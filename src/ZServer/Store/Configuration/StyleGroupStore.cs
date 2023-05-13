@@ -6,8 +6,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Style;
-using ZMap.Utilities;
 using ZServer.Extensions;
 
 namespace ZServer.Store.Configuration
@@ -92,7 +92,7 @@ namespace ZServer.Store.Configuration
         {
             return new SymbolStyle
             {
-                Size = section.GetExpression<int>("size"),
+                Size = section.GetExpression<int?>("size"),
                 Uri = section.GetExpression<Uri>("uri")
             };
         }
@@ -101,19 +101,19 @@ namespace ZServer.Store.Configuration
         {
             return new SpriteLineStyle
             {
-                Opacity = section.GetExpression<float>("opacity"),
-                Width = section.GetExpression<int>("width"),
+                Opacity = section.GetExpression<float?>("opacity"),
+                Width = section.GetExpression<int?>("width"),
                 Color = section.GetExpression<string>("color"),
                 DashArray = section.GetExpression<float[]>("dashArray"),
-                DashOffset = section.GetExpression<float>("dashOffset"),
+                DashOffset = section.GetExpression<float?>("dashOffset"),
                 LineJoin = section.GetExpression<string>("lineJoin"),
                 LineCap = section.GetExpression<string>("lineCap"),
                 Translate = section.GetExpression<double[]>("translate"),
                 TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor"),
-                GapWidth = section.GetExpression<int>("gapWidth"),
-                Offset = section.GetExpression<int>("offset"),
-                Blur = section.GetExpression<int>("blur"),
-                Gradient = section.GetExpression<int>("gradient"),
+                GapWidth = section.GetExpression<int?>("gapWidth"),
+                Offset = section.GetExpression<int?>("offset"),
+                Blur = section.GetExpression<int?>("blur"),
+                Gradient = section.GetExpression<int?>("gradient"),
                 Pattern = section.GetExpression<string>("pattern"),
                 Uri = section.GetExpression<Uri>("uri")
             };
@@ -121,7 +121,7 @@ namespace ZServer.Store.Configuration
 
         private Style GetTextStyle(IConfigurationSection section)
         {
-            Expression<string> label;
+            CSharpExpression<string> label;
             if (string.IsNullOrWhiteSpace(section.GetSection("label").Value) &&
                 !section.GetSection("label").GetChildren().Any())
             {
@@ -137,26 +137,26 @@ namespace ZServer.Store.Configuration
                 Label = label,
                 Align = section.GetExpression<string>("align"),
                 Color = section.GetExpression<string>("color"),
-                Opacity = section.GetExpression<float>("opacity"),
+                Opacity = section.GetExpression<float?>("opacity"),
                 BackgroundColor = section.GetExpression<string>("backgroundColor"),
-                BackgroundOpacity = section.GetExpression<float>("backgroundOpacity"),
-                Radius = section.GetExpression<float>("radius"),
+                BackgroundOpacity = section.GetExpression<float?>("backgroundOpacity"),
+                Radius = section.GetExpression<float?>("radius"),
                 RadiusColor = section.GetExpression<string>("radiusColor"),
-                RadiusOpacity = section.GetExpression<float>("radiusOpacity"),
+                RadiusOpacity = section.GetExpression<float?>("radiusOpacity"),
                 Style = section.GetExpression<string>("style"),
                 Font = section.GetExpression<List<string>>("font"),
-                Size = section.GetExpression<int>("size"),
+                Size = section.GetExpression<int?>("size"),
                 Weight = section.GetExpression<string>("weight"),
-                Rotate = section.GetExpression<float>("rotate"),
+                Rotate = section.GetExpression<float?>("rotate"),
                 Transform = section.GetExpression<TextTransform>("transform"),
                 Offset = section.GetExpression<float[]>("offset"),
-                OutlineSize = section.GetExpression<int>("outlineSize")
+                OutlineSize = section.GetExpression<int?>("outlineSize")
             };
         }
 
         private Style GetFillStyle(IConfigurationSection section)
         {
-            FillStyle symbol;
+            FillStyle fillStyle;
             var pattern = section.GetValue<string>("pattern");
             var patternExpression = section.GetExpression<string>("pattern");
 
@@ -165,7 +165,7 @@ namespace ZServer.Store.Configuration
 
             if (patternExpression != null)
             {
-                symbol = new SpriteFillStyle
+                fillStyle = new SpriteFillStyle
                 {
                     Pattern = patternExpression,
                     Uri = section.GetExpression<Uri>("uri")
@@ -173,15 +173,15 @@ namespace ZServer.Store.Configuration
             }
             else if (!string.IsNullOrWhiteSpace(pattern))
             {
-                symbol = new SpriteFillStyle
+                fillStyle = new SpriteFillStyle
                 {
-                    Pattern = Expression<string>.New(pattern),
+                    Pattern = CSharpExpression<string>.New(pattern),
                     Uri = section.GetExpression<Uri>("uri")
                 };
             }
             else if (resourceExpression != null)
             {
-                symbol = new ResourceFillStyle
+                fillStyle = new ResourceFillStyle
                 {
                     Uri = resourceExpression
                 };
@@ -190,9 +190,9 @@ namespace ZServer.Store.Configuration
             {
                 if (Uri.TryCreate(resource, UriKind.Absolute, out var uri))
                 {
-                    symbol = new ResourceFillStyle
+                    fillStyle = new ResourceFillStyle
                     {
-                        Uri = Expression<Uri>.New(uri)
+                        Uri = CSharpExpression<Uri>.New(uri)
                     };
                 }
                 else
@@ -202,17 +202,17 @@ namespace ZServer.Store.Configuration
             }
             else
             {
-                symbol = new FillStyle();
+                fillStyle = new FillStyle();
             }
 
-            symbol.Opacity = section.GetExpression<float>("opacity");
-            symbol.Pattern = section.GetExpression<string>("pattern");
-            symbol.Antialias = section.GetValue<bool>("antialias");
-            symbol.Color = section.GetExpression<string>("color");
-            symbol.OutlineColor = section.GetExpression<string>("outlineColor");
-            symbol.Translate = section.GetExpression<double[]>("translate");
-            symbol.TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor");
-            return symbol;
+            fillStyle.Opacity = section.GetExpression<float?>("opacity");
+            fillStyle.Pattern = section.GetExpression<string>("pattern");
+            fillStyle.Antialias = section.GetValue<bool>("antialias");
+            fillStyle.Color = section.GetExpression<string>("color");
+            // symbol.OutlineColor = section.GetExpression<string>("outlineColor");
+            fillStyle.Translate = section.GetExpression<double[]>("translate");
+            fillStyle.TranslateAnchor = section.GetExpression<TranslateAnchor?>("translateAnchor");
+            return fillStyle;
         }
 
         public async Task<List<StyleGroup>> GetAllAsync()
