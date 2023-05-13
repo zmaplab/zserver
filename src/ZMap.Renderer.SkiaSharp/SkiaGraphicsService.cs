@@ -42,7 +42,7 @@ public class SkiaGraphicsService : IGraphicsService
         }
 
         _canvas.Flush();
-        return _bitmap.Encode(GetImageFormat(imageFormat), 80).ToArray();
+        return _bitmap.Encode(GetImageFormat(imageFormat), 90).ToArray();
     }
 
     public void Render(byte[] image, RasterStyle style)

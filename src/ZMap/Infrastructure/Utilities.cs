@@ -28,7 +28,7 @@ public static class Utilities
     }
 
     /// <summary>
-    /// TODO: more extension names
+    /// 
     /// </summary>
     /// <param name="format"></param>
     /// <returns></returns>
@@ -36,8 +36,19 @@ public static class Utilities
     {
         return format switch
         {
-            "image/png" => ".png",
+            "image/bmp" => ".bmp",
+            "image/gif" => ".gif",
+            "image/ico" => ".ico",
             "image/jpeg" => ".jpeg",
+            "image/png" => ".png",
+            "image/wbmp" => ".wbmp",
+            "image/webp" => ".webp",
+            "image/pkm" => ".pkm",
+            "image/ktx" => ".ktx",
+            "image/astc" => ".astc",
+            "image/dng" => ".dng",
+            "image/heif" => ".heif",
+            "image/avif" => ".avif",
             _ => ".png"
         };
     }
