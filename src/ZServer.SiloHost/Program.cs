@@ -17,14 +17,15 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
-using Npgsql;
-using ZMap.Source.Postgre;
 using Orleans;
 using Serilog;
 using Serilog.Events;
+using ZMap;
 using ZMap.DynamicCompiler;
+using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZServer.Grains.WMS;
+using Log = Serilog.Log;
 
 namespace ZServer.SiloHost
 {
@@ -33,7 +34,7 @@ namespace ZServer.SiloHost
         public static Task Main(string[] args)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            CSharpDynamicCompiler.Load();
+            CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
 
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddEnvironmentVariables();
@@ -65,11 +66,8 @@ namespace ZServer.SiloHost
             }
 
             Log.Logger = loggerConfiguration.CreateLogger();
-
-            PostgreSource.Initialize();
+            
             FontUtilities.Load();
-
-            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 
@@ -170,7 +168,7 @@ namespace ZServer.SiloHost
                             options.GatewayPort = gatewayPort;
                             options.SiloPort = siloPort;
 
-                            var hostIp = Environment.GetEnvironmentVariable("HOST_IP");
+                            var hostIp = EnvironmentVariables.HostIp;
                             IPAddress ipAddress;
                             if (string.IsNullOrWhiteSpace(hostIp))
                             {
@@ -206,7 +204,7 @@ namespace ZServer.SiloHost
                 .ConfigureLogging(builder =>
                 {
                     var builder2 = builder.AddSerilog();
-                    ZMap.Log.Logger =
+                    ZMap.Infrastructure.Log.Logger =
                         builder2.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>()
                             .CreateLogger("Default");
                 })

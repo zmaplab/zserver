@@ -5,7 +5,7 @@ using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 
-namespace ZMap.Utilities
+namespace ZMap.Infrastructure
 {
     public static class CoordinateReferenceSystem
     {
@@ -26,7 +26,7 @@ namespace ZMap.Utilities
             SRIDCache = new ConcurrentDictionary<int, CoordinateSystem>();
             typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
             using var stream =
-                typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Utilities.proj.xml");
+                typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Infrastructure.proj.xml");
             if (stream == null)
             {
                 return;
@@ -71,13 +71,13 @@ namespace ZMap.Utilities
             };
         }
 
-        public static ICoordinateTransformation CreateTransformation(int sourceSRID, int targetSRID)
+        public static ICoordinateTransformation CreateTransformation(int sourceSrid, int targetSrid)
         {
-            var key = $"{sourceSRID}:{targetSRID}";
+            var key = $"{sourceSrid}:{targetSrid}";
             return CoordinateTransformations.GetOrAdd(key, _ =>
             {
-                var source = Get(sourceSRID);
-                var target = Get(targetSRID);
+                var source = Get(sourceSrid);
+                var target = Get(targetSrid);
 
                 if (source == null || target == null)
                 {
@@ -88,7 +88,7 @@ namespace ZMap.Utilities
             });
         }
 
-        public static Envelope Transform(this Envelope extent, int sourceSRID, int targetSRID)
+        public static Envelope Transform(this Envelope extent, int sourceSrid, int targetSrid)
         {
             if (extent == null)
             {
@@ -100,12 +100,12 @@ namespace ZMap.Utilities
                 return extent;
             }
 
-            if (sourceSRID == targetSRID)
+            if (sourceSrid == targetSrid)
             {
                 return extent.Copy();
             }
 
-            var transformation = CreateTransformation(sourceSRID, targetSRID);
+            var transformation = CreateTransformation(sourceSrid, targetSrid);
             if (transformation == null)
             {
                 throw new ArgumentException("创建投影转换失败");

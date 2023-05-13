@@ -4,7 +4,7 @@ namespace ZMap.Style
 {
     public class SpriteLineStyle : LineStyle
     {
-        public Expression<Uri> Uri { get; set; }
+        public CSharpExpression<Uri> Uri { get; set; }
 
         public override void Accept(IZMapStyleVisitor visitor, Feature feature)
         {

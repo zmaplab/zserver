@@ -1,9 +1,9 @@
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
-using ZMap.Renderer.SkiaSharp.Extensions;
+using ZMap.Extensions;
+using ZMap.Infrastructure;
 using ZMap.Style;
-using ZMap.Utilities;
 using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 
 namespace ZMap.Renderer.SkiaSharp
@@ -39,7 +39,7 @@ namespace ZMap.Renderer.SkiaSharp
                 return;
             }
 
-            var half = _style.Size.Value / 2;
+            var half = (_style.Size.Value ?? 14) / 2;
 
             var centroidPoint = CoordinateTransformUtilities.WordToExtent(extent,
                 width, height, centroid);

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 using ZServer.Entity;
 
 namespace ZServer.Store.Configuration
@@ -23,6 +23,7 @@ namespace ZServer.Store.Configuration
 
         public async Task<ResourceGroup> FindAsync(string name)
         {
+            // Group 只是一个逻辑组织，没有逻辑，即对象状态不会变化，因此不需要克隆
             return string.IsNullOrWhiteSpace(name)
                 ? null
                 : await Cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>

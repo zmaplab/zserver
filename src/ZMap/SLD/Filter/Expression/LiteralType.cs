@@ -13,7 +13,7 @@ public class LiteralType : ExpressionType
 
     public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        visitor.Push(ZMap.Style.Expression.New($"\"{Value}\""));
+        visitor.Push(ZMap.Style.CSharpExpression.New($"\"{Value}\""));
         return null;
     }
 }

@@ -1,6 +1,6 @@
 using NetTopologySuite.Geometries;
 using Xunit;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZServer.Tests;
 
@@ -14,7 +14,7 @@ public class GeoUtilitiesTests
         var width = 256;
         var pixelHeight = (bbox.MaxY - bbox.MinY) / height;
         var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
-        GeoUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, 183, 208);
+        GeographicUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, 183, 208);
         // Assert.Equal(117.95942406089455, latLon.Lon);
         // Assert.Equal(41.006979652534426, latLon.Lat);
     }

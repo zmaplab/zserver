@@ -16,23 +16,23 @@ namespace ZServer.Tests
             var style1 = new FillStyle
             {
                 Antialias = true,
-                Opacity = Expression<float>.New(0.5f),
-                Color = Expression<string>.New("#3ed53e")
+                Opacity = CSharpExpression<float?>.New(0.5f),
+                Color = CSharpExpression<string>.New("#3ed53e")
             };
             var style2 = new LineStyle
             {
-                Opacity = Expression<float>.New(1),
-                Width = Expression<int>.New(2),
-                Color = Expression<string>.New("#3ed53e"),
-                DashArray = Expression<float[]>.New(Array.Empty<float>()),
-                DashOffset = Expression<float>.New(0),
-                LineCap = Expression<string>.New("Round"),
-                LineJoin = Expression<string>.New("Round"),
-                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
-                GapWidth = Expression<int>.New(10),
-                Offset = Expression<int>.New(0),
-                Blur = Expression<int>.New(0),
-                Gradient = Expression<int>.New(0)
+                Opacity = CSharpExpression<float?>.New(1),
+                Width = CSharpExpression<int?>.New(2),
+                Color = CSharpExpression<string>.New("#3ed53e"),
+                DashArray = CSharpExpression<float[]>.New(Array.Empty<float>()),
+                DashOffset = CSharpExpression<float?>.New(0),
+                LineCap = CSharpExpression<string>.New("Round"),
+                LineJoin = CSharpExpression<string>.New("Round"),
+                Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
+                GapWidth = CSharpExpression<int?>.New(10),
+                Offset = CSharpExpression<int?>.New(0),
+                Blur = CSharpExpression<int?>.New(0),
+                Gradient = CSharpExpression<int?>.New(0)
             };
 
 
@@ -60,25 +60,25 @@ namespace ZServer.Tests
             var style1 = new ResourceFillStyle
             {
                 Antialias = true,
-                Opacity = Expression<float>.New(0.5f),
-                Color = Expression<string>.New("#3ed53e"),
-                Uri = Expression<Uri>.New(uri)
+                Opacity = CSharpExpression<float?>.New(0.5f),
+                Color = CSharpExpression<string>.New("#3ed53e"),
+                Uri = CSharpExpression<Uri>.New(uri)
             };
             var style2 = new LineStyle
             {
-                Opacity = Expression<float>.New(1),
-                Width = Expression<int>.New(2),
-                Color = Expression<string>.New("#3ed53e"),
+                Opacity = CSharpExpression<float?>.New(1),
+                Width = CSharpExpression<int?>.New(2),
+                Color = CSharpExpression<string>.New("#3ed53e"),
 
-                DashArray = Expression<float[]>.New(Array.Empty<float>()),
-                DashOffset = Expression<float>.New(0),
-                LineCap = Expression<string>.New("Round"),
-                LineJoin = Expression<string>.New("Round"),
-                Translate = Expression<double[]>.New(new double[] { 1, 1 }),
-                GapWidth = Expression<int>.New(10),
-                Offset = Expression<int>.New(0),
-                Blur = Expression<int>.New(0),
-                Gradient = Expression<int>.New(0)
+                DashArray = CSharpExpression<float[]>.New(Array.Empty<float>()),
+                DashOffset = CSharpExpression<float?>.New(0),
+                LineCap = CSharpExpression<string>.New("Round"),
+                LineJoin = CSharpExpression<string>.New("Round"),
+                Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
+                GapWidth = CSharpExpression<int?>.New(10),
+                Offset = CSharpExpression<int?>.New(0),
+                Blur = CSharpExpression<int?>.New(0),
+                Gradient = CSharpExpression<int?>.New(0)
             };
             var width = 1024;
             var height = 1024;

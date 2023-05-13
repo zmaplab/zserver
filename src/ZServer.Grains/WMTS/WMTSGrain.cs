@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using ZMap;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 using ZServer.Extensions;
-using ZServer.HashAlgorithm;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMTS;
 using ZServer.Store;
@@ -22,17 +21,15 @@ namespace ZServer.Grains.WMTS
         private readonly ILogger<WMTSGrain> _logger;
         private readonly ILayerQuerier _layerQuerier;
         private readonly IGridSetStore _gridSetStore;
-        private readonly IHashAlgorithmService _hashAlgorithmService;
         private readonly IGraphicsServiceProvider _graphicsServiceProvider;
 
         public WMTSGrain(ILogger<WMTSGrain> logger,
-            IGridSetStore gridSetStore, IHashAlgorithmService hashAlgorithmService,
+            IGridSetStore gridSetStore,
             IGraphicsServiceProvider graphicsServiceProvider,
             ILayerQuerier layerQuerier)
         {
             _logger = logger;
             _gridSetStore = gridSetStore;
-            _hashAlgorithmService = hashAlgorithmService;
             _graphicsServiceProvider = graphicsServiceProvider;
             _layerQuerier = layerQuerier;
         }
@@ -50,22 +47,13 @@ namespace ZServer.Grains.WMTS
             {
                 if (string.IsNullOrWhiteSpace(layers))
                 {
-                    var msg = $"{displayUrl}, no layers have been requested";
-                    _logger.LogWarning(msg);
+                    _logger.LogError("{Url}, no layers have been requested", displayUrl);
                     return MapResult.Failed("No layers have been requested", "LayerNotDefined");
-                }
-
-                if (string.IsNullOrWhiteSpace(format))
-                {
-                    var msg = $"{displayUrl}, no output map format requested";
-                    _logger.LogError(msg);
-                    return MapResult.Failed("No output map format requested", "InvalidFormat");
                 }
 
                 if (string.IsNullOrWhiteSpace(tileMatrixSet))
                 {
-                    var msg = $"{displayUrl}, no tile matrix set requested";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, no tile matrix set requested", displayUrl);
                     return MapResult.Failed("No tile matrix set requested", "InvalidTileMatrixSet");
                 }
 
@@ -73,22 +61,20 @@ namespace ZServer.Grains.WMTS
 
                 if (gridSet == null)
                 {
-                    var msg = $"{displayUrl}, could not find tile matrix set";
-                    _logger.LogError(msg);
+                    _logger.LogError("{Url}, could not find tile matrix set", displayUrl);
                     return MapResult.Failed($"Could not find tile matrix set {tileMatrixSet}",
                         "TileMatrixSetNotDefined");
                 }
 
-                var layerKey = BitConverter.ToString(_hashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(layers)))
-                    .Replace("-", string.Empty);
+                var layerKey = MurmurHashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(layers));
 
                 var cqlFilterHash = string.IsNullOrWhiteSpace(cqlFilter)
                     ? string.Empty
-                    : CryptographyUtilities.ComputeMd5(Encoding.UTF8.GetBytes(cqlFilter));
+                    : MurmurHashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
 
                 // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
                 var path = Path.Combine(AppContext.BaseDirectory,
-                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{ImageFormatUtilities.GetExtension(format)}");
+                    $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{Utilities.GetImageExtension(format)}");
                 var folder = Path.GetDirectoryName(path);
                 if (folder != null && !Directory.Exists(folder))
                 {
@@ -99,13 +85,15 @@ namespace ZServer.Grains.WMTS
                 if (File.Exists(path))
                 {
                     _logger.LogInformation($"[{traceIdentifier}] {displayUrl}, CACHED");
-                    return MapResult.Ok(File.ReadAllBytes(path), format);
+                    return MapResult.Ok(await File.ReadAllBytesAsync(path), format);
                 }
 #endif
+                format = string.IsNullOrWhiteSpace(format) ? "image/png" : format;
 
                 var tuple = gridSet.GetEnvelope(tileMatrix, tileCol, tileRow);
                 if (tuple == default)
                 {
+                    _logger.LogError("{Url}, could not get envelope from grid set", displayUrl);
                     return MapResult.EmptyMap(format);
                 }
 
@@ -117,12 +105,12 @@ namespace ZServer.Grains.WMTS
                 var layerQueries =
                     new List<QueryLayerParams>();
 
-                var splitLayers = layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var layerNames = layers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                for (var i = 0; i < splitLayers.Length; i++)
+                for (var i = 0; i < layerNames.Length; i++)
                 {
-                    var currentLayer = splitLayers[i];
-                    var layerQuery = currentLayer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                    var layerName = layerNames[i];
+                    var layerQuery = layerName.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
                     switch (layerQuery.Length)
                     {
@@ -141,10 +129,9 @@ namespace ZServer.Grains.WMTS
                             break;
                         default:
                         {
-                            var msg = $"{displayUrl}, layer format is incorrect {currentLayer}";
-                            _logger.LogError(msg);
-                            return MapResult.Failed($"Could not find layer {currentLayer}",
-                                "LayerNotDefined");
+                            _logger.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
+                            return MapResult.Failed($"layer format is incorrect {layerName}",
+                                "LayerFormatIncorrect");
                         }
                     }
                 }
@@ -162,20 +149,19 @@ namespace ZServer.Grains.WMTS
 
                 var map = new Map();
                 map.SetId(traceIdentifier)
-                    .SetSRID(gridSet.SRID)
+                    .SetSrid(gridSet.SRID)
                     .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                     .SetLogger(_logger)
                     .SetGraphicsContextFactory(_graphicsServiceProvider)
                     .AddLayers(layerList);
                 var image = await map.GetImageAsync(viewPort, format);
 
-                File.WriteAllBytes(path, image);
+                await File.WriteAllBytesAsync(path, image);
                 return MapResult.Ok(image, format);
             }
             catch (Exception e)
             {
-                var msg = $"{displayUrl}, {e}";
-                _logger.LogError(msg);
+                _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
                 return MapResult.Failed(e.Message, "InternalError");
             }
         }

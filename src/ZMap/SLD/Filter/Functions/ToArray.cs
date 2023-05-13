@@ -1,6 +1,6 @@
 using System;
+using ZMap.Infrastructure;
 using ZMap.SLD.Filter.Expression;
-using ZMap.Utilities;
 
 namespace ZMap.SLD.Filter.Functions;
 
@@ -17,7 +17,7 @@ public class ToArray
     {
         var left = _functionType1.Items[0];
         visitor.Visit(left, extraData);
-        var leftExpression = (ZMap.Style.Expression)visitor.Pop();
+        var leftExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
         // 必需是 LiteralType
         if (_functionType1.Items[1] is not LiteralType right)
@@ -26,10 +26,10 @@ public class ToArray
         }
 
         var type = right.Value;
-        ZMap.Style.Expression resultExpression;
+        ZMap.Style.CSharpExpression resultExpression;
         if (type is "string" or "String")
         {
-            resultExpression = ZMap.Style.Expression.New($$"""
+            resultExpression = ZMap.Style.CSharpExpression.New($$"""
 ((Func<{{type}}[]>)(() =>
 {
     var value = {{leftExpression.Body}};
@@ -44,7 +44,7 @@ public class ToArray
         }
         else
         {
-            resultExpression = ZMap.Style.Expression.New($$"""
+            resultExpression = ZMap.Style.CSharpExpression.New($$"""
 ((Func<{{type}}[]>)(() =>
 {
     var value = {{leftExpression.Body}};
@@ -58,7 +58,7 @@ public class ToArray
 """);
         }
 
-        DynamicCompilationUtilities.GetFunc(resultExpression.Body);
+        CSharpDynamicCompiler.GetOrCreateFunc(resultExpression.Body);
         visitor.Push(resultExpression);
         return null;
     }

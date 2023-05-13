@@ -1,13 +1,14 @@
 <Project>
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>zmap lab;</Authors>
         <Copyright>Copyright 2023 zmap lab</Copyright>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <IsPackable>true</IsPackable>
-        <LangVersion>preview</LangVersion>
+        <LangVersion>latest</LangVersion>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

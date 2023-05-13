@@ -13,7 +13,7 @@ public class PropertyNameType : ExpressionType
 
     public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        visitor.Push(ZMap.Style.Expression.New($"feature[\"{Text.Trim()}\"]"));
+        visitor.Push(ZMap.Style.CSharpExpression.New($"feature[\"{Text.Trim()}\"]"));
         return null;
     }
 }

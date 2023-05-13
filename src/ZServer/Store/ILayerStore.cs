@@ -17,7 +17,7 @@ namespace ZServer.Store
         /// <returns></returns>
         Task<ILayer> FindAsync(string resourceGroupName, string layerName);
 
-        Task<ILayer> FindAsync(string layerName);
+        // Task<ILayer> FindAsync(string layerName);
 
         /// <summary>
         /// 查询所有图层配置

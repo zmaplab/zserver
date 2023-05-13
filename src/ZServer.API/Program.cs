@@ -10,11 +10,10 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
-using ZMap;
 using ZMap.DynamicCompiler;
+using ZMap.Infrastructure;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZMap.Source.Postgre;
 using ZServer.API.Extensions;
 using Log = Serilog.Log;
 
@@ -34,9 +33,8 @@ namespace ZServer.API
                 CoordinateArraySequenceFactory.Instance,
                 PrecisionModel.Floating.Value,
                 4490, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
-            PostgreSource.Initialize();
             FontUtilities.Load();
-            CSharpDynamicCompiler.Load();
+            CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             if (!Directory.Exists("cache"))

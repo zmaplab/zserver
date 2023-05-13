@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Npgsql;
 using ZServer;
-using ZMap.Source.Postgre;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable 649
@@ -22,9 +21,6 @@ namespace Console
     {
         static void Main(string[] args)
         {
-            PostgreSource.Initialize();
-
-            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 

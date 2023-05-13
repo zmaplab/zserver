@@ -7,22 +7,22 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Npgsql;
+using ZMap.Infrastructure;
 
 namespace ZMap.Source.Postgre
 {
     public sealed class PostgreSource : SpatialDatabaseSource
     {
-        public static void Initialize()
-        {
-            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
-        }
+        // private static readonly ConcurrentDictionary<string, DbContext> DbContexts =
+        //     new ConcurrentDictionary<string, DbContext>();
 
         public PostgreSource(string connectionString, string database) : base(connectionString,
             database)
         {
+            // DbContexts.GetOrAdd($"{database}_{Table}", (key) => new BridgeDbContext(connectionString, database, Table));
         }
 
-        public override async ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
+        public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
         {
             if (string.IsNullOrWhiteSpace(Geometry))
             {
@@ -30,7 +30,7 @@ namespace ZMap.Source.Postgre
             }
 
             // todo: Filter 怎么才能保证没有 SQL 注入: 不真接暴露地图接口，由后端服务构造请求
-            var filter = Filter?.GetSql();
+            var filter = Filter?.ToQuerySql();
             var where = string.IsNullOrWhiteSpace(filter) ? string.Empty : $"{filter} AND ";
 
             // todo: 使用 PG 的 Simplify 达不到效果, 需要继续研究
@@ -41,7 +41,7 @@ namespace ZMap.Source.Postgre
             if (Properties == null || Properties.Count == 0)
             {
                 sql =
-                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
             else
             {
@@ -50,13 +50,12 @@ namespace ZMap.Source.Postgre
                     : $" , {string.Join(", ", Properties.Where(x => x != "geom"))}";
 
                 sql =
-                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
 
-            if (string.Equals("true", Environment.GetEnvironmentVariable("EnableSensitiveDataLogging"),
-                    StringComparison.InvariantCultureIgnoreCase))
+            if (EnvironmentVariables.EnableSensitiveDataLogging)
             {
-                Log.Logger.LogInformation(sql);
+                Log.Logger.LogInformation("{Sql}", sql);
             }
 
             using var conn = CreateDbConnection();
@@ -96,11 +95,13 @@ namespace ZMap.Source.Postgre
 
         private IDbConnection CreateDbConnection()
         {
-            var builder =
-                new NpgsqlConnectionStringBuilder(ConnectionString)
-                    { Database = Database };
+            var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
+                { Database = Database };
             var connectionString = builder.ToString();
-            return new NpgsqlConnection(connectionString);
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.UseNetTopologySuite();
+            var dataSource = dataSourceBuilder.Build();
+            return dataSource.CreateConnection();
         }
     }
 }

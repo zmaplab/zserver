@@ -15,8 +15,8 @@ public class Env
     {
         visitor.Visit(_functionType1.Items[0], extraData);
 
-        var expression = (ZMap.Style.Expression)visitor.Pop();
-        var resultExpression = ZMap.Style.Expression.New($$"""
+        var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var resultExpression = ZMap.Style.CSharpExpression.New($$"""
 feature.GetEnvValue({{expression.Body}})
 """);
         visitor.Push(resultExpression);

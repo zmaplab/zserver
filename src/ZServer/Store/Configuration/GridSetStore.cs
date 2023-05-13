@@ -4,8 +4,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
+using ZMap.Infrastructure;
 using ZMap.TileGrid;
-using ZMap.Utilities;
 
 namespace ZServer.Store.Configuration
 {
@@ -103,7 +103,7 @@ namespace ZServer.Store.Configuration
                                           ? null
                                           : scaleDenominators,
                                       metersPerUnit,
-                                      pixelSize ?? DefaultGridSets.DEFAULT_PIXEL_SIZE_METER,
+                                      pixelSize ?? DefaultGridSets.DefaultPixelSizeMeter,
                                       null,
                                       tileWidth,
                                       tileHeight,
@@ -118,7 +118,7 @@ namespace ZServer.Store.Configuration
                                       alignTopLeft,
                                       levels.Value,
                                       metersPerUnit,
-                                      pixelSize ?? DefaultGridSets.DEFAULT_PIXEL_SIZE_METER,
+                                      pixelSize ?? DefaultGridSets.DefaultPixelSizeMeter,
                                       tileWidth,
                                       tileHeight,
                                       yCoordinateFirst);

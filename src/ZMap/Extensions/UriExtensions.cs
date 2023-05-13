@@ -1,6 +1,6 @@
 using System;
 
-namespace ZMap.Renderer.SkiaSharp.Extensions
+namespace ZMap.Extensions
 {
     public static class UriExtensions
     {

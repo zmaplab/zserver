@@ -12,20 +12,11 @@ namespace ZMap.Source
         // ReSharper disable once InconsistentNaming
         public int SRID { get; set; }
 
-        public IFeatureFilter Filter { get; private set; }
+        public IFeatureFilter Filter { get; set; }
 
-        public void SetFilter(IFeatureFilter filter)
-        {
-            Filter = filter;
-        }
-
-        public abstract ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
+        public abstract Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
 
         public abstract Envelope GetEnvelope();
-        public ISource Clone()
-        {
-            return (ISource)MemberwiseClone();
-        }
 
         public abstract void Dispose();
     }

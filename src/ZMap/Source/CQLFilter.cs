@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 // ReSharper disable InconsistentNaming
 
@@ -19,12 +19,12 @@ public class CQLFilter : IFeatureFilter
         CQL = cql;
     }
 
-    public string GetSql()
+    public string ToQuerySql()
     {
         return CQL;
     }
 
-    public Func<Feature, bool> GetFunc()
+    public Func<Feature, bool> ToPredicate()
     {
         if (string.IsNullOrWhiteSpace(CQL))
         {
@@ -42,22 +42,24 @@ public class CQLFilter : IFeatureFilter
             var duplicate = new HashSet<string>();
             for (var i = 0; i < pieces.Count; ++i)
             {
-                if (i % 2 == 0)
+                if (i % 2 != 0)
                 {
-                    var piece = pieces[i];
-                    if (duplicate.Contains(piece))
-                    {
-                        continue;
-                    }
-
-                    body = body.Replace(piece, $" feature[\"{piece}\"] ");
-                    duplicate.Add(piece);
+                    continue;
                 }
+
+                var piece = pieces[i];
+                if (duplicate.Contains(piece))
+                {
+                    continue;
+                }
+
+                body = body.Replace(piece, $" feature[\"{piece}\"] ");
+                duplicate.Add(piece);
             }
 
             body = body.Replace("and", " && ").Replace("AND", " && ")
                 .Replace("or", " || ").Replace("OR", " || ");
-            var func = DynamicCompilationUtilities.GetFunc<bool>(body);
+            var func = CSharpDynamicCompiler.GetOrCreateFunc<bool>(body);
             return func;
         });
     }

@@ -6,8 +6,8 @@ namespace ZMap.TileGrid
 {
     public static class GridSetFactory
     {
-        public const double EPSG4326_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360.0;
-        public const double EPSG3857_TO_METERS = 1;
+        private const double Epsg4326ToMeters = 6378137.0 * 2.0 * Math.PI / 360.0;
+        private const double Epsg3857ToMeters = 1;
 
         /**
      * Note that you should provide EITHER resolutions or scales. Providing both will cause a
@@ -94,11 +94,11 @@ namespace ZMap.TileGrid
             {
                 if (srs == 4326)
                 {
-                    gridSet.MetersPerUnit = EPSG4326_TO_METERS;
+                    gridSet.MetersPerUnit = Epsg4326ToMeters;
                 }
                 else if (srs == 3857)
                 {
-                    gridSet.MetersPerUnit = EPSG3857_TO_METERS;
+                    gridSet.MetersPerUnit = Epsg3857ToMeters;
                 }
                 else
                 {
@@ -145,7 +145,7 @@ namespace ZMap.TileGrid
                 {
                     curGrid.Resolution = resolutions[i];
                     curGrid.ScaleDenominator =
-                        resolutions[i] * gridSet.MetersPerUnit / DefaultGridSets.DEFAULT_PIXEL_SIZE_METER;
+                        resolutions[i] * gridSet.MetersPerUnit / DefaultGridSets.DefaultPixelSizeMeter;
                 }
 
                 var mapUnitWidth = tileWidth * curGrid.Resolution;

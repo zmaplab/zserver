@@ -32,12 +32,12 @@ public class PropertyIsLikeType : ComparisonOpsType
     public override object Accept(IFilterVisitor visitor, object extraData)
     {
         visitor.VisitObject(PropertyName, extraData);
-        var propertyExpression = (ZMap.Style.Expression)visitor.Pop();
+        var propertyExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
         visitor.VisitObject(Literal, extraData);
-        var literalExpression = (ZMap.Style.Expression)visitor.Pop();
+        var literalExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-        visitor.Push(ZMap.Style.Expression.New(
+        visitor.Push(ZMap.Style.CSharpExpression.New(
             $"ZMap.SLD.Filter.Methods.Like({propertyExpression.Body}, {literalExpression.Body}, \"{WildCard}\", \"{SingleChar}\", \"{EscapeChar}\")"));
         return null;
     }

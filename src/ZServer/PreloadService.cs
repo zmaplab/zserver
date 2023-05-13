@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ZMap.Source.ShapeFile;
@@ -14,22 +13,20 @@ namespace ZServer
     public class PreloadService : IHostedService
     {
         private readonly ILogger<PreloadService> _logger;
-        private readonly IConfiguration _configuration;
 
-        public PreloadService(ILogger<PreloadService> logger, IConfiguration configuration)
+        public PreloadService(ILogger<PreloadService> logger)
         {
             _logger = logger;
-            _configuration = configuration;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 if (!string.Equals(Environment.GetEnvironmentVariable("PREHEAT"), "false",
                         StringComparison.InvariantCultureIgnoreCase))
                 {
-                    LoadAllShapes().Wait(cancellationToken);
+                    await LoadAllShapes();
                     _logger.LogInformation("Preload completed");
                 }
             }, cancellationToken);
@@ -44,7 +41,7 @@ namespace ZServer
         {
             if (!Directory.Exists(directory))
             {
-                _logger.LogInformation($"目录不存在: {directory}");
+                _logger.LogInformation("目录不存在: {Directory}", directory);
                 return;
             }
 
@@ -66,12 +63,17 @@ namespace ZServer
 
         private async Task LoadShape(string path)
         {
-            _logger.LogInformation($"Start loading {path}");
+            _logger.LogInformation("Start loading {Path}", path);
             var shapeFileSource = new ShapeFileSource(path);
 
             // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
-            (await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326)).ToList();
-            _logger.LogInformation($"Load {path} success");
+            // ReSharper disable once UnusedVariable
+            foreach (var feature in await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326))
+            {
+                
+            }
+
+            _logger.LogInformation("Load {Path} success", path);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

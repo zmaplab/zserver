@@ -57,27 +57,27 @@ namespace ZMap.SLD
             {
                 MinZoom = 0,
                 MaxZoom = Defaults.MaxZoomValue,
-                Filter = Expression<bool?>.New(null),
-                Label = Expression<string>.New(null, $"feature[\"{Label.PropertyName}\"]"),
-                Offset = Expression<float[]>.New(Array.Empty<float>()),
-                Color = Expression<string>.New("#000000"),
-                Opacity = Expression<float>.New(1),
-                BackgroundColor = Expression<string>.New(null),
-                BackgroundOpacity = Expression<float>.New(1),
-                Radius = Expression<float>.New(0),
-                RadiusColor = Expression<string>.New(null),
-                RadiusOpacity = Expression<float>.New(0),
-                Weight = Expression<string>.New(null),
-                Align = Expression<string>.New(null),
-                Rotate = Expression<float>.New(0),
-                Transform = Expression<TextTransform>.New(TextTransform.Lowercase),
-                OutlineSize = Expression<int>.New(0),
-                Font = Expression<List<string>>.New(new List<string>())
+                Filter = CSharpExpression<bool?>.New(null),
+                Label = CSharpExpression<string>.New(null, $"feature[\"{Label.PropertyName}\"]"),
+                Offset = CSharpExpression<float[]>.New(Array.Empty<float>()),
+                Color = CSharpExpression<string>.New("#000000"),
+                Opacity = CSharpExpression<float?>.New(1),
+                BackgroundColor = CSharpExpression<string>.New(null),
+                BackgroundOpacity = CSharpExpression<float?>.New(1),
+                Radius = CSharpExpression<float?>.New(0),
+                RadiusColor = CSharpExpression<string>.New(null),
+                RadiusOpacity = CSharpExpression<float?>.New(0),
+                Weight = CSharpExpression<string>.New(null),
+                Align = CSharpExpression<string>.New(null),
+                Rotate = CSharpExpression<float?>.New(0),
+                Transform = CSharpExpression<TextTransform>.New(TextTransform.Lowercase),
+                OutlineSize = CSharpExpression<int?>.New(0),
+                Font = CSharpExpression<List<string>>.New(new List<string>())
             };
 
             var size = Font.GetOrDefault("font-size");
             textStyle.Size =
-                size.BuildExpression(visitor, extraData, (int)FontType.Defaults["font-size"]);
+                size.BuildExpression(visitor, extraData, (int?)FontType.Defaults["font-size"]);
 
             var families = Font.Where(x => x.Name == "font-family").ToList();
             foreach (var family in families)

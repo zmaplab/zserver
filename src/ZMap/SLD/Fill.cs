@@ -71,7 +71,7 @@ namespace ZMap.SLD
 
             fillStyle.Color =
                 Color.BuildExpression(visitor, extraData, (string)DefaultValues["fill"]);
-            fillStyle.Opacity = Opacity.BuildExpression(visitor, extraData, (float)DefaultValues["fill-opacity"]);
+            fillStyle.Opacity = Opacity.BuildExpression(visitor, extraData, (float?)DefaultValues["fill-opacity"]);
 
             var translate = Parameters.FirstOrDefault(x => x.Name == "fill-translate");
             fillStyle.Translate =

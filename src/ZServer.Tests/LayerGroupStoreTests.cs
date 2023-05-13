@@ -10,7 +10,7 @@ namespace ZServer.Tests
         public async Task FindByName()
         {
             var store = GetScopedService<ILayerGroupStore>();
-            var layerGroup = await store.FindAsync("berlin_group");
+            var layerGroup = await store.FindAsync(null,"berlin_group");
             Assert.NotNull(layerGroup);
             Assert.Equal("berlin_group", layerGroup.Name);
 

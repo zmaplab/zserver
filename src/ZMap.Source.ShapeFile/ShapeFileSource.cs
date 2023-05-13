@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -14,7 +13,7 @@ using NetTopologySuite.IO;
 using NetTopologySuite.IO.ShapeFile.Extended;
 using ProjNet.CoordinateSystems;
 using ZMap.Indexing;
-using ZMap.Utilities;
+using ZMap.Infrastructure;
 
 namespace ZMap.Source.ShapeFile
 {
@@ -26,9 +25,6 @@ namespace ZMap.Source.ShapeFile
         public string File { get; }
 
         private static readonly CoordinateSystemFactory CoordinateSystemFactory = new();
-
-        private static readonly ConcurrentDictionary<string, Func<Feature, bool>>
-            FilterCache = new();
 
         private readonly GeometryFactory _geometryFactory;
 
@@ -44,38 +40,41 @@ namespace ZMap.Source.ShapeFile
         record FileReader
         {
             public BinaryReader Reader { get; set; }
-            public ISpatialIndex<SpatialIndexEntry> Tree { get; set; }
+            public ISpatialIndex<SpatialIndexItem> Tree { get; set; }
         }
 
-        public override ValueTask<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
+        public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
         {
             var features = new List<Feature>();
 
-            var filterFunc = Filter?.GetFunc();
-
-            var tuple = Cache.GetOrCreate(File,
-                entry =>
-                {
-                    var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
-
-                    var stream = mmf.CreateViewStream();
-                    var reader = new BinaryReader(stream, Encoding.Unicode);
-                    var tree = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
-
-                    var result = new FileReader
+            var predicate = Filter?.ToPredicate();
+            FileReader tuple;
+            lock (typeof(ShapeFileSource))
+            {
+                tuple = Cache.GetOrCreate(File,
+                    entry =>
                     {
-                        Reader = reader,
-                        Tree = tree
-                    };
-                    entry.SetValue(result);
-                    entry.SetSlidingExpiration(TimeSpan.FromHours(1));
-                    return result;
-                });
+                        var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
+
+                        var stream = mmf.CreateViewStream();
+                        var reader = new BinaryReader(stream, Encoding.Unicode);
+                        var tree = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
+
+                        var result = new FileReader
+                        {
+                            Reader = reader,
+                            Tree = tree
+                        };
+                        entry.SetValue(result);
+                        entry.SetSlidingExpiration(TimeSpan.FromHours(1));
+                        return result;
+                    });
+            }
 
             var spatialIndexItems = GetObjectIDsInView(tuple.Tree, extent);
             if (spatialIndexItems.Count == 0)
             {
-                return new ValueTask<IEnumerable<Feature>>(Array.Empty<Feature>());
+                return Task.FromResult<IEnumerable<Feature>>(Array.Empty<Feature>());
             }
 
             // ISpatialIndex<SpatialIndexEntry> _tree;
@@ -87,9 +86,9 @@ namespace ZMap.Source.ShapeFile
             {
                 var feature = GetOrCreate(extent, tuple.Reader, dbaseFile, spatialIndexItem);
 
-                if (filterFunc != null)
+                if (predicate != null)
                 {
-                    if (filterFunc(feature))
+                    if (predicate(feature))
                     {
                         features.Add(feature);
                     }
@@ -100,7 +99,7 @@ namespace ZMap.Source.ShapeFile
                 }
             }
 
-            return new ValueTask<IEnumerable<Feature>>(features);
+            return Task.FromResult<IEnumerable<Feature>>(features);
         }
 
         public override Envelope GetEnvelope()
@@ -109,12 +108,12 @@ namespace ZMap.Source.ShapeFile
         }
 
         private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
-            SpatialIndexEntry spatialIndexEntry)
+            SpatialIndexItem spatialIndexItem)
         {
-            return Cache.GetOrCreate($"ShapeFile:{File}:{spatialIndexEntry.Index}", entry =>
+            return Cache.GetOrCreate($"ShapeFile:{File}:{spatialIndexItem.Index}", entry =>
             {
-                var attributes = GetAttribute(dbaseFile, (int)spatialIndexEntry.Index);
-                var geometry = ReadGeometry(spatialIndexEntry, binaryReader);
+                var attributes = GetAttribute(dbaseFile, (int)spatialIndexItem.Index);
+                var geometry = ReadGeometry(spatialIndexItem, binaryReader);
 
                 if (geometry == null
                     || !geometry.IsValid
@@ -180,29 +179,29 @@ namespace ZMap.Source.ShapeFile
             return (int)coordinateSystem.AuthorityCode;
         }
 
-        private List<SpatialIndexEntry> GetObjectIDsInView(ISpatialIndex<SpatialIndexEntry> tree, Envelope bbox)
+        private List<SpatialIndexItem> GetObjectIDsInView(ISpatialIndex<SpatialIndexItem> tree, Envelope bbox)
         {
             //Use the spatial index to get a list of features whose boundingbox intersects bbox
             var res = tree.Query(bbox);
 
             /*Sort oids so we get a forward only read of the shapefile*/
-            var ret = new List<SpatialIndexEntry>(res);
+            var ret = new List<SpatialIndexItem>(res);
             ret.Sort((a, b) => (int)(a.Index - b.Index));
 
             return ret;
         }
 
-        private Geometry ReadGeometry(SpatialIndexEntry entry, BinaryReader reader)
+        private Geometry ReadGeometry(SpatialIndexItem item, BinaryReader reader)
         {
             lock (typeof(ShapeFileSource))
             {
-                var diff = entry.Offset - reader.BaseStream.Position;
+                var diff = item.Offset - reader.BaseStream.Position;
                 reader.BaseStream.Seek(diff, SeekOrigin.Current);
 
                 //Skip record number
                 reader.BaseStream.Seek(8, SeekOrigin.Current);
 
-                var bytes = reader.ReadBytes(entry.Length);
+                var bytes = reader.ReadBytes(item.Length);
                 using var geometryReader = new BigEndianBinaryReader(new MemoryStream(bytes));
 
                 var typeValue = geometryReader.ReadInt32();
@@ -216,7 +215,7 @@ namespace ZMap.Source.ShapeFile
 
                 geometryReader.BaseStream.Seek(0, 0);
 
-                var geometry = handler.Read(geometryReader, entry.Length, _geometryFactory);
+                var geometry = handler.Read(geometryReader, item.Length, _geometryFactory);
                 return geometry;
             }
         }

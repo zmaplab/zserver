@@ -10,7 +10,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using ZMap.DynamicCompiler;
-using ZMap.Source.Postgre;
+using ZMap.Infrastructure;
 using Feature = ZMap.Feature;
 
 namespace ZServer.Tests
@@ -22,10 +22,7 @@ namespace ZServer.Tests
 
         static BaseTests()
         {
-            CSharpDynamicCompiler.Load();
-
-            PostgreSource.Initialize();
-
+            CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
             var serviceCollection = new ServiceCollection();
             var configuration = GetConfiguration();
             serviceCollection.AddMemoryCache();
