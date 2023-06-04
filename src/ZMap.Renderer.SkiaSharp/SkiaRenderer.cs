@@ -11,7 +11,7 @@ public abstract class SkiaRenderer
 
     public virtual void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
     {
-        var paint = CreatePaint();
+        using var paint = CreatePaint();
         if (paint != null)
         {
             Draw(graphics, paint, geometry, extent, width, height);

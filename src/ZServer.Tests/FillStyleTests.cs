@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using SkiaSharp;
 using Xunit;
+using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
 
@@ -47,7 +48,7 @@ namespace ZServer.Tests
         }
 
         [Fact]
-        public void Fill()
+        public async Task Fill()
         {
             var data = GetFeatures();
 
@@ -69,12 +70,12 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/Fill.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/Fill.png", await stream.ToArrayAsync());
         }
 
         [Fact]
-        public void Opacity()
+        public async Task Opacity()
         {
             var data = GetFeatures();
 
@@ -101,12 +102,12 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/OpacityFill.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/Fill.png", await stream.ToArrayAsync());
         }
 
         [Fact]
-        public void LocalImageFill()
+        public async Task LocalImageFill()
         {
             var data = GetFeatures();
 
@@ -130,8 +131,8 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/LocalImageFill.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/LocalImageFill.png", await stream.ToArrayAsync());
         }
     }
 }

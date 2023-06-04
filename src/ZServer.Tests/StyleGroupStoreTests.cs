@@ -27,10 +27,10 @@ namespace ZServer.Tests
 
             Assert.Equal(3, styleGroup.Styles.Count);
             Assert.True(styleGroup.Styles[0] is SpriteFillStyle);
-            Assert.True(styleGroup.Styles[1] is SpriteLineStyle);
+            Assert.True(styleGroup.Styles[1] is LineStyle);
             Assert.True(styleGroup.Styles[2] is TextStyle);
             var fillStyle = (SpriteFillStyle)styleGroup.Styles[0];
-            var lineStyle = (SpriteLineStyle)styleGroup.Styles[1];
+            var lineStyle = (LineStyle)styleGroup.Styles[1];
             var textStyle = (TextStyle)styleGroup.Styles[2];
 
             fillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(1, 1), new Dictionary<string, dynamic>
@@ -38,7 +38,7 @@ namespace ZServer.Tests
                 { "height", 11 }
             }));
             Assert.Equal(true, fillStyle.Filter.Value);
-            Assert.Equal(null, lineStyle.Filter.Value);
+            Assert.Equal(null, lineStyle.Filter);
             Assert.Equal(false, textStyle.Filter.Value);
             Assert.True(fillStyle.Antialias);
             Assert.Equal(1, fillStyle.Opacity.Value);

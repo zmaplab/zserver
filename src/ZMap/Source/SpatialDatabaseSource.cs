@@ -52,7 +52,7 @@ namespace ZMap.Source
         public override string ToString()
         {
             return
-                $"ConnectionString: {ConnectionString}, Database: {Database}, Table: {Table}, SRID: {SRID}, Geometry: {Geometry}";
+                $"ConnectionString: {ConnectionString}, Database: {Database}, Table: {Table}, SRID: {Srid}, Geometry: {Geometry}";
         }
     }
 }

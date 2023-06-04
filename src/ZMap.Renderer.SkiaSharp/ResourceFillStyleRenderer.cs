@@ -1,7 +1,6 @@
 using System.IO;
 using SkiaSharp;
 using ZMap.Extensions;
-using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
@@ -37,49 +36,48 @@ namespace ZMap.Renderer.SkiaSharp
                 return base.CreatePaint();
             }
 
-            var paint = Cache.GetOrCreate($"RESOURCE_FILL_STYLE_PAINT_{opacity}{color}{antialias}{uri}", _ =>
+            SKPaint paint;
+            switch (uri.Scheme)
             {
-                switch (uri.Scheme)
+                case "file":
                 {
-                    case "file":
+                    var path = uri.ToPath();
+                    paint = GetDefaultPaint(color, opacity, antialias);
+                    if (File.Exists(path))
                     {
-                        var path = uri.ToPath();
-                        var paint = GetDefaultPaint(color, opacity);
-                        if (File.Exists(path))
-                        {
-                            paint.Shader = SKShader.CreateBitmap(SKBitmap.Decode(path), SKShaderTileMode.Repeat,
-                                SKShaderTileMode.Repeat);
-                        }
+                        paint.Shader = SKShader.CreateBitmap(SKBitmap.Decode(path), SKShaderTileMode.Repeat,
+                            SKShaderTileMode.Repeat);
+                    }
 
-                        return paint;
-                    }
-                    case "shape":
-                    {
-                        var paint = GetDefaultPaint(color, opacity);
-                        paint.PathEffect = uri.DnsSafeHost switch
-                        {
-                            "times" => Times,
-                            _ => paint.PathEffect
-                        };
-
-                        return paint;
-                    }
-                    default:
-                    {
-                        return GetDefaultPaint(color, opacity);
-                    }
+                    break;
                 }
-            });
+                case "shape":
+                {
+                    paint = GetDefaultPaint(color, opacity, antialias);
+                    paint.PathEffect = uri.DnsSafeHost switch
+                    {
+                        "times" => Times,
+                        _ => paint.PathEffect
+                    };
+
+                    break;
+                }
+                default:
+                {
+                    paint = GetDefaultPaint(color, opacity, antialias);
+                    break;
+                }
+            }
 
             return paint;
         }
 
-        private SKPaint GetDefaultPaint(string color, float opacity)
+        private SKPaint GetDefaultPaint(string color, float opacity, bool antialias)
         {
             var paint = new SKPaint
             {
                 Style = SKPaintStyle.Fill,
-                IsAntialias = true,
+                IsAntialias = antialias,
                 Color = ColorUtilities.GetColor(color, opacity)
             };
             return paint;

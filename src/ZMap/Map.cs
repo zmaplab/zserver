@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -13,7 +14,6 @@ public class Map : IDisposable
     private IGraphicsServiceProvider _graphicsServiceProvider;
     private Zoom _zoom;
     private int _srid;
-
     public IReadOnlyCollection<ILayer> Layers => _layers;
     public string Id { get; private set; }
 
@@ -57,11 +57,11 @@ public class Map : IDisposable
         return this;
     }
 
-    public async Task<byte[]> GetImageAsync(Viewport viewport, string imageFormat)
+    public async Task<Stream> GetImageAsync(Viewport viewport, string imageFormat)
     {
         if (viewport.Extent == null || viewport.Extent.IsNull)
         {
-            return Array.Empty<byte>();
+            return new MemoryStream();
         }
 
         using var graphicsService =
@@ -69,7 +69,7 @@ public class Map : IDisposable
         if (graphicsService == null)
         {
             _logger.LogWarning("Create graphics context failed");
-            return Array.Empty<byte>();
+            return new MemoryStream();
         }
 
         for (var i = _layers.Count - 1; i >= 0; --i)

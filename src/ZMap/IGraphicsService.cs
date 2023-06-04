@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using NetTopologySuite.Geometries;
 using ZMap.Style;
 
@@ -9,7 +10,7 @@ public interface IGraphicsService : IDisposable
     string Identifier { get; }
     int Width { get; }
     int Height { get; }
-    byte[] GetImage(string imageFormat, bool bordered = false);
+    Stream GetImage(string imageFormat, bool bordered = false);
 
     /// <summary>
     /// 渲染影像数据

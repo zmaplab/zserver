@@ -16,6 +16,11 @@ namespace ZServer.Extensions
                 }
                 else
                 {
+                    if (string.IsNullOrEmpty(expression))
+                    {
+                        return null;
+                    }
+
                     return CSharpExpression<bool?>.New(null, expression) as CSharpExpression<T>;
                 }
             }

@@ -198,7 +198,7 @@ namespace ZServer.SiloHost
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddZServer(context.Configuration);
+                    services.AddZServer(context.Configuration,"zserver.json");
                     services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
                 })
                 .ConfigureLogging(builder =>

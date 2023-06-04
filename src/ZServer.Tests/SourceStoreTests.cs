@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using ZMap.Source.Postgre;
 using ZServer.Store;
@@ -29,7 +30,7 @@ namespace ZServer.Tests
 
             Assert.NotNull(dataSource);
             Assert.EndsWith("osmbuildings.shp", dataSource.File);
-            Assert.Equal(4326, dataSource.SRID);
+            Assert.Equal(4326, dataSource.Srid);
         }
 
         [Fact]
@@ -37,18 +38,18 @@ namespace ZServer.Tests
         {
             var sourceStore = GetScopedService<ISourceStore>();
             var dataSources = await sourceStore.GetAllAsync();
-            var dataSource1 = (PostgreSource)dataSources[0];
+            var dataSource1 = (PostgreSource)dataSources.First(x => x is PostgreSource);
             Assert.NotNull(dataSource1);
             Assert.Equal(
                 "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
                 dataSource1.ConnectionString);
             Assert.Equal("berlin", dataSource1.Database);
 
-            var dataSource2 = (ShapeFileSource)dataSources[1];
+            var dataSource2 = (ShapeFileSource)dataSources.First(x => x is ShapeFileSource);
             Assert.NotNull(dataSource2);
-        
+
             Assert.EndsWith("osmbuildings.shp", dataSource2.File);
-            Assert.Equal(4326, dataSource2.SRID);
+            Assert.Equal(4326, dataSource2.Srid);
         }
     }
 }

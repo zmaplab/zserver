@@ -7,7 +7,7 @@ namespace ZServer.Store
     /// <summary>
     /// Layer 配置存储器
     /// </summary>
-    public interface ILayerStore
+    public interface ILayerStore : IRefresher
     {
         /// <summary>
         /// 

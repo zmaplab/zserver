@@ -35,6 +35,11 @@ namespace ZMap.Style
             }
         }
 
+        public CSharpExpression<TV> Clone()
+        {
+            return New(Value, Body);
+        }
+
         public void Invoke(Feature feature, TV defaultValue = default)
         {
             if (Value != null)
@@ -49,6 +54,7 @@ namespace ZMap.Style
                     {
                         return;
                     }
+
                     var output = func.Invoke(feature);
                     if (output != null)
                     {
@@ -60,7 +66,7 @@ namespace ZMap.Style
             {
                 if (string.IsNullOrWhiteSpace(Body))
                 {
-                    Value =  defaultValue;
+                    Value = defaultValue;
                 }
                 else
                 {
@@ -72,7 +78,7 @@ namespace ZMap.Style
                     }
                     else
                     {
-                        Value =  defaultValue;
+                        Value = defaultValue;
                     }
                 }
             }

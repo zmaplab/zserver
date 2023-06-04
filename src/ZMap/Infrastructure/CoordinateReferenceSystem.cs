@@ -128,6 +128,33 @@ namespace ZMap.Infrastructure
             return result;
         }
 
+        public static Point Transform(this Point point, int sourceSrid, int targetSrid)
+        {
+            if (point == null)
+            {
+                return null;
+            }
+
+            if (point.IsEmpty)
+            {
+                return point;
+            }
+
+            if (sourceSrid == targetSrid)
+            {
+                return (Point)point.Copy();
+            }
+
+            var transformation = CreateTransformation(sourceSrid, targetSrid);
+            if (transformation == null)
+            {
+                throw new ArgumentException("创建投影转换失败");
+            }
+
+            var coordinate = Transform(new Coordinate(point.X, point.Y), transformation);
+            return new Point(coordinate);
+        }
+
         /// <summary>
         ///  todo: 是否需要所有类型的图形都转换
         /// </summary>

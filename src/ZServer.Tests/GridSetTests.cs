@@ -35,6 +35,7 @@ namespace ZServer.Tests
         public async Task GetDefaultGridSet()
         {
             var store = GetScopedService<IGridSetStore>();
+      
             var gridSet4326 = await store.FindAsync("EPSG:4326");
 
 
@@ -59,7 +60,7 @@ namespace ZServer.Tests
         public async Task GetStoreGridSet()
         {
             var store = GetScopedService<IGridSetStore>();
-
+ 
             var gridSet4326 = await store.FindAsync("epsg4326test");
 
             var tuple = gridSet4326.GetEnvelope("14", 27058, 5295);

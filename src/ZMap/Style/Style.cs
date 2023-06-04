@@ -27,5 +27,7 @@ namespace ZMap.Style
         {
             Filter?.Invoke(feature);
         }
+
+        public abstract Style Clone();
     }
 }

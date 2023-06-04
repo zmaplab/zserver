@@ -7,7 +7,7 @@ namespace ZServer.Store
     /// <summary>
     /// 
     /// </summary>
-    public interface IResourceGroupStore
+    public interface IResourceGroupStore : IRefresher
     {
         /// <summary>
         /// 通过名称查找工作区

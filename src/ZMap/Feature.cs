@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NetTopologySuite.Geometries;
@@ -8,7 +9,7 @@ using ZMap.Infrastructure;
 
 namespace ZMap
 {
-    public record Feature
+    public class Feature : IDisposable
     {
         private readonly IDictionary<string, dynamic> _attributes;
         private IReadOnlyDictionary<string, dynamic> _environments;
@@ -87,6 +88,13 @@ namespace ZMap
             // 大地坐标系最大可用精度是 0.0001 米， 0.00001 开始会消除不掉异常点
             var distanceTolerance = coordinateSystem is GeographicCoordinateSystem ? 0.00001 : 0.0001;
             Geometry = VWSimplifier.Simplify(Geometry, distanceTolerance);
+        }
+
+        public void Dispose()
+        {
+            Geometry = null;
+            _attributes.Clear();
+            _environments = null;
         }
     }
 }

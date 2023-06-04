@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
+using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
 
@@ -9,7 +11,7 @@ namespace ZServer.Tests
     public class CompositeStyleTests : BaseTests
     {
         [Fact]
-        public void StrokeAndFill()
+        public async Task StrokeAndFill()
         {
             var data = GetFeatures();
 
@@ -48,12 +50,13 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style2);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/StrokeAndFill.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            var bytes = await stream.ToArrayAsync();
+            await File.WriteAllBytesAsync($"images/StrokeAndFill.png", bytes);
         }
 
         [Fact]
-        public void Hatching()
+        public async Task Hatching()
         {
             var data = GetFeatures();
             Uri.TryCreate("shape://times", UriKind.Absolute, out var uri);
@@ -91,8 +94,8 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style2);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/Hatching.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/Hatching.png", await stream.ToArrayAsync());
         }
     }
 }

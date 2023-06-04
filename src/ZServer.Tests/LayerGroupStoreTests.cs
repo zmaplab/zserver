@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using ZServer.Store;
 using Xunit;
 
@@ -30,13 +31,13 @@ namespace ZServer.Tests
             var layerGroups = await store.GetAllAsync();
             Assert.NotNull(layerGroups);
             Assert.Equal(2, layerGroups.Count);
-            Assert.Equal("berlin_group", layerGroups[0].Name);
-            Assert.Equal("berlin_group2", layerGroups[1].Name);
-           
-            Assert.Equal("resourceGroup1", layerGroups[0].ResourceGroup.Name);
-            Assert.Contains("This is my first resource group", layerGroups[0].ResourceGroup.Description);
-            Assert.Equal("resourceGroup2", layerGroups[1].ResourceGroup.Name);
-            Assert.Contains("This is my second resource group", layerGroups[1].ResourceGroup.Description);
+            var berlinGroup = layerGroups.First(x => x.Name == "berlin_group");
+            var berlinGroup2= layerGroups.First(x => x.Name == "berlin_group2");
+ 
+            Assert.Equal("resourceGroup1", berlinGroup.ResourceGroup.Name);
+            Assert.Contains("This is my first resource group", berlinGroup.ResourceGroup.Description);
+            Assert.Equal("resourceGroup2", berlinGroup2.ResourceGroup.Name);
+            Assert.Contains("This is my second resource group", berlinGroup2.ResourceGroup.Description);
         }
 
     }

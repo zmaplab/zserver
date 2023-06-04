@@ -1,7 +1,5 @@
 // ReSharper disable InconsistentNaming
 
-using System;
-
 namespace ZServer
 {
     public static class Constants

@@ -1,5 +1,3 @@
-using System;
-
 namespace ZMap.SLD.Filter;
 
 /// <summary>

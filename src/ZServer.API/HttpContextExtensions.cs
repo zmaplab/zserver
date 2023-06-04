@@ -15,6 +15,38 @@ namespace ZServer.API
         {
             Options.Converters.Add(new GeoJsonConverterFactory());
         }
+        
+        // public static async Task WriteMapImageAsync(this HttpContext httpContext, string code, string message, Stream stream, string imageFormat,
+        //     string infoFormat = "text/xml")
+        // {
+        //     if (string.IsNullOrEmpty(message))
+        //     {
+        //         httpContext.Response.ContentType = imageFormat;
+        //         httpContext.Response.ContentLength = stream.Length;
+        //         await stream.CopyToAsync(httpContext.Response.Body);
+        //     }
+        //     else
+        //     {
+        //         var exceptionReport = new ServerExceptionReport
+        //         {
+        //             Exceptions = new List<ServerException>
+        //             {
+        //                 new()
+        //                 {
+        //                     Code = code,
+        //                     Locator = null,
+        //                     Text = message
+        //                 }
+        //             }
+        //         };
+        //         var bytes = exceptionReport.Serialize(infoFormat);
+        //
+        //         httpContext.Response.ContentType = infoFormat;
+        //         httpContext.Response.ContentLength = bytes.Length;
+        //         await httpContext.Response.BodyWriter.WriteAsync(bytes);
+        //         await httpContext.Response.BodyWriter.FlushAsync();
+        //     }
+        // }
 
         public static async Task WriteMapImageAsync(this HttpContext httpContext, MapResult result,
             string infoFormat = "text/xml")

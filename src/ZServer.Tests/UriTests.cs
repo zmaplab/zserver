@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Xunit;
 using ZMap.Extensions;
-using ZMap.Renderer.SkiaSharp.Extensions;
 
 namespace ZServer.Tests
 {

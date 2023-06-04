@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Npgsql;
@@ -41,7 +42,7 @@ namespace ZMap.Source.Postgre
             if (Properties == null || Properties.Count == 0)
             {
                 sql =
-                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {Srid}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
             else
             {
@@ -50,7 +51,7 @@ namespace ZMap.Source.Postgre
                     : $" , {string.Join(", ", Properties.Where(x => x != "geom"))}";
 
                 sql =
-                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {SRID}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {Srid}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
             }
 
             if (EnvironmentVariables.EnableSensitiveDataLogging)
@@ -60,7 +61,7 @@ namespace ZMap.Source.Postgre
 
             using var conn = CreateDbConnection();
 
-            return (await conn.QueryAsync(sql, null, null, 10)).Select(x =>
+            return (await conn.QueryAsync(sql, null, null, 30)).Select(x =>
             {
                 var f = new Feature(Geometry, x);
                 if (f.Geometry.SRID != -1)
@@ -72,12 +73,12 @@ namespace ZMap.Source.Postgre
                 {
                     foreach (var geom in geometryCollection)
                     {
-                        geom.SRID = SRID;
+                        geom.SRID = Srid;
                     }
                 }
                 else
                 {
-                    f.Geometry.SRID = SRID;
+                    f.Geometry.SRID = Srid;
                 }
 
                 return f;
@@ -89,18 +90,30 @@ namespace ZMap.Source.Postgre
             return null;
         }
 
+        public override ISource Clone()
+        {
+            return (ISource)MemberwiseClone();
+        }
+
         public override void Dispose()
         {
         }
 
         private IDbConnection CreateDbConnection()
         {
-            var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
-                { Database = Database };
-            var connectionString = builder.ToString();
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-            dataSourceBuilder.UseNetTopologySuite();
-            var dataSource = dataSourceBuilder.Build();
+            var dataSource = Cache.GetOrCreate(Name, entry =>
+            {
+                var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
+                    { Database = Database };
+                var connectionString = builder.ToString();
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+                dataSourceBuilder.UseNetTopologySuite();
+                var dataSource = dataSourceBuilder.Build();
+                entry.SetValue(dataSource);
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(15));
+                return dataSource;
+            });
+
             return dataSource.CreateConnection();
         }
     }

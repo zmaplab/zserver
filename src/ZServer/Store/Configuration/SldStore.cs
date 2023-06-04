@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using ZMap.SLD;
 using ZMap.Style;
 
@@ -8,15 +10,20 @@ namespace ZServer.Store.Configuration;
 
 public class SldStore : ISldStore
 {
-    private static readonly Dictionary<string, List<StyleGroup>> Cache;
+    private static readonly ConcurrentDictionary<string, List<StyleGroup>> Cache = new();
 
-    static SldStore()
+    public Task<List<StyleGroup>> FindAsync(string name)
     {
-        Cache = new Dictionary<string, List<StyleGroup>>();
+        var result = Cache.TryGetValue(name, out var value) ? value : null;
+        return Task.FromResult(result);
+    }
+
+    public Task Refresh(IConfiguration configuration)
+    {
         var dir = "Sld";
         if (!Directory.Exists(dir))
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var files = Directory.GetFiles(dir);
@@ -28,14 +35,10 @@ public class SldStore : ISldStore
 
             if (!string.IsNullOrWhiteSpace(sld.Name))
             {
-                Cache.TryAdd(sld.Name, visitor.StyleGroups);
+                Cache.AddOrUpdate(sld.Name, visitor.StyleGroups, (_, _) => visitor.StyleGroups);
             }
         }
-    }
 
-    public Task<List<StyleGroup>> FindAsync(string name)
-    {
-        var result = Cache.TryGetValue(name, out var value) ? value : null;
-        return Task.FromResult(result);
+        return Task.CompletedTask;
     }
 }

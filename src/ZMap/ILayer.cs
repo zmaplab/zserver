@@ -26,6 +26,8 @@ namespace ZMap
         /// </summary>
         IReadOnlyCollection<StyleGroup> StyleGroups { get; }
 
+        string GetResourceGroupName();
+
         /// <summary>
         /// 是否启用
         /// </summary>
@@ -47,5 +49,6 @@ namespace ZMap
         Task RenderAsync(IGraphicsService service, Viewport viewport, Zoom zoom, int targetSrid);
 
         // void ClearEnvironments();
+        ILayer Clone();
     }
 }
