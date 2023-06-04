@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZServer.Store;
 using ZServer.Store.Configuration;
+using ZServer.Wms;
+using ZServer.Wmts;
+using ConfigurationProvider = ZServer.Store.Configuration.ConfigurationProvider;
 
 [assembly: InternalsVisibleTo("ZServer.Tests")]
 
@@ -17,7 +20,7 @@ namespace ZServer
     {
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static ZServerBuilder AddZServer(this IServiceCollection serviceCollection,
-            IConfiguration configuration)
+            IConfiguration configuration, string layersConfiguration)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -32,9 +35,13 @@ namespace ZServer
             serviceCollection.TryAddScoped<IStyleGroupStore, StyleGroupStore>();
             serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
             serviceCollection.TryAddScoped<ISldStore, SldStore>();
+            serviceCollection.TryAddSingleton(_ => new ConfigurationProvider(layersConfiguration));
+            serviceCollection.AddHostedService<ConfigurationSyncService>();
 
             serviceCollection.AddHostedService<PreloadService>();
             serviceCollection.TryAddScoped<ILayerQuerier, LayerQuerier>();
+            serviceCollection.TryAddScoped<IWmsService, WmsService>();
+            serviceCollection.TryAddScoped<IWmtsService, WmtsService>();
             serviceCollection.AddMemoryCache();
             return new ZServerBuilder(serviceCollection);
         }

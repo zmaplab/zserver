@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Force.DeepCloner;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using ProjNet.CoordinateSystems.Transformations;
 using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.Source;
@@ -47,7 +47,7 @@ namespace ZMap
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool Enabled { get; private set; }
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// 显示范围(一般由数据源覆盖范围决定)
@@ -67,7 +67,12 @@ namespace ZMap
         /// <summary>
         /// 空间标识符
         /// </summary>
-        public int Srid => Source.SRID;
+        public int Srid => Source.Srid;
+
+        public virtual string GetResourceGroupName()
+        {
+            return null;
+        }
 
         public Layer(string name, ISource source, List<StyleGroup> styleGroups, Envelope envelope = null)
         {
@@ -126,18 +131,15 @@ namespace ZMap
             //     }
             // }
 
-            // comments: Envelope 范围已经先全转成了数据源
+            // comments: 此转换不可少的原因是，若以数据源的坐标系绘制图片，会导致偏差，在图片与图片接缝处对不齐
             // // 使用应用层投影转换的原因是规避数据库支持问题
             // // 假如只是使用数据库当成存储层， 则不考虑空间计算问题， 完全可以把矢量数据存成二进制， 计算好图形的 extent 存为 minx, maxX, miny, maxy
             // // 则可以通过计算求出相交的所有图形
-            // ICoordinateTransformation transformation = null;
-            //
-            // if (SRID != srid)
-            // {
-            //     transformation = CoordinateTransformUtilities.GetTransformation(SRID, srid);
-            // }
-            if (_environments.ContainsKey(Defaults.WmsScaleKey))
+            ICoordinateTransformation transformation = null;
+
+            if (Srid != srid)
             {
+                transformation = CoordinateReferenceSystem.CreateTransformation(Srid, srid);
             }
 
             _environments[Defaults.WmsScaleKey] = zoom.Value;
@@ -162,12 +164,18 @@ namespace ZMap
                         queryEnvelope = extent;
                     }
 
-                    await RenderVectorAsync(graphicsService, vectorSource, queryEnvelope, extent, zoom);
+                    await RenderVectorAsync(graphicsService, vectorSource,
+                        queryEnvelope, viewport.Extent, zoom, transformation);
                     break;
                 case IRasterSource rasterSource:
-                    await RenderRasterAsync(graphicsService, rasterSource, extent, zoom);
+                    await RenderRasterAsync(graphicsService, rasterSource, viewport.Extent, zoom);
                     break;
             }
+        }
+
+        public virtual ILayer Clone()
+        {
+            return null;
         }
 
         // public void ClearEnvironments()
@@ -203,7 +211,7 @@ namespace ZMap
             Envelope queryEnvelope,
             Envelope targetExtent,
             Zoom zoom
-            // , ICoordinateTransformation transformation
+            , ICoordinateTransformation transformation
         )
         {
             // 需要考虑 CRS 的 AxisOrder.NORTH_EAST， 影响 Feature -> Word 的转换算法
@@ -226,17 +234,17 @@ namespace ZMap
                 // simplify 的算法要控制，消点效果不是很好
                 // feature.Simplify();
 
-                // if (transformation != null)
-                // {
-                //     feature.Transform(transformation);
-                // }
+                if (transformation != null)
+                {
+                    feature.Transform(transformation);
+                }
 
                 feature.SetEnvironment(_environments);
 
                 foreach (var styleGroup in StyleGroups)
                 {
                     // 若有配置过滤表达式， 则计算
-                    if (styleGroup.Filter.Value.HasValue && styleGroup.Filter.Value.Value)
+                    if (styleGroup.Filter is { Value: not null } && styleGroup.Filter.Value.Value)
                     {
                         continue;
                     }
@@ -246,7 +254,7 @@ namespace ZMap
                         continue;
                     }
 
-                    var styleGroup1 = styleGroup.DeepClone();
+                    var styleGroup1 = styleGroup;
                     styleGroup1.Accept(StyleVisitor, feature);
 
                     foreach (var style in styleGroup1.Styles)
@@ -257,7 +265,7 @@ namespace ZMap
                         }
 
                         // 若有配置过滤表达式， 则计算
-                        if (style.Filter.Value.HasValue && style.Filter.Value.Value)
+                        if (style.Filter is { Value: not null } && style.Filter.Value.Value)
                         {
                             continue;
                         }
@@ -266,6 +274,7 @@ namespace ZMap
                     }
                 }
 
+                feature.Dispose();
                 count++;
             }
 

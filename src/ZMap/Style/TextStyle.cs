@@ -65,5 +65,33 @@ namespace ZMap.Style
             Offset?.Invoke(feature);
             OutlineSize?.Invoke(feature, 2);
         }
+
+        public override Style Clone()
+        {
+            return new TextStyle()
+            {
+                MaxZoom = MaxZoom,
+                MinZoom = MinZoom,
+                ZoomUnit = ZoomUnit,
+                Label = Label?.Clone(),
+                Color = Color?.Clone(),
+                Translate = Translate?.Clone(),
+                Opacity = Opacity?.Clone(),
+                BackgroundColor = BackgroundColor?.Clone(),
+                BackgroundOpacity = BackgroundOpacity?.Clone(),
+                Radius = Radius?.Clone(),
+                RadiusColor = RadiusColor?.Clone(),
+                RadiusOpacity = RadiusOpacity?.Clone(),
+                Font = Font?.Clone(),
+                Size = Size?.Clone(),
+                Weight = Weight?.Clone(),
+                Style = Style?.Clone(),
+                Align = Align?.Clone(),
+                Rotate = Rotate?.Clone(),
+                Transform = Transform?.Clone(),
+                Offset = Offset?.Clone(),
+                OutlineSize = OutlineSize?.Clone()
+            };
+        }
     }
 }

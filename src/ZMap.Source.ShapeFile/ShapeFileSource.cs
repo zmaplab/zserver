@@ -32,9 +32,14 @@ namespace ZMap.Source.ShapeFile
         public ShapeFileSource(string file)
         {
             File = new FileInfo(file).FullName;
-            SRID = GetSrid(file);
+            Srid = GetSrid(file);
             _geometryFactory =
-                NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), SRID);
+                NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), Srid);
+        }
+
+        public override ISource Clone()
+        {
+            return (ISource)MemberwiseClone();
         }
 
         record FileReader
@@ -55,7 +60,6 @@ namespace ZMap.Source.ShapeFile
                     entry =>
                     {
                         var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
-
                         var stream = mmf.CreateViewStream();
                         var reader = new BinaryReader(stream, Encoding.Unicode);
                         var tree = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
@@ -66,7 +70,7 @@ namespace ZMap.Source.ShapeFile
                             Tree = tree
                         };
                         entry.SetValue(result);
-                        entry.SetSlidingExpiration(TimeSpan.FromHours(1));
+                        entry.SetSlidingExpiration(TimeSpan.FromDays(365));
                         return result;
                     });
             }
@@ -110,35 +114,30 @@ namespace ZMap.Source.ShapeFile
         private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
             SpatialIndexItem spatialIndexItem)
         {
-            return Cache.GetOrCreate($"ShapeFile:{File}:{spatialIndexItem.Index}", entry =>
+            var attributes = GetAttribute(dbaseFile, (int)spatialIndexItem.Index);
+            var geometry = ReadGeometry(spatialIndexItem, binaryReader);
+
+            if (geometry == null
+                || !geometry.IsValid
+                || !queryExtent.Intersects(geometry.EnvelopeInternal))
             {
-                var attributes = GetAttribute(dbaseFile, (int)spatialIndexItem.Index);
-                var geometry = ReadGeometry(spatialIndexItem, binaryReader);
+                return null;
+            }
 
-                if (geometry == null
-                    || !geometry.IsValid
-                    || !queryExtent.Intersects(geometry.EnvelopeInternal))
+            var dict = new Dictionary<string, object>();
+            foreach (var name in attributes.GetNames())
+            {
+                var value = attributes[name];
+                if (value is string v)
                 {
-                    return null;
+                    value = v.Replace("\0", "").Trim();
                 }
 
-                var dict = new Dictionary<string, object>();
-                foreach (var name in attributes.GetNames())
-                {
-                    var value = attributes[name];
-                    if (value is string v)
-                    {
-                        value = v.Replace("\0", "").Trim();
-                    }
+                dict.Add(name, value);
+            }
 
-                    dict.Add(name, value);
-                }
-
-                var f = new Feature(geometry, dict);
-                entry.SetValue(f);
-                entry.SetAbsoluteExpiration(TimeSpan.FromDays(12));
-                return f;
-            });
+            var f = new Feature(geometry, dict);
+            return f;
         }
 
         private IAttributesTable GetAttribute(DbaseReader dbaseFile, int index)

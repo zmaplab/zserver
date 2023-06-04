@@ -1,56 +1,49 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using ZMap.Infrastructure;
 using ZServer.Entity;
 
 namespace ZServer.Store.Configuration
 {
     public class ResourceGroupStore : IResourceGroupStore
     {
-        private readonly IConfiguration _configuration;
-        private readonly ServerOptions _options;
+        private static Dictionary<string, ResourceGroup> _cache = new();
 
-        public ResourceGroupStore(IConfiguration configuration,
-            IOptionsMonitor<ServerOptions> options)
+        public Task Refresh(IConfiguration configuration)
         {
-            _configuration = configuration;
-            _options = options.CurrentValue;
+            var sections = configuration.GetSection("resourceGroups");
+            var dict = new Dictionary<string, ResourceGroup>();
+            foreach (var section in sections.GetChildren())
+            {
+                var resourceGroup = section.Get<ResourceGroup>();
+                if (resourceGroup == null)
+                {
+                    continue;
+                }
+
+                resourceGroup.Name = section.Key;
+                dict.TryAdd(section.Key, resourceGroup);
+            }
+
+            _cache = dict;
+            return Task.CompletedTask;
         }
 
         public async Task<ResourceGroup> FindAsync(string name)
         {
-            // Group 只是一个逻辑组织，没有逻辑，即对象状态不会变化，因此不需要克隆
-            return string.IsNullOrWhiteSpace(name)
-                ? null
-                : await Cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>
-                {
-                    var section = _configuration.GetSection($"resourceGroups:{name}");
-
-                    var resourceGroup = section.Get<ResourceGroup>();
-                    if (resourceGroup != null)
-                    {
-                        resourceGroup.Name = name;
-                    }
-
-                    entry.SetValue(resourceGroup);
-                    entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
-                    return Task.FromResult(resourceGroup);
-                });
-        }
-
-        public async Task<List<ResourceGroup>> GetAllAsync()
-        {
-            var result = new List<ResourceGroup>();
-            foreach (var child in _configuration.GetSection("resourceGroups").GetChildren())
+            if (_cache.TryGetValue(name, out var resourceGroup))
             {
-                result.Add(await FindAsync(child.Key));
+                return await Task.FromResult(resourceGroup.Clone());
             }
 
-            return result;
+            return null;
+        }
+
+        public Task<List<ResourceGroup>> GetAllAsync()
+        {
+            var items = _cache.Values.Select(x => x.Clone()).ToList();
+            return Task.FromResult(items);
         }
     }
 }

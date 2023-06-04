@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Orleans;
 using ZServer.Interfaces.WMS;
+using ZServer.Wms;
 
 namespace ZServer.API.Controllers
 {
@@ -13,10 +15,14 @@ namespace ZServer.API.Controllers
     public class WMSController : ControllerBase
     {
         private readonly Lazy<IClusterClient> _clusterClient;
+        private readonly IConfiguration _configuration;
+        private readonly IWmsService _wmsService;
 
-        public WMSController(Lazy<IClusterClient> clusterClient)
+        public WMSController(Lazy<IClusterClient> clusterClient, IConfiguration configuration, IWmsService wmsService)
         {
             _clusterClient = clusterClient;
+            _configuration = configuration;
+            _wmsService = wmsService;
         }
 
         /// <summary>
@@ -35,7 +41,7 @@ namespace ZServer.API.Controllers
         /// <param name="height">渲染图片的高度</param>
         /// <param name="format">返回图片的格式，一般使用 PNG</param>
         /// <param name="transparent"></param>
-        /// <param name="bgcolor">图片背景色</param>
+        /// <param name="bgColor">图片背景色</param>
         /// <param name="time">请求的时间搓</param>
         /// <param name="filter">CQL_FILTER，编写 SQL 后面的 WHERE 限制条件</param>
         /// <param name="formatOptions">格式化参数，参考 WMS 标准</param>
@@ -55,7 +61,7 @@ namespace ZServer.API.Controllers
             int height,
             string format,
             bool transparent,
-            string bgcolor,
+            string bgColor,
             int time,
             [FromQuery(Name = "CQL_FILTER")] string filter,
             [FromQuery(Name = "FORMAT_OPTIONS")] string formatOptions,
@@ -69,7 +75,7 @@ namespace ZServer.API.Controllers
                     var friend = _clusterClient.Value.GetGrain<IWMSGrain>("0/0/0");
                     var result =
                         await friend.GetMapAsync(layers, styles, srs, bbox, width, height, format,
-                            transparent, bgcolor, time,
+                            transparent, bgColor, time,
                             formatOptions, filter,
                             new Dictionary<string, object>
                             {
@@ -79,6 +85,7 @@ namespace ZServer.API.Controllers
                             });
 
                     await HttpContext.WriteMapImageAsync(result, exceptions);
+
                     break;
                 }
                 case "GetFeatureInfo":

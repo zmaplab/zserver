@@ -91,7 +91,7 @@ namespace ZMap.Renderer.SkiaSharp
             }
             else
             {
-                image = Cache.GetOrCreate($"SYMBOL_STYLE_IMAGE_{_style.Uri.Value}", _ =>
+                image = Cache.GetOrCreate($"SSI_{_style.Uri.Value}", _ =>
                 {
                     switch (uri.Scheme)
                     {

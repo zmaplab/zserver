@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Style;
@@ -34,7 +35,7 @@ public class SkiaGraphicsService : IGraphicsService
         Identifier = identifier;
     }
 
-    public byte[] GetImage(string imageFormat, bool bordered = false)
+    public Stream GetImage(string imageFormat, bool bordered = false)
     {
         if (bordered)
         {
@@ -42,7 +43,7 @@ public class SkiaGraphicsService : IGraphicsService
         }
 
         _canvas.Flush();
-        return _bitmap.Encode(GetImageFormat(imageFormat), 90).ToArray();
+        return _bitmap.Encode(GetImageFormat(imageFormat), 90).AsStream();
     }
 
     public void Render(byte[] image, RasterStyle style)

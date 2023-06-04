@@ -36,6 +36,26 @@ namespace ZMap.Style
         /// </summary>
         public List<Style> Styles { get; set; } = new();
 
+        public StyleGroup Clone()
+        {
+            var styleGroup = new StyleGroup
+            {
+                Filter = Filter?.Clone(),
+                Name = Name,
+                Description = Description,
+                MinZoom = MinZoom,
+                MaxZoom = MaxZoom,
+                ZoomUnit = ZoomUnit
+            };
+
+            foreach (var style in Styles)
+            {
+                styleGroup.Styles.Add(style.Clone());
+            }
+
+            return styleGroup;
+        }
+
         public void Accept(IZMapStyleVisitor visitor, Feature feature)
         {
             if (Styles == null)

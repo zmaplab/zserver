@@ -12,5 +12,22 @@ namespace ZMap.Style
 
             Uri?.Invoke(feature);
         }
+
+        public override Style Clone()
+        {
+            return new ResourceFillStyle
+            {
+                MaxZoom = MaxZoom,
+                MinZoom = MinZoom,
+                ZoomUnit = ZoomUnit,
+                Antialias = Antialias,
+                Opacity = Opacity?.Clone(),
+                Pattern = Pattern?.Clone(),
+                Color = Color?.Clone(),
+                Translate = Translate?.Clone(),
+                TranslateAnchor = TranslateAnchor?.Clone(),
+                Uri = Uri?.Clone()
+            };
+        }
     }
 }

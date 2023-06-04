@@ -1,6 +1,5 @@
 using Xunit;
 using ZMap;
-using ZMap.SLD.Filter;
 
 namespace ZServer.Tests;
 

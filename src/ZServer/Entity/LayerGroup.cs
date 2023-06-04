@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Force.DeepCloner;
 using ZMap;
 
 namespace ZServer.Entity
@@ -22,12 +21,23 @@ namespace ZServer.Entity
 
         public LayerGroup Clone()
         {
-            var layerGroup= this.DeepClone();
-            
-            // foreach (var layer in layerGroup.Layers)
-            // {
-            //     layer.ClearEnvironments();
-            // }
+            var layerGroup = new LayerGroup
+            {
+                Name = Name,
+                Services = Services,
+                ResourceGroup = ResourceGroup,
+                Layers = new List<ILayer>()
+            };
+
+            if (Layers == null)
+            {
+                return layerGroup;
+            }
+
+            foreach (var layer in Layers)
+            {
+                layerGroup.Layers.Add(layer.Clone());
+            }
 
             return layerGroup;
         }

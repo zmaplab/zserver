@@ -1,19 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
-using ZMap;
-using ZMap.Infrastructure;
-using ZMap.Source;
-using ZServer.Extensions;
+using ZMap.Extensions;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMS;
+using ZServer.Wms;
 
 namespace ZServer.Grains.WMS
 {
@@ -24,17 +19,17 @@ namespace ZServer.Grains.WMS
     // ReSharper disable once InconsistentNaming
     public class WMSGrain : Grain, IWMSGrain
     {
-        private readonly ILogger<WMSGrain> _logger;
-        private readonly ILayerQuerier _layerQuerier;
-        private readonly IGraphicsServiceProvider _graphicsServiceProvider;
+        private readonly IWmsService _wmsService;
 
-        public WMSGrain(ILogger<WMSGrain> logger,
-            ILayerQuerier layerQuerier,
-            IGraphicsServiceProvider graphicsServiceProvider)
+        public WMSGrain(IWmsService wmsService)
         {
-            _logger = logger;
-            _layerQuerier = layerQuerier;
-            _graphicsServiceProvider = graphicsServiceProvider;
+            _wmsService = wmsService;
+        }
+
+        public Task<MapResult> GetCapabilitiesAsync(string version, string format,
+            IDictionary<string, object> arguments)
+        {
+            return Task.FromResult(new MapResult());
         }
 
         /// <summary>
@@ -76,77 +71,17 @@ namespace ZServer.Grains.WMS
             int width, int height, string format, bool transparent, string bgColor, int time,
             string formatOptions, string cqlFilter, IDictionary<string, object> extras)
         {
-            var traceIdentifier = extras.GetTraceIdentifier();
-            var displayUrl =
-                $"[{traceIdentifier}] LAYERS={layers}&FORMAT={format}&SRS={srs}&BBOX={bbox}&WIDTH={width}&HEIGHT={height}&FILTER={cqlFilter}&FORMAT_OPTIONS={formatOptions}";
-            try
+            var result = await _wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                transparent, bgColor, time,
+                formatOptions, cqlFilter, extras);
+            if (!string.IsNullOrEmpty(result.Code))
             {
-                var modeState =
-                    ModeStateUtilities.VerifyWmsGetMapArguments(layers, srs, bbox, width, height, format);
-                if (!modeState.IsValid)
-                {
-                    _logger.LogError("{Url}, arguments error", displayUrl);
-                    return MapResult.Failed(modeState.Text, modeState.Code);
-                }
-
-                var dpi = Utilities.GetDpi(formatOptions);
-
-                var filters = string.IsNullOrWhiteSpace(cqlFilter)
-                    ? Array.Empty<string>()
-                    : cqlFilter.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-
-                var layerQueries =
-                    new List<QueryLayerParams>();
-
-                for (var i = 0; i < modeState.Layers.Count; ++i)
-                {
-                    layerQueries.Add(new QueryLayerParams(modeState.Layers[i].ResourceGroup, modeState.Layers[i].Layer,
-                        new Dictionary<string, object>
-                        {
-                            { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
-                        }));
-                }
-
-                var layerList = await _layerQuerier.GetLayersAsync(layerQueries, traceIdentifier);
-                if (layerList.Count == 0)
-                {
-                    return MapResult.Ok(Array.Empty<byte>(), format);
-                }
-
-                var envelope = new Envelope(modeState.MinX, modeState.MaxX, modeState.MinY, modeState.MaxY);
-
-                var viewPort = new Viewport
-                {
-                    Extent = envelope,
-                    Width = width,
-                    Height = height,
-                    Transparent = transparent,
-                    Bordered = extras.TryGetValue("Bordered", out var b) && (bool)b
-                };
-
-                var scale = GeographicUtilities.CalculateOGCScale(envelope, modeState.SRID, width, dpi);
-                var map = new Map();
-                map.SetId(traceIdentifier)
-                    .SetSrid(modeState.SRID)
-                    .SetZoom(new Zoom(scale, ZoomUnits.Scale))
-                    .SetLogger(_logger)
-                    .SetGraphicsContextFactory(_graphicsServiceProvider)
-                    .AddLayers(layerList);
-                var image = await map.GetImageAsync(viewPort, format);
-
-                return MapResult.Ok(image, format);
+                return MapResult.Failed(result.Message, result.Code);
             }
-            catch (Exception e)
-            {
-                _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
-                return MapResult.Failed(e.Message, "InternalError");
-            }
-        }
 
-        public Task<MapResult> GetCapabilitiesAsync(string version, string format,
-            IDictionary<string, object> arguments)
-        {
-            return Task.FromResult(new MapResult());
+            await using var stream = result.Stream;
+            var bytes = await result.Stream.ToArrayAsync();
+            return MapResult.Ok(bytes, format);
         }
 
         public async Task<FeatureCollection> GetFeatureInfoAsync(string layers, string infoFormat, int featureCount,
@@ -154,106 +89,10 @@ namespace ZServer.Grains.WMS
             string bbox, int width, int height,
             double x, double y, IDictionary<string, object> arguments)
         {
-            var traceIdentifier = arguments.GetTraceIdentifier();
-            var displayUrl =
-                $"[{traceIdentifier}] LAYERS={layers}&FORMAT={infoFormat}&SRS={srs}&BBOX={bbox}&WIDTH={width}&HEIGHT={height}";
-
-            try
-            {
-                var modeState =
-                    ModeStateUtilities.VerifyWmsGetFeatureInfoArguments(layers, srs, bbox, width, height, x, y,
-                        featureCount);
-                if (!modeState.IsValid)
-                {
-                    _logger.LogError("{Url}, arguments error", displayUrl);
-                    return new FeatureCollection();
-                }
-
-                var layerQueries =
-                    new List<QueryLayerParams>();
-
-                for (var i = 0; i < modeState.Layers.Count; ++i)
-                {
-                    layerQueries.Add(
-                        new QueryLayerParams(modeState.Layers[i].ResourceGroup, modeState.Layers[i].Layer));
-                }
-
-                var layerList = await _layerQuerier.GetLayersAsync(layerQueries, traceIdentifier);
-                var envelope = new Envelope(modeState.MinX, modeState.MaxX, modeState.MinY, modeState.MaxY);
-                var featureCollection = await
-                    GetFeatureInfoAsync(layerList, featureCount, srs, envelope, width, height, x, y);
-                _logger.LogInformation("Query features {Url}, target layers: {Layers}, count: {Count}", displayUrl,
-                    string.Join(", ", layerList.Select(z => z.Name)), featureCollection.Count);
-                return featureCollection;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
-                return new FeatureCollection();
-            }
-        }
-
-        private async Task<FeatureCollection> GetFeatureInfoAsync(List<ILayer> layers,
-            int featureCount,
-            string srs,
-            Envelope bbox, int width, int height, double x, double y)
-        {
-            if (layers == null || layers.Count == 0)
-            {
-                return new FeatureCollection();
-            }
-
-            var pixelSensitivity = 10;
-
-            var pixelHeight = (bbox.MaxY - bbox.MinY) / height;
-            var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
-
-            var latLon = GeographicUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
-
-            var minX = latLon.Lon - pixelSensitivity * pixelWidth;
-            var maxX = latLon.Lon + pixelSensitivity * pixelWidth;
-            var minY = latLon.Lat - pixelSensitivity * pixelHeight;
-            var maxY = latLon.Lat + pixelSensitivity * pixelHeight;
-
-            var featureCollection = new FeatureCollection();
-            var totalCount = 0;
-            var srid = int.Parse(srs.Replace("EPSG:", ""));
-            foreach (var layer in layers)
-            {
-                var queryCount = totalCount >= featureCount ? 0 : featureCount - totalCount;
-
-                if (queryCount <= 0)
-                {
-                    break;
-                }
-
-                if (layer.Source is not SpatialDatabaseSource spatialDatabaseSource)
-                {
-                    continue;
-                }
-
-                var envelope = new Envelope(minX, maxX, minY, maxY);
-                var targetEnvelope = envelope.Transform(srid, spatialDatabaseSource.SRID);
-                var features = await spatialDatabaseSource
-                    .GetFeaturesInExtentAsync(targetEnvelope);
-
-                foreach (var feature in features)
-                {
-                    var attributes = new AttributesTable(feature.GetAttributes())
-                    {
-                        { "___layer", layer.Name }
-                    };
-                    featureCollection.Add(
-                        new NetTopologySuite.Features.Feature(feature.Geometry, attributes));
-                    totalCount++;
-                    if (totalCount >= featureCount)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return featureCollection;
+            var modeState = await _wmsService.GetFeatureInfoAsync(layers, infoFormat, featureCount,
+                srs, bbox, width, height,
+                x, y, arguments);
+            return !string.IsNullOrEmpty(modeState.Code) ? new FeatureCollection() : modeState.Features;
         }
 
         public override async Task OnActivateAsync()

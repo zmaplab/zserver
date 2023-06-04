@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using Microsoft.Extensions.Caching.Memory;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
-using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
 using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
@@ -82,7 +80,7 @@ namespace ZMap.Renderer.SkiaSharp
                 offsetY += offset.ElementAtOrDefault(1);
             }
 
-            var paint = CreatePaint();
+            using var paint = CreatePaint();
 
             var backgroundColor = _style.BackgroundColor.Value;
             if (!string.IsNullOrWhiteSpace(backgroundColor))
@@ -93,10 +91,9 @@ namespace ZMap.Renderer.SkiaSharp
                 using var textPath = paint.GetTextPath(text, offsetX - rect.Width / 2, offsetY);
                 // Create a new path for the outlines of the path
                 using var outlinePath = new SKPath();
-                var framePaint = CreateBackgroundPaint(backgroundColor);
-                framePaint.GetFillPath(textPath, outlinePath);
-
-                graphics.DrawPath(outlinePath, framePaint);
+                using var backgroundPaint = CreateBackgroundPaint(backgroundColor);
+                backgroundPaint.GetFillPath(textPath, outlinePath);
+                graphics.DrawPath(outlinePath, backgroundPaint);
             }
 
             graphics.DrawText(text, offsetX, offsetY, paint);
@@ -110,21 +107,13 @@ namespace ZMap.Renderer.SkiaSharp
                 size = 3;
             }
 
-            var key = $"TEXT_BACKGROUND_STYLE_PAINT_{color}{size}";
-
-            return Cache.GetOrCreate(key, entry =>
+            return new SKPaint
             {
-                var paint = new SKPaint
-                {
-                    Style = SKPaintStyle.StrokeAndFill,
-                    StrokeWidth = size,
-                    IsAntialias = true,
-                    Color = ColorUtilities.GetColor(color)
-                };
-                entry.SetValue(paint);
-                entry.SetAbsoluteExpiration(TimeSpan.FromDays(1));
-                return paint;
-            });
+                Style = SKPaintStyle.StrokeAndFill,
+                StrokeWidth = size,
+                IsAntialias = true,
+                Color = ColorUtilities.GetColor(color)
+            };
         }
 
         protected override SKPaint CreatePaint()
@@ -138,10 +127,7 @@ namespace ZMap.Renderer.SkiaSharp
                 ? a
                 : SKTextAlign.Center;
 
-            var fontKey = fontFamily == null ? string.Empty : string.Join(",", fontFamily);
-            var key = $"TEXT_STYLE_PAINT_{fontKey}{size}{rotate}{color}{align}";
-
-            return Cache.GetOrCreate(key, _ => new SKPaint
+            return new SKPaint
             {
                 Style = SKPaintStyle.Fill,
                 IsAntialias = true,
@@ -150,7 +136,7 @@ namespace ZMap.Renderer.SkiaSharp
                 TextSkewX = rotate,
                 TextAlign = align,
                 Typeface = FontUtilities.Get(fontFamily)
-            });
+            };
         }
     }
 }

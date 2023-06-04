@@ -58,11 +58,18 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
                 return SkTypefaceCache.GetOrAdd(name, f =>
                 {
                     // 1. get font from system
-                    var typeface = SKTypeface.FromFamilyName(f);
+                    var typeface = SKFontManager.Default.MatchFamily(f);
+                    if (typeface != null)
+                    {
+                        return typeface;
+                    }
+
+                    // 2. get font from system
+                    typeface = SKTypeface.FromFamilyName(f);
 
                     if (typeface.FamilyName != f)
                     {
-                        // 2. get font from cache, todo: weight, width, style 怎么生效？
+                        // 3. get font from cache, todo: weight, width, style 怎么生效？
                         typeface = Default;
                     }
 

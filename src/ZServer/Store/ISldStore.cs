@@ -4,7 +4,7 @@ using ZMap.Style;
 
 namespace ZServer.Store;
 
-public interface ISldStore
+public interface ISldStore : IRefresher
 {
     Task<List<StyleGroup>> FindAsync(string name);
 }

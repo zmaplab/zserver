@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
+using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
 
@@ -9,7 +11,7 @@ namespace ZServer.Tests
     public class LineStyleTests : BaseTests
     {
         [Fact]
-        public void Stroke()
+        public async Task Stroke()
         {
             var data = GetFeatures();
 
@@ -39,12 +41,12 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/Stroke.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/Stroke.png", await stream.ToArrayAsync());
         }
 
         [Fact]
-        public void Dash()
+        public async Task Dash()
         {
             var data = GetFeatures();
 
@@ -74,12 +76,12 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/Dash.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/Dash.png", await stream.ToArrayAsync());
         }
 
         [Fact]
-        public void Cap()
+        public async Task Cap()
         {
             var data = GetFeatures();
 
@@ -109,8 +111,8 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/CapDash.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/CapDash.png", await stream.ToArrayAsync());
         }
     }
 }

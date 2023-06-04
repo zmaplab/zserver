@@ -4,7 +4,7 @@ using ZServer.Entity;
 
 namespace ZServer.Store
 {
-    public interface ILayerGroupStore
+    public interface ILayerGroupStore : IRefresher
     {
         /// <summary>
         /// 

@@ -21,5 +21,10 @@ namespace ZServer.Entity
         /// 描述
         /// </summary>
         public string Description { get; set; }
+
+        public ResourceGroup Clone()
+        {
+            return (ResourceGroup)MemberwiseClone();
+        }
     }
 }

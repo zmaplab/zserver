@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
+using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
 
@@ -10,7 +12,7 @@ namespace ZServer.Tests
     public class TextStyleTests : BaseTests
     {
         [Fact]
-        public void Text()
+        public async Task Text()
         {
             var data = GetFeatures();
 
@@ -37,8 +39,8 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var bytes = graphicsService.GetImage("image/png");
-            File.WriteAllBytes($"images/{GetType().Name}_Label.png", bytes);
+            var stream = graphicsService.GetImage("image/png");
+            await File.WriteAllBytesAsync($"images/{GetType().Name}_Label.png", await stream.ToArrayAsync());
         }
     }
 }

@@ -5,7 +5,9 @@ namespace ZMap.Source
 {
     public interface ISource : IDisposable
     {
-        int SRID { get; }
+        string Name { get; set; }
+        int Srid { get; }
         Envelope GetEnvelope();
+        ISource Clone();
     }
 }

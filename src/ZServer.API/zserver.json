@@ -46,12 +46,12 @@
         },
         {
           "type": "text",
-          "minZoom": 100,
-          "maxZoom": 3000,
+          "minZoom": 20,
+          "maxZoom": 1000,
           "zoomUnit": "scale",
           "label": {
             "value": null,
-            "expression": "feature[\"name\"]"
+            "expression": "feature[\"name\"] "
           },
           "font": [
             "Source Han Sans SC"

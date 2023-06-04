@@ -6,18 +6,19 @@ namespace ZMap.Source
 {
     public abstract class VectorSourceBase : IVectorSource
     {
+        public string Name { get; set; }
         /// <summary>
         /// 
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public int SRID { get; set; }
+        public int Srid { get; set; }
 
         public IFeatureFilter Filter { get; set; }
 
         public abstract Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
 
         public abstract Envelope GetEnvelope();
-
+        public abstract ISource Clone();
         public abstract void Dispose();
     }
 }

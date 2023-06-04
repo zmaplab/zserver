@@ -35,7 +35,7 @@ namespace ZServer.Tests
             Assert.Equal("osmbuildings", source.Table);
             Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
                 source.ConnectionString);
-            Assert.Equal(4326, source.SRID);
+            Assert.Equal(4326, source.Srid);
 
             Assert.NotNull(layer.StyleGroups);
             Assert.Single(layer.StyleGroups);
@@ -82,7 +82,7 @@ namespace ZServer.Tests
             Assert.NotNull(layer.Source);
             Assert.True(layer.Source is ShapeFileSource);
             var source = (ShapeFileSource)layer.Source;
-            Assert.Equal(4326, source.SRID);
+            Assert.Equal(4326, source.Srid);
             Assert.EndsWith("osmbuildings.shp", source.File);
 
             Assert.NotNull(layer.StyleGroups);
@@ -123,8 +123,8 @@ namespace ZServer.Tests
             Assert.NotNull(layers);
             Assert.Equal(2, layers.Count);
 
-            var pgLayer = layers.ElementAt(0) as LayerEntity;
-            var shpLayer = layers[1] as LayerEntity;
+            var pgLayer = (LayerEntity)layers.First(x => x.Name == "berlin_db");
+            var shpLayer = (LayerEntity)layers.First(x => x.Name == "berlin_shp");
             Assert.Equal("berlin_db", pgLayer.Name);
             Assert.Equal("berlin_shp", shpLayer.Name);
 
@@ -135,7 +135,7 @@ namespace ZServer.Tests
             Assert.Equal("osmbuildings", pgSource.Table);
             Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
                 pgSource.ConnectionString);
-            Assert.Equal(4326, pgSource.SRID);
+            Assert.Equal(4326, pgSource.Srid);
 
             Assert.NotNull(pgLayer.StyleGroups);
             Assert.Single(pgLayer.StyleGroups);
@@ -173,7 +173,7 @@ namespace ZServer.Tests
             Assert.NotNull(shpLayer.Source);
             Assert.True(shpLayer.Source is ShapeFileSource);
             var source = (ShapeFileSource)shpLayer.Source;
-            Assert.Equal(4326, source.SRID);
+            Assert.Equal(4326, source.Srid);
             Assert.EndsWith("osmbuildings.shp", source.File);
 
             Assert.NotNull(shpLayer.StyleGroups);

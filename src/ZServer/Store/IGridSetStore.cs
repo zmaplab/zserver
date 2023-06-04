@@ -3,7 +3,7 @@ using ZMap.TileGrid;
 
 namespace ZServer.Store
 {
-    public interface IGridSetStore
+    public interface IGridSetStore : IRefresher
     {
         Task<GridSet> FindAsync(string name);
     }

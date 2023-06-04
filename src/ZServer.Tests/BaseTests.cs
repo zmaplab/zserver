@@ -11,6 +11,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
+using ConfigurationProvider = ZServer.Store.Configuration.ConfigurationProvider;
 using Feature = ZMap.Feature;
 
 namespace ZServer.Tests
@@ -27,9 +28,13 @@ namespace ZServer.Tests
             var configuration = GetConfiguration();
             serviceCollection.AddMemoryCache();
             serviceCollection.AddLogging(x => x.AddConsole());
-            serviceCollection.AddZServer(configuration);
+            serviceCollection.AddZServer(configuration, "layers.json");
             serviceCollection.TryAddSingleton(configuration);
+            serviceCollection.TryAddSingleton<ConfigurationSyncService>();
             Service = serviceCollection.BuildServiceProvider();
+            var syncService = Service.GetRequiredService<ConfigurationSyncService>();
+            var configurationProvider = Service.GetRequiredService<ConfigurationProvider>();
+            syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
         }
 
         // protected IRendererFactory GetRendererFactory()

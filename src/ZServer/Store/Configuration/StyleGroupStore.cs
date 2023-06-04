@@ -1,12 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using ZMap;
-using ZMap.Infrastructure;
 using ZMap.Style;
 using ZServer.Extensions;
 
@@ -14,48 +12,48 @@ namespace ZServer.Store.Configuration
 {
     public class StyleGroupStore : IStyleGroupStore
     {
-        private readonly IConfiguration _configuration;
-        private readonly ServerOptions _options;
+        private static readonly ConcurrentDictionary<string, StyleGroup> Cache = new();
 
-        public StyleGroupStore(IConfiguration configuration, IOptionsMonitor<ServerOptions> options)
+        public Task Refresh(IConfiguration configuration)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _options = options.CurrentValue;
-        }
-
-        public Task<StyleGroup> FindAsync(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
+            var sections = configuration.GetSection("styleGroups");
+            foreach (var section in sections.GetChildren())
             {
-                return null;
+                if (!section.GetChildren().Any())
+                {
+                    continue;
+                }
+
+                var styleGroup = new StyleGroup
+                {
+                    Name = section.Key,
+                    Filter = section.GetExpression<bool?>("filter"),
+                    Description = section.GetValue<string>("description"),
+                    MinZoom = section.GetValue<float>("minZoom"),
+                    MaxZoom = section.GetValue<float>("maxZoom"),
+                    ZoomUnit = section.GetValue<ZoomUnits>("zoomUnit"),
+                    Styles = GetStyles(section.GetSection("styles"))
+                };
+                Cache.AddOrUpdate(section.Key, styleGroup, (_, _) => styleGroup);
             }
 
-            var result = Cache.GetOrCreate($"{GetType().FullName}:{name}",
-                entry =>
-                {
-                    var section =
-                        _configuration.GetSection($"styleGroups:{name}");
-                    StyleGroup style = null;
-                    if (section.GetChildren().Any())
-                    {
-                        style = new StyleGroup
-                        {
-                            Name = name,
-                            Filter = section.GetExpression<bool?>("filter"),
-                            Description = section.GetValue<string>("description"),
-                            MinZoom = section.GetValue<float>("minZoom"),
-                            MaxZoom = section.GetValue<float>("maxZoom"),
-                            ZoomUnit = section.GetValue<ZoomUnits>("zoomUnit"),
-                            Styles = GetStyles(section.GetSection("styles"))
-                        };
-                    }
+            return Task.CompletedTask;
+        }
 
-                    entry.SetValue(style);
-                    entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
-                    return style;
-                });
+        public async Task<StyleGroup> FindAsync(string name)
+        {
+            if (Cache.TryGetValue(name, out var styleGroup))
+            {
+                return await Task.FromResult(styleGroup);
+            }
 
-            return Task.FromResult(result);
+            return null;
+        }
+
+        public Task<List<StyleGroup>> GetAllAsync()
+        {
+            var items = Cache.Values.Select(x => x.Clone()).ToList();
+            return Task.FromResult(items);
         }
 
         private List<Style> GetStyles(IConfigurationSection section)
@@ -68,8 +66,11 @@ namespace ZServer.Store.Configuration
                 {
                     "fill" => GetFillStyle(styleSection),
                     "line" => GetLineStyle(styleSection),
+                    "spriteLine" => GetSpriteLineStyle(styleSection),
+                    "spriteFill" => GetSpriteFillStyle(styleSection),
                     "text" => GetTextStyle(styleSection),
                     "symbol" => GetSymbolStyle(styleSection),
+                    "Raster" => GetRasterStyle(styleSection),
                     _ => null
                 };
 
@@ -97,7 +98,54 @@ namespace ZServer.Store.Configuration
             };
         }
 
+        private Style GetRasterStyle(IConfigurationSection section)
+        {
+            return new RasterStyle
+            {
+                Opacity = section.GetExpression<float?>("opacity"),
+                HueRotate = section.GetExpression<float?>("hueRotate"),
+                BrightnessMin = section.GetExpression<float?>("brightnessMin"),
+                BrightnessMax = section.GetExpression<float?>("brightnessMax"),
+                Saturation = section.GetExpression<float?>("saturation"),
+                Contrast = section.GetExpression<float?>("contrast")
+            };
+        }
+
         private Style GetLineStyle(IConfigurationSection section)
+        {
+            return new LineStyle
+            {
+                Opacity = section.GetExpression<float?>("opacity"),
+                Width = section.GetExpression<int?>("width"),
+                Color = section.GetExpression<string>("color"),
+                DashArray = section.GetExpression<float[]>("dashArray"),
+                DashOffset = section.GetExpression<float?>("dashOffset"),
+                LineJoin = section.GetExpression<string>("lineJoin"),
+                LineCap = section.GetExpression<string>("lineCap"),
+                Translate = section.GetExpression<double[]>("translate"),
+                TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor"),
+                GapWidth = section.GetExpression<int?>("gapWidth"),
+                Offset = section.GetExpression<int?>("offset"),
+                Blur = section.GetExpression<int?>("blur"),
+                Gradient = section.GetExpression<int?>("gradient"),
+                Pattern = section.GetExpression<string>("pattern")
+            };
+        }
+
+        private Style GetSpriteFillStyle(IConfigurationSection section)
+        {
+            return new SpriteFillStyle
+            {
+                Opacity = section.GetExpression<float?>("opacity"),
+                Color = section.GetExpression<string>("color"),
+                Translate = section.GetExpression<double[]>("translate"),
+                TranslateAnchor = section.GetExpression<TranslateAnchor?>("translateAnchor"),
+                Pattern = section.GetExpression<string>("pattern"),
+                Uri = section.GetExpression<Uri>("uri")
+            };
+        }
+
+        private Style GetSpriteLineStyle(IConfigurationSection section)
         {
             return new SpriteLineStyle
             {
@@ -131,7 +179,7 @@ namespace ZServer.Store.Configuration
             {
                 label = section.GetExpression<string>("label");
             }
-            
+
             return new TextStyle
             {
                 Label = label,
@@ -213,17 +261,6 @@ namespace ZServer.Store.Configuration
             fillStyle.Translate = section.GetExpression<double[]>("translate");
             fillStyle.TranslateAnchor = section.GetExpression<TranslateAnchor?>("translateAnchor");
             return fillStyle;
-        }
-
-        public async Task<List<StyleGroup>> GetAllAsync()
-        {
-            var result = new List<StyleGroup>();
-            foreach (var child in _configuration.GetSection("styleGroups").GetChildren())
-            {
-                result.Add(await FindAsync(child.Key));
-            }
-
-            return result;
         }
     }
 }

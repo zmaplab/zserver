@@ -20,5 +20,19 @@ namespace ZMap.Style
             Opacity?.Invoke(feature, 1);
             Rotation?.Invoke(feature);
         }
+
+        public override Style Clone()
+        {
+            return new SymbolStyle()
+            {
+                MaxZoom = MaxZoom,
+                MinZoom = MinZoom,
+                ZoomUnit = ZoomUnit,
+                Size = Size?.Clone(),
+                Uri = Uri?.Clone(),
+                Opacity = Opacity?.Clone(),
+                Rotation = Rotation?.Clone()
+            };
+        }
     }
 }

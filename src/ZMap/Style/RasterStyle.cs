@@ -35,5 +35,21 @@ namespace ZMap.Style
         public override void Accept(IZMapStyleVisitor visitor, Feature feature)
         {
         }
+
+        public override Style Clone()
+        {
+            return new RasterStyle()
+            {
+                MaxZoom = MaxZoom,
+                MinZoom = MinZoom,
+                ZoomUnit = ZoomUnit,
+                Opacity = Opacity?.Clone(),
+                HueRotate = HueRotate?.Clone(),
+                BrightnessMin = BrightnessMin?.Clone(),
+                BrightnessMax = BrightnessMax?.Clone(),
+                Saturation = Saturation?.Clone(),
+                Contrast = Contrast?.Clone()
+            };
+        }
     }
 }

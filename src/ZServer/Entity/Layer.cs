@@ -11,12 +11,17 @@ namespace ZServer.Entity
         /// <summary>
         /// 
         /// </summary>
-        public HashSet<ServiceType> Services { get; private set; }
+        public HashSet<ServiceType> Services { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public ResourceGroup ResourceGroup { get; private set; }
+        public ResourceGroup ResourceGroup { get; set; }
+
+        public override string GetResourceGroupName()
+        {
+            return ResourceGroup?.Name;
+        }
 
         public LayerEntity(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name, ISource source,
             List<StyleGroup> styleGroups, Envelope envelope = null) :
@@ -29,6 +34,24 @@ namespace ZServer.Entity
         public override string ToString()
         {
             return ResourceGroup == null ? Name : $"{ResourceGroup.Name}:{Name}";
+        }
+
+        public override ILayer Clone()
+        {
+            var styleGroups = new List<StyleGroup>();
+            foreach (var styleGroup in StyleGroups)
+            {
+                styleGroups.Add(styleGroup.Clone());
+            }
+
+            return new LayerEntity(ResourceGroup, Services, Name, Source.Clone(), styleGroups, Envelope)
+            {
+                MinZoom = MinZoom,
+                MaxZoom = MaxZoom,
+                ZoomUnit = ZoomUnit,
+                Enabled = Enabled,
+                Buffers = Buffers
+            };
         }
     }
 }

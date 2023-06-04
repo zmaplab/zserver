@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Force.DeepCloner;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using ZMap.Infrastructure;
 using ZMap.Source;
 
 namespace ZServer.Store.Configuration
@@ -18,20 +15,33 @@ namespace ZServer.Store.Configuration
     /// </summary>
     public class SourceStore : ISourceStore
     {
-        private readonly IConfiguration _configuration;
-        private readonly ServerOptions _options;
         private readonly ILogger<SourceStore> _logger;
+        private static readonly ConcurrentDictionary<string, ISource> Cache = new();
 
         private static readonly ConcurrentDictionary<Type, ParameterInfo[]>
             StorageTypeCache =
                 new();
 
-        public SourceStore(IConfiguration configuration, IOptionsMonitor<ServerOptions> options,
+        public SourceStore(
             ILogger<SourceStore> logger)
         {
-            _configuration = configuration;
             _logger = logger;
-            _options = options.CurrentValue;
+        }
+
+        public Task Refresh(IConfiguration configuration)
+        {
+            var sections = configuration.GetSection("sources");
+            foreach (var section in sections.GetChildren())
+            {
+                var source = Get(section);
+                if (source != null)
+                {
+                    source.Name = section.Key;
+                    Cache.AddOrUpdate(section.Key, source, (_, _) => source);
+                }
+            }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -41,45 +51,34 @@ namespace ZServer.Store.Configuration
         /// <returns></returns>
         public async Task<ISource> FindAsync(string name)
         {
-            // comments: 必须复制对像，不然并发情况会异常
-            return string.IsNullOrWhiteSpace(name)
-                ? null
-                : (await Cache.GetOrCreate($"{GetType().FullName}:{name}", entry =>
-                {
-                    var source = Get(name);
-                    entry.SetValue(source);
-                    entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
-                    return Task.FromResult(source);
-                })).DeepClone();
-        }
-
-        public async Task<List<ISource>> GetAllAsync()
-        {
-            var result = new List<ISource>();
-            foreach (var child in _configuration.GetSection("sources").GetChildren())
+            if (Cache.TryGetValue(name, out var source))
             {
-                result.Add(await FindAsync(child.Key));
+                return await Task.FromResult(source);
             }
 
-            return result;
+            return null;
+            // comments: 必须复制对像，不然并发情况会异常
         }
 
-        private ISource Get(string name)
+        public Task<List<ISource>> GetAllAsync()
         {
-            var key = $"sources:{name}";
-            var section = _configuration.GetSection(key);
+            var items = Cache.Values.Select(x => x.Clone()).ToList();
+            return Task.FromResult(items);
+        }
 
+        private ISource Get(IConfigurationSection section)
+        {
             var provider = section.GetSection("provider").Get<string>();
             if (string.IsNullOrWhiteSpace(provider))
             {
-                _logger.LogError("数据源 {Name} 不存在或驱动为空", name);
+                _logger.LogError("数据源 {Name} 不存在或驱动为空", section.Key);
                 return null;
             }
 
             var type = Type.GetType(provider);
             if (type == null)
             {
-                _logger.LogError("数据源 {Name} 的驱动 {Provider} 不存在", name, provider);
+                _logger.LogError("数据源 {Name} 的驱动 {Provider} 不存在", section.Key, provider);
                 return null;
             }
 
@@ -87,7 +86,7 @@ namespace ZServer.Store.Configuration
             {
                 if (!typeof(IVectorSource).IsAssignableFrom(x))
                 {
-                    _logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", name, provider);
+                    _logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", section.Key, provider);
                     return null;
                 }
 
