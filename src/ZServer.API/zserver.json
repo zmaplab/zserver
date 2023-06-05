@@ -32,6 +32,7 @@
       "minZoom": 100,
       "maxZoom": 80000,
       "zoomUnit": "scale",
+      "filter": "feature[\"name\"] != null",
       "styles": [
         {
           "type": "line",
@@ -53,6 +54,7 @@
             "value": null,
             "expression": "feature[\"name\"] "
           },
+          "filter": "feature[\"name\"] != \"中文\"",
           "font": [
             "Source Han Sans SC"
           ],
