@@ -80,6 +80,7 @@ namespace ZMap.Style
                 MaxZoom = MaxZoom,
                 MinZoom = MinZoom,
                 ZoomUnit = ZoomUnit,
+                Filter = Filter?.Clone(),
                 Opacity = Opacity?.Clone(),
                 Pattern = Pattern?.Clone(),
                 Color = Color?.Clone(),

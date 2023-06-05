@@ -28,6 +28,7 @@ namespace ZMap.Style
                 MaxZoom = MaxZoom,
                 MinZoom = MinZoom,
                 ZoomUnit = ZoomUnit,
+                Filter = Filter?.Clone(),
                 Size = Size?.Clone(),
                 Uri = Uri?.Clone(),
                 Opacity = Opacity?.Clone(),
