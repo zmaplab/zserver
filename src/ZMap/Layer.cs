@@ -244,7 +244,7 @@ namespace ZMap
                 foreach (var styleGroup in StyleGroups)
                 {
                     // 若有配置过滤表达式， 则计算
-                    if (styleGroup.Filter is { Value: not null } && styleGroup.Filter.Value.Value)
+                    if (styleGroup.Filter is { Value: not null } && !styleGroup.Filter.Value.Value)
                     {
                         continue;
                     }
@@ -265,7 +265,7 @@ namespace ZMap
                         }
 
                         // 若有配置过滤表达式， 则计算
-                        if (style.Filter is { Value: not null } && style.Filter.Value.Value)
+                        if (style.Filter is { Value: not null } && !style.Filter.Value.Value)
                         {
                             continue;
                         }
