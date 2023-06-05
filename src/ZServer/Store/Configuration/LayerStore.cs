@@ -16,7 +16,7 @@ namespace ZServer.Store.Configuration
 {
     public class LayerStore : ILayerStore
     {
-        private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> PropertyCache =
+        private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> PropertyCache =
             new();
 
         private readonly IStyleGroupStore _styleStore;
@@ -210,7 +210,7 @@ namespace ZServer.Store.Configuration
             var properties = PropertyCache.GetOrAdd(source.GetType(), t =>
             {
                 return t.GetProperties().Where(z => z.CanWrite)
-                    .ToDictionary(y => y.Name, y => y);
+                    .ToList();
             });
 
             foreach (var child in section.GetChildren())
@@ -221,7 +221,9 @@ namespace ZServer.Store.Configuration
                 }
 
                 var propertyName = child.Key.Replace("source", string.Empty);
-                if (!properties.TryGetValue(propertyName, out var property))
+                var property = properties
+                    .FirstOrDefault(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+                if (property == null)
                 {
                     continue;
                 }

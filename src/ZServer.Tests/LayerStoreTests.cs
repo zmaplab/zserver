@@ -33,6 +33,7 @@ namespace ZServer.Tests
             var source = (SpatialDatabaseSource)layer.Source;
             Assert.Equal("geom", source.Geometry);
             Assert.Equal("osmbuildings", source.Table);
+            Assert.Equal("berlin_db", source.Name);
             Assert.Equal("User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
                 source.ConnectionString);
             Assert.Equal(4326, source.Srid);
