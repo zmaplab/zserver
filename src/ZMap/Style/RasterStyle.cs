@@ -43,6 +43,7 @@ namespace ZMap.Style
                 MaxZoom = MaxZoom,
                 MinZoom = MinZoom,
                 ZoomUnit = ZoomUnit,
+                Filter = Filter?.Clone(),
                 Opacity = Opacity?.Clone(),
                 HueRotate = HueRotate?.Clone(),
                 BrightnessMin = BrightnessMin?.Clone(),
