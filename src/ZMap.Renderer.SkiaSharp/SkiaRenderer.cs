@@ -34,19 +34,21 @@ public abstract class SkiaRenderer
             CoordinateTransformUtilities.WordToExtent(extent, width, height, polygon.Shell.Coordinates);
 
         using var path = new SKPath();
+        path.FillType = SKPathFillType.EvenOdd;
+
+        path.MoveTo(shellPoints[0]);
         path.AddPoly(shellPoints);
-        canvas.DrawPath(path, paint);
 
         // 内部的环
         foreach (var polygonHole in polygon.Holes)
         {
             var holePoints =
                 CoordinateTransformUtilities.WordToExtent(extent, width, height, polygonHole.Coordinates);
-            using var path1 = new SKPath();
+            path.MoveTo(holePoints[0]);
             path.AddPoly(holePoints);
-
-            canvas.DrawPath(path1, paint);
         }
+
+        canvas.DrawPath(path, paint);
     }
 
     private void DrawLineString(SKCanvas canvas, SKPaint paint, LineString lineString, Envelope extent,
