@@ -192,6 +192,35 @@
     }
   },
   "layers": {
+    "berlin_db2": {
+      "metadata": {
+        "zserver:name": "demo"
+      },
+      "buffers": [
+        {
+          "minZoom": 500,
+          "maxZoom": 128000,
+          "zoomUnit": "scale",
+          "size": 32
+        }
+      ],
+      "resourceGroup": "resourceGroup1",
+      "services": [],
+      "extent": [
+        112.8,
+        120.1,
+        21.4,
+        23.2
+      ],
+      "source": "berlin_db",
+      "sourceTable": "osmbuildings",
+      "sourceWhere": "is_deleted = 'f'",
+      "sourceGeometry": "geom",
+      "sourceSRID": 4326,
+      "styleGroups": [
+        "style1"
+      ]
+    },
     "berlin_db": {
       "metadata": {
         "zserver:name": "demo"

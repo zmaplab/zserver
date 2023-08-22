@@ -60,22 +60,23 @@ namespace ZServer.Store.Configuration
                 return null;
             }
 
-            if (Cache.TryGetValue(layerName, out var layer))
+            if (!Cache.TryGetValue(layerName, out var layer))
             {
-                if (string.IsNullOrEmpty(resourceGroupName))
-                {
-                    return await Task.FromResult(layer.Clone());
-                }
+                return null;
+            }
 
-                if (layer.GetResourceGroupName() != resourceGroupName)
-                {
-                    return null;
-                }
-
+            if (string.IsNullOrEmpty(resourceGroupName))
+            {
                 return await Task.FromResult(layer.Clone());
             }
 
-            return null;
+            if (layer.GetResourceGroupName() != resourceGroupName)
+            {
+                return null;
+            }
+
+            return await Task.FromResult(layer.Clone());
+
             // var result = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerName}",
             //     async entry =>
             //     {

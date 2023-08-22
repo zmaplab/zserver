@@ -10,6 +10,18 @@ namespace ZServer.Tests
     public class SourceStoreTests : BaseTests
     {
         [Fact]
+        public async Task Clone()
+        {
+            var sourceStore = GetScopedService<ISourceStore>();
+            var dataSource = (PostgreSource)await sourceStore.FindAsync("berlin_db");
+
+            var b = (PostgreSource)dataSource.Clone();
+            b.Where = "is_deleted = 'f'";
+
+            Assert.True(string.IsNullOrEmpty(dataSource.Where));
+        }
+
+        [Fact]
         public async Task GetPgSource()
         {
             var sourceStore = GetScopedService<ISourceStore>();
