@@ -81,15 +81,15 @@ namespace ZServer.API
                 {
                     builder.AddCommandLine(args);
 
-                    if (File.Exists("serilog.json"))
+                    if (File.Exists("conf/serilog.json"))
                     {
-                        builder.AddJsonFile($"serilog.json",
+                        builder.AddJsonFile($"conf/serilog.json",
                             optional: true, reloadOnChange: true);
                     }
 
-                    if (File.Exists("zserver.json"))
+                    if (File.Exists("conf/appsettings.json"))
                     {
-                        builder.AddJsonFile($"zserver.json",
+                        builder.AddJsonFile($"conf/appsettings.json",
                             optional: true, reloadOnChange: true);
                     }
 

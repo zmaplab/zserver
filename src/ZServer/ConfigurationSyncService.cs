@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,15 @@ public class ConfigurationSyncService : IHostedService
         return Task.Factory.StartNew(async () =>
         {
             var configurationProvider = _serviceProvider.GetRequiredService<ConfigurationProvider>();
+            if (File.Exists(configurationProvider.Path))
+            {
+                _logger.LogInformation($"ZServer configuration {configurationProvider.Path} found successfully");
+            }
+            else
+            {
+                _logger.LogError($"ZServer configuration {configurationProvider.Path} not found");
+            }
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
@@ -36,7 +46,6 @@ public class ConfigurationSyncService : IHostedService
                     _logger.LogError("Load configuration store failed: {Exception}", e);
                 }
 
-                _logger.LogInformation("Load configuration store success");
                 await Task.Delay(15000, cancellationToken);
             }
         }, cancellationToken);
@@ -62,6 +71,8 @@ public class ConfigurationSyncService : IHostedService
             await layerStore.Refresh(configuration);
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
             await layerGroupStore.Refresh(configuration);
+
+            _logger.LogInformation("Refresh configuration store success");
         }
     }
 
