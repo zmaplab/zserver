@@ -1,16 +1,4 @@
 {
-  "swagger": true,
-  "traceFetch": false,
-  "orleans": {
-    "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=zserver_dev;Pooling=true;",
-    "invariant": "Npgsql",
-    "siloName": "zserver",
-    "clusterId": "zserver",
-    "serviceId": "zserver",
-    "gatewayPort": 41113,
-    "siloPort": 31113,
-    "dashboard": true
-  },
   "sources": {
     "zserver": {
       "provider": "ZMap.Source.Postgre.PostgreSource, ZMap.Source.Postgre",
