@@ -33,7 +33,7 @@ namespace Console
             serviceCollection.AddSingleton<IConfiguration>();
 
             // 配置的存储
-            serviceCollection.AddZServer(configuration, "zserver.json");
+            serviceCollection.AddZServer(configuration, "conf/zserver.json");
 
             serviceCollection.BuildServiceProvider();
 

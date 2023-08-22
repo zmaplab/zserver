@@ -87,9 +87,9 @@ namespace ZServer.API
                             optional: true, reloadOnChange: true);
                     }
 
-                    if (File.Exists("conf/zserver.json"))
+                    if (File.Exists("conf/appsettings.json"))
                     {
-                        builder.AddJsonFile($"conf/zserver.json",
+                        builder.AddJsonFile($"conf/appsettings.json",
                             optional: true, reloadOnChange: true);
                     }
 
