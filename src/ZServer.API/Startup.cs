@@ -47,7 +47,7 @@ namespace ZServer.API
             services.AddResponseCaching();
             services.AddRouting(x => { x.LowercaseUrls = true; });
 
-            services.AddZServer(Configuration,"zserver.json").AddSkiaSharpRenderer();
+            services.AddZServer(Configuration,"conf/zserver.json").AddSkiaSharpRenderer();
             services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
 
             var client = new Lazy<IClusterClient>(() =>

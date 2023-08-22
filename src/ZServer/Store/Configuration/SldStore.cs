@@ -20,7 +20,7 @@ public class SldStore : ISldStore
 
     public Task Refresh(IConfiguration configuration)
     {
-        var dir = "Sld";
+        var dir = "sld";
         if (!Directory.Exists(dir))
         {
             return Task.CompletedTask;

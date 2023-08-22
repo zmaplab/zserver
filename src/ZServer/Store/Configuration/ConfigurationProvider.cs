@@ -11,6 +11,8 @@ public class ConfigurationProvider
     private DateTime _lastWriteTime;
     private string _lastHash;
 
+    public string Path => _path;
+
     public ConfigurationProvider(string path)
     {
         _path = path;
@@ -42,7 +44,7 @@ public class ConfigurationProvider
         var configurationBuilder = new ConfigurationBuilder();
         using var stream = File.OpenRead(_path);
         configurationBuilder.AddJsonStream(stream);
-        var configuration= configurationBuilder.Build();
+        var configuration = configurationBuilder.Build();
         return configuration;
     }
 }
