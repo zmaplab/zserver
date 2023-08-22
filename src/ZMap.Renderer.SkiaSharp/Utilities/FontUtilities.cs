@@ -25,7 +25,7 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
             // mkfontdir
             // fc-cache
 
-            var folder = Path.Combine(AppContext.BaseDirectory, "Fonts");
+            var folder = Path.Combine(AppContext.BaseDirectory, "fonts");
             var ttcFiles = Directory.GetFiles(folder, "*.ttc");
             foreach (var file in ttcFiles)
             {
