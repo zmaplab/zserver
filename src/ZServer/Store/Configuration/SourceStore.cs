@@ -109,7 +109,16 @@ namespace ZServer.Store.Configuration
                     args[i] = section.GetSection(parameterInfos[i].Name).Get(parameterInfos[i].ParameterType);
                 }
 
-                source = (ISource)Activator.CreateInstance(type, args);
+                try
+                {
+                    source = (ISource)Activator.CreateInstance(type, args);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("创建数据源 {Name} 的驱动 {Provider} 失败: {Exception}", section.Key, provider,
+                        e.ToString());
+                    return null;
+                }
             }
 
             return source;
