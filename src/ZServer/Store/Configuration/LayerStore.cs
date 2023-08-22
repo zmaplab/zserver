@@ -49,7 +49,10 @@ namespace ZServer.Store.Configuration
                     : await _resourceGroupStore.FindAsync(resourceGroupName);
 
                 var layer = await BindLayerAsync(section, resourceGroup);
-                Cache.AddOrUpdate(section.Key, layer, (_, _) => layer);
+                if (layer != null)
+                {
+                    Cache.AddOrUpdate(section.Key, layer, (_, _) => layer);
+                }
             }
         }
 
@@ -151,7 +154,13 @@ namespace ZServer.Store.Configuration
             ResourceGroup resourceGroup)
         {
             var services = section.GetSection("services").Get<HashSet<ServiceType>>();
-            var source = (await RestoreSourceAsync(resourceGroup?.Name, section.Key, section)).Clone();
+            var sourceOrigin = await RestoreSourceAsync(resourceGroup?.Name, section.Key, section);
+            if (sourceOrigin == null)
+            {
+                return null;
+            }
+
+            var source = sourceOrigin.Clone();
             var styleGroups = await RestoreStyleGroupsAsync(section);
             var extent = section.GetSection("extent").Get<double[]>();
             Envelope envelope = null;
