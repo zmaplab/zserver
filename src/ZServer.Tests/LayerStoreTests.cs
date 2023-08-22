@@ -7,11 +7,33 @@ using ZMap.Source.ShapeFile;
 using ZServer.Entity;
 using System.Linq;
 using ZMap;
+using ZMap.Source.Postgre;
+using ZServer.Store.Configuration;
 
 namespace ZServer.Tests
 {
     public class LayerStoreTests : BaseTests
     {
+        [Fact]
+        public async Task ParallelTest()
+        {
+            var syncService = GetService<ConfigurationSyncService>();
+            var configurationProvider = GetService<ConfigurationProvider>();
+            await syncService.RefreshAsync(configurationProvider);
+
+            var list = Enumerable.Range(0, 10000).ToList();
+
+            await Parallel.ForEachAsync(list, async (i, token) =>
+            {
+                var store = GetScopedService<ILayerStore>();
+                await store.FindAsync("resourceGroup1", "berlin_db2");
+                var layer = await store.FindAsync("resourceGroup1", "berlin_db");
+                var source = layer.Source as PostgreSource;
+                Assert.NotNull(source);
+                Assert.True(string.IsNullOrEmpty(source.Where));
+            });
+        }
+
         [Fact]
         public async Task GetPgLayer()
         {

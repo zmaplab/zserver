@@ -53,7 +53,7 @@ namespace ZServer.Store.Configuration
         {
             if (Cache.TryGetValue(name, out var source))
             {
-                return await Task.FromResult(source);
+                return await Task.FromResult(source.Clone());
             }
 
             return null;

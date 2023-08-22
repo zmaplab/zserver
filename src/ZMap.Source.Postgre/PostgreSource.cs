@@ -92,6 +92,16 @@ namespace ZMap.Source.Postgre
 
         public override ISource Clone()
         {
+            // return new PostgreSource(ConnectionString, Database)
+            // {
+            //     Table= Table,
+            //     Id= Id,
+            //     Geometry= Geometry,
+            //     Where= Where,
+            //     Name= Name,
+            //     Properties= Properties.ToHashSet(),
+            //     Srid= Srid,
+            // };
             return (ISource)MemberwiseClone();
         }
 
