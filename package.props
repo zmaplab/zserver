@@ -7,7 +7,7 @@
         <Copyright>Copyright 2023 zmap lab</Copyright>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <IsPackable>true</IsPackable>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>preview</LangVersion>
         <Nullable>disable</Nullable>
     </PropertyGroup>
 
