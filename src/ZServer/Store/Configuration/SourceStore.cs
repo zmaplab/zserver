@@ -37,7 +37,7 @@ namespace ZServer.Store.Configuration
                 if (source != null)
                 {
                     source.Name = section.Key;
-                    Cache.AddOrUpdate(section.Key, source, (_, _) => source);
+                    Cache.AddOrUpdate(source.Name, source, (_, _) => source);
                 }
             }
 
