@@ -48,7 +48,6 @@ namespace ZServer.API.Controllers
 
             keyBuilder.Append(string.Join("_", layers));
             keyBuilder.Append(tileMatrixSet).Append('/');
-            keyBuilder.Append(format).Append('/');
             keyBuilder.Append(tileMatrix).Append('/');
             keyBuilder.Append(tileRow).Append('/');
             keyBuilder.Append(tileCol);
