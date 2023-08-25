@@ -34,11 +34,12 @@ namespace ZServer.API.Controllers
         /// <param name="tileCol"></param>
         /// <param name="format"></param>
         /// <param name="tileMatrixSet"></param>
+        /// <param name="cqlFilter"></param>
         /// <returns></returns>
         [HttpGet]
         public async Task GetAsync([Required] string layer, string style, [Required] string tileMatrix,
             [Required] int tileRow, [Required] int tileCol, string format = "image/png",
-            string tileMatrixSet = "EPSG:4326")
+            string tileMatrixSet = "EPSG:4326", string cqlFilter = null)
         {
             var keyBuilder = new StringBuilder();
 
@@ -57,7 +58,7 @@ namespace ZServer.API.Controllers
             var friend = _clusterClient.Value.GetGrain<IWMTSGrain>(key);
             var result =
                 await friend.GetTileAsync(layer, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
-                    null,
+                    cqlFilter,
                     new Dictionary<string, object>
                     {
                         { "TraceIdentifier", HttpContext.TraceIdentifier }
