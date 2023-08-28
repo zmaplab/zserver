@@ -39,7 +39,7 @@ namespace ZServer.API.Controllers
         [HttpGet]
         public async Task GetAsync([Required] string layer, string style, [Required] string tileMatrix,
             [Required] int tileRow, [Required] int tileCol, string format = "image/png",
-            string tileMatrixSet = "EPSG:4326", string cqlFilter = null)
+            string tileMatrixSet = "EPSG:4326", [FromQuery(Name = "CQL_FILTER")] string cqlFilter = null)
         {
             var keyBuilder = new StringBuilder();
 
