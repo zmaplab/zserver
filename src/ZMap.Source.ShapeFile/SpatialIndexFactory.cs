@@ -29,7 +29,17 @@ namespace ZMap.Source.ShapeFile
 
             if (!File.Exists(sidxPath))
             {
-                var entries = GetAllFeatureBoundingBoxes(reader).ToList();
+                List<SpatialIndexItem> entries;
+                try
+                {
+                    entries = GetAllFeatureBoundingBoxes(reader).ToList();
+                }
+                catch (Exception e)
+                {
+                    Log.Logger.LogError("加载空间索引失败， 矢量文件： {ShapeFile}， 异常： {Exception}", shapeFile, e);
+                    entries = new List<SpatialIndexItem>();
+                }
+
                 tree = CreateSpatialIndex(type, entries);
                 Save(entries, sidxPath);
             }
@@ -77,7 +87,8 @@ namespace ZMap.Source.ShapeFile
                 if (shapeFileStream.Position >= shapeFileStream.Length ||
                     shapeFileStream.Length - shapeFileStream.Position < 24)
                 {
-                    Log.Logger.LogInformation("Read end stream at: {Position}, stream length: {Length}", shapeFileStream.Position, shapeFileStream.Length);
+                    Log.Logger.LogInformation("Read end stream at: {Position}, stream length: {Length}",
+                        shapeFileStream.Position, shapeFileStream.Length);
                     break;
                 }
 

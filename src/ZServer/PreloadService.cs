@@ -70,7 +70,6 @@ namespace ZServer
             // ReSharper disable once UnusedVariable
             foreach (var feature in await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326))
             {
-                
             }
 
             _logger.LogInformation("Load {Path} success", path);
