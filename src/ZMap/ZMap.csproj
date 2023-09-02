@@ -3,14 +3,16 @@
     <Import Project="../../package.props" />
     <Import Project="../../version.props" />
     <ItemGroup>
-        <PackageReference Include="MessagePack.Annotations" Version="2.5.108" />
+        <PackageReference Include="MessagePack.Annotations" Version="2.5.124" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
         <PackageReference Include="NetTopologySuite" Version="2.5.0" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+        <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
         <PackageReference Include="ProjNET" Version="2.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
         <PackageReference Include="murmurhash" Version="1.0.3" />
-        <PackageReference Include="System.Text.Json" Version="7.0.2" />
+        <PackageReference Include="System.Text.Json" Version="7.0.3" />
     </ItemGroup>
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
@@ -24,5 +26,8 @@
       <EmbeddedResource Include="Infrastructure\proj.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ZMap.TileGrid\ZMap.TileGrid.csproj" />
     </ItemGroup>
 </Project>

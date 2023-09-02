@@ -69,7 +69,7 @@ namespace ZMap.SLD
 
         public void Accept(IStyleVisitor visitor, object extraData)
         {
-            if (visitor.Pop() is not IStrokeStyle strokeStyle)
+            if (visitor.Pop() is not LineStyle strokeStyle)
             {
                 return;
             }

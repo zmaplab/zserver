@@ -18,11 +18,11 @@ namespace ZMap.Style
             return new CSharpExpression<TV>
             {
                 Value = v,
-                Body = body
+                Expression = body
             };
         }
 
-        public static CSharpExpression<TV> From(dynamic value, TV defaultValue)
+        public static CSharpExpression<TV> From(TV value, TV defaultValue)
         {
             if (value == null)
             {
@@ -37,24 +37,23 @@ namespace ZMap.Style
 
         public CSharpExpression<TV> Clone()
         {
-            return New(Value, Body);
+            return New(Value, Expression);
         }
 
         public void Invoke(Feature feature, TV defaultValue = default)
         {
             if (Value != null)
             {
-                if (string.IsNullOrWhiteSpace(Body))
+                if (!string.IsNullOrWhiteSpace(Expression))
                 {
-                }
-                else
-                {
-                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Body);
+                    // 只要有表达式，则以表达式优先，不然何必去配置表达式呢
+                    // 即使表达式计算的值为空，也应该认为是用户需要的结果
+                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Expression);
                     if (func == null)
                     {
                         return;
                     }
-
+                    
                     var output = func.Invoke(feature);
                     if (output != null)
                     {
@@ -64,13 +63,14 @@ namespace ZMap.Style
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(Body))
+                // 说明未直接配值，在表达式对象中也没有配置值
+                if (string.IsNullOrWhiteSpace(Expression))
                 {
                     Value = defaultValue;
                 }
                 else
                 {
-                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Body);
+                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Expression);
                     if (func != null)
                     {
                         var output = func.Invoke(feature);
@@ -87,13 +87,13 @@ namespace ZMap.Style
 
     public class CSharpExpression
     {
-        public string Body { get; protected set; }
+        public string Expression { get; protected init; }
 
         public static CSharpExpression New(string body = null)
         {
             return new CSharpExpression
             {
-                Body = body
+                Expression = body
             };
         }
     }

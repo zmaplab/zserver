@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ZServer.Store;
 using Xunit;
 using ZMap.Source.Postgre;
-using ZServer.Store.Configuration;
 
 namespace ZServer.Tests
 {
@@ -12,7 +11,7 @@ namespace ZServer.Tests
         [Fact]
         public async Task ParallelTest()
         {
-            var syncService = GetService<ConfigurationSyncService>();
+            var syncService = GetService<ConfigurationStoreRefreshService>();
             var configurationProvider = GetService<ConfigurationProvider>();
             await syncService.RefreshAsync(configurationProvider);
 

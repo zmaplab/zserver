@@ -90,10 +90,17 @@ public static class OrleansExtensions
                     })
                     .Configure<EndpointOptions>(options =>
                     {
-                        var siloPort = int.Parse(context.Configuration["Orleans:SiloPort"]);
-                        var gatewayPort = int.Parse(context.Configuration["Orleans:GatewayPort"]);
-                        options.GatewayPort = gatewayPort;
-                        options.SiloPort = siloPort;
+                        var siloPort = context.Configuration["Orleans:SiloPort"];
+                        var gatewayPort = context.Configuration["Orleans:GatewayPort"];
+                        if (!string.IsNullOrEmpty(siloPort))
+                        {
+                            options.SiloPort = int.Parse(siloPort);
+                        }
+
+                        if (!string.IsNullOrEmpty(gatewayPort))
+                        {
+                            options.GatewayPort = int.Parse(gatewayPort);
+                        }
 
                         var hostIp = EnvironmentVariables.HostIp;
                         IPAddress ipAddress;
@@ -113,8 +120,8 @@ public static class OrleansExtensions
                         }
 
                         options.AdvertisedIPAddress = ipAddress;
-                        options.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort);
-                        options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
+                        options.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, options.SiloPort);
+                        options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, options.GatewayPort);
                     });
             }
 

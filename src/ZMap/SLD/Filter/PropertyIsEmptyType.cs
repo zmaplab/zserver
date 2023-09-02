@@ -18,7 +18,7 @@ public class PropertyIsEmptyType : ComparisonOpsType
 
         var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New($"string.IsNullOrWhiteSpace({expression.Body}?.ToString())"));
+        visitor.Push(ZMap.Style.CSharpExpression.New($"string.IsNullOrWhiteSpace({expression.Expression}?.ToString())"));
 
         return null;
     }

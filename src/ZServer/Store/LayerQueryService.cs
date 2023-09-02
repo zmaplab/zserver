@@ -2,28 +2,30 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ZMap;
+using ZMap.Ogc;
 using ZMap.Source;
-using ZServer.Store;
+using ZMap.Store;
 
-namespace ZServer;
+namespace ZServer.Store;
 
-public class LayerQuerier : ILayerQuerier
+public class LayerQueryService : ILayerQueryService
 {
     private readonly ILayerGroupStore _layerGroupStore;
     private readonly ILayerStore _layerStore;
-    private readonly ILogger<LayerQuerier> _logger;
+    private readonly ILogger<LayerQueryService> _logger;
 
-    public LayerQuerier(ILayerGroupStore layerGroupStore, ILayerStore layerStore, ILogger<LayerQuerier> logger)
+    public LayerQueryService(ILayerGroupStore layerGroupStore, ILayerStore layerStore,
+        ILogger<LayerQueryService> logger)
     {
         _layerGroupStore = layerGroupStore;
         _layerStore = layerStore;
         _logger = logger;
     }
 
-    public async Task<List<ILayer>> GetLayersAsync(
+    public async Task<List<Layer>> GetLayersAsync(
         List<QueryLayerParams> queryLayerRequests, string traceIdentifier)
     {
-        var list = new List<ILayer>();
+        var list = new List<Layer>();
         var hashSet = new HashSet<string>();
 
         foreach (var layerQuery in queryLayerRequests)
@@ -37,7 +39,7 @@ public class LayerQuerier : ILayerQuerier
                     continue;
                 }
 
-                _logger.LogError("[{TraceIdentifier}] Layer {Layer} is not exists", traceIdentifier, layerQuery.Layer);
+                _logger.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
             }
             else
             {
@@ -60,15 +62,16 @@ public class LayerQuerier : ILayerQuerier
                         continue;
                     }
                 }
- 
-                _logger.LogError("[{TraceIdentifier}] Layer {ResourceGroup}:{Layer} is not exists", traceIdentifier, layerQuery.ResourceGroup, layerQuery.Layer);
+
+                _logger.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
+                    layerQuery.ResourceGroup, layerQuery.Layer);
             }
         }
 
         return list;
     }
 
-    private void TryAdd(ISet<string> hashSet, ICollection<ILayer> list, QueryLayerParams layerQuery, ILayer layer)
+    private void TryAdd(ISet<string> hashSet, ICollection<Layer> list, QueryLayerParams layerQuery, Layer layer)
     {
         if (hashSet.Contains(layer.Name))
         {
@@ -86,13 +89,13 @@ public class LayerQuerier : ILayerQuerier
         }
 
         if (layerQuery.Arguments == null || !layerQuery.Arguments.ContainsKey(
-                                             Constants.AdditionalFilter)
-                                         || layerQuery.Arguments[Constants.AdditionalFilter] == null)
+                                             Defaults.AdditionalFilter)
+                                         || layerQuery.Arguments[Defaults.AdditionalFilter] == null)
         {
             return;
         }
 
-        var filter = layerQuery.Arguments[Constants.AdditionalFilter].ToString();
+        var filter = layerQuery.Arguments[Defaults.AdditionalFilter].ToString();
         if (!string.IsNullOrWhiteSpace(filter))
         {
             vectorSource.Filter = new CQLFilter(filter);

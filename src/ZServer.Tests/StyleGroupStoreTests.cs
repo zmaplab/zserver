@@ -38,23 +38,38 @@ namespace ZServer.Tests
                 { "height", 11 }
             }));
             Assert.Equal(true, fillStyle.Filter.Value);
-            Assert.Equal(null, lineStyle.Filter);
+
+
+            var b = lineStyle.Filter is
+            {
+                Value: not null
+            };
+
+
+            Assert.False(b);
+
+            CSharpExpression<bool?> c = null;
+
+            Assert.False(c is
+            {
+                Value: not null
+            });
             Assert.Equal(false, textStyle.Filter.Value);
             Assert.True(fillStyle.Antialias);
             Assert.Equal(1, fillStyle.Opacity.Value);
-            Assert.Equal("feature[\"opacity\"]", fillStyle.Opacity.Body);
+            Assert.Equal("feature[\"opacity\"]", fillStyle.Opacity.Expression);
             Assert.Equal("#3ed53e", fillStyle.Color.Value);
-            Assert.Equal("feature[\"color\"]", fillStyle.Color.Body);
+            Assert.Equal("feature[\"color\"]", fillStyle.Color.Expression);
             Assert.NotNull(fillStyle.Translate.Value);
-            Assert.Equal("feature[\"translate\"]", fillStyle.Translate.Body);
+            Assert.Equal("feature[\"translate\"]", fillStyle.Translate.Expression);
             Assert.Equal(2, fillStyle.Translate.Value.Length);
             Assert.Equal(1, fillStyle.Translate.Value[0]);
             Assert.Equal(2, fillStyle.Translate.Value[1]);
             Assert.Equal(TranslateAnchor.Viewport, fillStyle.TranslateAnchor.Value);
-            Assert.Equal("feature[\"translateAnchor\"]", fillStyle.TranslateAnchor.Body);
+            Assert.Equal("feature[\"translateAnchor\"]", fillStyle.TranslateAnchor.Expression);
             Assert.Equal("sprite pattern", fillStyle.Pattern.Value);
-            Assert.Equal(new Uri("file://images/colorblocks1.png").AbsoluteUri, fillStyle.Uri.Value.AbsoluteUri);
-            Assert.Equal("feature[\"uri\"]", fillStyle.Uri.Body);
+            Assert.Equal("file://images/colorblocks1.png", fillStyle.Uri.Value);
+            Assert.Equal("feature[\"uri\"]", fillStyle.Uri.Expression);
 
             Assert.Equal(1, lineStyle.Opacity.Value);
             Assert.Equal(1, lineStyle.Width.Value);
@@ -65,23 +80,23 @@ namespace ZServer.Tests
             Assert.Equal(10f, lineStyle.DashOffset.Value);
             Assert.Equal("lineJoin string", lineStyle.LineJoin.Value);
             Assert.Equal(2, lineStyle.Translate.Value.Length);
-            Assert.Equal("feature[\"translate\"]", lineStyle.Translate.Body);
+            Assert.Equal("feature[\"translate\"]", lineStyle.Translate.Expression);
             Assert.Equal(1d, lineStyle.Translate.Value[0]);
             Assert.Equal(2d, lineStyle.Translate.Value[1]);
             Assert.Equal(TranslateAnchor.Viewport, lineStyle.TranslateAnchor.Value);
-            Assert.Equal("feature[\"translateAnchor\"]", lineStyle.TranslateAnchor.Body);
+            Assert.Equal("feature[\"translateAnchor\"]", lineStyle.TranslateAnchor.Expression);
             Assert.Equal(1, lineStyle.GapWidth.Value);
-            Assert.Equal("feature[\"gapWidth\"]", lineStyle.GapWidth.Body);
+            Assert.Equal("feature[\"gapWidth\"]", lineStyle.GapWidth.Expression);
             Assert.Equal(2, lineStyle.Offset.Value);
-            Assert.Equal("feature[\"offset\"]", lineStyle.Offset.Body);
+            Assert.Equal("feature[\"offset\"]", lineStyle.Offset.Expression);
             Assert.Equal(3, lineStyle.Blur.Value);
-            Assert.Equal("feature[\"blur\"]", lineStyle.Blur.Body);
+            Assert.Equal("feature[\"blur\"]", lineStyle.Blur.Expression);
             Assert.Equal(4, lineStyle.Gradient.Value);
             Assert.Equal("sprite pattern", lineStyle.Pattern.Value);
-            Assert.Equal("feature[\"sprite-pattern\"]", lineStyle.Pattern.Body);
+            Assert.Equal("feature[\"sprite-pattern\"]", lineStyle.Pattern.Expression);
 
             Assert.Equal("property string", textStyle.Label.Value);
-            Assert.Equal("property expression", textStyle.Label.Body);
+            Assert.Equal("property expression", textStyle.Label.Expression);
             Assert.Equal("auto", textStyle.Align.Value);
             Assert.Equal(2, textStyle.Font.Value.Count);
             Assert.Equal("Open Sans Regular", textStyle.Font.Value[0]);
@@ -93,7 +108,6 @@ namespace ZServer.Tests
             Assert.Equal(2, textStyle.Offset.Value.Length);
             Assert.Equal(90, textStyle.Offset.Value[0]);
             Assert.Equal(90, textStyle.Offset.Value[1]);
-
         }
     }
 }

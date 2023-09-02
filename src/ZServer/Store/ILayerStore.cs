@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZMap;
+using ZMap.Store;
 
 namespace ZServer.Store
 {
@@ -15,7 +16,7 @@ namespace ZServer.Store
         /// <param name="resourceGroupName"></param>
         /// <param name="layerName"></param>
         /// <returns></returns>
-        Task<ILayer> FindAsync(string resourceGroupName, string layerName);
+        Task<Layer> FindAsync(string resourceGroupName, string layerName);
 
         // Task<ILayer> FindAsync(string layerName);
 
@@ -23,12 +24,12 @@ namespace ZServer.Store
         /// 查询所有图层配置
         /// </summary>
         /// <returns></returns>
-        Task<List<ILayer>> GetAllAsync();
+        Task<List<Layer>> GetAllAsync();
 
         /// <summary>
         /// 查询所有图层配置
         /// </summary>
         /// <returns></returns>
-        Task<List<ILayer>> GetListAsync(string resourceGroupName);
+        Task<List<Layer>> GetListAsync(string resourceGroupName);
     }
 }

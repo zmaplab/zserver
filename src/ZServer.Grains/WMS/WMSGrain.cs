@@ -6,9 +6,9 @@ using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
 using ZMap.Extensions;
+using ZMap.Ogc.Wms;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMS;
-using ZServer.Wms;
 
 namespace ZServer.Grains.WMS
 {
@@ -19,9 +19,9 @@ namespace ZServer.Grains.WMS
     // ReSharper disable once InconsistentNaming
     public class WMSGrain : Grain, IWMSGrain
     {
-        private readonly IWmsService _wmsService;
+        private readonly WmsService _wmsService;
 
-        public WMSGrain(IWmsService wmsService)
+        public WMSGrain(WmsService wmsService)
         {
             _wmsService = wmsService;
         }

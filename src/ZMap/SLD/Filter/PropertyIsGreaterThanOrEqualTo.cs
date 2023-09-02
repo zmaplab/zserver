@@ -30,7 +30,7 @@ public class PropertyIsGreaterThanOrEqualTo
         var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
         visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({leftExpression.Body}, {rightExpression.Body})"));
+            $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({leftExpression.Expression}, {rightExpression.Expression})"));
 
         return null;
     }

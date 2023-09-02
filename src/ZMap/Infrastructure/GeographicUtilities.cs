@@ -7,7 +7,7 @@ namespace ZMap.Infrastructure;
 /// <summary>
 /// 地理空间计算相关的方法
 /// </summary>
-public class GeographicUtilities
+public static class GeographicUtilities
 {
     /// <summary>
     /// 经纬度坐标系的比例尺计算
@@ -37,7 +37,6 @@ public class GeographicUtilities
         var envelope4326 = envelope.Transform(srid, 4326);
         return CalculateOGCScale(envelope4326, width, dpi);
     }
-
 
     /// <summary>
     /// Calculate the Representative Fraction Scale for a Lat/Long map.

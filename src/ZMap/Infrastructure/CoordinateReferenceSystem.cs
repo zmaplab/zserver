@@ -178,7 +178,7 @@ namespace ZMap.Infrastructure
                 MultiLineString lineString => Transform(lineString, transform),
                 MultiPolygon polygon => Transform(polygon, transform),
                 GeometryCollection collection => Transform(collection, transform),
-                _ => throw new ArgumentException("Can't transform geometry type '" + geometry.GetType() + "'")
+                _ => throw new ArgumentException($"图形类型 {geometry.GetType().Name} 不支持投影转换")
             };
         }
 
@@ -220,18 +220,22 @@ namespace ZMap.Infrastructure
         private static Polygon Transform(Polygon polygon, ICoordinateTransformation transform)
         {
             var shell = Transform((LinearRing)polygon.ExteriorRing, transform);
-            LinearRing[] holes = null;
-            var holesCount = polygon.NumInteriorRings;
-            if (holesCount > 0)
+            LinearRing[] interiorRings;
+
+            if (polygon.NumInteriorRings > 0)
             {
-                holes = new LinearRing[holesCount];
-                for (var i = 0; i < holesCount; i++)
+                interiorRings = new LinearRing[polygon.NumInteriorRings];
+                for (var i = 0; i < polygon.NumInteriorRings; i++)
                 {
-                    holes[i] = Transform((LinearRing)polygon.GetInteriorRingN(i), transform);
+                    interiorRings[i] = Transform((LinearRing)polygon.GetInteriorRingN(i), transform);
                 }
             }
+            else
+            {
+                interiorRings = Array.Empty<LinearRing>();
+            }
 
-            return GeometryFactory.CreatePolygon(shell, holes);
+            return GeometryFactory.CreatePolygon(shell, interiorRings);
         }
 
         private static LinearRing Transform(LinearRing linearRing, ICoordinateTransformation transform)

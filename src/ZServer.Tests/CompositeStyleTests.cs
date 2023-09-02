@@ -59,13 +59,12 @@ namespace ZServer.Tests
         public async Task Hatching()
         {
             var data = GetFeatures();
-            Uri.TryCreate("shape://times", UriKind.Absolute, out var uri);
             var style1 = new ResourceFillStyle
             {
                 Antialias = true,
                 Opacity = CSharpExpression<float?>.New(0.5f),
                 Color = CSharpExpression<string>.New("#3ed53e"),
-                Uri = CSharpExpression<Uri>.New(uri)
+                Uri = CSharpExpression<string>.New("shape://times")
             };
             var style2 = new LineStyle
             {

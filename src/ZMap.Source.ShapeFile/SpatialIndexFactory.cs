@@ -36,7 +36,7 @@ namespace ZMap.Source.ShapeFile
                 }
                 catch (Exception e)
                 {
-                    Log.Logger.LogError("加载空间索引失败， 矢量文件： {ShapeFile}， 异常： {Exception}", shapeFile, e);
+                    Log.Logger.LogError("加载空间索引失败， 矢量文件： {ShapeFile}， 异常： {Exception}", shapeFile, e.ToString());
                     entries = new List<SpatialIndexItem>();
                 }
 
@@ -72,7 +72,7 @@ namespace ZMap.Source.ShapeFile
         }
 
         /// <summary>
-        /// Reads all boundingboxes of features in the shapefile. This is used for spatial indexing.
+        /// Reads all boundingBoxes of features in the shapefile. This is used for spatial indexing.
         /// </summary>
         /// <returns></returns>
         private static IEnumerable<SpatialIndexItem> GetAllFeatureBoundingBoxes(BinaryReader shapeFileReader)

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace ZMap.Style
 {
-    public class TextStyle : VectorStyle, IFillStyle
+    public class TextStyle : VectorStyle
     {
         public CSharpExpression<string> Label { get; set; }
         public CSharpExpression<string> Color { get; set; }
@@ -38,7 +38,7 @@ namespace ZMap.Style
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(Label.Body))
+            if (!string.IsNullOrWhiteSpace(Label.Expression))
             {
                 Label.Invoke(feature);
             }
@@ -68,7 +68,7 @@ namespace ZMap.Style
 
         public override Style Clone()
         {
-            return new TextStyle()
+            return new TextStyle
             {
                 MaxZoom = MaxZoom,
                 MinZoom = MinZoom,

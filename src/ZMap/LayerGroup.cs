@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using ZMap;
 
-namespace ZServer.Entity
+namespace ZMap
 {
-    public class LayerGroup : IOgcWebServiceProvider
+    public class LayerGroup
     {
         /// <summary>
         /// 
@@ -15,7 +14,7 @@ namespace ZServer.Entity
         /// <summary>
         /// 图层列表
         /// </summary>
-        public List<ILayer> Layers { get; set; }
+        public List<Layer> Layers { get; set; }
 
         public HashSet<ServiceType> Services { get; set; }
 
@@ -26,7 +25,7 @@ namespace ZServer.Entity
                 Name = Name,
                 Services = Services,
                 ResourceGroup = ResourceGroup,
-                Layers = new List<ILayer>()
+                Layers = new List<Layer>()
             };
 
             if (Layers == null)

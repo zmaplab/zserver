@@ -38,7 +38,7 @@ namespace ZMap.Style
 
         public override Style Clone()
         {
-            return new RasterStyle()
+            return new RasterStyle
             {
                 MaxZoom = MaxZoom,
                 MinZoom = MinZoom,

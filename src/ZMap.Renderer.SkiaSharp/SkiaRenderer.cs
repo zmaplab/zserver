@@ -9,6 +9,17 @@ public abstract class SkiaRenderer
 {
     protected abstract SKPaint CreatePaint();
 
+    protected virtual SKPaint CreateDefaultPaint()
+    {
+        return new SKPaint
+        {
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 1,
+            IsAntialias = true,
+            Color = SKColors.Black
+        };
+    }
+
     public virtual void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
     {
         using var paint = CreatePaint();

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ZMap;
-using ZServer.Entity;
 
-namespace ZServer.Store.Configuration
+namespace ZServer.Store
 {
     public class LayerGroupStore : ILayerGroupStore
     {
@@ -26,24 +25,38 @@ namespace ZServer.Store.Configuration
             _logger = logger;
         }
 
-        public async Task Refresh(IConfiguration configuration)
+        public async Task Refresh(IEnumerable<IConfiguration> configurations)
         {
-            var sections = configuration.GetSection("layerGroups");
-            foreach (var section in sections.GetChildren())
+            var existKeys = Cache.Keys.ToList();
+            var keys = new List<string>();
+
+            foreach (var configuration in configurations)
             {
-                var resourceGroupName = section.GetValue<string>("resourceGroup");
+                var sections = configuration.GetSection("layerGroups");
+                foreach (var section in sections.GetChildren())
+                {
+                    var resourceGroupName = section.GetValue<string>("resourceGroup");
 
-                var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
-                    ? null
-                    : await _resourceGroupStore.FindAsync(resourceGroupName);
+                    var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
+                        ? null
+                        : await _resourceGroupStore.FindAsync(resourceGroupName);
 
-                var layerGroup = Activator.CreateInstance<LayerGroup>();
-                layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
-                layerGroup.Name = section.Key;
-                layerGroup.ResourceGroup = resourceGroup;
-                layerGroup.Layers = new List<ILayer>();
-                await RestoreAsync(layerGroup, section);
-                Cache.AddOrUpdate(section.Key, layerGroup, (_, _) => layerGroup);
+                    var layerGroup = Activator.CreateInstance<LayerGroup>();
+                    layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
+                    layerGroup.Name = section.Key;
+                    layerGroup.ResourceGroup = resourceGroup;
+                    layerGroup.Layers = new List<Layer>();
+                    await RestoreAsync(layerGroup, section);
+
+                    keys.Add(layerGroup.Name);
+                    Cache.AddOrUpdate(layerGroup.Name, layerGroup, (_, _) => layerGroup);
+                }
+            }
+
+            var removedKeys = existKeys.Except(keys);
+            foreach (var removedKey in removedKeys)
+            {
+                Cache.TryRemove(removedKey, out _);
             }
         }
 
@@ -163,7 +176,7 @@ namespace ZServer.Store.Configuration
                 foreach (var layerName in layerNames)
                 {
                     var parts = layerName.Split(':');
-                    ILayer layer = null;
+                    Layer layer = null;
                     switch (parts.Length)
                     {
                         case 1:

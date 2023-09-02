@@ -18,7 +18,7 @@ public class PropertyIsNullType : ComparisonOpsType
 
         var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New($"{expression.Body} == null"));
+        visitor.Push(ZMap.Style.CSharpExpression.New($"{expression.Expression} == null"));
 
         return null;
     }

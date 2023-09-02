@@ -30,7 +30,7 @@ namespace ZMap.SLD.Filter
             var upperBoundaryExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
             visitor.Push(ZMap.Style.CSharpExpression.New(
-                $"ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({propertyExpression.Body}, {lowerBoundaryExpression.Body}, {upperBoundaryExpression.Body})"));
+                $"ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({propertyExpression.Expression}, {lowerBoundaryExpression.Expression}, {upperBoundaryExpression.Expression})"));
 
             return null;
         }

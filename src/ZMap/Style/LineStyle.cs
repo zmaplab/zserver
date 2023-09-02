@@ -1,6 +1,6 @@
 namespace ZMap.Style
 {
-    public class LineStyle : VectorStyle, IStrokeStyle
+    public class LineStyle : VectorStyle
     {
         /// <summary>
         /// 线的不透明度（可选，取值范围为 0 ~ 1，默认值为 1）

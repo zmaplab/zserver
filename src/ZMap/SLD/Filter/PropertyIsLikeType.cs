@@ -38,7 +38,7 @@ public class PropertyIsLikeType : ComparisonOpsType
         var literalExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
         visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"ZMap.SLD.Filter.Methods.Like({propertyExpression.Body}, {literalExpression.Body}, \"{WildCard}\", \"{SingleChar}\", \"{EscapeChar}\")"));
+            $"ZMap.SLD.Filter.Methods.Like({propertyExpression.Expression}, {literalExpression.Expression}, \"{WildCard}\", \"{SingleChar}\", \"{EscapeChar}\")"));
         return null;
     }
 }

@@ -10,11 +10,11 @@ namespace ZMap;
 public class Map : IDisposable
 {
     private ILogger _logger = NullLogger.Instance;
-    private readonly List<ILayer> _layers = new();
+    private readonly List<Layer> _layers = new();
     private IGraphicsServiceProvider _graphicsServiceProvider;
     private Zoom _zoom;
     private int _srid;
-    public IReadOnlyCollection<ILayer> Layers => _layers;
+    public IReadOnlyCollection<Layer> Layers => _layers;
     public string Id { get; private set; }
 
     public Map SetZoom(Zoom zoom)
@@ -41,7 +41,7 @@ public class Map : IDisposable
         return this;
     }
 
-    public Map AddLayers(IEnumerable<ILayer> layers)
+    public Map AddLayers(IEnumerable<Layer> layers)
     {
         foreach (var layer in layers)
         {
@@ -61,15 +61,15 @@ public class Map : IDisposable
     {
         if (viewport.Extent == null || viewport.Extent.IsNull)
         {
-            return new MemoryStream();
+            return Stream.Null;
         }
 
         using var graphicsService =
             _graphicsServiceProvider.Create(Id, viewport.Width, viewport.Height);
         if (graphicsService == null)
         {
-            _logger.LogWarning("Create graphics context failed");
-            return new MemoryStream();
+            _logger.LogWarning("创建图形服务失败");
+            return Stream.Null;
         }
 
         for (var i = _layers.Count - 1; i >= 0; --i)

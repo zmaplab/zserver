@@ -20,7 +20,7 @@ public class Mul : BinaryOperatorType
         visitor.Visit(right, extraData);
         var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New($"{leftExpression.Body} * {rightExpression.Body}"));
+        visitor.Push(ZMap.Style.CSharpExpression.New($"{leftExpression.Expression} * {rightExpression.Expression}"));
         return null;
     }
 }

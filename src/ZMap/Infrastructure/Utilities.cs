@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using static System.Int32;
 
 namespace ZMap.Infrastructure;
 
@@ -22,7 +23,7 @@ public static class Utilities
         }
 
         var value = match.Value.Substring(4, match.Value.Length - 4);
-        int.TryParse(value, out dpi);
+        TryParse(value, out dpi);
 
         return dpi;
     }

@@ -7,24 +7,6 @@ namespace ZServer.Extensions
     {
         public static CSharpExpression<T> GetExpression<T>(this IConfigurationSection section, string name)
         {
-            if (name == "filter" && typeof(T) == typeof(bool?))
-            {
-                var expression = section.GetValue<string>(name);
-                if (bool.TryParse(expression, out var result))
-                {
-                    return CSharpExpression<bool?>.New(result) as CSharpExpression<T>;
-                }
-                else
-                {
-                    if (string.IsNullOrEmpty(expression))
-                    {
-                        return null;
-                    }
-
-                    return CSharpExpression<bool?>.New(null, expression) as CSharpExpression<T>;
-                }
-            }
-
             var expressionValue = section.GetSection($"{name}:value").Get<T>();
             var expressionBody = section.GetSection($"{name}:expression").Get<string>();
             // 若表达示值不为空，或者配置的值是默认值
@@ -37,6 +19,14 @@ namespace ZServer.Extensions
             var targetSection = section.GetSection(name);
             var value = targetSection.Get<T>();
             return CSharpExpression<T>.New(value);
+        }
+
+        public static CSharpExpression<bool?> GetFilterExpression(this IConfigurationSection section)
+        {
+            var expression = section.GetValue<string>("filter");
+            return bool.TryParse(expression, out var result)
+                ? CSharpExpression<bool?>.New(result)
+                : CSharpExpression<bool?>.New(null, string.IsNullOrEmpty(expression) ? null : expression);
         }
 
         // public static T GetOrDefault<T>(this IConfigurationSection section, string name)

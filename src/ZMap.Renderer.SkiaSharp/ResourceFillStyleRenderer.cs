@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using SkiaSharp;
 using ZMap.Extensions;
@@ -26,22 +27,23 @@ namespace ZMap.Renderer.SkiaSharp
         {
             var style = (ResourceFillStyle)Style;
 
-            var opacity = style.Opacity.Value ?? 1;
-            var color = style.Color?.Value;
-            var uri = style.Uri?.Value;
-            var antialias = Style.Antialias;
-
-            if (uri == null)
+            var uri = style.Uri.Value;
+            if (string.IsNullOrEmpty(uri) || !Uri.TryCreate(uri, UriKind.Absolute, out var u))
             {
-                return base.CreatePaint();
+                return CreateDefaultPaint();
             }
 
             SKPaint paint;
-            switch (uri.Scheme)
+
+
+            var opacity = style.Opacity.Value ?? 1;
+            var color = style.Color?.Value;
+            var antialias = Style.Antialias;
+            switch (u.Scheme)
             {
                 case "file":
                 {
-                    var path = uri.ToPath();
+                    var path = u.ToPath();
                     paint = GetDefaultPaint(color, opacity, antialias);
                     if (File.Exists(path))
                     {
@@ -54,7 +56,7 @@ namespace ZMap.Renderer.SkiaSharp
                 case "shape":
                 {
                     paint = GetDefaultPaint(color, opacity, antialias);
-                    paint.PathEffect = uri.DnsSafeHost switch
+                    paint.PathEffect = u.DnsSafeHost switch
                     {
                         "times" => Times,
                         _ => paint.PathEffect

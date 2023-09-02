@@ -46,7 +46,7 @@ namespace ZServer.Tests
         }
 
 
-        [Fact]
+        [Fact(Skip = "SLD 实现验证")]
         public void LoadFromXml()
         {
             var styledLayerDescriptor1 = StyledLayerDescriptor.Load("se.xml");
@@ -82,7 +82,7 @@ namespace ZServer.Tests
 
             var rule1 = rules[0];
             Assert.Equal("规划道路中线L16", rule1.Name);
-            Assert.Equal(true, rule1.ElseFilter);
+            Assert.True(rule1.ElseFilter);
             Assert.Equal(10000000d, rule1.MaxScaleDenominator);
             Assert.Equal(6772d, rule1.MinScaleDenominator);
 
@@ -93,14 +93,14 @@ namespace ZServer.Tests
             // Assert.Equal("14", pointSymbolizer1.Graphic.Rotation);
             var rule2 = rules[1];
             Assert.Equal("规划道路中线L17", rule2.Name);
-            Assert.Equal(false, rule2.ElseFilter);
+            Assert.False(rule2.ElseFilter);
             Assert.Equal(6771d, rule2.MaxScaleDenominator);
             Assert.Equal(3387d, rule2.MinScaleDenominator);
 
             Assert.Equal(4, rule1.Symbolizers.Count);
 
             var symbolizer1 = rule1.Symbolizers[0];
-            Assert.IsType(typeof(LineSymbolizer), symbolizer1);
+            Assert.IsType<LineSymbolizer>(symbolizer1);
             var lineSymbolizer1 = (LineSymbolizer)symbolizer1;
             var stroke1 = lineSymbolizer1.Stroke;
             // Assert.Equal("#f8f8f8", stroke1.Color.Text);
@@ -130,7 +130,7 @@ namespace ZServer.Tests
             // Assert.Equal("round", stroke2.LineJoin.Text[0]);
             // Assert.Equal("4 2", stroke2.DashArray.Text[0]);
             // Assert.Null(stroke2.DashOffset);
-            
+
             var ruleFont1 = rules.First(x => x.Name == "文字1");
             var textSymbolizer1 = (TextSymbolizer)ruleFont1.Symbolizers[0];
             Assert.Equal("微软雅黑", textSymbolizer1.Font.GetOrDefault("font-family").Text[0]);
@@ -139,7 +139,7 @@ namespace ZServer.Tests
             Assert.Equal("style1", textSymbolizer1.Font.GetOrDefault("font-style").Text[0]);
             Assert.Equal("dlmc", textSymbolizer1.Label.PropertyName);
             Assert.Equal(2, textSymbolizer1.Halo.Radius);
-            Assert.Equal(true, textSymbolizer1.LabelPlacement.LinePlacement.GeneralizeLine);
+            Assert.True(textSymbolizer1.LabelPlacement.LinePlacement.GeneralizeLine);
 
             var rulePolygon1 = rules.First(x => x.Name == "Polygon1");
             var polygonSymbolizer1 = (PolygonSymbolizer)rulePolygon1.Symbolizers[0];

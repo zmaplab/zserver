@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
@@ -85,7 +86,7 @@ namespace ZMap.Renderer.SkiaSharp
         {
             SKBitmap image;
             var uri = _style.Uri.Value;
-            if (uri == null)
+            if (string.IsNullOrEmpty(uri) || !Uri.TryCreate(uri, UriKind.Absolute, out var u))
             {
                 image = DefaultImage;
             }
@@ -93,11 +94,11 @@ namespace ZMap.Renderer.SkiaSharp
             {
                 image = Cache.GetOrCreate($"SSI_{_style.Uri.Value}", _ =>
                 {
-                    switch (uri.Scheme)
+                    switch (u.Scheme)
                     {
                         case "file":
                         {
-                            var path = uri.ToPath();
+                            var path = u.ToPath();
                             return File.Exists(path) ? SKBitmap.Decode(path) : DefaultImage;
                         }
                         default:

@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ZMap.Infrastructure;
@@ -37,29 +39,14 @@ public static class ConvertUtilities
 
     public static T[] ToArray<T>(string text)
     {
-        var pieces = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-        if (typeof(T) == typeof(string))
-        {
-            return pieces as T[];
-        }
-        else
-        {
-            var result = pieces.Select(x => (T)Convert.ChangeType(x, typeof(T))).ToArray();
-            return result;
-        }
+        var type = typeof(T);
+        return ToArray(text, type).Select(x => x == null ? default : (T)x).ToArray();
     }
 
-    public static dynamic ToArray(string text, Type type)
+    public static IEnumerable<object> ToArray(string text, Type type)
     {
-        var pieces = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-        if (type == typeof(string))
-        {
-            return pieces;
-        }
-        else
-        {
-            var result = pieces.Select(x => Convert.ChangeType(x, type)).ToArray();
-            return result;
-        }
+        
+        var data = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+        return data.Select(x => type == typeof(string) ? x : Convert.ChangeType(x, type));
     }
 }

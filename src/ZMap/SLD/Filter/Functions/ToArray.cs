@@ -32,7 +32,7 @@ public class ToArray
             resultExpression = ZMap.Style.CSharpExpression.New($$"""
 ((Func<{{type}}[]>)(() =>
 {
-    var value = {{leftExpression.Body}};
+    var value = {{leftExpression.Expression}};
     if(value == null){
         return default;
     } else {
@@ -47,7 +47,7 @@ public class ToArray
             resultExpression = ZMap.Style.CSharpExpression.New($$"""
 ((Func<{{type}}[]>)(() =>
 {
-    var value = {{leftExpression.Body}};
+    var value = {{leftExpression.Expression}};
     if(value == null){
         return default;
     } else {
@@ -58,7 +58,7 @@ public class ToArray
 """);
         }
 
-        CSharpDynamicCompiler.GetOrCreateFunc(resultExpression.Body);
+        CSharpDynamicCompiler.GetOrCreateFunc(resultExpression.Expression);
         visitor.Push(resultExpression);
         return null;
     }

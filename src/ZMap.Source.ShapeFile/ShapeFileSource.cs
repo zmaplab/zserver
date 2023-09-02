@@ -42,12 +42,6 @@ namespace ZMap.Source.ShapeFile
             return (ISource)MemberwiseClone();
         }
 
-        record FileReader
-        {
-            public BinaryReader Reader { get; set; }
-            public ISpatialIndex<SpatialIndexItem> Tree { get; set; }
-        }
-
         public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
         {
             var features = new List<Feature>();
@@ -62,12 +56,12 @@ namespace ZMap.Source.ShapeFile
                         var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
                         var stream = mmf.CreateViewStream();
                         var reader = new BinaryReader(stream, Encoding.Unicode);
-                        var tree = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
+                        var spatialIndex = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
 
                         var result = new FileReader
                         {
                             Reader = reader,
-                            Tree = tree
+                            SpatialIndex = spatialIndex
                         };
                         entry.SetValue(result);
                         entry.SetSlidingExpiration(TimeSpan.FromDays(365));
@@ -75,7 +69,7 @@ namespace ZMap.Source.ShapeFile
                     });
             }
 
-            var spatialIndexItems = GetObjectIDsInView(tuple.Tree, extent);
+            var spatialIndexItems = GetObjectIDsInView(tuple.SpatialIndex, extent);
             if (spatialIndexItems.Count == 0)
             {
                 return Task.FromResult<IEnumerable<Feature>>(Array.Empty<Feature>());
@@ -111,6 +105,17 @@ namespace ZMap.Source.ShapeFile
             return null;
         }
 
+        public override string ToString()
+        {
+            return $"Path: {File}";
+        }
+
+        public override void Dispose()
+        {
+        }
+
+        public Func<Feature, bool> Predicate { get; set; }
+
         private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
             SpatialIndexItem spatialIndexItem)
         {
@@ -136,8 +141,8 @@ namespace ZMap.Source.ShapeFile
                 dict.Add(name, value);
             }
 
-            var f = new Feature(geometry, dict);
-            return f;
+            var feature = new Feature(geometry, dict);
+            return feature;
         }
 
         private IAttributesTable GetAttribute(DbaseReader dbaseFile, int index)
@@ -145,34 +150,23 @@ namespace ZMap.Source.ShapeFile
             return dbaseFile.ReadEntry(index);
         }
 
-        public override string ToString()
-        {
-            return $"Path: {File}";
-        }
-
-        public override void Dispose()
-        {
-        }
-
-        public Func<Feature, bool> Predicate { get; set; }
-
         private int GetSrid(string path)
         {
-            var prjPath = path.Replace(".shp", ".prj");
+            var projPath = path.Replace(".shp", ".prj");
             CoordinateSystem coordinateSystem;
             try
             {
-                if (!System.IO.File.Exists(prjPath))
+                if (!System.IO.File.Exists(projPath))
                 {
-                    throw new Exception($"投影文件不存在 {prjPath}");
+                    throw new Exception($"投影文件不存在 {projPath}");
                 }
 
                 coordinateSystem =
-                    CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(prjPath)));
+                    CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(projPath)));
             }
             catch
             {
-                throw new Exception($"投影文件不正确 {prjPath}");
+                throw new Exception($"投影文件不正确 {projPath}");
             }
 
             return (int)coordinateSystem.AuthorityCode;
@@ -180,7 +174,7 @@ namespace ZMap.Source.ShapeFile
 
         private List<SpatialIndexItem> GetObjectIDsInView(ISpatialIndex<SpatialIndexItem> tree, Envelope bbox)
         {
-            //Use the spatial index to get a list of features whose boundingbox intersects bbox
+            //Use the spatial index to get a list of features whose boundingBox intersects bbox
             var res = tree.Query(bbox);
 
             /*Sort oids so we get a forward only read of the shapefile*/
@@ -217,6 +211,12 @@ namespace ZMap.Source.ShapeFile
                 var geometry = handler.Read(geometryReader, item.Length, _geometryFactory);
                 return geometry;
             }
+        }
+
+        record FileReader
+        {
+            public BinaryReader Reader { get; init; }
+            public ISpatialIndex<SpatialIndexItem> SpatialIndex { get; init; }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using ZMap.Infrastructure;
 
-namespace ZServer.Store.Configuration;
+namespace ZServer.Store;
 
 public class ConfigurationProvider
 {
@@ -34,7 +34,7 @@ public class ConfigurationProvider
         _lastWriteTime = file.LastWriteTime;
 
         var json = File.ReadAllBytes(_path);
-        var hash = MurmurHashAlgorithmService.ComputeHash(json);
+        var hash = MurmurHashAlgorithmUtilities.ComputeHash(json);
         if (hash == _lastHash)
         {
             return null;

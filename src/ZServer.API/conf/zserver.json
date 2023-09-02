@@ -24,7 +24,7 @@
       "styles": [
         {
           "type": "line",
-          "opacity": "1",
+          "opacity": "0.5",
           "dashArray": [
             5,
             5
@@ -42,7 +42,6 @@
             "value": null,
             "expression": "feature[\"name\"] "
           },
-          "filter": "feature[\"name\"] != \"中文\"",
           "font": [
             "Source Han Sans SC"
           ],

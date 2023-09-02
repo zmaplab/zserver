@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NetTopologySuite.Geometries;
 
-namespace ZServer.Wms;
+namespace ZMap.Ogc.Wms;
 
 public class RequestArguments
 {

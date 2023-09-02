@@ -1,5 +1,5 @@
 // ReSharper disable InconsistentNaming
-namespace ZServer
+namespace ZMap
 {
     public enum ServiceType
     {

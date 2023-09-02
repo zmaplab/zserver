@@ -67,6 +67,10 @@ public class SkiaGraphicsService : IGraphicsService
 
     private IRenderer Create<TStyle>(TStyle style) where TStyle : Style.Style
     {
+        if (style == null)
+        {
+            
+        }
         return style switch
         {
             ResourceFillStyle resourceFillStyle => new ResourceFillStyleRenderer(resourceFillStyle),
@@ -75,7 +79,7 @@ public class SkiaGraphicsService : IGraphicsService
             TextStyle textStyle => new TextStyleRenderer(textStyle),
             SymbolStyle symbolStyle => new SymbolStyleRenderer(symbolStyle),
             RasterStyle rasterStyle => new RasterStyleRender(rasterStyle),
-            _ => throw new NotSupportedException("不支持的样式")
+            _ => throw new NotSupportedException($"不支持的样式: {style.GetType().Name}")
         };
     }
 

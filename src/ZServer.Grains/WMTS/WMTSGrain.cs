@@ -2,18 +2,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 using ZMap.Extensions;
+using ZMap.Ogc.Wmts;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMTS;
-using ZServer.Wmts;
 
 namespace ZServer.Grains.WMTS
 {
     // ReSharper disable once InconsistentNaming
     public class WMTSGrain : Grain, IWMTSGrain
     {
-        private readonly IWmtsService _wmtsService;
+        private readonly WmtsService _wmtsService;
 
-        public WMTSGrain(IWmtsService wmtsService)
+        public WMTSGrain(WmtsService wmtsService)
         {
             _wmtsService = wmtsService;
         }

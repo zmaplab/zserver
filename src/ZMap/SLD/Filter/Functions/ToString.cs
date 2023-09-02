@@ -22,7 +22,7 @@ public class ToString
         var resultExpression = ZMap.Style.CSharpExpression.New($$"""
 ((Func<string>)(() =>
 {
-    var value_{{guid}} = {{expression.Body}};
+    var value_{{guid}} = {{expression.Expression}};
     return value_{{guid}} == null ? null : value_{{guid}}.ToString();
 })).Invoke()
 """);

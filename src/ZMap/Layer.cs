@@ -13,11 +13,10 @@ using ZMap.Style;
 
 namespace ZMap
 {
-    public class Layer : ILayer
+    public class Layer : IVisibleLimit
     {
         private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
         private readonly List<StyleGroup> _styleGroups;
-        private readonly Dictionary<string, dynamic> _environments = new();
 
         /// <summary>
         /// 图层名称
@@ -69,16 +68,30 @@ namespace ZMap
         /// </summary>
         public int Srid => Source.Srid;
 
-        public virtual string GetResourceGroupName()
+        /// <summary>
+        /// 
+        /// </summary>
+        public HashSet<ServiceType> Services { get; set; }
+
+        /// <summary>
+        /// 资源组
+        /// </summary>
+        public ResourceGroup ResourceGroup { get; set; }
+
+
+        public Layer(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name, ISource source,
+            List<StyleGroup> styleGroups, Envelope envelope = null) :
+            this(name, source, styleGroups, envelope)
         {
-            return null;
+            ResourceGroup = resourceGroup;
+            Services = services;
         }
 
-        public Layer(string name, ISource source, List<StyleGroup> styleGroups, Envelope envelope = null)
+        private Layer(string name, ISource source, List<StyleGroup> styleGroups, Envelope envelope = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentNullException(nameof(name), "图层名称不能为空");
             }
 
             Name = name;
@@ -104,10 +117,8 @@ namespace ZMap
 
             // 数据源为空: 在构造中检测了
             // 没有样式: 在构造中检测了
-            // 所有的样式都不可显示
-            // 则不需要渲染， 提前退出， 避免数据查询开销
-            if (StyleGroups == null || StyleGroups.Count == 0 ||
-                !StyleGroups.Any(styleGroup => styleGroup.IsVisible(zoom)))
+            // 所有的样式都不可显示，则不需要渲染，提前退出，避免数据查询开销
+            if (!StyleGroups.Any(x => x.IsVisible(zoom)))
             {
                 return;
             }
@@ -142,12 +153,17 @@ namespace ZMap
                 transformation = CoordinateReferenceSystem.CreateTransformation(Srid, srid);
             }
 
-            _environments[Defaults.WmsScaleKey] = zoom.Value;
+            var environments = new Dictionary<string, dynamic>
+            {
+                { Defaults.WmsScaleKey, zoom.Value }
+            };
 
             switch (Source)
             {
                 case IVectorSource vectorSource:
-                    Envelope queryEnvelope;
+                    Envelope renderEnvelope;
+                    // 不同级别使用不同的 Buffer，比如左右两个相领的图形，右边图形绘制文字特别长，但图形若没有交在左边，会导到文字只显示部分
+                    // 不过，文字的绘制可以优化到 TextRender 如果超过边界，就进行移动
                     var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
                     if (buffer is { Size: > 0 })
                     {
@@ -155,17 +171,17 @@ namespace ZMap
                         var yPerPixel = extent.Height / viewport.Height;
                         var x = xPerPixel * buffer.Size;
                         var y = yPerPixel * buffer.Size;
-                        queryEnvelope = new Envelope(extent.MinX - x, extent.MaxX + x,
+                        renderEnvelope = new Envelope(extent.MinX - x, extent.MaxX + x,
                             extent.MinY - y,
                             extent.MaxY + y);
                     }
                     else
                     {
-                        queryEnvelope = extent;
+                        renderEnvelope = extent;
                     }
 
-                    await RenderVectorAsync(graphicsService, vectorSource,
-                        queryEnvelope, viewport.Extent, zoom, transformation);
+                    await RenderVectorAsync(graphicsService, vectorSource, renderEnvelope, viewport.Extent, zoom,
+                        transformation, environments);
                     break;
                 case IRasterSource rasterSource:
                     await RenderRasterAsync(graphicsService, rasterSource, viewport.Extent, zoom);
@@ -173,9 +189,22 @@ namespace ZMap
             }
         }
 
-        public virtual ILayer Clone()
+        public Layer Clone()
         {
-            return null;
+            var styleGroups = new List<StyleGroup>();
+            foreach (var styleGroup in StyleGroups)
+            {
+                styleGroups.Add(styleGroup.Clone());
+            }
+
+            return new Layer(ResourceGroup, Services, Name, Source.Clone(), styleGroups, Envelope)
+            {
+                MinZoom = MinZoom,
+                MaxZoom = MaxZoom,
+                ZoomUnit = ZoomUnit,
+                Enabled = Enabled,
+                Buffers = Buffers
+            };
         }
 
         // public void ClearEnvironments()
@@ -210,8 +239,7 @@ namespace ZMap
         private async Task RenderVectorAsync(IGraphicsService service, IVectorSource vectorSource,
             Envelope queryEnvelope,
             Envelope targetExtent,
-            Zoom zoom
-            , ICoordinateTransformation transformation
+            Zoom zoom, ICoordinateTransformation transformation, IReadOnlyDictionary<string, dynamic> environments
         )
         {
             // 需要考虑 CRS 的 AxisOrder.NORTH_EAST， 影响 Feature -> Word 的转换算法
@@ -239,7 +267,7 @@ namespace ZMap
                     feature.Transform(transformation);
                 }
 
-                feature.SetEnvironment(_environments);
+                feature.SetEnvironment(environments);
 
                 foreach (var styleGroup in StyleGroups)
                 {
@@ -254,10 +282,11 @@ namespace ZMap
                         continue;
                     }
 
-                    var styleGroup1 = styleGroup;
-                    styleGroup1.Accept(StyleVisitor, feature);
+                    // 需要保证 StyleGroups 每次都是新对象
+                    // 不然 Accept 后会导致数据异常
+                    styleGroup.Accept(StyleVisitor, feature);
 
-                    foreach (var style in styleGroup1.Styles)
+                    foreach (var style in styleGroup.Styles)
                     {
                         if (!style.IsVisible(zoom) || style is not VectorStyle vectorStyle)
                         {
@@ -287,6 +316,11 @@ namespace ZMap
                     service.Identifier, this.Name, service.Width, service.Height, vectorSource.Filter, count,
                     stopwatch.ElapsedMilliseconds);
             }
+        }
+
+        public override string ToString()
+        {
+            return ResourceGroup == null ? Name : $"{ResourceGroup.Name}:{Name}";
         }
 
 //         private async Task PaintAsync(IVectorSource vectorSource, Envelope envelope,

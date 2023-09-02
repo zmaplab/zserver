@@ -1,6 +1,6 @@
 namespace ZMap.Style
 {
-    public class FillStyle : VectorStyle, IFillStyle
+    public class FillStyle : VectorStyle
     {
         /// <summary>
         /// 填充时是否反锯齿（可选，默认值为 true）

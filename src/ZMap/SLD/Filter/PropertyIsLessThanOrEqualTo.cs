@@ -19,7 +19,7 @@ public class PropertyIsLessThanOrEqualTo
         var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
         visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.LessThanOrEqualTo({leftExpression.Body}, {rightExpression.Body})"));
+            $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.LessThanOrEqualTo({leftExpression.Expression}, {rightExpression.Expression})"));
 
         return null;
     }

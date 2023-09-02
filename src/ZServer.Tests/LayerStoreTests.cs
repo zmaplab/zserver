@@ -4,11 +4,9 @@ using Xunit;
 using ZMap.Source;
 using ZMap.Style;
 using ZMap.Source.ShapeFile;
-using ZServer.Entity;
 using System.Linq;
 using ZMap;
 using ZMap.Source.Postgre;
-using ZServer.Store.Configuration;
 
 namespace ZServer.Tests
 {
@@ -17,7 +15,7 @@ namespace ZServer.Tests
         [Fact]
         public async Task ParallelTest()
         {
-            var syncService = GetService<ConfigurationSyncService>();
+            var syncService = GetService<ConfigurationStoreRefreshService>();
             var configurationProvider = GetService<ConfigurationProvider>();
             await syncService.RefreshAsync(configurationProvider);
 
@@ -94,7 +92,7 @@ namespace ZServer.Tests
         public async Task GetShapeFileLayer()
         {
             var store = GetScopedService<ILayerStore>();
-            var layer = await store.FindAsync(null, "berlin_shp") as LayerEntity;
+            var layer = await store.FindAsync(null, "berlin_shp");
             Assert.NotNull(layer);
             Assert.Equal("berlin_shp", layer.Name);
 
@@ -146,8 +144,8 @@ namespace ZServer.Tests
             Assert.NotNull(layers);
             Assert.Equal(2, layers.Count);
 
-            var pgLayer = (LayerEntity)layers.First(x => x.Name == "berlin_db");
-            var shpLayer = (LayerEntity)layers.First(x => x.Name == "berlin_shp");
+            var pgLayer = layers.First(x => x.Name == "berlin_db");
+            var shpLayer = layers.First(x => x.Name == "berlin_shp");
             Assert.Equal("berlin_db", pgLayer.Name);
             Assert.Equal("berlin_shp", shpLayer.Name);
 

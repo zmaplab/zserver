@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Orleans;
+using ZMap.Ogc.Wms;
 using ZServer.Interfaces.WMS;
-using ZServer.Wms;
 
 namespace ZServer.API.Controllers
 {
@@ -16,9 +16,9 @@ namespace ZServer.API.Controllers
     {
         private readonly Lazy<IClusterClient> _clusterClient;
         private readonly IConfiguration _configuration;
-        private readonly IWmsService _wmsService;
+        private readonly WmsService _wmsService;
 
-        public WMSController(Lazy<IClusterClient> clusterClient, IConfiguration configuration, IWmsService wmsService)
+        public WMSController(Lazy<IClusterClient> clusterClient, IConfiguration configuration, WmsService wmsService)
         {
             _clusterClient = clusterClient;
             _configuration = configuration;

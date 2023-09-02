@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using ZMap.Infrastructure;
 using ZMap.SLD.Filter.Expression;
@@ -24,11 +25,28 @@ public static class ParameterValueListExtensions
         {
             parameter.Accept(visitor, extraData);
             var value = visitor.Pop();
-            return value == null ? CSharpExpression<T>.New(defaultValue) : CSharpExpression<T>.From(value, defaultValue);
+            if (value == null)
+            {
+                return CSharpExpression<T>.New(defaultValue);
+            }
+
+            var type = typeof(T);
+            Type valueType;
+            if (type.Name == "Nullable`1" && type.Namespace == "System")
+            {
+                valueType = type.GenericTypeArguments.ElementAt(0);
+            }
+            else
+            {
+                valueType = type;
+            }
+
+            return CSharpExpression<T>.From(Convert.ChangeType(value, valueType), defaultValue);
         }
     }
 
-    public static CSharpExpression<T[]> BuildArrayExpression<T>(this ParameterValue parameter, IExpressionVisitor visitor,
+    public static CSharpExpression<T[]> BuildArrayExpression<T>(this ParameterValue parameter,
+        IExpressionVisitor visitor,
         object extraData,
         T[] defaultValue)
     {
@@ -49,7 +67,7 @@ public static class ParameterValueListExtensions
                 var result = visitor.Pop();
                 if (result is CSharpExpression expression)
                 {
-                    return result as CSharpExpression<T[]> ?? CSharpExpression<T[]>.New(null, expression.Body);
+                    return result as CSharpExpression<T[]> ?? CSharpExpression<T[]>.New(null, expression.Expression);
                 }
                 else
                 {
