@@ -5,26 +5,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using ZMap;
+using Microsoft.VisualBasic;
+using ZMap.Extensions;
 using ZMap.Infrastructure;
-using ZServer.Extensions;
-using ZServer.Store;
+using ZMap.Store;
 
-namespace ZServer.Wmts;
+namespace ZMap.Ogc.Wmts;
 
-public class WmtsService : IWmtsService
+public class WmtsService
 {
     private readonly ILogger<WmtsService> _logger;
     private readonly IGraphicsServiceProvider _graphicsServiceProvider;
-    private readonly ILayerQuerier _layerQuerier;
+    private readonly ILayerQueryService _layerQueryService;
     private readonly IGridSetStore _gridSetStore;
 
     public WmtsService(ILogger<WmtsService> logger, IGraphicsServiceProvider graphicsServiceProvider,
-        ILayerQuerier layerQuerier, IGridSetStore gridSetStore)
+        ILayerQueryService layerQueryService, IGridSetStore gridSetStore)
     {
         _logger = logger;
         _graphicsServiceProvider = graphicsServiceProvider;
-        _layerQuerier = layerQuerier;
+        _layerQueryService = layerQueryService;
         _gridSetStore = gridSetStore;
     }
 
@@ -59,11 +59,11 @@ public class WmtsService : IWmtsService
                 return ("TileMatrixSetNotDefined", $"Could not find tile matrix set {tileMatrixSet}", null);
             }
 
-            var layerKey = MurmurHashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(layers));
+            var layerKey = MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(layers));
 
             var cqlFilterHash = string.IsNullOrWhiteSpace(cqlFilter)
                 ? string.Empty
-                : MurmurHashAlgorithmService.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
+                : MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
 
             // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
             var path = Path.Combine(AppContext.BaseDirectory,
@@ -110,13 +110,13 @@ public class WmtsService : IWmtsService
                         layerQueries.Add(new QueryLayerParams(layerQuery[0], layerQuery[1],
                             new Dictionary<string, object>
                             {
-                                { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
+                                { Defaults.AdditionalFilter, filters.ElementAtOrDefault(i) }
                             }));
                         break;
                     case 1:
                         layerQueries.Add(new QueryLayerParams(null, layerQuery[0], new Dictionary<string, object>
                         {
-                            { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
+                            { Defaults.AdditionalFilter, filters.ElementAtOrDefault(i) }
                         }));
                         break;
                     default:
@@ -127,7 +127,7 @@ public class WmtsService : IWmtsService
                 }
             }
 
-            var layerList = await _layerQuerier.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = await _layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
             var scale = tuple.ScaleDenominator;
             var viewPort = new Viewport
             {

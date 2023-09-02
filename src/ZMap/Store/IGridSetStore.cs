@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using ZMap.TileGrid;
 
-namespace ZServer.Store
+namespace ZMap.Store
 {
     public interface IGridSetStore : IRefresher
     {

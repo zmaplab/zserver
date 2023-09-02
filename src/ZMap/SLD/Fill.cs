@@ -63,7 +63,7 @@ namespace ZMap.SLD
 
         public object Accept(IStyleVisitor visitor, object extraData)
         {
-            if (visitor.Pop() is not IFillStyle fillStyle)
+            if (visitor.Pop() is not FillStyle fillStyle)
             {
                 // TODO: 是不是应该报错？
                 return null;

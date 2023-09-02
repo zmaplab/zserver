@@ -26,7 +26,7 @@ namespace ZMap.SLD.Filter
             var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
 
             visitor.Push(ZMap.Style.CSharpExpression.New(
-                $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.EqualTo({leftExpression.Body}, {rightExpression.Body})"));
+                $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.EqualTo({leftExpression.Expression}, {rightExpression.Expression})"));
             return null;
         }
     }

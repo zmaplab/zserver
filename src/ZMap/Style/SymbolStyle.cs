@@ -7,7 +7,7 @@ namespace ZMap.Style
     public class SymbolStyle : VectorStyle
     {
         public CSharpExpression<int?> Size { get; set; }
-        public CSharpExpression<Uri> Uri { get; set; }
+        public CSharpExpression<string> Uri { get; set; }
         public CSharpExpression<float?> Opacity { get; set; }
         public CSharpExpression<float?> Rotation { get; set; }
 
@@ -23,7 +23,7 @@ namespace ZMap.Style
 
         public override Style Clone()
         {
-            return new SymbolStyle()
+            return new SymbolStyle
             {
                 MaxZoom = MaxZoom,
                 MinZoom = MinZoom,

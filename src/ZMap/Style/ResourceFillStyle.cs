@@ -4,7 +4,7 @@ namespace ZMap.Style
 {
     public class ResourceFillStyle : FillStyle
     {
-        public CSharpExpression<Uri> Uri { get; set; }
+        public CSharpExpression<string> Uri { get; set; }
 
         public override void Accept(IZMapStyleVisitor visitor, Feature feature)
         {

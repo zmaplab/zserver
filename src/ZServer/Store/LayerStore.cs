@@ -10,9 +10,8 @@ using NetTopologySuite.Geometries;
 using ZMap;
 using ZMap.Source;
 using ZMap.Style;
-using ZServer.Entity;
 
-namespace ZServer.Store.Configuration
+namespace ZServer.Store
 {
     public class LayerStore : ILayerStore
     {
@@ -24,7 +23,7 @@ namespace ZServer.Store.Configuration
         private readonly ISourceStore _sourceStore;
         private readonly ILogger<LayerStore> _logger;
         private readonly ISldStore _sldStore;
-        private static readonly ConcurrentDictionary<string, ILayer> Cache = new();
+        private static readonly ConcurrentDictionary<string, Layer> Cache = new();
 
         public LayerStore(IStyleGroupStore styleStore,
             IResourceGroupStore resourceGroupStore, ISourceStore sourceStore,
@@ -37,26 +36,41 @@ namespace ZServer.Store.Configuration
             _sldStore = sldStore;
         }
 
-        public async Task Refresh(IConfiguration configuration)
+        public async Task Refresh(IEnumerable<IConfiguration> configurations)
         {
-            var sections = configuration.GetSection("layers");
-            foreach (var section in sections.GetChildren())
+            var existKeys = Cache.Keys.ToList();
+            var keys = new List<string>();
+
+            foreach (var configuration in configurations)
             {
-                var resourceGroupName = section.GetValue<string>("resourceGroup");
-
-                var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
-                    ? null
-                    : await _resourceGroupStore.FindAsync(resourceGroupName);
-
-                var layer = await BindLayerAsync(section, resourceGroup);
-                if (layer != null)
+                var sections = configuration.GetSection("layers");
+                foreach (var section in sections.GetChildren())
                 {
-                    Cache.AddOrUpdate(section.Key, layer, (_, _) => layer);
+                    var resourceGroupName = section.GetValue<string>("resourceGroup");
+
+                    var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
+                        ? null
+                        : await _resourceGroupStore.FindAsync(resourceGroupName);
+
+                    var layer = await BindLayerAsync(section, resourceGroup);
+                    if (layer == null)
+                    {
+                        continue;
+                    }
+
+                    keys.Add(layer.Name);
+                    Cache.AddOrUpdate(layer.Name, layer, (_, _) => layer);
                 }
+            }
+
+            var removedKeys = existKeys.Except(keys);
+            foreach (var removedKey in removedKeys)
+            {
+                Cache.TryRemove(removedKey, out _);
             }
         }
 
-        public async Task<ILayer> FindAsync(string resourceGroupName, string layerName)
+        public async Task<Layer> FindAsync(string resourceGroupName, string layerName)
         {
             if (string.IsNullOrWhiteSpace(resourceGroupName) && string.IsNullOrWhiteSpace(layerName))
             {
@@ -73,7 +87,7 @@ namespace ZServer.Store.Configuration
                 return await Task.FromResult(layer.Clone());
             }
 
-            if (layer.GetResourceGroupName() != resourceGroupName)
+            if (layer.ResourceGroup?.Name != resourceGroupName)
             {
                 return null;
             }
@@ -125,15 +139,15 @@ namespace ZServer.Store.Configuration
             // return result?.DeepClone();
         }
 
-        public Task<List<ILayer>> GetAllAsync()
+        public Task<List<Layer>> GetAllAsync()
         {
             var items = Cache.Values.Select(x => x.Clone()).ToList();
             return Task.FromResult(items);
         }
 
-        public Task<List<ILayer>> GetListAsync(string resourceGroup)
+        public Task<List<Layer>> GetListAsync(string resourceGroup)
         {
-            var result = new List<ILayer>();
+            var result = new List<Layer>();
             if (string.IsNullOrWhiteSpace(resourceGroup))
             {
                 return Task.FromResult(result);
@@ -141,7 +155,7 @@ namespace ZServer.Store.Configuration
 
             foreach (var value in Cache.Values)
             {
-                if (value.GetResourceGroupName() == resourceGroup)
+                if (value.ResourceGroup?.Name == resourceGroup)
                 {
                     result.Add(value.Clone());
                 }
@@ -169,7 +183,7 @@ namespace ZServer.Store.Configuration
                 envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
             }
 
-            var layer = new LayerEntity(resourceGroup, services, section.Key, source, styleGroups, envelope);
+            var layer = new Layer(resourceGroup, services, section.Key, source, styleGroups, envelope);
             section.Bind(layer);
             return layer;
         }

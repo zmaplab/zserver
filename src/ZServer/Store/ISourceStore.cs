@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZMap.Source;
+using ZMap.Store;
 
 namespace ZServer.Store
 {

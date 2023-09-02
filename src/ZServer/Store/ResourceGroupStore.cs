@@ -2,28 +2,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using ZServer.Entity;
+using ZMap;
 
-namespace ZServer.Store.Configuration
+namespace ZServer.Store
 {
     public class ResourceGroupStore : IResourceGroupStore
     {
         private static Dictionary<string, ResourceGroup> _cache = new();
 
-        public Task Refresh(IConfiguration configuration)
+        public Task Refresh(IEnumerable<IConfiguration> configurations)
         {
-            var sections = configuration.GetSection("resourceGroups");
             var dict = new Dictionary<string, ResourceGroup>();
-            foreach (var section in sections.GetChildren())
-            {
-                var resourceGroup = section.Get<ResourceGroup>();
-                if (resourceGroup == null)
-                {
-                    continue;
-                }
 
-                resourceGroup.Name = section.Key;
-                dict.TryAdd(section.Key, resourceGroup);
+            foreach (var configuration in configurations)
+            {
+                var sections = configuration.GetSection("resourceGroups");
+                foreach (var section in sections.GetChildren())
+                {
+                    var resourceGroup = section.Get<ResourceGroup>();
+                    if (resourceGroup == null)
+                    {
+                        continue;
+                    }
+
+                    resourceGroup.Name = section.Key;
+                    dict.TryAdd(section.Key, resourceGroup);
+                }
             }
 
             _cache = dict;

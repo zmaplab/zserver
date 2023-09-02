@@ -15,7 +15,7 @@ services:
     volumes:
       - ./serilog.json:/app/serilog.json
       - ./zserver.json:/app/zserver.json
-      - ./Fonts:/app/Fonts
+      - ./fonts:/app/fonts
       - ./shapes:/app/shapes
     environment:
       - HOST_IP=192.168.50.23

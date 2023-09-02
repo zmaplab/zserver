@@ -9,7 +9,7 @@ using ZMap.Infrastructure;
 
 namespace ZMap
 {
-    public class Feature : IDisposable
+    public record Feature : IDisposable
     {
         private readonly IDictionary<string, dynamic> _attributes;
         private IReadOnlyDictionary<string, dynamic> _environments;
@@ -51,7 +51,7 @@ namespace ZMap
             _environments = environments ?? new Dictionary<string, dynamic>();
         }
 
-        public dynamic GetEnvValue(string name)
+        public dynamic GetEnvironmentValue(string name)
         {
             return _environments.TryGetValue(name, out var v) ? v : null;
         }

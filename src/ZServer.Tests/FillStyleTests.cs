@@ -111,13 +111,12 @@ namespace ZServer.Tests
         {
             var data = GetFeatures();
 
-            Uri.TryCreate("file://images/colorblocks1.png", UriKind.Absolute, out var uri);
             var style = new ResourceFillStyle
             {
                 Antialias = true,
                 Opacity = CSharpExpression<float?>.New(0.5f),
                 Color = CSharpExpression<string>.New("#3ed53e"),
-                Uri = CSharpExpression<Uri>.New(uri)
+                Uri = CSharpExpression<string>.New("file://images/colorblocks1.png")
             };
 
             var width = 256;

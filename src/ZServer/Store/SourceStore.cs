@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ZMap.Source;
 
-namespace ZServer.Store.Configuration
+namespace ZServer.Store
 {
     /// <summary>
     /// 
@@ -28,17 +28,32 @@ namespace ZServer.Store.Configuration
             _logger = logger;
         }
 
-        public Task Refresh(IConfiguration configuration)
+        public Task Refresh(IEnumerable<IConfiguration> configurations)
         {
-            var sections = configuration.GetSection("sources");
-            foreach (var section in sections.GetChildren())
+            var existKeys = Cache.Keys.ToList();
+            var keys = new List<string>();
+
+            foreach (var configuration in configurations)
             {
-                var source = Get(section);
-                if (source != null)
+                var sections = configuration.GetSection("sources");
+                foreach (var section in sections.GetChildren())
                 {
+                    var source = Get(section);
+                    if (source == null)
+                    {
+                        continue;
+                    }
+
                     source.Name = section.Key;
+                    keys.Add(source.Name);
                     Cache.AddOrUpdate(source.Name, source, (_, _) => source);
                 }
+            }
+
+            var removedKeys = existKeys.Except(keys);
+            foreach (var removedKey in removedKeys)
+            {
+                Cache.TryRemove(removedKey, out _);
             }
 
             return Task.CompletedTask;
@@ -106,7 +121,13 @@ namespace ZServer.Store.Configuration
                 var args = new object[parameterInfos.Length];
                 for (var i = 0; i < args.Length; ++i)
                 {
-                    args[i] = section.GetSection(parameterInfos[i].Name).Get(parameterInfos[i].ParameterType);
+                    var name = parameterInfos[i].Name;
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        continue;
+                    }
+
+                    args[i] = section.GetSection(name).Get(parameterInfos[i].ParameterType);
                 }
 
                 try

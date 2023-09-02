@@ -5,12 +5,13 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ZMap;
+using ZMap.Ogc.Wms;
+using ZMap.Ogc.Wmts;
 using ZMap.Renderer.SkiaSharp;
+using ZMap.Store;
 using ZServer.Store;
-using ZServer.Store.Configuration;
-using ZServer.Wms;
-using ZServer.Wmts;
-using ConfigurationProvider = ZServer.Store.Configuration.ConfigurationProvider;
+using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 
 [assembly: InternalsVisibleTo("ZServer.Tests")]
 
@@ -36,12 +37,12 @@ namespace ZServer
             serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
             serviceCollection.TryAddScoped<ISldStore, SldStore>();
             serviceCollection.TryAddSingleton(_ => new ConfigurationProvider(layersConfiguration));
-            serviceCollection.AddHostedService<ConfigurationSyncService>();
+            serviceCollection.AddHostedService<ConfigurationStoreRefreshService>();
 
             serviceCollection.AddHostedService<PreloadService>();
-            serviceCollection.TryAddScoped<ILayerQuerier, LayerQuerier>();
-            serviceCollection.TryAddScoped<IWmsService, WmsService>();
-            serviceCollection.TryAddScoped<IWmtsService, WmtsService>();
+            serviceCollection.TryAddScoped<ILayerQueryService, LayerQueryService>();
+            serviceCollection.TryAddScoped<WmsService>();
+            serviceCollection.TryAddScoped<WmtsService>();
             serviceCollection.AddMemoryCache();
             return new ZServerBuilder(serviceCollection);
         }

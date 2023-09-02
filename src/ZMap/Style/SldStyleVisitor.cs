@@ -131,7 +131,7 @@ public class SldStyleVisitor : IStyleVisitor, IFilterVisitor
             if (_stack.Pop() is CSharpExpression filterExpression)
             {
                 styleGroup.Filter = CSharpExpression<bool?>.New(null,
-                    $"{(rule.ElseFilter ? "!" : string.Empty)}{filterExpression.Body}");
+                    $"{(rule.ElseFilter ? "!" : string.Empty)}{filterExpression.Expression}");
             }
         }
 

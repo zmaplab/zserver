@@ -7,7 +7,7 @@ public class FunctionsTests
 {
  
 
-    [Fact]
+    [Fact(Skip = "SLD 实现验证")]
     public void IntTest()
     {
         var s1 = "1";

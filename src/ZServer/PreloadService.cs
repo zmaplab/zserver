@@ -23,11 +23,14 @@ namespace ZServer
         {
             return Task.Run(async () =>
             {
-                if (!string.Equals(Environment.GetEnvironmentVariable("PREHEAT"), "false",
+                if (string.Equals(Environment.GetEnvironmentVariable("PREHEAT"), "true",
+                        StringComparison.InvariantCultureIgnoreCase)
+                    ||
+                    string.Equals(Environment.GetEnvironmentVariable("PRE_LOAD_SHP"), "true",
                         StringComparison.InvariantCultureIgnoreCase))
                 {
                     await LoadAllShapes();
-                    _logger.LogInformation("Preload completed");
+                    _logger.LogInformation("预加载矢量文件成功");
                 }
             }, cancellationToken);
         }
@@ -41,7 +44,6 @@ namespace ZServer
         {
             if (!Directory.Exists(directory))
             {
-                _logger.LogInformation("目录不存在: {Directory}", directory);
                 return;
             }
 
@@ -63,7 +65,7 @@ namespace ZServer
 
         private async Task LoadShape(string path)
         {
-            _logger.LogInformation("Start loading {Path}", path);
+            _logger.LogInformation("开始加载矢量文件: {Path}", path);
             var shapeFileSource = new ShapeFileSource(path);
 
             // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
@@ -72,7 +74,7 @@ namespace ZServer
             {
             }
 
-            _logger.LogInformation("Load {Path} success", path);
+            _logger.LogInformation("加载矢量文件 {Path} 成功", path);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

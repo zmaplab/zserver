@@ -1,21 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ZMap.Store;
 using ZServer.Store;
-using ZServer.Store.Configuration;
+using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 
 namespace ZServer;
 
-public class ConfigurationSyncService : IHostedService
+public class ConfigurationStoreRefreshService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<ConfigurationSyncService> _logger;
+    private readonly ILogger<ConfigurationStoreRefreshService> _logger;
 
-    public ConfigurationSyncService(IServiceProvider serviceProvider, ILogger<ConfigurationSyncService> logger)
+    public ConfigurationStoreRefreshService(IServiceProvider serviceProvider,
+        ILogger<ConfigurationStoreRefreshService> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -28,11 +32,12 @@ public class ConfigurationSyncService : IHostedService
             var configurationProvider = _serviceProvider.GetRequiredService<ConfigurationProvider>();
             if (File.Exists(configurationProvider.Path))
             {
-                _logger.LogInformation($"ZServer configuration {configurationProvider.Path} found successfully");
+                _logger.LogInformation("ZServer 已发现配置文件 {ConfigurationPath} ",
+                    configurationProvider.Path);
             }
             else
             {
-                _logger.LogError($"ZServer configuration {configurationProvider.Path} not found");
+                _logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
             }
 
             while (!cancellationToken.IsCancellationRequested)
@@ -43,7 +48,7 @@ public class ConfigurationSyncService : IHostedService
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("Load configuration store failed: {Exception}", e);
+                    _logger.LogError("加载配置文件存储失败: {Exception}", e);
                 }
 
                 await Task.Delay(15000, cancellationToken);
@@ -56,23 +61,24 @@ public class ConfigurationSyncService : IHostedService
         var configuration = configurationProvider.GetConfiguration();
         if (configuration != null)
         {
+            var configurations = new List<IConfiguration> { configuration };
             using var scope = _serviceProvider.CreateScope();
             var gridSetStore = scope.ServiceProvider.GetRequiredService<IGridSetStore>();
-            await gridSetStore.Refresh(configuration);
+            await gridSetStore.Refresh(configurations);
             var sourceStore = scope.ServiceProvider.GetRequiredService<ISourceStore>();
-            await sourceStore.Refresh(configuration);
+            await sourceStore.Refresh(configurations);
             var styleGroupStore = scope.ServiceProvider.GetRequiredService<IStyleGroupStore>();
-            await styleGroupStore.Refresh(configuration);
+            await styleGroupStore.Refresh(configurations);
             var sldStore = scope.ServiceProvider.GetRequiredService<ISldStore>();
-            await sldStore.Refresh(configuration);
+            await sldStore.Refresh(configurations);
             var resourceGroupStore = scope.ServiceProvider.GetRequiredService<IResourceGroupStore>();
-            await resourceGroupStore.Refresh(configuration);
+            await resourceGroupStore.Refresh(configurations);
             var layerStore = scope.ServiceProvider.GetRequiredService<ILayerStore>();
-            await layerStore.Refresh(configuration);
+            await layerStore.Refresh(configurations);
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
-            await layerGroupStore.Refresh(configuration);
+            await layerGroupStore.Refresh(configurations);
 
-            _logger.LogInformation("Refresh configuration store success");
+            _logger.LogInformation("刷新配置文件存储成功");
         }
     }
 

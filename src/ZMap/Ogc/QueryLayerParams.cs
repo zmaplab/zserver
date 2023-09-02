@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ZServer
+namespace ZMap.Ogc
 {
     public class QueryLayerParams
     {

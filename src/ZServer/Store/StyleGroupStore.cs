@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,33 +7,47 @@ using ZMap;
 using ZMap.Style;
 using ZServer.Extensions;
 
-namespace ZServer.Store.Configuration
+namespace ZServer.Store
 {
     public class StyleGroupStore : IStyleGroupStore
     {
         private static readonly ConcurrentDictionary<string, StyleGroup> Cache = new();
 
-        public Task Refresh(IConfiguration configuration)
+        public Task Refresh(IEnumerable<IConfiguration> configurations)
         {
-            var sections = configuration.GetSection("styleGroups");
-            foreach (var section in sections.GetChildren())
-            {
-                if (!section.GetChildren().Any())
-                {
-                    continue;
-                }
+            var existKeys = Cache.Keys.ToList();
+            var keys = new List<string>();
 
-                var styleGroup = new StyleGroup
+            foreach (var configuration in configurations)
+            {
+                var sections = configuration.GetSection("styleGroups");
+                foreach (var section in sections.GetChildren())
                 {
-                    Name = section.Key,
-                    Filter = section.GetExpression<bool?>("filter"),
-                    Description = section.GetValue<string>("description"),
-                    MinZoom = section.GetValue<float>("minZoom"),
-                    MaxZoom = section.GetValue<float>("maxZoom"),
-                    ZoomUnit = section.GetValue<ZoomUnits>("zoomUnit"),
-                    Styles = GetStyles(section.GetSection("styles"))
-                };
-                Cache.AddOrUpdate(section.Key, styleGroup, (_, _) => styleGroup);
+                    if (!section.GetChildren().Any())
+                    {
+                        continue;
+                    }
+
+                    var styleGroup = new StyleGroup
+                    {
+                        Name = section.Key,
+                        Filter = section.GetFilterExpression(),
+                        Description = section.GetValue<string>("description"),
+                        MinZoom = section.GetValue<float>("minZoom"),
+                        MaxZoom = section.GetValue<float>("maxZoom"),
+                        ZoomUnit = section.GetValue<ZoomUnits>("zoomUnit"),
+                        Styles = GetStyles(section.GetSection("styles"))
+                    };
+
+                    keys.Add(section.Key);
+                    Cache.AddOrUpdate(section.Key, styleGroup, (_, _) => styleGroup);
+                }
+            }
+
+            var removedKeys = existKeys.Except(keys);
+            foreach (var removedKey in removedKeys)
+            {
+                Cache.TryRemove(removedKey, out _);
             }
 
             return Task.CompletedTask;
@@ -79,7 +92,7 @@ namespace ZServer.Store.Configuration
                     continue;
                 }
 
-                result.Filter = styleSection.GetExpression<bool?>("filter");
+                result.Filter = styleSection.GetFilterExpression();
                 result.MinZoom = styleSection.GetValue<float>("minZoom");
                 result.MaxZoom = styleSection.GetValue<float>("maxZoom");
                 result.ZoomUnit = styleSection.GetValue<ZoomUnits>("zoomUnit");
@@ -94,7 +107,7 @@ namespace ZServer.Store.Configuration
             return new SymbolStyle
             {
                 Size = section.GetExpression<int?>("size"),
-                Uri = section.GetExpression<Uri>("uri")
+                Uri = section.GetExpression<string>("uri")
             };
         }
 
@@ -141,7 +154,7 @@ namespace ZServer.Store.Configuration
                 Translate = section.GetExpression<double[]>("translate"),
                 TranslateAnchor = section.GetExpression<TranslateAnchor?>("translateAnchor"),
                 Pattern = section.GetExpression<string>("pattern"),
-                Uri = section.GetExpression<Uri>("uri")
+                Uri = section.GetExpression<string>("uri")
             };
         }
 
@@ -163,7 +176,7 @@ namespace ZServer.Store.Configuration
                 Blur = section.GetExpression<int?>("blur"),
                 Gradient = section.GetExpression<int?>("gradient"),
                 Pattern = section.GetExpression<string>("pattern"),
-                Uri = section.GetExpression<Uri>("uri")
+                Uri = section.GetExpression<string>("uri")
             };
         }
 
@@ -209,14 +222,14 @@ namespace ZServer.Store.Configuration
             var patternExpression = section.GetExpression<string>("pattern");
 
             var resource = section.GetValue<string>("resource");
-            var resourceExpression = section.GetExpression<Uri>("resource");
+            var resourceExpression = section.GetExpression<string>("resource");
 
             if (patternExpression != null)
             {
                 fillStyle = new SpriteFillStyle
                 {
                     Pattern = patternExpression,
-                    Uri = section.GetExpression<Uri>("uri")
+                    Uri = section.GetExpression<string>("uri")
                 };
             }
             else if (!string.IsNullOrWhiteSpace(pattern))
@@ -224,7 +237,7 @@ namespace ZServer.Store.Configuration
                 fillStyle = new SpriteFillStyle
                 {
                     Pattern = CSharpExpression<string>.New(pattern),
-                    Uri = section.GetExpression<Uri>("uri")
+                    Uri = section.GetExpression<string>("uri")
                 };
             }
             else if (resourceExpression != null)
@@ -236,17 +249,10 @@ namespace ZServer.Store.Configuration
             }
             else if (!string.IsNullOrWhiteSpace(resource))
             {
-                if (Uri.TryCreate(resource, UriKind.Absolute, out var uri))
+                fillStyle = new ResourceFillStyle
                 {
-                    fillStyle = new ResourceFillStyle
-                    {
-                        Uri = CSharpExpression<Uri>.New(uri)
-                    };
-                }
-                else
-                {
-                    throw new Exception($"不是合法的资源路径: {resource}");
-                }
+                    Uri = CSharpExpression<string>.New(resource)
+                };
             }
             else
             {

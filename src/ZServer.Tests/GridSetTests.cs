@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Xunit;
+using ZMap.Store;
 using ZMap.TileGrid;
 using ZServer.Store;
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace ZServer.Entity
+namespace ZMap
 {
     /// <summary>
     /// 资源分组

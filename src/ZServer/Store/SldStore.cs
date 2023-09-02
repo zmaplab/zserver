@@ -1,12 +1,13 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using ZMap.SLD;
 using ZMap.Style;
 
-namespace ZServer.Store.Configuration;
+namespace ZServer.Store;
 
 public class SldStore : ISldStore
 {
@@ -18,13 +19,16 @@ public class SldStore : ISldStore
         return Task.FromResult(result);
     }
 
-    public Task Refresh(IConfiguration configuration)
+    public Task Refresh(IEnumerable<IConfiguration> configurations)
     {
         var dir = "sld";
         if (!Directory.Exists(dir))
         {
             return Task.CompletedTask;
         }
+
+        var existKeys = Cache.Keys.ToList();
+        var keys = new List<string>();
 
         var files = Directory.GetFiles(dir);
         foreach (var file in files)
@@ -33,10 +37,19 @@ public class SldStore : ISldStore
             var visitor = new SldStyleVisitor();
             sld.Accept(visitor, null);
 
-            if (!string.IsNullOrWhiteSpace(sld.Name))
+            if (string.IsNullOrWhiteSpace(sld.Name))
             {
-                Cache.AddOrUpdate(sld.Name, visitor.StyleGroups, (_, _) => visitor.StyleGroups);
+                continue;
             }
+
+            keys.Add(sld.Name);
+            Cache.AddOrUpdate(sld.Name, visitor.StyleGroups, (_, _) => visitor.StyleGroups);
+        }
+
+        var removedKeys = existKeys.Except(keys);
+        foreach (var removedKey in removedKeys)
+        {
+            Cache.TryRemove(removedKey, out _);
         }
 
         return Task.CompletedTask;

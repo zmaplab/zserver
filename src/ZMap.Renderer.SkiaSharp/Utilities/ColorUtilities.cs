@@ -1,11 +1,13 @@
 using System;
+using Microsoft.Extensions.Logging;
 using SkiaSharp;
+using ZMap.Infrastructure;
 
 namespace ZMap.Renderer.SkiaSharp.Utilities
 {
     public static class ColorUtilities
     {
-        private static readonly SKColor DefaultColor = SKColors.ForestGreen;
+        private static readonly SKColor DefaultColor = SKColors.Black;
 
         public static SKColor GetColor(string hexString, float opacity = 1)
         {
@@ -13,18 +15,17 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
             {
                 return DefaultColor;
             }
+
+            if (!SKColor.TryParse(hexString, out var color))
+            {
+                Log.Logger.LogWarning("RGB {IncorrectColorHexString} 不是一个合法的颜色", color);
+                return DefaultColor;
+            }
             else
             {
-                if (!SKColor.TryParse(hexString, out var color))
-                {
-                    throw new ArgumentException($"RGB {color} 不是一个合法的颜色");
-                }
-                else
-                {
-                    opacity = opacity > 1 ? 1 : opacity;
-                    var alpha = Convert.ToByte(Math.Round(opacity / 0.0039215, 0));
-                    return color.WithAlpha(alpha);
-                }
+                opacity = opacity > 1 ? 1 : opacity;
+                var alpha = Convert.ToByte(Math.Round(opacity / 0.0039215, 0));
+                return color.WithAlpha(alpha);
             }
         }
     }

@@ -6,25 +6,25 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using ZMap;
+using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.Source;
-using ZServer.Extensions;
+using ZMap.Store;
 
-namespace ZServer.Wms;
+namespace ZMap.Ogc.Wms;
 
-public class WmsService : IWmsService
+public class WmsService
 {
     private readonly ILogger<WmsService> _logger;
     private readonly IGraphicsServiceProvider _graphicsServiceProvider;
-    private readonly ILayerQuerier _layerQuerier;
+    private readonly ILayerQueryService _layerQueryService;
 
     public WmsService(ILogger<WmsService> logger, IGraphicsServiceProvider graphicsServiceProvider,
-        ILayerQuerier layerQuerier)
+        ILayerQueryService layerQueryService)
     {
         _logger = logger;
         _graphicsServiceProvider = graphicsServiceProvider;
-        _layerQuerier = layerQuerier;
+        _layerQueryService = layerQueryService;
     }
 
     public async Task<(string Code, string Message, Stream Stream)> GetMapAsync(string layers, string styles,
@@ -61,11 +61,11 @@ public class WmsService : IWmsService
                     modeState.Arguments.Layers[i].Layer,
                     new Dictionary<string, object>
                     {
-                        { Constants.AdditionalFilter, filters.ElementAtOrDefault(i) }
+                        { Defaults.AdditionalFilter, filters.ElementAtOrDefault(i) }
                     }));
             }
 
-            var layerList = await _layerQuerier.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = await _layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
             if (layerList.Count == 0)
             {
                 return (null, null, new MemoryStream());
@@ -129,7 +129,7 @@ public class WmsService : IWmsService
                         modeState.Arguments.Layers[i].Layer));
             }
 
-            var layerList = await _layerQuerier.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = await _layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
 
             var featureCollection = await
                 GetFeatureInfoAsync(layerList, featureCount, srs, modeState.Arguments.Envelope, width, height, x, y);
@@ -149,7 +149,7 @@ public class WmsService : IWmsService
         }
     }
 
-    private async Task<FeatureCollection> GetFeatureInfoAsync(List<ILayer> layers,
+    private async Task<FeatureCollection> GetFeatureInfoAsync(List<Layer> layers,
         int featureCount,
         string srs,
         Envelope bbox, int width, int height, double x, double y)
