@@ -6,7 +6,7 @@ using Orleans;
 namespace ZServer.Interfaces.WMS
 {
     // ReSharper disable once InconsistentNaming
-    public interface IWMSGrain : IGrainWithStringKey, IRemindable
+    public interface IWMSGrain : IGrainWithStringKey
     {
         /// <summary>
         /// 
@@ -25,11 +25,11 @@ namespace ZServer.Interfaces.WMS
         /// <param name="arguments"></param>
         /// <param name="transparent"></param>
         /// <returns></returns>
-        Task<MapResult> GetMapAsync(string layers, string styles, string srs, string bbox,
+        ValueTask<MapResult> GetMapAsync(string layers, string styles, string srs, string bbox,
             int width, int height, string format, bool transparent, string bgcolor, int time,
             string formatOptions, string cqlFilter, IDictionary<string, object> arguments);
 
-        Task<MapResult> GetCapabilitiesAsync(string version, string format, IDictionary<string, object> arguments);
+        ValueTask<MapResult> GetCapabilitiesAsync(string version, string format, IDictionary<string, object> arguments);
 
         /// <summary>
         /// 
@@ -45,7 +45,7 @@ namespace ZServer.Interfaces.WMS
         /// <param name="width"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        Task<FeatureCollection> GetFeatureInfoAsync(string layers, string infoFormat, int featureCount, string srs,
+        ValueTask<FeatureCollection> GetFeatureInfoAsync(string layers, string infoFormat, int featureCount, string srs,
             string bbox,
             int width, int height, double x, double y, IDictionary<string, object> arguments);
     }

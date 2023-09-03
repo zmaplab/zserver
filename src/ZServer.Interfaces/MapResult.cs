@@ -1,8 +1,9 @@
-using System;
+using Orleans;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace ZServer.Interfaces
 {
+    [GenerateSerializer, Immutable]
     public struct MapResult
     {
         /// <summary>
@@ -25,7 +26,15 @@ namespace ZServer.Interfaces
         /// </summary>
         public string Locator { get; private set; }
 
-        public MapImage Image { get; private set; }
+        /// <summary>
+        /// 内容格式
+        /// </summary>
+        public string ImageType { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public byte[] ImageBytes { get; private set; }
 
         public static MapResult Failed(string message, string code, string locator = null)
         {
@@ -35,29 +44,32 @@ namespace ZServer.Interfaces
                 Code = code,
                 Locator = locator,
                 Message = message,
-                Image = null
+                ImageBytes = null,
+                ImageType = null
             };
         }
 
-        public static MapResult EmptyMap(string contentType)
+        // public static MapResult EmptyMap(string contentType)
+        // {
+        //     return new MapResult
+        //     {
+        //         Success = true,
+        //         Code = "200",
+        //         Message = null,
+        //         ImageType = contentType,
+        //         ImageBytes = Array.Empty<byte>()
+        //     };
+        // }
+
+        public static MapResult Ok(byte[] bytes, string type)
         {
             return new MapResult
             {
                 Success = true,
                 Code = "200",
                 Message = null,
-                Image = new MapImage(Array.Empty<byte>(), contentType)
-            };
-        }
-
-        public static MapResult Ok(byte[] content, string contentType)
-        {
-            return new MapResult
-            {
-                Success = true,
-                Code = "200",
-                Message = null,
-                Image = new MapImage(content, contentType)
+                ImageType = type,
+                ImageBytes = bytes
             };
         }
     }

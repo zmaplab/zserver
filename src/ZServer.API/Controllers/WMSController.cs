@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -14,11 +13,11 @@ namespace ZServer.API.Controllers
     // ReSharper disable once InconsistentNaming
     public class WMSController : ControllerBase
     {
-        private readonly Lazy<IClusterClient> _clusterClient;
+        private readonly IClusterClient _clusterClient;
         private readonly IConfiguration _configuration;
         private readonly WmsService _wmsService;
 
-        public WMSController(Lazy<IClusterClient> clusterClient, IConfiguration configuration, WmsService wmsService)
+        public WMSController(IClusterClient clusterClient, IConfiguration configuration, WmsService wmsService)
         {
             _clusterClient = clusterClient;
             _configuration = configuration;
@@ -72,25 +71,34 @@ namespace ZServer.API.Controllers
             {
                 case "GetMap":
                 {
-                    var friend = _clusterClient.Value.GetGrain<IWMSGrain>("0/0/0");
-                    var result =
-                        await friend.GetMapAsync(layers, styles, srs, bbox, width, height, format,
-                            transparent, bgColor, time,
-                            formatOptions, filter,
-                            new Dictionary<string, object>
-                            {
-                                { "TraceIdentifier", HttpContext.TraceIdentifier },
-                                { "Bordered", bordered },
-                                { "Buffer", buffer }
-                            });
+                    // var friend = _clusterClient.GetGrain<IWMSGrain>("0/0/0");
+                    // var result =
+                    //     await friend.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                    //         transparent, bgColor, time,
+                    //         formatOptions, filter,
+                    //         new Dictionary<string, object>
+                    //         {
+                    //             { "TraceIdentifier", HttpContext.TraceIdentifier },
+                    //             { "Bordered", bordered },
+                    //             { "Buffer", buffer }
+                    //         });
 
-                    await HttpContext.WriteMapImageAsync(result, exceptions);
 
+                    var result = await _wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                        transparent, bgColor, time,
+                        formatOptions, filter, new Dictionary<string, object>
+                        {
+                            { "TraceIdentifier", HttpContext.TraceIdentifier },
+                            { "Bordered", bordered },
+                            { "Buffer", buffer }
+                        });
+
+                    await HttpContext.WriteResultAsync(result.Code, result.Message, result.Stream, format);
                     break;
                 }
                 case "GetFeatureInfo":
                 {
-                    var friend = _clusterClient.Value.GetGrain<IWMSGrain>("0/0/0");
+                    var friend = _clusterClient.GetGrain<IWMSGrain>("0/0/0");
                     var result =
                         await friend.GetFeatureInfoAsync(layers, null, featureCount, srs, bbox, width, height, x, y,
                             new Dictionary<string, object>

@@ -15,9 +15,9 @@ namespace ZServer.API.Controllers
     // ReSharper disable once InconsistentNaming
     public class WMTSController : ControllerBase
     {
-        private readonly Lazy<IClusterClient> _clusterClient;
+        private readonly IClusterClient _clusterClient;
 
-        public WMTSController(Lazy<IClusterClient> clusterClient)
+        public WMTSController(IClusterClient clusterClient)
         {
             _clusterClient = clusterClient;
         }
@@ -54,7 +54,7 @@ namespace ZServer.API.Controllers
 
             var key = keyBuilder.ToString();
 
-            var friend = _clusterClient.Value.GetGrain<IWMTSGrain>(key);
+            var friend = _clusterClient.GetGrain<IWMTSGrain>(key);
             var result =
                 await friend.GetTileAsync(layer, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
                     cqlFilter,
@@ -63,7 +63,7 @@ namespace ZServer.API.Controllers
                         { "TraceIdentifier", HttpContext.TraceIdentifier }
                     });
 
-            await HttpContext.WriteMapImageAsync(result);
+            await HttpContext.WriteResultAsync(result);
         }
     }
 }

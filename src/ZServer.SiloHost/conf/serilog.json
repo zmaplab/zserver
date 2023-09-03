@@ -1,0 +1,51 @@
+{
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.RollingFile",
+      "Serilog.Sinks.Async",
+      "Serilog.Sinks.Console",
+      "Serilog.Expressions",
+      "Serilog.Enrichers.Environment",
+      "Serilog.Enrichers.Thread"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Information",
+        "Microsoft.AspNetCore": "Warning",
+        "Microsoft.EntityFrameworkCore": "Warning",
+        "Microsoft.EntityFrameworkCore.Model.Validation": "Warning",
+        "Microsoft.AspNetCore.Cors.Infrastructure.CorsService": "Warning",
+        "Microsoft.AspNetCore.Mvc": "Warning",
+        "Microsoft.AspNetCore.Hosting": "Warning",
+        "Orleans": "Error"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
+        }
+      },
+      {
+        "Name": "ApplicationInsights",
+        "Args": {
+          "restrictedToMinimumLevel": "Information",
+          "telemetryConverter": "Serilog.Sinks.ApplicationInsights.Sinks.ApplicationInsights.TelemetryConverters.TraceTelemetryConverter, Serilog.Sinks.ApplicationInsights"
+        }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithThreadId",
+      "WithProcessId"
+    ],
+    "Properties": {
+      "Application": "ZServer.API",
+      "MachineName": "%COMPUTERNAME%"
+    }
+  }
+}

@@ -77,8 +77,14 @@ namespace ZServer.API
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureHostConfiguration(x =>
+                {
+                    x.AddEnvironmentVariables();
+                    x.AddCommandLine(args);
+                })
                 .ConfigureAppConfiguration((_, builder) =>
                 {
+                    builder.AddEnvironmentVariables();
                     builder.AddCommandLine(args);
 
                     if (File.Exists("conf/serilog.json"))
@@ -121,7 +127,7 @@ namespace ZServer.API
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls("http://+:8200");
-                }).ConfigureOrleans()
+                }).UseOrleans(OrleansExtensions.ConfigureSilo)
                 .UseSerilog();
     }
 }

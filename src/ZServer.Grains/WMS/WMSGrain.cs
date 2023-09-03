@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using NetTopologySuite.Features;
 using Orleans;
@@ -17,7 +18,7 @@ namespace ZServer.Grains.WMS
     /// </summary>
     [Reentrant, StatelessWorker]
     // ReSharper disable once InconsistentNaming
-    public class WMSGrain : Grain, IWMSGrain
+    public class WMSGrain : Grain, IWMSGrain, IRemindable
     {
         private readonly WmsService _wmsService;
 
@@ -26,10 +27,10 @@ namespace ZServer.Grains.WMS
             _wmsService = wmsService;
         }
 
-        public Task<MapResult> GetCapabilitiesAsync(string version, string format,
+        public ValueTask<MapResult> GetCapabilitiesAsync(string version, string format,
             IDictionary<string, object> arguments)
         {
-            return Task.FromResult(new MapResult());
+            return ValueTask.FromResult(new MapResult());
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace ZServer.Grains.WMS
         /// <param name="extras"></param>
         /// <param name="transparent"></param>
         /// <returns></returns>
-        public async Task<MapResult> GetMapAsync(string layers, string styles, string srs, string bbox,
+        public async ValueTask<MapResult> GetMapAsync(string layers, string styles, string srs, string bbox,
             int width, int height, string format, bool transparent, string bgColor, int time,
             string formatOptions, string cqlFilter, IDictionary<string, object> extras)
         {
@@ -84,7 +85,8 @@ namespace ZServer.Grains.WMS
             return MapResult.Ok(bytes, format);
         }
 
-        public async Task<FeatureCollection> GetFeatureInfoAsync(string layers, string infoFormat, int featureCount,
+        public async ValueTask<FeatureCollection> GetFeatureInfoAsync(string layers, string infoFormat,
+            int featureCount,
             string srs,
             string bbox, int width, int height,
             double x, double y, IDictionary<string, object> arguments)
@@ -95,9 +97,9 @@ namespace ZServer.Grains.WMS
             return !string.IsNullOrEmpty(modeState.Code) ? new FeatureCollection() : modeState.Features;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await RegisterOrUpdateReminder(GetType().Name, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2));
+            // await RegisterOrUpdateReminder(GetType().Name, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2));
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
