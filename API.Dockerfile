@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS api-builder
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS api-builder
 WORKDIR /app
 COPY . .
 RUN cd src/ZServer.API && dotnet publish -c Release -o out
@@ -15,7 +15,7 @@ RUN rm -rf src/ZServer.API/out/runtimes/win-x86
 RUN rm -rf src/ZServer.API/out/shapes
 RUN rm -rf src/ZServer.API/out/Fonts
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS zserver-api
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS zserver-api
 WORKDIR /app
 RUN sed -i "s@http://deb.debian.org@http://mirrors.aliyun.com@g" /etc/apt/sources.list 
 RUN apt-get update -y && apt-get install -y libgdiplus locales fontconfig && apt-get clean && ln -s /usr/lib/libgdiplus.so /usr/lib/gdiplus.dll

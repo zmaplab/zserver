@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS api-builder
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS api-builder
 WORKDIR /app
 COPY . .
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
@@ -16,7 +16,7 @@ RUN rm -rf src/ZServer.SiloHost/out/runtimes/win-x86
 RUN rm -rf src/ZServer.API/out/shapes
 RUN rm -rf src/ZServer.API/out/Fonts
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS zserver
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS zserver
 ENV LANG C.UTF-8
 WORKDIR /app
 COPY --from=api-builder /app/src/ZServer.API/out .
