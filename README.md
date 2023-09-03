@@ -2,6 +2,8 @@
 
 基于 Actor 模型实现的分布式计算地图服务器，符合 OpenGIS Web 的服务器规范
 
+[![Docker Image CI](https://github.com/zmaplab/zserver/actions/workflows/docker-image.yml/badge.svg)](https://github.com/zmaplab/zserver/actions/workflows/docker-image.yml)
+
 ![DESIGN IMAGE](https://github.com/zmaplab/zserver/blob/main/img/design.jpg?raw=true)
 
 ## 开发说明
