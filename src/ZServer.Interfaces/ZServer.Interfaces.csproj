@@ -3,10 +3,7 @@
     <Import Project="../../package.props" />
     <Import Project="../../version.props" />
     <ItemGroup>
-        <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.7.1" />
-        <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.7.1" PrivateAssets="all">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.2.1" />
         <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
         <PackageReference Include="System.Text.Json" Version="7.0.3" />
     </ItemGroup>

@@ -9,10 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NetTopologySuite.IO.Converters;
-using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Serilog;
 using ZServer.API.Filters;
 using Log = ZMap.Infrastructure.Log;
 
@@ -47,42 +45,33 @@ namespace ZServer.API
             services.AddResponseCaching();
             services.AddRouting(x => { x.LowercaseUrls = true; });
 
-            services.AddZServer(Configuration,"conf/zserver.json").AddSkiaSharpRenderer();
+            services.AddZServer(Configuration, "conf/zserver.json").AddSkiaSharpRenderer();
             services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
 
-            var client = new Lazy<IClusterClient>(() =>
-            {
-                if ("true".Equals(Configuration["standalone"]))
-                {
-                    var cb = new ClientBuilder()
-                        .UseLocalhostClustering(30000, "zserver", "zserver")
-                        .ConfigureLogging(logging => logging.AddSerilog())
-                        .Build();
-                    cb.Connect().GetAwaiter().GetResult();
-                    return cb;
-                }
-                else
-                {
-                    var cb = new ClientBuilder()
-                        .Configure<ClusterOptions>(options =>
-                        {
-                            options.ClusterId = Configuration["Orleans:ClusterId"];
-                            options.ServiceId = Configuration["Orleans:ServiceId"];
-                        })
-                        .UseAdoNetClustering(options =>
-                        {
-                            options.ConnectionString = Configuration["Orleans:ConnectionString"];
-                            options.Invariant = Configuration["Orleans:Invariant"];
-                        })
-                        .ConfigureLogging(logging => logging.AddSerilog())
-                        .Build();
-                    cb.Connect().GetAwaiter().GetResult();
-                    return cb;
-                }
-            });
 
             services.Configure<ClusterOptions>("Orleans", Configuration);
-            services.AddSingleton(client);
+            // services.AddOrleansClient(builder =>
+            // {
+            //     if ("true".Equals(Configuration["standalone"]))
+            //     {
+            //         builder
+            //             .UseLocalhostClustering(30000, "zserver", "zserver");
+            //     }
+            //     else
+            //     {
+            //         builder.Configure<ClusterOptions>(options =>
+            //         {
+            //             options.ClusterId = Configuration["Orleans:ClusterId"];
+            //             options.ServiceId = Configuration["Orleans:ServiceId"];
+            //         });
+            //
+            //         builder.UseAdoNetClustering(options =>
+            //         {
+            //             options.ConnectionString = Configuration["Orleans:ConnectionString"];
+            //             options.Invariant = Configuration["Orleans:Invariant"];
+            //         });
+            //     }
+            // });
 
             services.AddSwaggerGen(c =>
             {

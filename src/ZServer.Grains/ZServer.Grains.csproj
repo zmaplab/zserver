@@ -4,10 +4,7 @@
     <Import Project="../../version.props" />
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-        <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.7.1" />
-        <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.7.1" PrivateAssets="all">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Microsoft.Orleans.Reminders" Version="7.2.1" />
     </ItemGroup>
 
     <ItemGroup>

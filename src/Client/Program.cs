@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
@@ -98,22 +99,22 @@ namespace Client
         //     await reader.ReadAsync();
         // }
 
-        private static async Task<IClusterClient> ConnectClient()
-        {
-            var client = new ClientBuilder()
-                .UseLocalhostClustering()
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "dev";
-                    options.ServiceId = "ZServer";
-                })
-                .ConfigureLogging(logging => logging.AddConsole())
-                .Build();
-
-            await client.Connect();
-            Console.WriteLine("Client successfully connected to silo host \n");
-            return client;
-        }
+        // private static async Task<IClusterClient> ConnectClient()
+        // {
+        //     var client = new HostBuilder()
+        //         .UseLocalhostClustering()
+        //         .Configure<ClusterOptions>(options =>
+        //         {
+        //             options.ClusterId = "dev";
+        //             options.ServiceId = "ZServer";
+        //         })
+        //         .ConfigureLogging(logging => logging.AddConsole())
+        //         .Build();
+        //
+        //     await client.Connect();
+        //     Console.WriteLine("Client successfully connected to silo host \n");
+        //     return client;
+        // }
 
         private static Task DoClientWork(IClusterClient client)
         {

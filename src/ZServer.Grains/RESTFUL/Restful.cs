@@ -5,7 +5,7 @@ using ZServer.Interfaces.RESTFUL;
 
 namespace ZServer.Grains.RESTFUL
 {
-    public class Restful : Grain, IRestful
+    public class Restful : Grain, IRestful, IRemindable
     {
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
