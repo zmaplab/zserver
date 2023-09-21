@@ -16,39 +16,36 @@
   },
   "styleGroups": {
     "polygon": {
+      "zoomUnit": "scale",
+      "maxZoom": 9990000,
       "description": "",
       "minZoom": 100,
-      "maxZoom": 80000,
-      "zoomUnit": "scale",
-      "filter": "feature[\"name\"] != null",
       "styles": [
         {
-          "type": "line",
-          "opacity": "0.5",
-          "dashArray": [
-            5,
-            5
-          ],
-          "dashOffset": 0,
-          "width": 2,
-          "color": "#E0861A"
+          "color": "#66FF99",
+          "width": "1",
+          "type": "fill",
+          "opacity": "0.7"
         },
         {
-          "type": "text",
-          "minZoom": 20,
-          "maxZoom": 1000,
-          "zoomUnit": "scale",
-          "label": {
-            "value": null,
-            "expression": "feature[\"name\"] "
+          "color": "#66FF66",
+          "maxZoom": 120000,
+          "width": "1",
+          "type": "line",
+          "opacity": "0.9"
+        },
+        {
+          "color": "#99FFFF",
+          "size": 16,
+          "maxZoom": 15000,
+          "property": {
+            "expression": "feature[\"小班\"]"
           },
+          "minZoom": 100,
+          "type": "text",
           "font": [
-            "Source Han Sans SC"
-          ],
-          "color": "#FF0000",
-          "backgroundColor": "#00FA9A",
-          "outlineSize": 6,
-          "size": 14
+            "SimSun"
+          ]
         }
       ]
     },
@@ -73,6 +70,13 @@
     }
   },
   "layerGroups": {
+    "layer_group": {
+      "resourceGroup": "zserver",
+      "layers": [
+        "polygon",
+        "polygon_3857"
+      ]
+    }
   },
   "layers": {
     "polygon": {

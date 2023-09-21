@@ -11,7 +11,7 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
 
         public static SKColor GetColor(string hexString, float opacity = 1)
         {
-            if (string.IsNullOrWhiteSpace(hexString))
+            if (string.IsNullOrEmpty(hexString))
             {
                 return DefaultColor;
             }
@@ -21,12 +21,10 @@ namespace ZMap.Renderer.SkiaSharp.Utilities
                 Log.Logger.LogWarning("RGB {IncorrectColorHexString} 不是一个合法的颜色", color);
                 return DefaultColor;
             }
-            else
-            {
-                opacity = opacity > 1 ? 1 : opacity;
-                var alpha = Convert.ToByte(Math.Round(opacity / 0.0039215, 0));
-                return color.WithAlpha(alpha);
-            }
+
+            opacity = opacity > 1 ? 1 : opacity;
+            var alpha = Convert.ToByte(Math.Round(opacity / 0.0039215, 0));
+            return color.WithAlpha(alpha);
         }
     }
 }
