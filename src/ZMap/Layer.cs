@@ -99,12 +99,12 @@ namespace ZMap
             Enabled = true;
             Envelope = envelope ?? source.GetEnvelope();
 
-            if (styleGroups == null || !styleGroups.Any())
-            {
-                throw new ArgumentNullException(nameof(styleGroups), "图层样式未配置");
-            }
+            // if (styleGroups == null || !styleGroups.Any())
+            // {
+            //     throw new ArgumentNullException(nameof(styleGroups), "图层样式未配置");
+            // }
 
-            _styleGroups = styleGroups;
+            _styleGroups = styleGroups ?? new();
         }
 
         public async Task RenderAsync(IGraphicsService graphicsService, Viewport viewport, Zoom zoom, int srid)

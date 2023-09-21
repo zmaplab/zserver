@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -44,6 +45,11 @@ namespace ZMap.Source.ShapeFile
 
         public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
         {
+            if (Srid == -1)
+            {
+                return Task.FromResult(Enumerable.Empty<Feature>());
+            }
+
             var features = new List<Feature>();
 
             var predicate = Filter?.ToPredicate();
@@ -153,22 +159,13 @@ namespace ZMap.Source.ShapeFile
         private int GetSrid(string path)
         {
             var projPath = path.Replace(".shp", ".prj");
-            CoordinateSystem coordinateSystem;
-            try
+            if (!System.IO.File.Exists(projPath))
             {
-                if (!System.IO.File.Exists(projPath))
-                {
-                    throw new Exception($"投影文件不存在 {projPath}");
-                }
-
-                coordinateSystem =
-                    CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(projPath)));
-            }
-            catch
-            {
-                throw new Exception($"投影文件不正确 {projPath}");
+                return -1;
             }
 
+            var coordinateSystem =
+                CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(projPath)));
             return (int)coordinateSystem.AuthorityCode;
         }
 
