@@ -224,7 +224,8 @@ namespace ZServer.Store
             var resource = section.GetValue<string>("resource");
             var resourceExpression = section.GetExpression<string>("resource");
 
-            if (patternExpression != null)
+            if (patternExpression != null && (!string.IsNullOrEmpty(patternExpression.Expression) ||
+                                              !string.IsNullOrEmpty(patternExpression.Value)))
             {
                 fillStyle = new SpriteFillStyle
                 {
@@ -232,7 +233,7 @@ namespace ZServer.Store
                     Uri = section.GetExpression<string>("uri")
                 };
             }
-            else if (!string.IsNullOrWhiteSpace(pattern))
+            else if (!string.IsNullOrEmpty(pattern))
             {
                 fillStyle = new SpriteFillStyle
                 {
@@ -240,14 +241,15 @@ namespace ZServer.Store
                     Uri = section.GetExpression<string>("uri")
                 };
             }
-            else if (resourceExpression != null)
+            else if (resourceExpression != null && (!string.IsNullOrEmpty(resourceExpression.Expression) ||
+                                                    !string.IsNullOrEmpty(resourceExpression.Value)))
             {
                 fillStyle = new ResourceFillStyle
                 {
                     Uri = resourceExpression
                 };
             }
-            else if (!string.IsNullOrWhiteSpace(resource))
+            else if (!string.IsNullOrEmpty(resource))
             {
                 fillStyle = new ResourceFillStyle
                 {
