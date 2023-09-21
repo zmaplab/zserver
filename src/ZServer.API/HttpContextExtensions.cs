@@ -16,8 +16,9 @@ namespace ZServer.API
         {
             Options.Converters.Add(new GeoJsonConverterFactory());
         }
-        
-        public static async Task WriteResultAsync(this HttpContext httpContext, string code, string message, Stream stream, string imageFormat,
+
+        public static async Task WriteResultAsync(this HttpContext httpContext, string code, string message,
+            Stream stream, string imageFormat,
             string infoFormat = "text/xml")
         {
             if (string.IsNullOrEmpty(message))
@@ -41,7 +42,7 @@ namespace ZServer.API
                     }
                 };
                 var bytes = exceptionReport.Serialize(infoFormat);
-        
+
                 httpContext.Response.ContentType = infoFormat;
                 httpContext.Response.ContentLength = bytes.Length;
                 await httpContext.Response.BodyWriter.WriteAsync(bytes);
@@ -52,7 +53,7 @@ namespace ZServer.API
         public static async Task WriteResultAsync(this HttpContext httpContext, MapResult result,
             string infoFormat = "text/xml")
         {
-            if (result.Success)
+            if (result.ImageBytes != null)
             {
                 httpContext.Response.ContentType = result.ImageType;
                 httpContext.Response.ContentLength = result.ImageBytes.Length;
