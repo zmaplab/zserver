@@ -194,7 +194,7 @@ namespace ZServer.Store
 
             var styleNames = section.GetSection("styleGroups").Get<string[]>();
 
-            if (styleNames.Length > 0)
+            if (styleNames is { Length: > 0 })
             {
                 foreach (var name in styleNames)
                 {
