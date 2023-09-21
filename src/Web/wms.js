@@ -62,7 +62,7 @@ const map = new Map({
         params: {
           VERSION: '1.1.1',
           TILED: true,
-          LAYERS: 'zserver:layer_group',
+          LAYERS: layer,
           bordered: true,
         },
         format: 'image/webp',

@@ -115,6 +115,11 @@ namespace ZMap.Source.ShapeFile
 
                     shapeFileStream.Seek(recordLength - 20, SeekOrigin.Current);
 
+                    if (double.IsNaN(x1) || double.IsNaN(y1))
+                    {
+                        continue;
+                    }
+
                     yield return new SpatialIndexItem
                     {
                         Index = (uint)a /*+1*/,
@@ -133,6 +138,12 @@ namespace ZMap.Source.ShapeFile
                     var x2 = shapeFileReader.ReadDouble();
                     var y2 = shapeFileReader.ReadDouble();
                     shapeFileStream.Seek(recordLength - 36, SeekOrigin.Current);
+
+                    if (double.IsNaN(x1) || double.IsNaN(x2) || double.IsNaN(y1) || double.IsNaN(y2))
+                    {
+                        continue;
+                    }
+
                     yield return new SpatialIndexItem
                     {
                         Index = (uint)a /*+1*/,
@@ -163,13 +174,19 @@ namespace ZMap.Source.ShapeFile
 
             foreach (var entry in entries)
             {
-                var box = new Envelope(entry.X1, entry.X2, entry.Y1, entry.Y2);
-                if (box.IsNull)
+                try
                 {
-                    continue;
-                }
+                    var box = new Envelope(entry.X1, entry.X2, entry.Y1, entry.Y2);
+                    if (box.IsNull)
+                    {
+                        continue;
+                    }
 
-                tree.Insert(box, entry);
+                    tree.Insert(box, entry);
+                }
+                catch (Exception e)
+                {
+                }
             }
 
             return tree;
