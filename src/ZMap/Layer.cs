@@ -77,8 +77,7 @@ namespace ZMap
         /// 资源组
         /// </summary>
         public ResourceGroup ResourceGroup { get; set; }
-
-
+        
         public Layer(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name, ISource source,
             List<StyleGroup> styleGroups, Envelope envelope = null) :
             this(name, source, styleGroups, envelope)

@@ -1,3 +1,4 @@
+// using Newtonsoft.Json;
 using ZMap.Infrastructure;
 
 namespace ZMap.Style
@@ -11,6 +12,10 @@ namespace ZMap.Style
     /// <typeparam name="TV"></typeparam>
     public class CSharpExpression<TV> : CSharpExpression
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        // [JsonProperty]
         public TV Value { get; internal set; }
 
         public static CSharpExpression<TV> New(TV v, string body = null)
@@ -53,7 +58,7 @@ namespace ZMap.Style
                     {
                         return;
                     }
-                    
+
                     var output = func.Invoke(feature);
                     if (output != null)
                     {
@@ -87,7 +92,11 @@ namespace ZMap.Style
 
     public class CSharpExpression
     {
-        public string Expression { get; protected init; }
+        /// <summary>
+        /// 
+        /// </summary>
+        // [JsonProperty]
+        public string Expression { get; internal set; }
 
         public static CSharpExpression New(string body = null)
         {
