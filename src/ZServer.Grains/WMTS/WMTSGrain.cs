@@ -32,7 +32,7 @@ namespace ZServer.Grains.WMTS
             }
 
             await using var stream = result.Stream;
-            var bytes = await result.Stream.ToArrayAsync();
+            var bytes = await stream.ToArrayAsync();
             return MapResult.Ok(bytes, format);
         }
     }

@@ -1,14 +1,48 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using ZMap.Source.Postgre;
 using ZServer.Store;
 using Xunit;
 using ZMap.Source.ShapeFile;
+using ZMap.Style;
 
 namespace ZServer.Tests
 {
     public class SourceStoreTests : BaseTests
     {
+        [Fact]
+        public void AAAQ()
+        {
+            var json = """
+                       {
+                       "value": {
+                         "value": "1",
+                         "expression": "feature[\"opacity\"]"
+                        }
+                       }
+                       """;
+            var settings = new JsonSerializerSettings();
+
+            var a = JsonConvert.DeserializeObject<MyClass>(json, settings);
+        }
+
+        class MyClass
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            // [JsonProperty("value")]
+            public CSharpExpression<string> Value { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            [JsonProperty("value")]
+            public string Value2 { get; set; }
+        }
+
         [Fact]
         public async Task Clone()
         {
