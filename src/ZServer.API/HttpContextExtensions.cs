@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -53,7 +54,7 @@ namespace ZServer.API
         public static async Task WriteResultAsync(this HttpContext httpContext, MapResult result,
             string infoFormat = "text/xml")
         {
-            if (result.ImageBytes != null)
+            if (string.IsNullOrEmpty(result.Code) || result.Code == "200")
             {
                 httpContext.Response.ContentType = result.ImageType;
                 httpContext.Response.ContentLength = result.ImageBytes.Length;

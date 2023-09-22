@@ -27,7 +27,7 @@ public class WmsService
         _layerQueryService = layerQueryService;
     }
 
-    public async Task<(string Code, string Message, Stream Stream)> GetMapAsync(string layers, string styles,
+    public async Task<MapResult> GetMapAsync(string layers, string styles,
         string srs, string bbox, int width,
         int height, string format,
         bool transparent, string bgColor, int time, string formatOptions, string cqlFilter,
@@ -43,7 +43,7 @@ public class WmsService
             if (!string.IsNullOrEmpty(modeState.Code))
             {
                 _logger.LogError("{Url}, arguments error", displayUrl);
-                return (modeState.Code, modeState.Message, null);
+                return new MapResult(Stream.Null, modeState.Code, modeState.Message);
             }
 
             var dpi = Utilities.GetDpi(formatOptions);
@@ -68,7 +68,7 @@ public class WmsService
             var layerList = await _layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
             if (layerList.Count == 0)
             {
-                return (null, null, new MemoryStream());
+                return new MapResult(Stream.Null, null, null);
             }
 
             var viewPort = new Viewport
@@ -90,14 +90,12 @@ public class WmsService
                 .SetGraphicsContextFactory(_graphicsServiceProvider)
                 .AddLayers(layerList);
             var image = await map.GetImageAsync(viewPort, format);
-
-            return (null, null, image);
-            // return MapResult.Ok(image, format);
+            return new MapResult(image, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
-            return ("InternalError", e.Message, null);
+            return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }
 

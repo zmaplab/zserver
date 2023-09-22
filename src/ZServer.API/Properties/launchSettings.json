@@ -4,9 +4,9 @@
     "ZServer.API": {
       "commandName": "Project",
       "environmentVariables": {
-        "HOST_IP": "192.168.31.200",
-        "EnableSensitiveDataLogging": "false",
-        "standalone": "true"
+        "HOST_IP": "192.168.31.111",
+        "EnableSensitiveDataLogging": "true",
+        "standalone": "false"
       }
     }
   }

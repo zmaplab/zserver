@@ -30,9 +30,28 @@ public static class OrleansExtensions
             return;
         }
 
-        var connectString = context.Configuration["Orleans:ConnectionString"];
-        var invariant = context.Configuration["Orleans:Invariant"];
+        var connectString = EnvironmentVariables.GetValue(context.Configuration, "ClusterConnectionString",
+            "Orleans:ConnectionString");
+        var invariant = EnvironmentVariables.GetValue(context.Configuration, "ClusterInvariant", "Orleans:Invariant");
+        var siloName = EnvironmentVariables.GetValue(context.Configuration, "ClusterSiloName", "Orleans:SiloName");
+        var clusterId = EnvironmentVariables.GetValue(context.Configuration, "ClusterId", "Orleans:ClusterId");
+        var serviceId = EnvironmentVariables.GetValue(context.Configuration, "ClusterServiceId", "Orleans:ServiceId");
+        var siloPort =
+            int.Parse(EnvironmentVariables.GetValue(context.Configuration, "ClusterSiloPort", "Orleans:SiloPort"));
+        var gatewayPort =
+            int.Parse(EnvironmentVariables.GetValue(context.Configuration, "ClusterGatewayPort",
+                "Orleans:GatewayPort"));
+        var enableDashboard =
+            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboard", "Orleans:Dashboard");
+        var dashboardPort =
+            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboardPort", "Orleans:DashboardPort");
+        if (string.IsNullOrEmpty(dashboardPort))
+        {
+            dashboardPort = "8182";
+        }
 
+        Log.Logger.Information(
+            $"Standalone: false, Invariant: {invariant}, SiloName: {siloName}, ClusterId: {clusterId}, ServiceId: {serviceId}, SiloPort: {siloPort}, GatewayPort: {gatewayPort}, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
         var assembly = Assembly.Load($"{invariant}");
 
         var scriptPath = $"{invariant}.sql";
@@ -56,36 +75,26 @@ public static class OrleansExtensions
 
         siloBuilder.UseAdoNetClustering(options =>
         {
-            options.ConnectionString = context.Configuration["Orleans:ConnectionString"];
-            options.Invariant = context.Configuration["Orleans:Invariant"];
+            options.ConnectionString = connectString;
+            options.Invariant = invariant;
         });
         siloBuilder.UseAdoNetReminderService(options =>
         {
             options.ConnectionString = connectString;
-            options.Invariant = context.Configuration["Orleans:Invariant"];
+            options.Invariant = invariant;
         });
-        siloBuilder.Configure<SiloOptions>(options =>
-                options.SiloName = context.Configuration["Orleans:SiloName"])
+        siloBuilder.Configure<SiloOptions>(options => options.SiloName = siloName)
             .Configure<ClusterOptions>(options =>
             {
-                options.ClusterId = context.Configuration["Orleans:ClusterId"];
-                options.ServiceId = context.Configuration["Orleans:ServiceId"];
+                options.ClusterId = clusterId;
+                options.ServiceId = serviceId;
             })
             .Configure<EndpointOptions>(options =>
             {
-                var siloPort = context.Configuration["Orleans:SiloPort"];
-                var gatewayPort = context.Configuration["Orleans:GatewayPort"];
-                if (!string.IsNullOrEmpty(siloPort))
-                {
-                    options.SiloPort = int.Parse(siloPort);
-                }
+                options.SiloPort = siloPort;
+                options.GatewayPort = gatewayPort;
 
-                if (!string.IsNullOrEmpty(gatewayPort))
-                {
-                    options.GatewayPort = int.Parse(gatewayPort);
-                }
-
-                var hostIp = EnvironmentVariables.HostIp;
+                var hostIp = EnvironmentVariables.HostIP;
                 IPAddress ipAddress;
                 if (string.IsNullOrWhiteSpace(hostIp))
                 {
@@ -107,9 +116,9 @@ public static class OrleansExtensions
                 options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, options.GatewayPort);
             });
 
-        if (context.Configuration["Orleans:Dashboard"] == "True")
+        if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
         {
-            siloBuilder.UseDashboard(options => { options.Port = 8182; });
+            siloBuilder.UseDashboard(options => { options.Port = int.Parse(dashboardPort); });
         }
     }
 }

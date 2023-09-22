@@ -22,7 +22,7 @@ https://docs.docker.com/engine/install/
 docker run --name postgis -p 5432:5432 -e POSTGRES_PASSWORD=1qazZAQ! -d postgis/postgis
 ```
 
-+ dotnet sdk 5.0 或以上
++ dotnet sdk 7.0 或以上
 
 ```
 https://dotnet.microsoft.com/download
@@ -54,9 +54,15 @@ create extension postgis;
 ```
 + 上传 Demo 数据
 
-通过 QGIS/ArcGIS 打开 ZServer.SiloHost/shapes/polygon.shp 并上传到 zserver_dev 数据库中， 表名为 polygon
+通过 QGIS/ArcGIS 打开 ZServer.API/shapes/polygon.shp 并上传到 zserver_dev 数据库中， 表名为 polygon
 
 + 启动 ZServer.API
+
+```
+cd src/ZServer.API
+dotnet run --Standalone false --ClusterSiloPort 10001 --ClusterGatewayPort 20001 --ClusterDashboard true --ClusterDashboardPort 30001 --Port 8100
+dotnet run --Standalone false --ClusterSiloPort 10002 --ClusterGatewayPort 20002 --ClusterDashboard true --ClusterDashboardPort 30002 --Port 8200
+```
 + 启动 Web
 
 ```

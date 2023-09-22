@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.Store;
@@ -28,7 +26,7 @@ public class WmtsService
         _gridSetStore = gridSetStore;
     }
 
-    public async Task<(string Code, string Message, Stream Stream)> GetTileAsync(string layers, string styles,
+    public async Task<MapResult> GetTileAsync(string layers, string styles,
         string format,
         string tileMatrixSet, string tileMatrix, int tileRow,
         int tileCol, string cqlFilter, IDictionary<string, object> arguments)
@@ -42,13 +40,13 @@ public class WmtsService
             if (string.IsNullOrWhiteSpace(layers))
             {
                 _logger.LogError("{Url}, no layers have been requested", displayUrl);
-                return ("LayerNotDefined", "No layers have been requested", null);
+                return new MapResult(Stream.Null, "LayerNotDefined", "No layers have been requested");
             }
 
             if (string.IsNullOrWhiteSpace(tileMatrixSet))
             {
                 _logger.LogError("{Url}, no tile matrix set requested", displayUrl);
-                return ("InvalidTileMatrixSet", "No tile matrix set requested", null);
+                return new MapResult(Stream.Null, "InvalidTileMatrixSet", "No tile matrix set requested");
             }
 
             var gridSet = await _gridSetStore.FindAsync(tileMatrixSet);
@@ -56,20 +54,12 @@ public class WmtsService
             if (gridSet == null)
             {
                 _logger.LogError("{Url}, could not find tile matrix set", displayUrl);
-                return ("TileMatrixSetNotDefined", $"Could not find tile matrix set {tileMatrixSet}", null);
+                return new MapResult(Stream.Null, "TileMatrixSetNotDefined",
+                    $"Could not find tile matrix set {tileMatrixSet}");
             }
 
-            var layerKey = MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(layers));
-
-            var cqlFilterHash = string.IsNullOrWhiteSpace(cqlFilter)
-                ? string.Empty
-                : MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
-
-            // todo: 设计 cache 接口， 方便扩展 OSS 或者别的 分布式文件系统
-            var path = Path.Combine(AppContext.BaseDirectory,
-                string.IsNullOrEmpty(cqlFilterHash)
-                    ? $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{Utilities.GetImageExtension(format)}"
-                    : $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{Utilities.GetImageExtension(format)}");
+            var path = Utilities.GetWmtsKey(layers, cqlFilter, format, tileMatrixSet, tileRow.ToString(),
+                tileCol.ToString());
 
             var folder = Path.GetDirectoryName(path);
             if (folder != null && !Directory.Exists(folder))
@@ -80,14 +70,14 @@ public class WmtsService
             if (File.Exists(path))
             {
                 _logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
-                return (null, null, File.OpenRead(path));
+                return new MapResult(File.OpenRead(path), null, null);
             }
 
             var tuple = gridSet.GetEnvelope(tileMatrix, tileCol, tileRow);
             if (tuple == default)
             {
                 _logger.LogError("{Url}, could not get envelope from grid set", displayUrl);
-                return (null, null, new MemoryStream());
+                return new MapResult(Stream.Null, null, null);
             }
 
             // 如果有多个图层过滤条件
@@ -123,7 +113,8 @@ public class WmtsService
                     default:
                     {
                         _logger.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
-                        return ("LayerFormatIncorrect", $"layer format is incorrect {layerName}", null);
+                        return new MapResult(Stream.Null, "LayerFormatIncorrect",
+                            $"layer format is incorrect {layerName}");
                     }
                 }
             }
@@ -150,12 +141,12 @@ public class WmtsService
             await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
             await image.CopyToAsync(fileStream);
             image.Seek(0, SeekOrigin.Begin);
-            return (null, null, image);
+            return new MapResult(image, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
-            return ("InternalError", e.Message, null);
+            return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }
 }
