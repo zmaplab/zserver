@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using NetTopologySuite.Features;
 using Orleans;
 using Orleans.Concurrency;
-using Orleans.Runtime;
 using ZMap.Extensions;
 using ZMap.Ogc.Wms;
 using ZServer.Interfaces;
@@ -18,7 +15,7 @@ namespace ZServer.Grains.WMS
     /// </summary>
     [Reentrant, StatelessWorker]
     // ReSharper disable once InconsistentNaming
-    public class WMSGrain : Grain, IWMSGrain, IRemindable
+    public class WMSGrain : Grain, IWMSGrain
     {
         private readonly WmsService _wmsService;
 
@@ -75,13 +72,14 @@ namespace ZServer.Grains.WMS
             var result = await _wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
                 transparent, bgColor, time,
                 formatOptions, cqlFilter, extras);
+
             if (!string.IsNullOrEmpty(result.Code))
             {
                 return MapResult.Failed(result.Message, result.Code);
             }
 
-            await using var stream = result.Stream;
-            var bytes = await result.Stream.ToArrayAsync();
+            await using var stream = result.Image;
+            var bytes = await result.Image.ToArrayAsync();
             return MapResult.Ok(bytes, format);
         }
 
@@ -97,14 +95,14 @@ namespace ZServer.Grains.WMS
             return !string.IsNullOrEmpty(modeState.Code) ? new FeatureCollection() : modeState.Features;
         }
 
-        public override async Task OnActivateAsync(CancellationToken cancellationToken)
-        {
-            // await RegisterOrUpdateReminder(GetType().Name, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2));
-        }
+        // public override async Task OnActivateAsync(CancellationToken cancellationToken)
+        // {
+        //     // await RegisterOrUpdateReminder(GetType().Name, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2));
+        // }
 
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return Task.CompletedTask;
-        }
+        // public Task ReceiveReminder(string reminderName, TickStatus status)
+        // {
+        //     return Task.CompletedTask;
+        // }
     }
 }

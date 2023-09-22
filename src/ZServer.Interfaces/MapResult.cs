@@ -1,40 +1,47 @@
+using System;
 using Orleans;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace ZServer.Interfaces
 {
     [GenerateSerializer, Immutable]
-    public struct MapResult
+    public record MapResult
     {
         /// <summary>
         /// 执行结果是否正确
         /// </summary>
-        public bool Success { get; set; }
+        [Id(0)]
+        public bool Success { get; private set; }
 
         /// <summary>
         /// 返回的消息
         /// </summary>
-        public string Message { get; set; }
+        [Id(1)]
+        public string Message { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Code { get; set; }
+        [Id(2)]
+        public string Code { get; private set; }
 
         /// <summary>
         /// A service to indicate to a client where in the client's request an exception was encountered
         /// </summary>
-        public string Locator { get; set; }
+        [Id(3)]
+        public string Locator { get; private set; }
 
         /// <summary>
         /// 内容格式
         /// </summary>
-        public string ImageType { get; set; }
+        [Id(4)]
+        public string ImageType { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public byte[] ImageBytes { get; set; }
+        [Id(5)]
+        public byte[] ImageBytes { get; private set; }
 
         public static MapResult Failed(string message, string code, string locator = null)
         {
@@ -44,8 +51,8 @@ namespace ZServer.Interfaces
                 Code = code,
                 Locator = locator,
                 Message = message,
-                ImageBytes = null,
-                ImageType = null
+                ImageBytes = Array.Empty<byte>(),
+                ImageType = "image/png"
             };
         }
 

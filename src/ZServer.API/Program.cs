@@ -10,6 +10,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
+using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 // using ZMap.DynamicCompiler;
@@ -24,6 +25,8 @@ namespace ZServer.API
 {
     public static class Program
     {
+        private static IConfiguration _configuration;
+
         public static void Main(string[] args)
         {
             // FixOrleansPublishSingleFileIssue();
@@ -75,6 +78,11 @@ namespace ZServer.API
         //     return false; // make sure you only skip if really necessary
         // }
 
+        /// <summary>
+        /// 配置响应顺序，按从低到高：环境 -> 配置 -> command parameters
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureHostConfiguration(x =>
@@ -85,7 +93,6 @@ namespace ZServer.API
                 .ConfigureAppConfiguration((_, builder) =>
                 {
                     builder.AddEnvironmentVariables();
-                    builder.AddCommandLine(args);
 
                     if (File.Exists("conf/serilog.json"))
                     {
@@ -121,12 +128,32 @@ namespace ZServer.API
                         });
                     }
 
-                    Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Build()).CreateLogger();
+                    builder.AddCommandLine(args);
+
+                    _configuration = builder.Build();
+
+                    EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(_configuration, "HOST_IP", "HostIP");
+
+                    Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(_configuration).CreateLogger();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    var configurationBuilder = new ConfigurationBuilder();
+                    configurationBuilder.AddEnvironmentVariables();
+                    configurationBuilder.AddCommandLine(args);
+                    var configuration = configurationBuilder.Build();
+
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://+:8200");
+
+                    var port = configuration["PORT"];
+                    if (string.IsNullOrEmpty(port))
+                    {
+                        port = "8200";
+                    }
+
+                    EnvironmentVariables.Port = port;
+
+                    webBuilder.UseUrls($"http://+:{EnvironmentVariables.Port}");
                 }).UseOrleans(OrleansExtensions.ConfigureSilo)
                 .UseSerilog();
     }

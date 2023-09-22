@@ -10,6 +10,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
+using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Utilities;
@@ -20,6 +21,8 @@ namespace ZServer.SiloHost
 {
     public static class Program
     {
+        private static IConfiguration _configuration;
+
         public static Task Main(string[] args)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -45,7 +48,6 @@ namespace ZServer.SiloHost
                 .ConfigureAppConfiguration(builder =>
                 {
                     builder.AddEnvironmentVariables();
-                    builder.AddCommandLine(args);
 
                     if (File.Exists("conf/serilog.json"))
                     {
@@ -81,6 +83,11 @@ namespace ZServer.SiloHost
                         });
                     }
 
+                    builder.AddCommandLine(args);
+
+                    _configuration = builder.Build();
+
+                    EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(_configuration, "HOST_IP", "HostIP");
                     Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Build()).CreateLogger();
                 })
                 .UseOrleans(OrleansExtensions.ConfigureSilo)

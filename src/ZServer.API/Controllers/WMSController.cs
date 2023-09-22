@@ -93,7 +93,7 @@ namespace ZServer.API.Controllers
                             { "Buffer", buffer }
                         });
 
-                    await HttpContext.WriteResultAsync(result.Code, result.Message, result.Stream, format);
+                    await HttpContext.WriteResultAsync(result.Code, result.Message, result.Image, format);
                     break;
                 }
                 case "GetFeatureInfo":

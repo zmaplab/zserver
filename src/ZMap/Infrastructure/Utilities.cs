@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using static System.Int32;
 
@@ -8,6 +11,22 @@ namespace ZMap.Infrastructure;
 /// </summary>
 public static class Utilities
 {
+    public static string GetWmtsKey(string layers, string cqlFilter, string format, string tileMatrix, string tileRow,
+        string tileCol)
+    {
+        var layerKey = MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(layers));
+
+        var cqlFilterHash = string.IsNullOrWhiteSpace(cqlFilter)
+            ? string.Empty
+            : MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
+
+        var imageExtension = Utilities.GetImageExtension(format);
+        return Path.Combine(AppContext.BaseDirectory,
+            string.IsNullOrEmpty(cqlFilterHash)
+                ? $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{imageExtension}"
+                : $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{imageExtension}");
+    }
+
     public static int GetDpi(string formatOptions)
     {
         var dpi = 96;

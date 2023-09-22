@@ -22,15 +22,15 @@ public class LoggerMiddleware
     {
         try
         {
-            var hostIp = EnvironmentVariables.HostIp;
+            var hostIp = EnvironmentVariables.HostIP;
             if (!string.IsNullOrWhiteSpace(hostIp))
             {
                 LogContext.PushProperty("HOST_IP", hostIp); //traceId
             }
 
-            if (context.Request.Headers.ContainsKey("trace-id"))
+            if (context.Request.Headers.TryGetValue("trace-id", out var header))
             {
-                LogContext.PushProperty("TraceId", context.Request.Headers["trace-id"].ToString()); //traceId
+                LogContext.PushProperty("TraceId", header.ToString()); //traceId
             }
             else
             {
