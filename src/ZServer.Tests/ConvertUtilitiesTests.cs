@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.Json;
-using Xunit;
+﻿using Xunit;
 using ZMap.Infrastructure;
 
 namespace ZServer.Tests;

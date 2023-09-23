@@ -18,7 +18,7 @@ namespace ZServer.Grains.WMTS
             _wmtsService = wmtsService;
         }
 
-        public async Task<MapResult> GetTileAsync(string layers, string styles, string format,
+        public async ValueTask<MapResult> GetTileAsync(string layers, string styles, string format,
             string tileMatrixSet,
             string tileMatrix, int tileRow,
             int tileCol, string cqlFilter, IDictionary<string, object> arguments)

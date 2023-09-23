@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using Newtonsoft.Json.Linq;
 using ZMap;
 using ZMap.Source;
 using ZMap.Style;
@@ -27,13 +28,53 @@ namespace ZServer.Store
 
         public LayerStore(IStyleGroupStore styleStore,
             IResourceGroupStore resourceGroupStore, ISourceStore sourceStore,
-            ILogger<LayerStore> logger, ISldStore sldStore)
+            ISldStore sldStore, ILogger<LayerStore> logger)
         {
             _styleStore = styleStore;
             _resourceGroupStore = resourceGroupStore;
             _sourceStore = sourceStore;
             _logger = logger;
             _sldStore = sldStore;
+        }
+
+        public async Task Refresh(List<JObject> configurations)
+        {
+            var existKeys = Cache.Keys.ToList();
+            var keys = new List<string>();
+
+            foreach (var configuration in configurations)
+            {
+                var sections = configuration.SelectToken("layers");
+                if (sections == null)
+                {
+                    continue;
+                }
+
+                foreach (var section in sections.Children<JProperty>())
+                {
+                    var name = section.Name;
+                    var resourceGroupName = section.Value["resourceGroup"]?.ToObject<string>();
+
+                    var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
+                        ? null
+                        : await _resourceGroupStore.FindAsync(resourceGroupName);
+
+                    var layer = await BindLayerAsync(name, section.Value as JObject, resourceGroup);
+                    if (layer == null)
+                    {
+                        continue;
+                    }
+
+                    keys.Add(name);
+                    Cache.AddOrUpdate(name, layer, (_, _) => layer);
+                }
+            }
+
+            var removedKeys = existKeys.Except(keys);
+            foreach (var removedKey in removedKeys)
+            {
+                Cache.TryRemove(removedKey, out _);
+            }
         }
 
         public async Task Refresh(IEnumerable<IConfiguration> configurations)
@@ -188,6 +229,41 @@ namespace ZServer.Store
             return layer;
         }
 
+        private async Task<Layer> BindLayerAsync(string name, JObject section,
+            ResourceGroup resourceGroup)
+        {
+            if (section == null)
+            {
+                return null;
+            }
+
+            var servicesToken = section["services"];
+            var services = servicesToken == null
+                ? new HashSet<ServiceType>()
+                : servicesToken.ToObject<HashSet<ServiceType>>();
+            var sourceOrigin = await RestoreSourceAsync(resourceGroup?.Name, name, section);
+            if (sourceOrigin == null)
+            {
+                return null;
+            }
+
+            var source = sourceOrigin.Clone();
+            var styleGroups = await RestoreStyleGroupsAsync(section);
+            var extent = section["extent"]?.ToObject<double[]>();
+            Envelope envelope = null;
+            if (extent is { Length: 4 })
+            {
+                envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
+            }
+
+            var layer = new Layer(resourceGroup, services, name, source, styleGroups, envelope)
+            {
+                Buffers = section["buffers"]?.ToObject<List<GridBuffer>>(),
+                Enabled = section["enabled"]?.ToObject<bool>() ?? true
+            };
+            return layer;
+        }
+
         private async Task<List<StyleGroup>> RestoreStyleGroupsAsync(IConfigurationSection section)
         {
             var group = new List<StyleGroup>();
@@ -209,6 +285,35 @@ namespace ZServer.Store
                     {
                         group.AddRange(sldStyleGroups);
                     }
+                }
+            }
+
+            return group;
+        }
+
+        private async Task<List<StyleGroup>> RestoreStyleGroupsAsync(JObject section)
+        {
+            var group = new List<StyleGroup>();
+
+            var styleNames = section["styleGroups"]?.ToObject<string[]>();
+
+            if (styleNames is not { Length: > 0 })
+            {
+                return group;
+            }
+
+            foreach (var name in styleNames)
+            {
+                var styleGroup = await _styleStore.FindAsync(name);
+                if (styleGroup != null)
+                {
+                    group.Add(styleGroup.Clone());
+                }
+
+                var sldStyleGroups = await _sldStore.FindAsync(name);
+                if (sldStyleGroups != null)
+                {
+                    group.AddRange(sldStyleGroups);
                 }
             }
 
@@ -253,6 +358,53 @@ namespace ZServer.Store
                 }
 
                 var value = child.Get(property.PropertyType);
+                if (value != null)
+                {
+                    property.SetValue(source, value);
+                }
+            }
+
+            return source;
+        }
+
+        private async Task<ISource> RestoreSourceAsync(string resourceGroup, string name, JObject section)
+        {
+            var sourceName = section["source"]?.ToObject<string>();
+            if (string.IsNullOrEmpty(sourceName))
+            {
+                _logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
+                return null;
+            }
+
+            var source = await _sourceStore.FindAsync(sourceName);
+            if (source == null)
+            {
+                _logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
+                return null;
+            }
+
+            var properties = PropertyCache.GetOrAdd(source.GetType(), t =>
+            {
+                return t.GetProperties().Where(z => z.CanWrite)
+                    .ToList();
+            });
+
+            foreach (var child in section.Children<JProperty>())
+            {
+                if (!child.Name.StartsWith("source") || child.Name == "source")
+                {
+                    continue;
+                }
+
+                var propertyName = child.Name.Replace("source", string.Empty);
+                var property = properties
+                    .FirstOrDefault(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+                if (property == null)
+                {
+                    continue;
+                }
+
+                var value = child.ToObject(property.PropertyType);
                 if (value != null)
                 {
                     property.SetValue(source, value);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using ZMap;
 
 namespace ZServer.Store
@@ -23,6 +24,11 @@ namespace ZServer.Store
             _resourceGroupStore = resourceGroupStore;
             _layerStore = layerStore;
             _logger = logger;
+        }
+        
+        public Task Refresh(List<JObject> configurations)
+        {
+            return Task.CompletedTask;
         }
 
         public async Task Refresh(IEnumerable<IConfiguration> configurations)

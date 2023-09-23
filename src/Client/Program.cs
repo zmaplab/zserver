@@ -1,12 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Orleans;
-using Orleans.Configuration;
 using ZServer.Interfaces.WMS;
 
 namespace Client
@@ -22,17 +16,17 @@ namespace Client
         {
             try
             {
-                var settings = new XmlReaderSettings
-                {
-                    ValidationType = ValidationType.None,
-                    Async = true
-                };
-
-
-                XmlSerializer serializer = new XmlSerializer(typeof(StyledLayerDescriptor));
-                var stream = File.ReadAllBytes("se.xml");
-                var reader = new NamespaceIgnorantXmlTextReader(new MemoryStream(stream));
-                var result = serializer.Deserialize(reader) as StyledLayerDescriptor;
+                // var settings = new XmlReaderSettings
+                // {
+                //     ValidationType = ValidationType.None,
+                //     Async = true
+                // };
+                //
+                //
+                // XmlSerializer serializer = new XmlSerializer(typeof(StyledLayerDescriptor));
+                // var stream = File.ReadAllBytes("se.xml");
+                // var reader = new NamespaceIgnorantXmlTextReader(new MemoryStream(stream));
+                // var result = serializer.Deserialize(reader) as StyledLayerDescriptor;
 
 
                 Console.ReadKey();
@@ -119,7 +113,7 @@ namespace Client
         private static Task DoClientWork(IClusterClient client)
         {
             // example of calling grains from the initialized client
-            client.GetGrain<IWMSGrain>(Guid.NewGuid().ToString("N"));
+            client.GetGrain<IWMSGrain>(0);
 
             // foreach (var layer in layers.Split(',', StringSplitOptions.RemoveEmptyEntries))
             // {

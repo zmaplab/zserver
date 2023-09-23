@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZServer.Benchmark", "src\ZS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.DynamicCompiler", "src\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj", "{87E22E7D-6640-4CF4-9140-ADD2396AD912}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZServer.Silo", "src\ZServer.Silo\ZServer.Silo.csproj", "{E335B71B-A78D-4A23-A7D1-14933963424E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{87E22E7D-6640-4CF4-9140-ADD2396AD912}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87E22E7D-6640-4CF4-9140-ADD2396AD912}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87E22E7D-6640-4CF4-9140-ADD2396AD912}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E335B71B-A78D-4A23-A7D1-14933963424E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E335B71B-A78D-4A23-A7D1-14933963424E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E335B71B-A78D-4A23-A7D1-14933963424E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E335B71B-A78D-4A23-A7D1-14933963424E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

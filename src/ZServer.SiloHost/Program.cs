@@ -14,7 +14,7 @@ using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZServer.SiloHost.Extensions;
+using ZServer.Silo;
 using Log = Serilog.Log;
 
 namespace ZServer.SiloHost
@@ -90,7 +90,7 @@ namespace ZServer.SiloHost
                     EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(_configuration, "HOST_IP", "HostIP");
                     Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Build()).CreateLogger();
                 })
-                .UseOrleans(OrleansExtensions.ConfigureSilo)
+                .ConfigureSilo()
                 .UseSerilog()
                 .RunConsoleAsync();
         }

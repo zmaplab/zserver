@@ -27,7 +27,7 @@ public class WmsService
         _layerQueryService = layerQueryService;
     }
 
-    public async Task<MapResult> GetMapAsync(string layers, string styles,
+    public async ValueTask<MapResult> GetMapAsync(string layers, string styles,
         string srs, string bbox, int width,
         int height, string format,
         bool transparent, string bgColor, int time, string formatOptions, string cqlFilter,

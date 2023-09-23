@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using ZMap.Style;
 
 namespace ZServer.Extensions
@@ -21,9 +22,69 @@ namespace ZServer.Extensions
             return CSharpExpression<T>.New(value);
         }
 
+        public static CSharpExpression<T> GetExpression<T>(this JToken section, string name)
+        {
+            var targetSection = section[name];
+            switch (targetSection)
+            {
+                case null:
+                    return CSharpExpression<T>.New(default);
+                case JValue v:
+                {
+                    var value = v.ToObject<T>();
+                    return CSharpExpression<T>.New(value);
+                }
+                case JArray a:
+                {
+                    var value = a.ToObject<T>();
+                    return CSharpExpression<T>.New(value);
+                }
+            }
+
+            var expressionValue = targetSection["value"] == null ? default : targetSection["value"].ToObject<T>();
+            var expressionBody = targetSection["expression"]?.ToObject<string>();
+
+            // 若表达示值不为空，或者配置的值是默认值
+            if ((expressionValue != null && !expressionValue.Equals(default(T))) ||
+                !string.IsNullOrWhiteSpace(expressionBody))
+            {
+                return CSharpExpression<T>.New(expressionValue, expressionBody);
+            }
+
+            return CSharpExpression<T>.New(default);
+        }
+
         public static CSharpExpression<bool?> GetFilterExpression(this IConfigurationSection section)
         {
             var expression = section.GetValue<string>("filter");
+            return bool.TryParse(expression, out var result)
+                ? CSharpExpression<bool?>.New(result)
+                : CSharpExpression<bool?>.New(null, string.IsNullOrEmpty(expression) ? null : expression);
+        }
+
+        public static CSharpExpression<bool?> GetFilterExpression(this JProperty section)
+        {
+            var filterToken = section.Value["filter"];
+            if (filterToken == null)
+            {
+                return CSharpExpression<bool?>.New(null);
+            }
+
+            var expression = filterToken.ToObject<string>();
+            return bool.TryParse(expression, out var result)
+                ? CSharpExpression<bool?>.New(result)
+                : CSharpExpression<bool?>.New(null, string.IsNullOrEmpty(expression) ? null : expression);
+        }
+
+        public static CSharpExpression<bool?> GetFilterExpression(this JObject section)
+        {
+            var filterToken = section["filter"];
+            if (filterToken == null)
+            {
+                return CSharpExpression<bool?>.New(null);
+            }
+
+            var expression = filterToken.ToObject<string>();
             return bool.TryParse(expression, out var result)
                 ? CSharpExpression<bool?>.New(result)
                 : CSharpExpression<bool?>.New(null, string.IsNullOrEmpty(expression) ? null : expression);

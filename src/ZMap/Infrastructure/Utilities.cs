@@ -11,6 +11,21 @@ namespace ZMap.Infrastructure;
 /// </summary>
 public static class Utilities
 {
+    public static void PrintInfo()
+    {
+        var info = """
+                    ______ _____
+                   |___  // ____|
+                      / /| (___   ___ _ ____   _____ _ __
+                     / /  \___ \ / _ \ '__\ \ / / _ \ '__|
+                    / /__ ____) |  __/ |   \ V /  __/ |
+                   /_____|_____/ \___|_|    \_/ \___|_|
+                   :: zserver api ::         (v0.9.0.beta)
+
+                   """;
+        Console.WriteLine(info);
+    }
+
     public static string GetWmtsKey(string layers, string cqlFilter, string format, string tileMatrix, string tileRow,
         string tileCol)
     {

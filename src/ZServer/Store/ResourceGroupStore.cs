@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using ZMap;
 
 namespace ZServer.Store
@@ -9,6 +10,32 @@ namespace ZServer.Store
     public class ResourceGroupStore : IResourceGroupStore
     {
         private static Dictionary<string, ResourceGroup> _cache = new();
+
+        public Task Refresh(List<JObject> configurations)
+        {
+            var dict = new Dictionary<string, ResourceGroup>();
+
+            foreach (var configuration in configurations)
+            {
+                var sections = configuration.SelectToken("resourceGroups");
+                if (sections == null)
+                {
+                    continue;
+                }
+
+                foreach (var section in sections.Children<JProperty>())
+                {
+                    var name = section.Name;
+                    var entity = section.Value.ToObject<ResourceGroup>();
+                    entity.Name = name;
+
+                    dict.TryAdd(name, entity);
+                }
+            }
+
+            _cache = dict;
+            return Task.CompletedTask;
+        }
 
         public Task Refresh(IEnumerable<IConfiguration> configurations)
         {

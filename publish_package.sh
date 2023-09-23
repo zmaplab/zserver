@@ -10,6 +10,7 @@ rm -rf src/ZServer/bin/Release
 rm -rf src/ZServer.Grains/bin/Release
 rm -rf src/ZServer.Interfaces/bin/Release
 rm -rf src/ZMap.DynamicCompiler/bin/Release
+rm -rf src/ZServer.Silo/bin/Release
 
 dotnet build -c Release ZServer.sln
 dotnet pack -c Release ZServer.sln
@@ -21,4 +22,5 @@ dotnet nuget push src/ZMap.TileGrid/bin/Release/*.nupkg   --source $NUGET_SERVER
 dotnet nuget push src/ZServer/bin/Release/*.nupkg   --source $NUGET_SERVER --api-key $NUGET_KEY --skip-duplicate 
 dotnet nuget push src/ZServer.Grains/bin/Release/*.nupkg   --source $NUGET_SERVER --api-key $NUGET_KEY --skip-duplicate 
 dotnet nuget push src/ZServer.Interfaces/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY --skip-duplicate 
-dotnet nuget push src/ZMap.DynamicCompiler/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY --skip-duplicate 
+dotnet nuget push src/ZMap.DynamicCompiler/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY --skip-duplicate
+dotnet nuget push src/ZServer.Silo/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY --skip-duplicate  

@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 using System.Text;
 using Dapper;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +14,7 @@ using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZServer.API.Extensions;
+using ZServer.Silo;
 using Log = Serilog.Log;
 
 #if !DEBUG
@@ -29,6 +28,7 @@ namespace ZServer.API
 
         public static void Main(string[] args)
         {
+            Utilities.PrintInfo();
             // FixOrleansPublishSingleFileIssue();
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -108,12 +108,13 @@ namespace ZServer.API
 
                     var configuration = builder.Build();
 
-                    // 1. 加载 nacos 配置
-                    var section = configuration.GetSection("Nacos");
-                    if (section.GetChildren().Any())
-                    {
-                        builder.AddNacosV2Configuration(section);
-                    }
+                    // nacos 漏洞太多
+                    // // 1. 加载 nacos 配置
+                    // var section = configuration.GetSection("Nacos");
+                    // if (section.GetChildren().Any())
+                    // {
+                    //     builder.AddNacosV2Configuration(section);
+                    // }
 
                     // 2. 加载 remote configuration 配置
                     if (!string.IsNullOrWhiteSpace(configuration["RemoteConfiguration:Endpoint"]))
@@ -154,7 +155,7 @@ namespace ZServer.API
                     EnvironmentVariables.Port = port;
 
                     webBuilder.UseUrls($"http://+:{EnvironmentVariables.Port}");
-                }).UseOrleans(OrleansExtensions.ConfigureSilo)
+                }).ConfigureSilo()
                 .UseSerilog();
     }
 }
