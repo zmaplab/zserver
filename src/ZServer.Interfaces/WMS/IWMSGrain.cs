@@ -6,7 +6,7 @@ using Orleans;
 namespace ZServer.Interfaces.WMS
 {
     // ReSharper disable once InconsistentNaming
-    public interface IWMSGrain : IGrainWithStringKey
+    public interface IWMSGrain : IGrainWithIntegerKey
     {
         /// <summary>
         /// 

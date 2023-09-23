@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using ZServer.Store;
 using Xunit;
@@ -5,6 +7,9 @@ using ZMap.Source;
 using ZMap.Style;
 using ZMap.Source.ShapeFile;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ZMap;
 using ZMap.Source.Postgre;
 
@@ -12,6 +17,33 @@ namespace ZServer.Tests
 {
     public class LayerStoreTests : BaseTests
     {
+        [Fact]
+        public async Task LoadFromJson()
+        {
+            var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
+            var styleGroupStore = new StyleGroupStore();
+            await styleGroupStore.Refresh(new List<JObject> { json });
+            var resourceGroupStore = new ResourceGroupStore();
+            await resourceGroupStore.Refresh(new List<JObject> { json });
+            var sourceStore = new SourceStore(NullLogger<SourceStore>.Instance);
+            await sourceStore.Refresh(new List<JObject> { json });
+            var sldStore = new SldStore();
+            await sldStore.Refresh(new List<JObject> { json });
+
+            var store = new LayerStore(styleGroupStore, resourceGroupStore, sourceStore, sldStore,
+                NullLogger<LayerStore>.Instance);
+            await store.Refresh(new List<JObject> { json });
+
+            var layer = await store.FindAsync("resourceGroup1", "berlin_db");
+            var source = layer.Source as PostgreSource;
+            Assert.NotNull(source);
+            Assert.True(string.IsNullOrEmpty(source.Where));
+
+            await Test1(store);
+            await Test2(store);
+            await Test3(store);
+        }
+
         [Fact]
         public async Task ParallelTest()
         {
@@ -36,6 +68,11 @@ namespace ZServer.Tests
         public async Task GetPgLayer()
         {
             var store = GetScopedService<ILayerStore>();
+            await Test1(store);
+        }
+
+        private async Task Test1(ILayerStore store)
+        {
             var layer = await store.FindAsync("resourceGroup1", "berlin_db");
             Assert.NotNull(layer);
             Assert.Equal("berlin_db", layer.Name);
@@ -92,6 +129,11 @@ namespace ZServer.Tests
         public async Task GetShapeFileLayer()
         {
             var store = GetScopedService<ILayerStore>();
+            await Test2(store);
+        }
+
+        private async Task Test2(ILayerStore store)
+        {
             var layer = await store.FindAsync(null, "berlin_shp");
             Assert.NotNull(layer);
             Assert.Equal("berlin_shp", layer.Name);
@@ -140,6 +182,11 @@ namespace ZServer.Tests
         public async Task GetAllLayer()
         {
             var store = GetScopedService<ILayerStore>();
+            await Test3(store);
+        }
+
+        private async Task Test3(ILayerStore store)
+        {
             var layers = await store.GetAllAsync();
             Assert.NotNull(layers);
             Assert.Equal(2, layers.Count);

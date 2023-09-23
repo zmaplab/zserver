@@ -4,46 +4,34 @@
         <TargetFramework>net7.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <AssemblyName>zapi</AssemblyName>
-        <!-- Warning: setting the below switch is *NOT* recommended in web apps -->
-        <!-- See: https://aka.ms/binaryformatter -->
-        <!-- See: https://github.com/dotnet/orleans/issues/6805 -->
-        <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DotNetCore.Compile.Environment" Version="3.2.0" />
-        <PackageReference Include="Lib.Harmony" Version="2.2.2" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-        <PackageReference Include="Microsoft.Orleans.Client" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.1" />
-        <PackageReference Include="OrleansDashboard" Version="7.2.2" />
-        <PackageReference Include="RemoteConfiguration.Json.Aliyun" Version="0.1.2" />
-        <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
-        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-        <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
-        <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-        <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
-        <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="nacos-sdk-csharp" Version="1.3.5" />
-        <PackageReference Include="nacos-sdk-csharp.Extensions.Configuration" Version="1.3.5" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.5" />
-        <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="3.0.0" />
-        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+        <PackageReference Include="DotNetCore.Compile.Environment" Version="3.2.0"/>
+<!--        <PackageReference Include="Lib.Harmony" Version="2.2.2"/>-->
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
+        <PackageReference Include="RemoteConfiguration.Json.Aliyun" Version="0.1.2"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="7.0.0"/>
+        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0"/>
+        <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0"/>
+        <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2"/>
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0"/>
+        <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0"/>
+        <PackageReference Include="Serilog.Expressions" Version="3.4.1"/>
+        <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.5"/>
+        <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="3.0.0"/>
+        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj" />
-        <ProjectReference Include="..\ZMap.Source.Postgre\ZMap.Source.Postgre.csproj" />
-        <ProjectReference Include="..\ZMap.Source.ShapeFile\ZMap.Source.ShapeFile.csproj" />
-        <ProjectReference Include="..\ZServer.Grains\ZServer.Grains.csproj" />
-        <ProjectReference Include="..\ZServer.Interfaces\ZServer.Interfaces.csproj" />
+        <ProjectReference Include="..\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj"/>
+        <ProjectReference Include="..\ZMap.Source.Postgre\ZMap.Source.Postgre.csproj"/>
+        <ProjectReference Include="..\ZMap.Source.ShapeFile\ZMap.Source.ShapeFile.csproj"/>
+        <ProjectReference Include="..\ZServer.Silo\ZServer.Silo.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -84,33 +72,34 @@
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Update="shapes\polygon_3857.cpg">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="shapes\polygon_3857.dbf">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="shapes\polygon_3857.prj">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="shapes\polygon_3857.qmd">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="shapes\polygon_3857.shp">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="shapes\polygon_3857.shx">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Slds\polygon.sld">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Sld\polygon.sld">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="CleanNpgsql.sql">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
 
 
 </Project>

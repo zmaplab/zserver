@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Orleans;
-using ZMap.Ogc.Wms;
 using ZServer.Interfaces.WMS;
 
 namespace ZServer.API.Controllers
@@ -13,15 +13,14 @@ namespace ZServer.API.Controllers
     // ReSharper disable once InconsistentNaming
     public class WMSController : ControllerBase
     {
+        private static readonly Random Rnd = new Random();
         private readonly IClusterClient _clusterClient;
         private readonly IConfiguration _configuration;
-        private readonly WmsService _wmsService;
 
-        public WMSController(IClusterClient clusterClient, IConfiguration configuration, WmsService wmsService)
+        public WMSController(IClusterClient clusterClient, IConfiguration configuration)
         {
             _clusterClient = clusterClient;
             _configuration = configuration;
-            _wmsService = wmsService;
         }
 
         /// <summary>
@@ -71,34 +70,35 @@ namespace ZServer.API.Controllers
             {
                 case "GetMap":
                 {
-                    // var friend = _clusterClient.GetGrain<IWMSGrain>("0/0/0");
-                    // var result =
-                    //     await friend.GetMapAsync(layers, styles, srs, bbox, width, height, format,
-                    //         transparent, bgColor, time,
-                    //         formatOptions, filter,
-                    //         new Dictionary<string, object>
-                    //         {
-                    //             { "TraceIdentifier", HttpContext.TraceIdentifier },
-                    //             { "Bordered", bordered },
-                    //             { "Buffer", buffer }
-                    //         });
+                    // comments by lewis at 20230923
+                    // 还是应该使用集群模式， 不然无法分布式分担渲染、查询开销， 要依赖外部负载组件
+                    var friend = _clusterClient.GetGrain<IWMSGrain>(GetLoadBalanceKey());
+                    var result =
+                        await friend.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                            transparent, bgColor, time,
+                            formatOptions, filter,
+                            new Dictionary<string, object>
+                            {
+                                { "TraceIdentifier", HttpContext.TraceIdentifier },
+                                { "Bordered", bordered },
+                                { "Buffer", buffer }
+                            });
 
+                    // var result = await _wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                    //     transparent, bgColor, time,
+                    //     formatOptions, filter, new Dictionary<string, object>
+                    //     {
+                    //         { "TraceIdentifier", HttpContext.TraceIdentifier },
+                    //         { "Bordered", bordered },
+                    //         { "Buffer", buffer }
+                    //     });
 
-                    var result = await _wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
-                        transparent, bgColor, time,
-                        formatOptions, filter, new Dictionary<string, object>
-                        {
-                            { "TraceIdentifier", HttpContext.TraceIdentifier },
-                            { "Bordered", bordered },
-                            { "Buffer", buffer }
-                        });
-
-                    await HttpContext.WriteResultAsync(result.Code, result.Message, result.Image, format);
+                    await HttpContext.WriteResultAsync(result);
                     break;
                 }
                 case "GetFeatureInfo":
                 {
-                    var friend = _clusterClient.GetGrain<IWMSGrain>("0/0/0");
+                    var friend = _clusterClient.GetGrain<IWMSGrain>(GetLoadBalanceKey());
                     var result =
                         await friend.GetFeatureInfoAsync(layers, null, featureCount, srs, bbox, width, height, x, y,
                             new Dictionary<string, object>
@@ -114,6 +114,12 @@ namespace ZServer.API.Controllers
                     return;
                 }
             }
+        }
+
+        private int GetLoadBalanceKey()
+        {
+            var wmsActivationNum = _configuration["wmsActivationNum"];
+            return Rnd.Next(string.IsNullOrEmpty(wmsActivationNum) ? 96 : int.Parse(wmsActivationNum));
         }
     }
 }

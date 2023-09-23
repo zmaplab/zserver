@@ -11,7 +11,7 @@ namespace ZServer.Interfaces.WMTS
     // ReSharper disable once InconsistentNaming
     public interface IWMTSGrain : IGrainWithStringKey
     {
-        Task<MapResult> GetTileAsync(string layers, string styles, string format,
+        ValueTask<MapResult> GetTileAsync(string layers, string styles, string format,
             string tileMatrixSet, string tileMatrix, int tileRow, int tileCol, string cqlFilter,
             IDictionary<string, object> arguments
         );

@@ -4,7 +4,6 @@
     <Import Project="../../version.props" />
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-        <PackageReference Include="Microsoft.Orleans.Reminders" Version="7.2.1" />
     </ItemGroup>
 
     <ItemGroup>

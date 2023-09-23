@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using ZMap;
 using ZMap.Style;
@@ -12,9 +15,28 @@ namespace ZServer.Tests
     public class StyleGroupStoreTests : BaseTests
     {
         [Fact]
+        public async Task LoadFromJson()
+        {
+            Enum.TryParse("Scale", out ZoomUnits scale);
+            Enum.TryParse("Matrix", out ZoomUnits matrix);
+            Assert.Equal(ZoomUnits.Scale, scale);
+            Assert.Equal(ZoomUnits.Matrix, matrix);
+            var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
+            var store = new StyleGroupStore();
+            await store.Refresh(new List<JObject> { json });
+
+            await Test(store);
+        }
+
+        [Fact]
         public async Task FindByName()
         {
             var store = GetScopedService<IStyleGroupStore>();
+            await Test(store);
+        }
+
+        private async Task Test(IStyleGroupStore store)
+        {
             var styleGroup = await store.FindAsync("DI_规划道路中线");
 
             Assert.NotNull(styleGroup);

@@ -35,11 +35,11 @@
           "opacity": "0.9"
         },
         {
-          "color": "#99FFFF",
+          "color": "#FF3333",
           "size": 16,
-          "maxZoom": 15000,
-          "property": {
-            "expression": "feature[\"小班\"]"
+          "maxZoom": 6000,
+          "label": {
+            "expression": "feature[\"name\"]"
           },
           "minZoom": 100,
           "type": "text",

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using ZMap.Store;
 using ZServer.Store;
 using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
@@ -32,7 +32,7 @@ public class ConfigurationStoreRefreshService : IHostedService
             var configurationProvider = _serviceProvider.GetRequiredService<ConfigurationProvider>();
             if (File.Exists(configurationProvider.Path))
             {
-                _logger.LogInformation("ZServer 已发现配置文件 {ConfigurationPath} ",
+                _logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
                     configurationProvider.Path);
             }
             else
@@ -48,7 +48,7 @@ public class ConfigurationStoreRefreshService : IHostedService
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("加载配置文件存储失败: {Exception}", e);
+                    _logger.LogError("加载配置文件失败: {Exception}", e);
                 }
 
                 await Task.Delay(15000, cancellationToken);
@@ -61,7 +61,7 @@ public class ConfigurationStoreRefreshService : IHostedService
         var configuration = configurationProvider.GetConfiguration();
         if (configuration != null)
         {
-            var configurations = new List<IConfiguration> { configuration };
+            var configurations = new List<JObject> { configuration };
             using var scope = _serviceProvider.CreateScope();
             var gridSetStore = scope.ServiceProvider.GetRequiredService<IGridSetStore>();
             await gridSetStore.Refresh(configurations);
@@ -78,7 +78,7 @@ public class ConfigurationStoreRefreshService : IHostedService
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
             await layerGroupStore.Refresh(configurations);
 
-            _logger.LogInformation("刷新配置文件存储成功");
+            _logger.LogInformation("刷新配置文件成功");
         }
     }
 

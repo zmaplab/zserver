@@ -7,18 +7,34 @@ using System.Net.Sockets;
 using System.Reflection;
 using Dapper;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Serilog;
 using ZMap;
+using ZMap.Infrastructure;
 
-namespace ZServer.API.Extensions;
+namespace ZServer.Silo;
 
 public static class OrleansExtensions
 {
-    public static void ConfigureSilo(HostBuilderContext context, ISiloBuilder siloBuilder)
+    public static IHostBuilder ConfigureSilo(this IHostBuilder hostBuilder)
     {
+        hostBuilder.UseOrleans(ConfigureSilo);
+        return hostBuilder;
+    }
+
+    private static void ConfigureSilo(HostBuilderContext context, ISiloBuilder siloBuilder)
+    {
+        var enableDashboard =
+            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboard", "Orleans:Dashboard");
+        var dashboardPort =
+            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboardPort", "Orleans:DashboardPort");
+        if (string.IsNullOrEmpty(dashboardPort))
+        {
+            dashboardPort = "8182";
+        }
+
         siloBuilder.AddMemoryGrainStorageAsDefault();
 
         if ("true".Equals(context.Configuration["standalone"]) ||
@@ -26,7 +42,13 @@ public static class OrleansExtensions
         {
             siloBuilder.UseLocalhostClustering(11111, 30000, null, "zserver", "zserver");
             siloBuilder.UseInMemoryReminderService();
-            Log.Logger.Information("Standalone: true");
+            if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
+            {
+                siloBuilder.UseDashboard(options => { options.Port = int.Parse(dashboardPort); });
+            }
+
+            Log.Logger.LogInformation(
+                $"Standalone: true, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
             return;
         }
 
@@ -41,16 +63,8 @@ public static class OrleansExtensions
         var gatewayPort =
             int.Parse(EnvironmentVariables.GetValue(context.Configuration, "ClusterGatewayPort",
                 "Orleans:GatewayPort"));
-        var enableDashboard =
-            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboard", "Orleans:Dashboard");
-        var dashboardPort =
-            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboardPort", "Orleans:DashboardPort");
-        if (string.IsNullOrEmpty(dashboardPort))
-        {
-            dashboardPort = "8182";
-        }
 
-        Log.Logger.Information(
+        Log.Logger.LogInformation(
             $"Standalone: false, Invariant: {invariant}, SiloName: {siloName}, ClusterId: {clusterId}, ServiceId: {serviceId}, SiloPort: {siloPort}, GatewayPort: {gatewayPort}, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
         var assembly = Assembly.Load($"{invariant}");
 
@@ -83,6 +97,13 @@ public static class OrleansExtensions
             options.ConnectionString = connectString;
             options.Invariant = invariant;
         });
+        // comments by lewis at 20230923
+        // 如 WMTS 的 tile, 不需要保持状态
+        // siloBuilder.AddAdoNetGrainStorageAsDefault(options =>
+        // {
+        //     options.ConnectionString = connectString;
+        //     options.Invariant = invariant;
+        // });
         siloBuilder.Configure<SiloOptions>(options => options.SiloName = siloName)
             .Configure<ClusterOptions>(options =>
             {

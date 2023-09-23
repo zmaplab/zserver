@@ -36,8 +36,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ZMap.DynamicCompiler\ZMap.DynamicCompiler.csproj" />
-        <ProjectReference Include="..\ZServer.Grains\ZServer.Grains.csproj" />
         <ProjectReference Include="..\ZMap.Source.Postgre\ZMap.Source.Postgre.csproj" />
+        <ProjectReference Include="..\ZServer.Silo\ZServer.Silo.csproj" />
     </ItemGroup>
 
     <ItemGroup>

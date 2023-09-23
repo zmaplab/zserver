@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Extensions.Configuration;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ZMap.Infrastructure;
 
 namespace ZServer.Store;
@@ -18,7 +20,7 @@ public class ConfigurationProvider
         _path = path;
     }
 
-    public IConfiguration GetConfiguration()
+    public JObject GetConfiguration()
     {
         if (!File.Exists(_path))
         {
@@ -33,18 +35,15 @@ public class ConfigurationProvider
 
         _lastWriteTime = file.LastWriteTime;
 
-        var json = File.ReadAllBytes(_path);
-        var hash = MurmurHashAlgorithmUtilities.ComputeHash(json);
+        var bytes = File.ReadAllBytes(_path);
+        var hash = MurmurHashAlgorithmUtilities.ComputeHash(bytes);
         if (hash == _lastHash)
         {
             return null;
         }
 
         _lastHash = hash;
-        var configurationBuilder = new ConfigurationBuilder();
-        using var stream = File.OpenRead(_path);
-        configurationBuilder.AddJsonStream(stream);
-        var configuration = configurationBuilder.Build();
-        return configuration;
+        var json = Encoding.UTF8.GetString(bytes);
+        return JsonConvert.DeserializeObject(json) as JObject;
     }
 }

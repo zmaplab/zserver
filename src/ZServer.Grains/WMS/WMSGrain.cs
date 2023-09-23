@@ -13,7 +13,7 @@ namespace ZServer.Grains.WMS
     /// <summary>
     /// 
     /// </summary>
-    [Reentrant, StatelessWorker]
+    [Reentrant]
     // ReSharper disable once InconsistentNaming
     public class WMSGrain : Grain, IWMSGrain
     {

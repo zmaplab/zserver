@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
-using Orleans.Hosting;
 using ZServer.API.Filters;
 using Log = ZMap.Infrastructure.Log;
 
@@ -47,7 +46,6 @@ namespace ZServer.API
 
             services.AddZServer(Configuration, "conf/zserver.json").AddSkiaSharpRenderer();
             services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
-
 
             services.Configure<ClusterOptions>("Orleans", Configuration);
             // services.AddOrleansClient(builder =>
@@ -95,12 +93,6 @@ namespace ZServer.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Log.Logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("ZServer");
-
-            // BridgeDbContext dbContext = new BridgeDbContext(
-            //     "User ID=postgres;Password=oVkr7GiT29CAkw;Host=hdy.dev;Port=1921;Database=szsf_dev;Pooling=true;",
-            //     "szsf_dev", "xiao_hui");
-            // dbContext.GetType().GetMethod("Set", BindingFlags.Public)
-            //     .Invoke(dbContext, new object[] {   });
 
             if (env.IsDevelopment())
             {

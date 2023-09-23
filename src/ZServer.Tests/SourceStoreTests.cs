@@ -1,7 +1,10 @@
-using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ZMap.Source.Postgre;
 using ZServer.Store;
 using Xunit;
@@ -12,22 +15,6 @@ namespace ZServer.Tests
 {
     public class SourceStoreTests : BaseTests
     {
-        [Fact]
-        public void AAAQ()
-        {
-            var json = """
-                       {
-                       "value": {
-                         "value": "1",
-                         "expression": "feature[\"opacity\"]"
-                        }
-                       }
-                       """;
-            var settings = new JsonSerializerSettings();
-
-            var a = JsonConvert.DeserializeObject<MyClass>(json, settings);
-        }
-
         class MyClass
         {
             /// <summary>
@@ -44,15 +31,48 @@ namespace ZServer.Tests
         }
 
         [Fact]
-        public async Task Clone()
+        public async Task LoadFromJson()
         {
-            var sourceStore = GetScopedService<ISourceStore>();
-            var dataSource = (PostgreSource)await sourceStore.FindAsync("berlin_db");
+            var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
+            var store = new SourceStore(NullLogger<SourceStore>.Instance);
+            await store.Refresh(new List<JObject> { json });
+
+            var dataSource = (PostgreSource)await store.FindAsync("berlin_db");
 
             var b = (PostgreSource)dataSource.Clone();
             b.Where = "is_deleted = 'f'";
 
             Assert.True(string.IsNullOrEmpty(dataSource.Where));
+
+            Assert.Equal(
+                "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
+                dataSource.ConnectionString);
+            Assert.Equal("berlin", dataSource.Database);
+            Assert.True(string.IsNullOrEmpty(dataSource.Where));
+            
+            var dataSources = await store.GetAllAsync();
+            var dataSource1 = (PostgreSource)dataSources.First(x => x is PostgreSource);
+            Assert.NotNull(dataSource1);
+            Assert.Equal(
+                "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
+                dataSource1.ConnectionString);
+            Assert.Equal("berlin", dataSource1.Database);
+
+            var dataSource2 = (ShapeFileSource)dataSources.First(x => x is ShapeFileSource);
+            Assert.NotNull(dataSource2);
+
+            Assert.EndsWith("osmbuildings.shp", dataSource2.File);
+            Assert.Equal(4326, dataSource2.Srid);
+        }
+
+        [Fact]
+        public async Task Clone()
+        {
+            var sourceStore = GetScopedService<ISourceStore>();
+            var store = (PostgreSource)await sourceStore.FindAsync("berlin_db");
+
+            var b = (PostgreSource)store.Clone();
+            b.Where = "is_deleted = 'f'";
         }
 
         [Fact]

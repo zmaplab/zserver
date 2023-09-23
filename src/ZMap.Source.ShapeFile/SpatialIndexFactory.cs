@@ -174,19 +174,13 @@ namespace ZMap.Source.ShapeFile
 
             foreach (var entry in entries)
             {
-                try
+                var box = new Envelope(entry.X1, entry.X2, entry.Y1, entry.Y2);
+                if (box.IsNull)
                 {
-                    var box = new Envelope(entry.X1, entry.X2, entry.Y1, entry.Y2);
-                    if (box.IsNull)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    tree.Insert(box, entry);
-                }
-                catch (Exception e)
-                {
-                }
+                tree.Insert(box, entry);
             }
 
             return tree;
