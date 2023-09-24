@@ -313,7 +313,7 @@ namespace ZServer.Store
                 var sldStyleGroups = await _sldStore.FindAsync(name);
                 if (sldStyleGroups != null)
                 {
-                    group.AddRange(sldStyleGroups);
+                    group.AddRange(sldStyleGroups.Select(x => x.Clone()));
                 }
             }
 
