@@ -58,7 +58,7 @@ create extension postgis;
 
 #### 启动 ZServer.API
 
-#### 单机模式
+##### 单机模式
 
 ```
 dotnet run --Standalone true --ClusterDashboard true --ClusterDashboardPort 8182 --Port 8200
@@ -81,7 +81,7 @@ dotnet run --Standalone false --ClusterSiloPort 10002 --ClusterGatewayPort 20002
 
 + 访问 localhost:3000 切换 wmts wms 测试查看效果
 
-#### docker-compose
+##### docker-compose
 
 ```
 version: "3"
