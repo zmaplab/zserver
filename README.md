@@ -58,7 +58,7 @@ create extension postgis;
 
 #### 启动 ZServer.API
 
-#### 单机模式
+##### 单机模式
 
 ```
 dotnet run --Standalone true --ClusterDashboard true --ClusterDashboardPort 8182 --Port 8200
@@ -80,6 +80,79 @@ dotnet run --Standalone false --ClusterSiloPort 10002 --ClusterGatewayPort 20002
 ```
 
 + 访问 localhost:3000 切换 wmts wms 测试查看效果
+
+##### docker-compose
+
+```
+version: "3"
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.50.0.0/16
+volumes:          
+  zserver_api_conf:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /DataDisk/zserver-api/conf
+  zserver_api_cache:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /DataDisk/zserver-api/cache             
+  zserver_api_symbols:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /DataDisk/zserver-api/Symbols       
+  zserver_api_fonts:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /DataDisk/zserver-api/Fonts      
+  zserver_api_shapes:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /DataDisk/zserver-api/shapes
+  zserver_api_sld:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /DataDisk/zserver-api/sld
+services:
+  zserver-api:
+    image: "zlzforever/zserver-api:latest"
+    restart: always
+    ports:
+      - 8200:8200
+      - 8201:8182
+      - 41113:41113
+      - 31113:31113
+    volumes:
+      - zserver_api_conf:/app/conf
+      - zserver_api_cache:/app/cache
+      - zserver_api_symbols:/app/Symbols
+      - zserver_api_fonts:/app/fonts
+      - zserver_api_shapes:/app/shapes
+      - zserver_api_sld:/app/sld
+    environment:
+      - PORT=8200
+      - standalone=false
+      - ClusterDashboard=true
+      - ClusterDashboardPort=8182
+      - HOST_IP=192.168.0.244
+      - TZ=Asia/Shanghai      
+      - EnableSensitiveDataLogging=false
+```
 
 ## Roadmap
 
