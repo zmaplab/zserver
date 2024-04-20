@@ -8,35 +8,34 @@ using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
 
-namespace ZServer.Tests
+namespace ZServer.Tests;
+
+public class SymbolStyleTests : BaseTests
 {
-    public class SymbolStyleTests : BaseTests
+    [Fact]
+    public async Task ImageSymbol()
     {
-        [Fact]
-        public async Task ImageSymbol()
+        var data = GetFeatures();
+
+        var style = new SymbolStyle
         {
-            var data = GetFeatures();
+            Uri = CSharpExpression<string>.New("file://108.png"),
+            Size = CSharpExpression<int?>.New(30)
+        };
 
-            var style = new SymbolStyle
-            {
-                Uri = CSharpExpression<string>.New("file://108.png"),
-                Size = CSharpExpression<int?>.New(30)
-            };
+        var width = 512;
+        var height = 512;
+        new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+        var graphicsService =
+            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
-            var width = 512;
-            var height = 512;
-            new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
-            var graphicsService =
-                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
-
-            foreach (var feature in data)
-            {
-                graphicsService.Render(Extent, feature.Geometry, style);
-            }
-
-
-            var stream = graphicsService.GetImage("image/png");
-            await File.WriteAllBytesAsync($"images/{GetType().Name}_ImageSymbol.png", await stream.ToArrayAsync());
+        foreach (var feature in data)
+        {
+            graphicsService.Render(Extent, feature.Geometry, style);
         }
+
+
+        var stream = graphicsService.GetImage("image/png");
+        await File.WriteAllBytesAsync($"images/{GetType().Name}_ImageSymbol.png", stream.ToArray());
     }
 }

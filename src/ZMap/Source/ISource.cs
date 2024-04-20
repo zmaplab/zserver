@@ -1,13 +1,12 @@
 using System;
 using NetTopologySuite.Geometries;
 
-namespace ZMap.Source
+namespace ZMap.Source;
+
+public interface ISource : IDisposable
 {
-    public interface ISource : IDisposable
-    {
-        string Name { get; set; }
-        int Srid { get; }
-        Envelope GetEnvelope();
-        ISource Clone();
-    }
+    string Name { get; set; }
+    int Srid { get; }
+    Envelope GetEnvelope();
+    ISource Clone();
 }

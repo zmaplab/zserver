@@ -1,6 +1,3 @@
-﻿namespace ZMap.SLD
-{
-    public class GrayChannel:Channel
-    {
-    }
-}
+﻿namespace ZMap.SLD;
+
+public class GrayChannel:Channel;

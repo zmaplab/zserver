@@ -1,8 +1,7 @@
-namespace ZMap.Style
+namespace ZMap.Style;
+
+public enum TranslateAnchor
 {
-    public enum TranslateAnchor
-    {
-        Map,
-        Viewport
-    }
+    Map,
+    Viewport
 }

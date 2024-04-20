@@ -1,5 +1,3 @@
 namespace ZMap.SLD;
 
-public class LayerConstraint
-{
-}
+public class LayerConstraint;

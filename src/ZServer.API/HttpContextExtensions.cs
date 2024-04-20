@@ -1,95 +1,56 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using NetTopologySuite.IO.Converters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using ZServer.Interfaces;
 
-namespace ZServer.API
+namespace ZServer.API;
+
+public static class HttpContextExtensions
 {
-    public static class HttpContextExtensions
+    public static async Task WriteZServerResponseAsync(this HttpContext httpContext, ZServerResponse result,
+        string infoFormat = "text/xml")
     {
-        private static readonly JsonSerializerOptions Options = new();
-
-        static HttpContextExtensions()
+        if (result.Exception == null)
         {
-            Options.Converters.Add(new GeoJsonConverterFactory());
+            httpContext.Response.ContentType = result.ContentType;
+            httpContext.Response.ContentLength = result.Body.Length;
+            await httpContext.Response.BodyWriter.WriteAsync(result.Body);
+            await httpContext.Response.BodyWriter.FlushAsync();
         }
-
-        public static async Task WriteResultAsync(this HttpContext httpContext, string code, string message,
-            Stream stream, string imageFormat,
-            string infoFormat = "text/xml")
+        else
         {
-            if (string.IsNullOrEmpty(message))
+            var exceptionReport = new ServerExceptionReport
             {
-                httpContext.Response.ContentType = imageFormat;
-                httpContext.Response.ContentLength = stream.Length;
-                await stream.CopyToAsync(httpContext.Response.Body);
-            }
-            else
-            {
-                var exceptionReport = new ServerExceptionReport
+                Exceptions = new List<ServerException>
                 {
-                    Exceptions = new List<ServerException>
+                    new()
                     {
-                        new()
-                        {
-                            Code = code,
-                            Locator = null,
-                            Text = message
-                        }
+                        Code = result.Exception.Code,
+                        Locator = result.Exception.Locator,
+                        Text = result.Exception.Text
                     }
-                };
-                var bytes = exceptionReport.Serialize(infoFormat);
+                }
+            };
 
-                httpContext.Response.ContentType = infoFormat;
-                httpContext.Response.ContentLength = bytes.Length;
-                await httpContext.Response.BodyWriter.WriteAsync(bytes);
-                await httpContext.Response.BodyWriter.FlushAsync();
-            }
-        }
-
-        public static async Task WriteResultAsync(this HttpContext httpContext, MapResult result,
-            string infoFormat = "text/xml")
-        {
-            if (string.IsNullOrEmpty(result.Code) || result.Code == "200")
-            {
-                httpContext.Response.ContentType = result.ImageType;
-                httpContext.Response.ContentLength = result.ImageBytes.Length;
-                await httpContext.Response.BodyWriter.WriteAsync(result.ImageBytes);
-                await httpContext.Response.BodyWriter.FlushAsync();
-            }
-            else
-            {
-                var exceptionReport = new ServerExceptionReport
-                {
-                    Exceptions = new List<ServerException>
-                    {
-                        new()
-                        {
-                            Code = result.Code,
-                            Locator = result.Locator,
-                            Text = result.Message
-                        }
-                    }
-                };
-                var bytes = exceptionReport.Serialize(infoFormat);
-
-                httpContext.Response.ContentType = infoFormat;
-                httpContext.Response.ContentLength = bytes.Length;
-                await httpContext.Response.BodyWriter.WriteAsync(bytes);
-                await httpContext.Response.BodyWriter.FlushAsync();
-            }
-        }
-
-        public static async Task WriteAsync(this HttpContext httpContext, object result)
-        {
-            var bytes = JsonSerializer.SerializeToUtf8Bytes(result, Options);
-            httpContext.Response.ContentType = "application/json";
+            var bytes = exceptionReport.Serialize(infoFormat);
+            httpContext.Response.ContentType = infoFormat;
             httpContext.Response.ContentLength = bytes.Length;
             await httpContext.Response.BodyWriter.WriteAsync(bytes);
             await httpContext.Response.BodyWriter.FlushAsync();
         }
+    }
+
+    public static async Task WriteAsync(this HttpContext httpContext, object result)
+    {
+        var options = httpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value;
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(result, options.JsonSerializerOptions);
+        httpContext.Response.ContentType = "application/json";
+        httpContext.Response.ContentLength = bytes.Length;
+        await httpContext.Response.BodyWriter.WriteAsync(bytes);
+        await httpContext.Response.BodyWriter.FlushAsync();
     }
 }

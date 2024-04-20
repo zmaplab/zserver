@@ -1,6 +1,3 @@
-namespace ZMap.SLD
-{
-    public class GraphicalSymbol
-    {
-    }
-}
+namespace ZMap.SLD;
+
+public class GraphicalSymbol;

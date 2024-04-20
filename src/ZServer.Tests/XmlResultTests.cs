@@ -3,27 +3,26 @@ using System.Text;
 using Xunit;
 using ZServer.Interfaces;
 
-namespace ZServer.Tests
-{
-    public class XmlResultTests
-    {
-        [Fact]
-        public void Test1()
-        {
-            var exception = new ServerException
-            {
-                Code = "test",
-                Text = "this is a exception"
-            };
+namespace ZServer.Tests;
 
-            var report = new ServerExceptionReport
+public class XmlResultTests
+{
+    [Fact]
+    public void Test1()
+    {
+        var exception = new ServerException
+        {
+            Code = "",
+            Text = "this is a exception"
+        };
+
+        var report = new ServerExceptionReport
+        {
+            Exceptions = new List<ServerException>
             {
-                Exceptions = new List<ServerException>
-                {
-                    exception
-                }
-            };
-            Encoding.UTF8.GetString(report.Serialize());
-        }
+                exception
+            }
+        };
+        Encoding.UTF8.GetString(report.Serialize());
     }
 }

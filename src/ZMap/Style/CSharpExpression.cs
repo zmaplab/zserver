@@ -1,109 +1,108 @@
 // using Newtonsoft.Json;
 using ZMap.Infrastructure;
 
-namespace ZMap.Style
+namespace ZMap.Style;
+
+/// <summary>
+/// 1.若有 value，没有表达式，则使用 value
+/// 2.若有 value，有表达式，表达式的值不为空，则使用表达式的值
+/// 3.若无 value，没有表达式，则使用表达式的值
+/// 4.若无 value，有表达式，则使用表达式的值
+/// </summary>
+/// <typeparam name="TV"></typeparam>
+public class CSharpExpression<TV> : CSharpExpression
 {
     /// <summary>
-    /// 1.若有 value，没有表达式，则使用 value
-    /// 2.若有 value，有表达式，表达式的值不为空，则使用表达式的值
-    /// 3.若无 value，没有表达式，则使用表达式的值
-    /// 4.若无 value，有表达式，则使用表达式的值
+    /// 
     /// </summary>
-    /// <typeparam name="TV"></typeparam>
-    public class CSharpExpression<TV> : CSharpExpression
+    // [JsonProperty]
+    public TV Value { get; internal set; }
+
+    public static CSharpExpression<TV> New(TV v, string body = null)
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        // [JsonProperty]
-        public TV Value { get; internal set; }
-
-        public static CSharpExpression<TV> New(TV v, string body = null)
+        return new CSharpExpression<TV>
         {
-            return new CSharpExpression<TV>
-            {
-                Value = v,
-                Expression = body
-            };
+            Value = v,
+            Expression = body
+        };
+    }
+
+    public static CSharpExpression<TV> From(TV value, TV defaultValue)
+    {
+        if (value == null)
+        {
+            return New(defaultValue);
         }
-
-        public static CSharpExpression<TV> From(TV value, TV defaultValue)
+        else
         {
-            if (value == null)
-            {
-                return New(defaultValue);
-            }
-            else
-            {
-                var v = ConvertUtilities.ToObject<TV>(value);
-                return New(Equals(v, default(TV)) ? defaultValue : v);
-            }
+            var v = ConvertUtilities.ToObject<TV>(value);
+            return New(Equals(v, default(TV)) ? defaultValue : v);
         }
+    }
 
-        public CSharpExpression<TV> Clone()
-        {
-            return New(Value, Expression);
-        }
+    public CSharpExpression<TV> Clone()
+    {
+        return New(Value, Expression);
+    }
 
-        public void Invoke(Feature feature, TV defaultValue = default)
+    public void Invoke(Feature feature, TV defaultValue = default)
+    {
+        if (Value != null)
         {
-            if (Value != null)
+            if (!string.IsNullOrWhiteSpace(Expression))
             {
-                if (!string.IsNullOrWhiteSpace(Expression))
+                // 只要有表达式，则以表达式优先，不然何必去配置表达式呢
+                // 即使表达式计算的值为空，也应该认为是用户需要的结果
+                var func = CSharpDynamicCompiler.GetOrCreateFunc(Expression);
+                if (func == null)
                 {
-                    // 只要有表达式，则以表达式优先，不然何必去配置表达式呢
-                    // 即使表达式计算的值为空，也应该认为是用户需要的结果
-                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Expression);
-                    if (func == null)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    var output = func.Invoke(feature);
-                    if (output != null)
-                    {
-                        Value = output;
-                    }
+                var output = func.Invoke(feature);
+                if (output != null)
+                {
+                    Value = output;
                 }
             }
+        }
+        else
+        {
+            // 说明未直接配值，在表达式对象中也没有配置值
+            if (string.IsNullOrWhiteSpace(Expression))
+            {
+                Value = defaultValue;
+            }
             else
             {
-                // 说明未直接配值，在表达式对象中也没有配置值
-                if (string.IsNullOrWhiteSpace(Expression))
+                var func = CSharpDynamicCompiler.GetOrCreateFunc(Expression);
+                if (func != null)
                 {
-                    Value = defaultValue;
+                    var output = func.Invoke(feature);
+                    Value = output != null ? (TV)output : defaultValue;
                 }
                 else
                 {
-                    var func = CSharpDynamicCompiler.GetOrCreateFunc(Expression);
-                    if (func != null)
-                    {
-                        var output = func.Invoke(feature);
-                        Value = output != null ? (TV)output : defaultValue;
-                    }
-                    else
-                    {
-                        Value = defaultValue;
-                    }
+                    Value = defaultValue;
                 }
             }
         }
     }
+}
 
-    public class CSharpExpression
+public class CSharpExpression
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    // [JsonProperty]
+    public string Expression { get; internal set; }
+
+    public static CSharpExpression New(string body = null)
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        // [JsonProperty]
-        public string Expression { get; internal set; }
-
-        public static CSharpExpression New(string body = null)
+        return new CSharpExpression
         {
-            return new CSharpExpression
-            {
-                Expression = body
-            };
-        }
+            Expression = body
+        };
     }
 }

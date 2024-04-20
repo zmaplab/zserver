@@ -1,17 +1,16 @@
 ﻿using System.Xml;
 
-namespace ZMap.SLD
+namespace ZMap.SLD;
+
+public class Normalize
 {
-    public class Normalize
+    public void ReadXml(XmlReader reader)
     {
-        public void ReadXml(XmlReader reader)
+        while (reader.Read())
         {
-            while (reader.Read())
+            if (reader.LocalName == "Normalize" && reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.LocalName == "Normalize" && reader.NodeType == XmlNodeType.EndElement)
-                {
-                    break;
-                }
+                break;
             }
         }
     }

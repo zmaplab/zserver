@@ -1,6 +1,3 @@
-namespace ZMap.Renderer
-{
-    public interface ILineStyleRenderer<in TGraphics> : IVectorRenderer<TGraphics>
-    {
-    }
-}
+namespace ZMap.Renderer;
+
+public interface ILineStyleRenderer<in TGraphics> : IVectorRenderer<TGraphics>;

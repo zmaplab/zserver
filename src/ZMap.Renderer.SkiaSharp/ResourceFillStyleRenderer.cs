@@ -6,83 +6,76 @@ using ZMap.Renderer.SkiaSharp.Extensions;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
 
-namespace ZMap.Renderer.SkiaSharp
+namespace ZMap.Renderer.SkiaSharp;
+
+public class ResourceFillStyleRenderer(ResourceFillStyle style) : FillStyleRenderer(style)
 {
-    public class ResourceFillStyleRenderer : FillStyleRenderer
+    private static readonly SKPathEffect Times1 = SKPathEffect.Create2DLine(1,
+        SKMatrix.CreateSkew(10, 10).Concat(SKMatrix.CreateRotationDegrees(45)));
+
+    private static readonly SKPathEffect Times2 = SKPathEffect.Create2DLine(1,
+        SKMatrix.CreateSkew(10, 10).Concat(SKMatrix.CreateRotationDegrees(135)));
+
+    private static readonly SKPathEffect Times = SKPathEffect.CreateSum(Times1, Times2);
+
+    protected override SKPaint CreatePaint()
     {
-        private static readonly SKPathEffect Times1 = SKPathEffect.Create2DLine(1,
-            SKMatrix.CreateSkew(10, 10).Concat(SKMatrix.CreateRotationDegrees(45)));
+        var style = (ResourceFillStyle)Style;
 
-        private static readonly SKPathEffect Times2 = SKPathEffect.Create2DLine(1,
-            SKMatrix.CreateSkew(10, 10).Concat(SKMatrix.CreateRotationDegrees(135)));
-
-        private static readonly SKPathEffect Times = SKPathEffect.CreateSum(Times1, Times2);
-
-        public ResourceFillStyleRenderer(ResourceFillStyle style) :
-            base(style)
+        var uri = style.Uri.Value;
+        if (string.IsNullOrEmpty(uri) || !Uri.TryCreate(uri, UriKind.Absolute, out var u))
         {
+            return CreateDefaultPaint();
         }
 
-        protected override SKPaint CreatePaint()
-        {
-            var style = (ResourceFillStyle)Style;
+        SKPaint paint;
 
-            var uri = style.Uri.Value;
-            if (string.IsNullOrEmpty(uri) || !Uri.TryCreate(uri, UriKind.Absolute, out var u))
+        var opacity = style.Opacity.Value ?? 1;
+        var color = style.Color?.Value;
+        var antialias = Style.Antialias;
+        switch (u.Scheme)
+        {
+            case "file":
             {
-                return CreateDefaultPaint();
+                var path = u.ToPath();
+                paint = GetDefaultPaint(color, opacity, antialias);
+                if (File.Exists(path))
+                {
+                    paint.Shader = SKShader.CreateBitmap(SKBitmap.Decode(path), SKShaderTileMode.Repeat,
+                        SKShaderTileMode.Repeat);
+                }
+
+                break;
             }
-
-            SKPaint paint;
-
-
-            var opacity = style.Opacity.Value ?? 1;
-            var color = style.Color?.Value;
-            var antialias = Style.Antialias;
-            switch (u.Scheme)
+            case "shape":
             {
-                case "file":
+                paint = GetDefaultPaint(color, opacity, antialias);
+                paint.PathEffect = u.DnsSafeHost switch
                 {
-                    var path = u.ToPath();
-                    paint = GetDefaultPaint(color, opacity, antialias);
-                    if (File.Exists(path))
-                    {
-                        paint.Shader = SKShader.CreateBitmap(SKBitmap.Decode(path), SKShaderTileMode.Repeat,
-                            SKShaderTileMode.Repeat);
-                    }
+                    "times" => Times,
+                    _ => paint.PathEffect
+                };
 
-                    break;
-                }
-                case "shape":
-                {
-                    paint = GetDefaultPaint(color, opacity, antialias);
-                    paint.PathEffect = u.DnsSafeHost switch
-                    {
-                        "times" => Times,
-                        _ => paint.PathEffect
-                    };
-
-                    break;
-                }
-                default:
-                {
-                    paint = GetDefaultPaint(color, opacity, antialias);
-                    break;
-                }
+                break;
             }
-
-            return paint;
-        }
-
-        private SKPaint GetDefaultPaint(string color, float opacity, bool antialias)
-        {
-            var paint = new SKPaint
+            default:
             {
-                Style = SKPaintStyle.Fill,
-                IsAntialias = antialias,
-                Color = ColorUtilities.GetColor(color, opacity)
-            };
-            return paint;
+                paint = GetDefaultPaint(color, opacity, antialias);
+                break;
+            }
         }
+
+        return paint;
+    }
+
+    private SKPaint GetDefaultPaint(string color, float opacity, bool antialias)
+    {
+        var paint = new SKPaint
+        {
+            Style = SKPaintStyle.Fill,
+            IsAntialias = antialias,
+            Color = ColorUtilities.GetColor(color, opacity)
+        };
+        return paint;
     }
 }

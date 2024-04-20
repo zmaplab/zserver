@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <!-- Warning: setting the below switch is *NOT* recommended in web apps -->
         <!-- See: https://aka.ms/binaryformatter -->
         <!-- See: https://github.com/dotnet/orleans/issues/6805 -->
@@ -11,25 +11,19 @@
 
     <ItemGroup>
         <PackageReference Include="DotNetCore.Compile.Environment" Version="3.2.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-        <PackageReference Include="Microsoft.Orleans.Client" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Orleans.Client" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.2" />
         <PackageReference Include="OrleansDashboard" Version="7.2.2" />
-        <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
-        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-        <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-        <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
+        <PackageReference Include="Serilog.Expressions" Version="4.0.0" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-        <PackageReference Include="nacos-sdk-csharp" Version="1.3.5" />
-        <PackageReference Include="nacos-sdk-csharp.Extensions.Configuration" Version="1.3.5" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.5" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.8" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
         <PackageReference Include="RemoteConfiguration.Json.Aliyun" Version="0.1.2" />
     </ItemGroup>

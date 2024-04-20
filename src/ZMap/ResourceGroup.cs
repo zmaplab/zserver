@@ -1,30 +1,29 @@
 using System;
 
-namespace ZMap
+namespace ZMap;
+
+/// <summary>
+/// 资源分组
+/// </summary>
+public class ResourceGroup
 {
     /// <summary>
-    /// 资源分组
+    /// 标识
     /// </summary>
-    public class ResourceGroup
+    public Guid Id { get; set; }
+
+    /// <summary>
+    /// 名称
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// 描述
+    /// </summary>
+    public string Description { get; set; }
+
+    public ResourceGroup Clone()
     {
-        /// <summary>
-        /// 标识
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// 名称
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string Description { get; set; }
-
-        public ResourceGroup Clone()
-        {
-            return (ResourceGroup)MemberwiseClone();
-        }
+        return (ResourceGroup)MemberwiseClone();
     }
 }

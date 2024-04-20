@@ -1,17 +1,16 @@
 ﻿using System.Xml;
 
-namespace ZMap.SLD
+namespace ZMap.SLD;
+
+public class Histogram
 {
-    public class Histogram
+    public void ReadXml(XmlReader reader)
     {
-        public void ReadXml(XmlReader reader)
+        while (reader.Read())
         {
-            while (reader.Read())
+            if (reader.LocalName == "Histogram" && reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.LocalName == "Histogram" && reader.NodeType == XmlNodeType.EndElement)
-                {
-                    break;
-                }
+                break;
             }
         }
     }

@@ -13,59 +13,59 @@ using ZMap.Store;
 
 namespace ZMap.Ogc.Wms;
 
-public class WmsService
+public class WmsService(
+    ILogger<WmsService> logger,
+    IGraphicsServiceProvider graphicsServiceProvider,
+    ILayerQueryService layerQueryService)
 {
-    private readonly ILogger<WmsService> _logger;
-    private readonly IGraphicsServiceProvider _graphicsServiceProvider;
-    private readonly ILayerQueryService _layerQueryService;
-
-    public WmsService(ILogger<WmsService> logger, IGraphicsServiceProvider graphicsServiceProvider,
-        ILayerQueryService layerQueryService)
-    {
-        _logger = logger;
-        _graphicsServiceProvider = graphicsServiceProvider;
-        _layerQueryService = layerQueryService;
-    }
-
     public async ValueTask<MapResult> GetMapAsync(string layers, string styles,
         string srs, string bbox, int width,
         int height, string format,
         bool transparent, string bgColor, int time, string formatOptions, string cqlFilter,
-        IDictionary<string, object> extras)
+        IDictionary<string, object> arguments)
     {
-        var traceIdentifier = extras.GetTraceIdentifier();
-        var displayUrl =
-            $"[{traceIdentifier}] LAYERS={layers}&FORMAT={format}&SRS={srs}&BBOX={bbox}&WIDTH={width}&HEIGHT={height}&FILTER={cqlFilter}&FORMAT_OPTIONS={formatOptions}";
+        var traceIdentifier = arguments.GetTraceIdentifier();
+        string displayUrl = null;
         try
         {
-            var modeState =
+            var validateResult =
                 ArgumentsValidator.VerifyAndBuildWmsGetMapArguments(layers, srs, bbox, width, height, format);
-            if (!string.IsNullOrEmpty(modeState.Code))
+            if (!string.IsNullOrEmpty(validateResult.Code))
             {
-                _logger.LogError("{Url}, arguments error", displayUrl);
-                return new MapResult(Stream.Null, modeState.Code, modeState.Message);
+                displayUrl = GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
+                    cqlFilter);
+                logger.LogError("{Url}, arguments error", displayUrl);
+                return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
+
+            var requestArguments = validateResult.Arguments;
 
             var dpi = Utilities.GetDpi(formatOptions);
 
-            var filters = string.IsNullOrWhiteSpace(cqlFilter)
-                ? Array.Empty<string>()
-                : cqlFilter.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var filterList = string.IsNullOrWhiteSpace(cqlFilter)
+                ? []
+                : cqlFilter.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+            // var styleList = string.IsNullOrWhiteSpace(styles)
+            //     ? []
+            //     : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
             var layerQueries =
-                new List<QueryLayerParams>();
+                new List<LayerQuery>();
 
-            for (var i = 0; i < modeState.Arguments.Layers.Count; ++i)
+            for (var i = 0; i < requestArguments.Layers.Count; ++i)
             {
-                layerQueries.Add(new QueryLayerParams(modeState.Arguments.Layers[i].ResourceGroup,
-                    modeState.Arguments.Layers[i].Layer,
+                var layer = validateResult.Arguments.Layers.ElementAt(i);
+                // var style = styleList.ElementAtOrDefault(i);
+                layerQueries.Add(new LayerQuery(layer.ResourceGroup,
+                    layer.Layer,
                     new Dictionary<string, object>
                     {
-                        { Defaults.AdditionalFilter, filters.ElementAtOrDefault(i) }
+                        { Defaults.AdditionalFilter, filterList.ElementAtOrDefault(i) }
                     }));
             }
 
-            var layerList = await _layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
             if (layerList.Count == 0)
             {
                 return new MapResult(Stream.Null, null, null);
@@ -73,77 +73,87 @@ public class WmsService
 
             var viewPort = new Viewport
             {
-                Extent = modeState.Arguments.Envelope,
+                Extent = validateResult.Arguments.Envelope,
                 Width = width,
                 Height = height,
                 Transparent = transparent,
-                Bordered = extras.TryGetValue("Bordered", out var b) && (bool)b
+                Bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b
             };
 
-            var scale = GeographicUtilities.CalculateOGCScale(modeState.Arguments.Envelope, modeState.Arguments.SRID,
+            var scale = GeographicUtilities.CalculateOGCScale(validateResult.Arguments.Envelope,
+                validateResult.Arguments.SRID,
                 width, dpi);
             var map = new Map();
             map.SetId(traceIdentifier)
-                .SetSrid(modeState.Arguments.SRID)
+                .SetSrid(validateResult.Arguments.SRID)
                 .SetZoom(new Zoom(scale, ZoomUnits.Scale))
-                .SetLogger(_logger)
-                .SetGraphicsContextFactory(_graphicsServiceProvider)
+                .SetLogger(logger)
+                .SetGraphicsContextFactory(graphicsServiceProvider)
                 .AddLayers(layerList);
             var image = await map.GetImageAsync(viewPort, format);
             return new MapResult(image, null, null);
         }
         catch (Exception e)
         {
-            _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
+            displayUrl ??= GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
+                cqlFilter);
+            logger.LogError(e, "请求 {Url} 失败", displayUrl);
             return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }
 
-    public async Task<(string Code, string Message, FeatureCollection Features)> GetFeatureInfoAsync(string layers,
-        string infoFormat, int featureCount, string srs, string bbox, int width,
-        int height, double x, double y, IDictionary<string, object> arguments)
+    public async ValueTask<GetFeatureInfoResult> GetFeatureInfoAsync(string layers,
+        string srs, string bbox, int width, int height,
+        string infoFormat, int featureCount,
+        double x, double y, IDictionary<string, object> arguments)
     {
         var traceIdentifier = arguments.GetTraceIdentifier();
-        var displayUrl =
-            $"[{traceIdentifier}] LAYERS={layers}&FORMAT={infoFormat}&SRS={srs}&BBOX={bbox}&WIDTH={width}&HEIGHT={height}";
+        string displayUrl = null;
         try
         {
-            var modeState =
+            var validateResult =
                 ArgumentsValidator.VerifyAndBuildWmsGetFeatureInfoArguments(layers, srs, bbox, width, height, x, y,
                     featureCount);
-            if (!string.IsNullOrEmpty(modeState.Code))
+            if (!string.IsNullOrEmpty(validateResult.Code))
             {
-                _logger.LogError("{Url}, arguments error", displayUrl);
-                return (modeState.Code, modeState.Message, null);
+                displayUrl = GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
+                logger.LogError("{Url}, arguments error", displayUrl);
+                return new GetFeatureInfoResult(null, validateResult.Code, validateResult.Message);
             }
 
             var layerQueries =
-                new List<QueryLayerParams>();
+                new List<LayerQuery>();
 
-            for (var i = 0; i < modeState.Arguments.Layers.Count; ++i)
+            for (var i = 0; i < validateResult.Arguments.Layers.Count; ++i)
             {
-                layerQueries.Add(
-                    new QueryLayerParams(modeState.Arguments.Layers[i].ResourceGroup,
-                        modeState.Arguments.Layers[i].Layer));
+                var layer = validateResult.Arguments.Layers.ElementAt(i);
+                layerQueries.Add(new LayerQuery(layer.ResourceGroup,
+                    layer.Layer,
+                    new Dictionary<string, object>()));
             }
 
-            var layerList = await _layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
 
             var featureCollection = await
-                GetFeatureInfoAsync(layerList, featureCount, srs, modeState.Arguments.Envelope, width, height, x, y);
+                GetFeatureInfoAsync(layerList, featureCount, srs, validateResult.Arguments.Envelope, width, height, x,
+                    y);
 
-            if (EnvironmentVariables.EnableSensitiveDataLogging)
+            if (!EnvironmentVariables.EnableSensitiveDataLogging)
             {
-                _logger.LogInformation("Query features {Url}, target layers: {Layers}, count: {Count}", displayUrl,
-                    string.Join(", ", layerList.Select(z => z.Name)), featureCollection.Count);
+                return new GetFeatureInfoResult(featureCollection, null, null);
             }
 
-            return (null, null, featureCollection);
+            displayUrl = GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
+            logger.LogInformation("GetFeatureInfo {Url}, hit layers: {Layers}, count: {Count}", displayUrl,
+                string.Join(", ", layerList.Select(z => z.Name)), featureCollection.Count);
+
+            return new GetFeatureInfoResult(featureCollection, null, null);
         }
         catch (Exception e)
         {
-            _logger.LogError("{Url}, {Exception}", displayUrl, e.ToString());
-            return ("InternalError", e.Message, null);
+            displayUrl ??= GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
+            logger.LogError(e, "请求 {Url} 失败", displayUrl);
+            return new GetFeatureInfoResult(null, "InternalError", e.Message);
         }
     }
 
@@ -208,5 +218,22 @@ public class WmsService
         }
 
         return featureCollection;
+    }
+
+    private string GetMapDisplayUrl(string traceIdentifier, string layers,
+        string srs, string bbox, int width,
+        int height, string format,
+        string formatOptions, string cqlFilter)
+    {
+        return
+            $"[{traceIdentifier}] LAYERS={layers}&FORMAT={format}&SRS={srs}&BBOX={bbox}&WIDTH={width}&HEIGHT={height}&FILTER={cqlFilter}&FORMAT_OPTIONS={formatOptions}";
+    }
+
+    private string GetFeatureInfoDisplayUrl(string traceIdentifier, string layers,
+        string srs, string bbox, int width,
+        int height, string infoFormat)
+    {
+        return
+            $"[{traceIdentifier}] LAYERS={layers}&FORMAT={infoFormat}&SRS={srs}&BBOX={bbox}&WIDTH={width}&HEIGHT={height}";
     }
 }

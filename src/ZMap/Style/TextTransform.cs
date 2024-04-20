@@ -1,9 +1,8 @@
-namespace ZMap.Style
+namespace ZMap.Style;
+
+public enum TextTransform
 {
-    public enum TextTransform
-    {
-        None,
-        Uppercase,
-        Lowercase
-    }
+    None,
+    Uppercase,
+    Lowercase
 }

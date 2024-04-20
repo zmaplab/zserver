@@ -1,25 +1,17 @@
 using SkiaSharp;
 using ZMap.Style;
 
-namespace ZMap.Renderer.SkiaSharp
+namespace ZMap.Renderer.SkiaSharp;
+
+public class RasterStyleRender(RasterStyle style) : SkiaRenderer, IRasterStyleRender<SKCanvas>
 {
-    public class RasterStyleRender : SkiaRenderer, IRasterStyleRender<SKCanvas>
+    protected override SKPaint CreatePaint()
     {
-        private readonly RasterStyle _rasterStyle;
+        return new SKPaint();
+    }
 
-        public RasterStyleRender(RasterStyle style)
-        {
-            _rasterStyle = style;
-        }
-
-        protected override SKPaint CreatePaint()
-        {
-            return new SKPaint();
-        }
-
-        public override string ToString()
-        {
-            return $"{_rasterStyle}";
-        }
+    public override string ToString()
+    {
+        return $"{style}";
     }
 }

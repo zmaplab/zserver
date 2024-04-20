@@ -2,12 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ZServer;
 
-public class ZServerBuilder
+public class ZServerBuilder(IServiceCollection services)
 {
-    public ZServerBuilder(IServiceCollection services)
-    {
-        Services = services;
-    }
-
-    public IServiceCollection Services { get; }
+    public IServiceCollection Services { get; } = services;
 }

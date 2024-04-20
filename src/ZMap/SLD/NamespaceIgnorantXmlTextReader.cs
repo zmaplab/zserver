@@ -3,11 +3,7 @@ using System.Xml;
 
 namespace ZMap.SLD;
 
-public class NamespaceIgnorantXmlTextReader : XmlTextReader
+public class NamespaceIgnorantXmlTextReader(Stream stream) : XmlTextReader(stream)
 {
-    public NamespaceIgnorantXmlTextReader(Stream stream) : base(stream)
-    {
-    }
-
     public override string NamespaceURI => "";
 }

@@ -3,7 +3,7 @@
     <Import Project="../../package.props" />
     <Import Project="../../version.props" />
     <ItemGroup>
-        <PackageReference Include="SkiaSharp" Version="2.88.5" />
+        <PackageReference Include="SkiaSharp" Version="2.88.8" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ZMap\ZMap.csproj" />

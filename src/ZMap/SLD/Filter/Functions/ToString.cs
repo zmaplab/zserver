@@ -3,18 +3,11 @@ using ZMap.SLD.Filter.Expression;
 
 namespace ZMap.SLD.Filter.Functions;
 
-public class ToString
+public class ToString(FunctionType1 functionType1)
 {
-    private readonly FunctionType1 _functionType1;
-
-    public ToString(FunctionType1 functionType1)
-    {
-        _functionType1 = functionType1;
-    }
-
     public object Accept(IExpressionVisitor visitor, object extraData)
     {
-        visitor.Visit(_functionType1.Items[0], extraData);
+        visitor.Visit(functionType1.Items[0], extraData);
 
         var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
         var guid = Guid.NewGuid().ToString("N");

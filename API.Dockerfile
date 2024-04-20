@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS api-builder
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS api-builder
 WORKDIR /app
 COPY . .
 RUN cd src/ZServer.API && dotnet publish -c Release -o out
@@ -15,15 +15,22 @@ RUN rm -rf src/ZServer.API/out/runtimes/win-x86
 RUN rm -rf src/ZServer.API/out/shapes
 RUN rm -rf src/ZServer.API/out/Fonts
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS zserver-api
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS zserver-api
 WORKDIR /app
-RUN sed -i "s@http://deb.debian.org@http://mirrors.aliyun.com@g" /etc/apt/sources.list 
-RUN apt-get update -y && apt-get install -y libgdiplus locales fontconfig && apt-get clean && ln -s /usr/lib/libgdiplus.so /usr/lib/gdiplus.dll
-RUN sed -ie 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/g' /etc/locale.gen && locale-gen && mkdir /usr/share/fonts/truetype/deng/
-ADD ./src/ZServer.API/fonts/* /usr/share/fonts/truetype/deng/
-RUN fc-cache -vf && fc-list
+EXPOSE 8200
 ENV LANG zh_CN.UTF-8
-COPY --from=api-builder /app/src/ZServer.API/out .
 RUN mkdir /app/shapes && mkdir /app/Fonts
-ENTRYPOINT ["dotnet", "zapi.dll"]
+RUN echo "deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib" > /etc/apt/sources.list && \
+    echo "deb-src https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian-security/ bookworm-security main" >> /etc/apt/sources.list && \
+    echo "deb-src https://mirrors.aliyun.com/debian-security/ bookworm-security main" >> /etc/apt/sources.list \
+RUN apt-get update &&\
+    apt-get install -y fontconfig && apt-get clean
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ADD ./src/ZServer.API/fonts/* /usr/share/fonts/truetype/deng/
+COPY --from=api-builder /app/src/ZServer.API/out .
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["dotnet", "zapi.dll"]
 

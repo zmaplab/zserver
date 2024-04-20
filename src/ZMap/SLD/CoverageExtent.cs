@@ -1,6 +1,3 @@
 namespace ZMap.SLD;
 
-public class CoverageExtent
-{
-    
-}
+public class CoverageExtent;

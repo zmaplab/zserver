@@ -1,36 +1,31 @@
 using System.Xml.Serialization;
+using Orleans;
 
-namespace ZServer.Interfaces
+namespace ZServer.Interfaces;
+
+[XmlRoot("ServerException")]
+[GenerateSerializer]
+[Immutable]
+public class ServerException
 {
-    [XmlRoot("ServerException")]
-    public class ServerException
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        [XmlAttribute("code")]
-        public string Code { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlAttribute("code")]
+    [Id(0)]
+    public string Code { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [XmlText]
-        public string Text { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlAttribute("locator")]
+    [Id(1)]
+    public string Locator { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [XmlAttribute("locator")]
-        public string Locator { get; set; }
-
-        public ServerException()
-        {
-        }
-
-        public ServerException(string text, string code)
-        {
-            Text = text;
-            Code = code;
-        }
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlText]
+    [Id(2)]
+    public string Text { get; set; }
 }

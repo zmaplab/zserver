@@ -1,7 +1,6 @@
-namespace ZMap.SLD
+namespace ZMap.SLD;
+
+public interface IStyle
 {
-    public interface IStyle
-    {
-        object Accept(IStyleVisitor visitor, object extraData);
-    }
+    object Accept(IStyleVisitor visitor, object extraData);
 }

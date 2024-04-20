@@ -4,12 +4,8 @@ using Microsoft.Extensions.Logging;
 
 namespace ZServer.API.Filters;
 
-public class GlobalExceptionFilter : IExceptionFilter
+public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExceptionFilter
 {
-    private readonly ILogger<GlobalExceptionFilter> _logger;
-
-    public GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) => _logger = logger;
-
     public void OnException(ExceptionContext context)
     {
         context.HttpContext.Response.StatusCode = 500;
@@ -19,7 +15,7 @@ public class GlobalExceptionFilter : IExceptionFilter
             msg = "系统内部错误",
             code = 500
         });
-
-        _logger.LogError("{Exception}", context.Exception.ToString());
+        context.ExceptionHandled = true;
+        logger.LogError(context.Exception, "请求异常");
     }
 }
