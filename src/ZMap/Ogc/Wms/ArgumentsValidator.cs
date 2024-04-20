@@ -6,62 +6,61 @@ namespace ZMap.Ogc.Wms;
 
 public static class ArgumentsValidator
 {
-    public static (string Code, string Message, RequestArguments Arguments) VerifyAndBuildWmsGetMapArguments(
+    public static ValidateResult VerifyAndBuildWmsGetMapArguments(
         string layers,
         string srs, string bbox,
         int width, int height, string format)
     {
         if (string.IsNullOrWhiteSpace(layers))
         {
-            return ("LayerNotDefined", "No layers have been requested", null);
+            return new ValidateResult(null, "LayerNotDefined", "No layers have been requested");
         }
 
         if (string.IsNullOrWhiteSpace(format))
         {
-            return ("InvalidFormat", "No output map format requested", null);
+            return new ValidateResult(null, "InvalidFormat", "No output map format requested");
         }
 
         if (string.IsNullOrWhiteSpace(srs))
         {
-            return ("InvalidSRS", "No srs requested", null);
+            return new ValidateResult(null, "InvalidSRS", "No srs requested");
         }
 
         if (!int.TryParse(srs.Replace("EPSG:", ""), out var srid))
         {
-            return ("InvalidSRS", "SRS is not valid", null);
+            return new ValidateResult(null, "InvalidSRS", "SRS is not valid");
         }
 
         if (string.IsNullOrWhiteSpace(bbox))
         {
-            return ("MissingBBox", "GetMap requests must include a BBOX parameter", null);
+            return new ValidateResult(null, "MissingBBox", "GetMap requests must include a BBOX parameter");
         }
 
-        var points = bbox.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        var points = bbox.Split(',', StringSplitOptions.RemoveEmptyEntries);
         if (points.Length != 4 || !float.TryParse(points[0], out var x1) ||
             !float.TryParse(points[1], out var y1)
             || !float.TryParse(points[2], out var x2)
             || !float.TryParse(points[3], out var y2))
         {
-            return ("InvalidBBox", $"The request bounding box is invalid: {bbox}", null);
+            return new ValidateResult(null, "InvalidBBox", $"The request bounding box is invalid: {bbox}");
         }
 
         if (x2 - x1 <= 0 || y2 - y1 <= 0)
         {
-            return ("InvalidBBox", $"The request bounding box has zero area: {bbox}", null);
+            return new ValidateResult(null, "InvalidBBox", $"The request bounding box has zero area: {bbox}");
         }
 
         if (width <= 0 || height <= 0)
         {
-            return (
-                "MissingOrInvalidParameter",
-                $"Missing or invalid requested map size. Parameters WIDTH and HEIGHT shall be present and be integers > 0. Got WIDTH={width}, HEIGHT={height}",
-                null);
+            return new ValidateResult(
+                null, "MissingOrInvalidParameter",
+                $"Missing or invalid requested map size. Parameters WIDTH and HEIGHT shall be present and be integers > 0. Got WIDTH={width}, HEIGHT={height}");
         }
 
         var list = new List<(string Group, string Layer)>();
-        foreach (var layer in layers.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var layer in layers.Split(';', StringSplitOptions.RemoveEmptyEntries))
         {
-            var layerQuery = layer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            var layerQuery = layer.Split(':', StringSplitOptions.RemoveEmptyEntries);
 
             switch (layerQuery.Length)
             {
@@ -74,66 +73,62 @@ public static class ArgumentsValidator
                 default:
                 {
                     // todo: 重新描述错误
-                    return ("LayerNotDefined", $"can not find layer {layer}", null);
+                    return new ValidateResult(null, "LayerNotDefined", $"can not find layer {layer}");
                 }
             }
         }
 
         if (list.Count == 0)
         {
-            return ("LayerNotDefined", $"can not find layer {layers}", null);
+            return new ValidateResult(null, "LayerNotDefined", $"can not find layer {layers}");
         }
 
         var envelope = new Envelope(x1, x2, y1, y2);
-        return (null, null, new RequestArguments
-        {
-            Envelope = envelope, SRID = srid, Layers = list
-        });
+        return new ValidateResult(new RequestArguments(envelope, srid, list), null, null);
     }
 
-    public static (string Code, string Message, RequestArguments Arguments) VerifyAndBuildWmsGetFeatureInfoArguments(
+    public static ValidateResult VerifyAndBuildWmsGetFeatureInfoArguments(
         string layers, string srs, string bbox,
         int width, int height, double x, double y, int featureCount)
     {
         if (string.IsNullOrWhiteSpace(layers))
         {
-            return ("LayerNotDefined", "No layers have been requested", null);
+            return new ValidateResult(null, "LayerNotDefined", "No layers have been requested");
         }
 
         if (string.IsNullOrWhiteSpace(srs))
         {
-            return ("InvalidSRS", "No srs requested", null);
+            return new ValidateResult(null, "InvalidSRS", "No srs requested");
         }
 
         if (!int.TryParse(srs.Replace("EPSG:", ""), out var srid))
         {
-            return ("InvalidSRS", "SRS is not valid", null);
+            return new ValidateResult(null, "InvalidSRS", "SRS is not valid");
         }
 
         if (string.IsNullOrWhiteSpace(bbox))
         {
-            return ("MissingBBox", "GetFeatureInfo requests must include a BBOX parameter", null);
+            return new ValidateResult(null, "MissingBBox", "GetFeatureInfo requests must include a BBOX parameter");
         }
 
-        var points = bbox.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        var points = bbox.Split(',', StringSplitOptions.RemoveEmptyEntries);
         if (points.Length != 4 || !float.TryParse(points[0], out var x1) ||
             !float.TryParse(points[1], out var y1)
             || !float.TryParse(points[2], out var x2)
             || !float.TryParse(points[3], out var y2))
         {
-            return ("InvalidBBox", $"The request bounding box is invalid: {bbox}", null);
+            return new ValidateResult(null, "InvalidBBox", $"The request bounding box is invalid: {bbox}");
         }
 
         if (x2 - x1 <= 0 || y2 - y1 <= 0)
         {
-            return ("InvalidBBox", $"The request bounding box has zero area: {bbox}", null);
+            return new ValidateResult(null, "InvalidBBox", $"The request bounding box has zero area: {bbox}");
         }
 
         if (width <= 0 || height <= 0)
         {
-            return ("MissingOrInvalidParameter",
-                $"Missing or invalid requested map size. Parameters WIDTH and HEIGHT shall be present and be integers > 0. Got WIDTH={width}, HEIGHT={height}",
-                null);
+            return new ValidateResult(null, "MissingOrInvalidParameter",
+                $"Missing or invalid requested map size. Parameters WIDTH and HEIGHT shall be present and be integers > 0. Got WIDTH={width}, HEIGHT={height}");
         }
 
         // if (x < 0 || y < 0 || x > width || y > height)
@@ -143,13 +138,13 @@ public static class ArgumentsValidator
 
         if (featureCount <= 0)
         {
-            return ("InvalidFeatureCount", $"featureCount is invalid", null);
+            return new ValidateResult(null, "InvalidFeatureCount", $"featureCount is invalid");
         }
 
         var list = new List<(string Group, string Layer)>();
-        foreach (var layer in layers.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var layer in layers.Split(';', StringSplitOptions.RemoveEmptyEntries))
         {
-            var layerQuery = layer.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            var layerQuery = layer.Split(':', StringSplitOptions.RemoveEmptyEntries);
 
             switch (layerQuery.Length)
             {
@@ -163,20 +158,17 @@ public static class ArgumentsValidator
                 default:
                 {
                     // todo: 重新描述错误
-                    return ("LayerNotDefined", $"Could not find layer {layer}", null);
+                    return new ValidateResult(null, "LayerNotDefined", $"Could not find layer {layer}");
                 }
             }
         }
 
         if (list.Count == 0)
         {
-            return ("LayerNotDefined", $"Could not find layer {layers}", null);
+            return new ValidateResult(null, "LayerNotDefined", $"Could not find layer {layers}");
         }
 
         var envelope = new Envelope(x1, x2, y1, y2);
-        return (null, null, new RequestArguments
-        {
-            Envelope = envelope, SRID = srid, Layers = list
-        });
+        return new ValidateResult(new RequestArguments(envelope, srid, list), null, null);
     }
 }

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace ZMap.SLD
+namespace ZMap.SLD;
+
+public interface IFilterDeserializer
 {
-    public interface IFilterDeserializer
-    {
-        void Start(Stack<dynamic> stack, XmlReader reader);
-        void End(Stack<dynamic> stack);
-    }
+    void Start(Stack<dynamic> stack, XmlReader reader);
+    void End(Stack<dynamic> stack);
 }

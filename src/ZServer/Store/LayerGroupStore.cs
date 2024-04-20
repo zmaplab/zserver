@@ -8,198 +8,189 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMap;
 
-namespace ZServer.Store
+namespace ZServer.Store;
+
+public class LayerGroupStore(
+    IResourceGroupStore resourceGroupStore,
+    ILayerStore layerStore,
+    ILogger<LayerGroupStore> logger)
+    : ILayerGroupStore
 {
-    public class LayerGroupStore : ILayerGroupStore
+    private static readonly ConcurrentDictionary<string, LayerGroup> Cache = new();
+
+    public Task Refresh(List<JObject> configurations)
     {
-        private readonly IResourceGroupStore _resourceGroupStore;
-        private readonly ILayerStore _layerStore;
-        private readonly ILogger<LayerGroupStore> _logger;
-        private static readonly ConcurrentDictionary<string, LayerGroup> Cache = new();
+        return Task.CompletedTask;
+    }
 
-        public LayerGroupStore(
-            IResourceGroupStore resourceGroupStore, ILayerStore layerStore,
-            ILogger<LayerGroupStore> logger)
-        {
-            _resourceGroupStore = resourceGroupStore;
-            _layerStore = layerStore;
-            _logger = logger;
-        }
-        
-        public Task Refresh(List<JObject> configurations)
-        {
-            return Task.CompletedTask;
-        }
+    public async Task Refresh(IEnumerable<IConfiguration> configurations)
+    {
+        var existKeys = Cache.Keys.ToList();
+        var keys = new List<string>();
 
-        public async Task Refresh(IEnumerable<IConfiguration> configurations)
+        foreach (var configuration in configurations)
         {
-            var existKeys = Cache.Keys.ToList();
-            var keys = new List<string>();
-
-            foreach (var configuration in configurations)
+            var sections = configuration.GetSection("layerGroups");
+            foreach (var section in sections.GetChildren())
             {
-                var sections = configuration.GetSection("layerGroups");
-                foreach (var section in sections.GetChildren())
-                {
-                    var resourceGroupName = section.GetValue<string>("resourceGroup");
+                var resourceGroupName = section.GetValue<string>("resourceGroup");
 
-                    var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
-                        ? null
-                        : await _resourceGroupStore.FindAsync(resourceGroupName);
+                var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
+                    ? null
+                    : await resourceGroupStore.FindAsync(resourceGroupName);
 
-                    var layerGroup = Activator.CreateInstance<LayerGroup>();
-                    layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
-                    layerGroup.Name = section.Key;
-                    layerGroup.ResourceGroup = resourceGroup;
-                    layerGroup.Layers = new List<Layer>();
-                    await RestoreAsync(layerGroup, section);
+                var layerGroup = Activator.CreateInstance<LayerGroup>();
+                layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
+                layerGroup.Name = section.Key;
+                layerGroup.ResourceGroup = resourceGroup;
+                layerGroup.Layers = new List<Layer>();
+                await RestoreAsync(layerGroup, section);
 
-                    keys.Add(layerGroup.Name);
-                    Cache.AddOrUpdate(layerGroup.Name, layerGroup, (_, _) => layerGroup);
-                }
-            }
-
-            var removedKeys = existKeys.Except(keys);
-            foreach (var removedKey in removedKeys)
-            {
-                Cache.TryRemove(removedKey, out _);
+                keys.Add(layerGroup.Name);
+                Cache.AddOrUpdate(layerGroup.Name, layerGroup, (_, _) => layerGroup);
             }
         }
 
-        public async Task<LayerGroup> FindAsync(string resourceGroupName, string layerGroupName)
+        var removedKeys = existKeys.Except(keys);
+        foreach (var removedKey in removedKeys)
         {
-            if (string.IsNullOrWhiteSpace(resourceGroupName) && string.IsNullOrWhiteSpace(layerGroupName))
-            {
-                return null;
-            }
+            Cache.TryRemove(removedKey, out _);
+        }
+    }
 
-            if (!Cache.TryGetValue(layerGroupName, out var layerGroup))
-            {
-                return null;
-            }
+    public async Task<LayerGroup> FindAsync(string resourceGroupName, string layerGroupName)
+    {
+        if (string.IsNullOrWhiteSpace(resourceGroupName) && string.IsNullOrWhiteSpace(layerGroupName))
+        {
+            return null;
+        }
 
-            if (string.IsNullOrEmpty(resourceGroupName))
-            {
-                return await Task.FromResult(layerGroup.Clone());
-            }
+        if (!Cache.TryGetValue(layerGroupName, out var layerGroup))
+        {
+            return null;
+        }
 
-            if (layerGroup.ResourceGroup?.Name != resourceGroupName)
-            {
-                return null;
-            }
-
+        if (string.IsNullOrEmpty(resourceGroupName))
+        {
             return await Task.FromResult(layerGroup.Clone());
-
-            // var item = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerGroupName}",
-            //     async entry =>
-            //     {
-            //         ResourceGroup resourceGroup = null;
-            //         // 若传的资源组不为空，才需要查询资源组信息
-            //         if (!string.IsNullOrEmpty(resourceGroupName))
-            //         {
-            //             // 若资源组不存在，则返回空
-            //             resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
-            //             if (resourceGroup == null)
-            //             {
-            //                 _logger.LogError("资源组 {ResourceGroupName} 不存在", resourceGroupName);
-            //                 return null;
-            //             }
-            //         }
-            //
-            //         var section =
-            //             _configuration.GetSection($"layerGroups:{layerGroupName}");
-            //
-            //         var configResourceGroupName = section.GetSection("resourceGroup").Get<string>();
-            //
-            //         // 若传的资源组不为空，并且代码执行到此处，说明资源组存在
-            //         if (!string.IsNullOrEmpty(resourceGroupName))
-            //         {
-            //             // 若配置的资源组与查询资源组不一致，则返回空
-            //             if (configResourceGroupName != resourceGroupName)
-            //             {
-            //                 return null;
-            //             }
-            //         }
-            //
-            //         if (resourceGroup == null && !string.IsNullOrEmpty(configResourceGroupName))
-            //         {
-            //             resourceGroup = await _resourceGroupStore.FindAsync(configResourceGroupName);
-            //         }
-            //
-            //         var layerGroup = Activator.CreateInstance<LayerGroup>();
-            //         layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
-            //         layerGroup.Name = layerGroupName;
-            //         layerGroup.ResourceGroup = resourceGroup;
-            //         layerGroup.Layers = new List<ILayer>();
-            //
-            //         await RestoreAsync(layerGroup, section);
-            //
-            //         if (layerGroup.Layers.Count == 0)
-            //         {
-            //             _logger.LogWarning("图层组 {LayerGroupName} 中的没有有效图层", layerGroupName);
-            //         }
-            //
-            //         entry.SetValue(layerGroup);
-            //         entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
-            //         return layerGroup;
-            //     });
-            // // 1. 从 configuration 中解析对象非常耗时，因此需要使用缓存
-            // // 2. 但是若是直接返回对象，会导致对象被复用（修改），状态可能不正确
-            // return item?.Clone();
         }
 
-        public Task<List<LayerGroup>> GetAllAsync()
+        if (layerGroup.ResourceGroup?.Name != resourceGroupName)
         {
-            var items = Cache.Values.Select(x => x.Clone()).ToList();
-            return Task.FromResult(items);
+            return null;
         }
 
-        public Task<List<LayerGroup>> GetListAsync(string resourceGroup)
+        return await Task.FromResult(layerGroup.Clone());
+
+        // var item = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerGroupName}",
+        //     async entry =>
+        //     {
+        //         ResourceGroup resourceGroup = null;
+        //         // 若传的资源组不为空，才需要查询资源组信息
+        //         if (!string.IsNullOrEmpty(resourceGroupName))
+        //         {
+        //             // 若资源组不存在，则返回空
+        //             resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
+        //             if (resourceGroup == null)
+        //             {
+        //                 _logger.LogError("资源组 {ResourceGroupName} 不存在", resourceGroupName);
+        //                 return null;
+        //             }
+        //         }
+        //
+        //         var section =
+        //             _configuration.GetSection($"layerGroups:{layerGroupName}");
+        //
+        //         var configResourceGroupName = section.GetSection("resourceGroup").Get<string>();
+        //
+        //         // 若传的资源组不为空，并且代码执行到此处，说明资源组存在
+        //         if (!string.IsNullOrEmpty(resourceGroupName))
+        //         {
+        //             // 若配置的资源组与查询资源组不一致，则返回空
+        //             if (configResourceGroupName != resourceGroupName)
+        //             {
+        //                 return null;
+        //             }
+        //         }
+        //
+        //         if (resourceGroup == null && !string.IsNullOrEmpty(configResourceGroupName))
+        //         {
+        //             resourceGroup = await _resourceGroupStore.FindAsync(configResourceGroupName);
+        //         }
+        //
+        //         var layerGroup = Activator.CreateInstance<LayerGroup>();
+        //         layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
+        //         layerGroup.Name = layerGroupName;
+        //         layerGroup.ResourceGroup = resourceGroup;
+        //         layerGroup.Layers = new List<ILayer>();
+        //
+        //         await RestoreAsync(layerGroup, section);
+        //
+        //         if (layerGroup.Layers.Count == 0)
+        //         {
+        //             _logger.LogWarning("图层组 {LayerGroupName} 中的没有有效图层", layerGroupName);
+        //         }
+        //
+        //         entry.SetValue(layerGroup);
+        //         entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
+        //         return layerGroup;
+        //     });
+        // // 1. 从 configuration 中解析对象非常耗时，因此需要使用缓存
+        // // 2. 但是若是直接返回对象，会导致对象被复用（修改），状态可能不正确
+        // return item?.Clone();
+    }
+
+    public Task<List<LayerGroup>> GetAllAsync()
+    {
+        var items = Cache.Values.Select(x => x.Clone()).ToList();
+        return Task.FromResult(items);
+    }
+
+    public Task<List<LayerGroup>> GetListAsync(string resourceGroup)
+    {
+        var result = new List<LayerGroup>();
+        if (string.IsNullOrWhiteSpace(resourceGroup))
         {
-            var result = new List<LayerGroup>();
-            if (string.IsNullOrWhiteSpace(resourceGroup))
-            {
-                return Task.FromResult(result);
-            }
-
-            foreach (var value in Cache.Values)
-            {
-                if (value.ResourceGroup?.Name == resourceGroup)
-                {
-                    result.Add(value.Clone());
-                }
-            }
-
             return Task.FromResult(result);
         }
 
-
-        private async Task RestoreAsync(LayerGroup layerGroup, IConfigurationSection section)
+        foreach (var value in Cache.Values)
         {
-            var layerNames = section.GetSection("layers").Get<HashSet<string>>();
-            if (layerNames != null)
+            if (value.ResourceGroup?.Name == resourceGroup)
             {
-                foreach (var layerName in layerNames)
-                {
-                    var parts = layerName.Split(':');
-                    Layer layer = null;
-                    switch (parts.Length)
-                    {
-                        case 1:
-                            layer = await _layerStore.FindAsync(null, layerName);
-                            break;
-                        case 2:
-                            layer = await _layerStore.FindAsync(parts[0], parts[1]);
-                            break;
-                        default:
-                            _logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
-                            break;
-                    }
+                result.Add(value.Clone());
+            }
+        }
 
-                    if (layer != null)
-                    {
-                        layerGroup.Layers.Add(layer);
-                    }
+        return Task.FromResult(result);
+    }
+
+
+    private async Task RestoreAsync(LayerGroup layerGroup, IConfigurationSection section)
+    {
+        var layerNames = section.GetSection("layers").Get<HashSet<string>>();
+        if (layerNames != null)
+        {
+            foreach (var layerName in layerNames)
+            {
+                var parts = layerName.Split(':');
+                Layer layer = null;
+                switch (parts.Length)
+                {
+                    case 1:
+                        layer = await layerStore.FindAsync(null, layerName);
+                        break;
+                    case 2:
+                        layer = await layerStore.FindAsync(parts[0], parts[1]);
+                        break;
+                    default:
+                        logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
+                        break;
+                }
+
+                if (layer != null)
+                {
+                    layerGroup.Layers.Add(layer);
                 }
             }
         }

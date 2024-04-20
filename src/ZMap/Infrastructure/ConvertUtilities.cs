@@ -19,21 +19,19 @@ public static class ConvertUtilities
         {
             return v;
         }
-        else
+
+        if (targetType.IsGenericType
+            && (targetType.GetGenericTypeDefinition() == typeof(Nullable<>)))
         {
-            if (targetType.IsGenericType
-                && (targetType.GetGenericTypeDefinition() == typeof(Nullable<>)))
-            {
-                targetType = Nullable.GetUnderlyingType(targetType);
-            }
-
-            if (targetType == null)
-            {
-                return default;
-            }
-
-            return targetType == typeof(string) ? (T)v.ToString() : (T)Convert.ChangeType(v, targetType);
+            targetType = Nullable.GetUnderlyingType(targetType);
         }
+
+        if (targetType == null)
+        {
+            return default;
+        }
+
+        return targetType == typeof(string) ? (T)v.ToString() : (T)Convert.ChangeType(v, targetType);
     }
 
     public static T[] ToArray<T>(string text)

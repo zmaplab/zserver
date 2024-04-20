@@ -1,6 +1,3 @@
 namespace ZMap.SLD;
 
-public class RangeAxis
-{
-    
-}
+public class RangeAxis;

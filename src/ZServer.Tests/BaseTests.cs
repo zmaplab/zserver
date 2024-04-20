@@ -14,83 +14,82 @@ using ZMap.Infrastructure;
 using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 using Feature = ZMap.Feature;
 
-namespace ZServer.Tests
+namespace ZServer.Tests;
+
+public abstract class BaseTests
 {
-    public abstract class BaseTests
+    protected readonly Envelope Extent = new(-160.9, 105, -75, 103);
+    private static readonly IServiceProvider Service;
+
+    static BaseTests()
     {
-        protected readonly Envelope Extent = new(-160.9, 105, -75, 103);
-        private static readonly IServiceProvider Service;
+        CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
+        var serviceCollection = new ServiceCollection();
+        var configuration = GetConfiguration();
+        serviceCollection.AddMemoryCache();
+        serviceCollection.AddLogging(x => x.AddConsole());
+        serviceCollection.AddZServer(configuration, "layers.json");
+        serviceCollection.TryAddSingleton(configuration);
+        serviceCollection.TryAddSingleton<ConfigurationStoreRefreshService>();
+        Service = serviceCollection.BuildServiceProvider();
+        var syncService = Service.GetRequiredService<ConfigurationStoreRefreshService>();
+        var configurationProvider = Service.GetRequiredService<ConfigurationProvider>();
+        syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
+    }
 
-        static BaseTests()
+    // protected IRendererFactory GetRendererFactory()
+    // {
+    //     return GetScopedService<IRendererFactory>();
+    // }
+
+    private Feature ToDictionary(IFeature feature)
+    {
+        var dict = new Dictionary<string, object>();
+        foreach (var name in feature.Attributes.GetNames())
         {
-            CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
-            var serviceCollection = new ServiceCollection();
-            var configuration = GetConfiguration();
-            serviceCollection.AddMemoryCache();
-            serviceCollection.AddLogging(x => x.AddConsole());
-            serviceCollection.AddZServer(configuration, "layers.json");
-            serviceCollection.TryAddSingleton(configuration);
-            serviceCollection.TryAddSingleton<ConfigurationStoreRefreshService>();
-            Service = serviceCollection.BuildServiceProvider();
-            var syncService = Service.GetRequiredService<ConfigurationStoreRefreshService>();
-            var configurationProvider = Service.GetRequiredService<ConfigurationProvider>();
-            syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
+            dict.Add(name, feature.Attributes[name]);
         }
 
-        // protected IRendererFactory GetRendererFactory()
-        // {
-        //     return GetScopedService<IRendererFactory>();
-        // }
+        return new Feature(feature.Geometry, dict);
+    }
 
-        private Feature ToDictionary(IFeature feature)
+
+    protected List<Feature> GetFeatures()
+    {
+        var c = GetGeometries();
+        return c.Select(ToDictionary).ToList();
+    }
+
+    protected BaseTests()
+    {
+        if (!Directory.Exists("images"))
         {
-            var dict = new Dictionary<string, object>();
-            foreach (var name in feature.Attributes.GetNames())
-            {
-                dict.Add(name, feature.Attributes[name]);
-            }
-
-            return new Feature(feature.Geometry, dict);
+            Directory.CreateDirectory("images");
         }
+    }
 
+    private FeatureCollection GetGeometries()
+    {
+        var json = File.ReadAllText("polygons.json");
+        var reader = new GeoJsonReader();
+        var collection = reader.Read<FeatureCollection>(json);
+        return collection;
+    }
 
-        protected List<Feature> GetFeatures()
-        {
-            var c = GetGeometries();
-            return c.Select(ToDictionary).ToList();
-        }
+    private static IConfiguration GetConfiguration()
+    {
+        var builder = new ConfigurationBuilder();
+        builder.AddJsonFile("appsettings.json");
+        return builder.Build();
+    }
 
-        protected BaseTests()
-        {
-            if (!Directory.Exists("images"))
-            {
-                Directory.CreateDirectory("images");
-            }
-        }
+    protected T GetScopedService<T>()
+    {
+        return Service.CreateScope().ServiceProvider.GetService<T>();
+    }
 
-        private FeatureCollection GetGeometries()
-        {
-            var json = File.ReadAllText("polygons.json");
-            var reader = new GeoJsonReader();
-            var collection = reader.Read<FeatureCollection>(json);
-            return collection;
-        }
-
-        private static IConfiguration GetConfiguration()
-        {
-            var builder = new ConfigurationBuilder();
-            builder.AddJsonFile("appsettings.json");
-            return builder.Build();
-        }
-
-        protected T GetScopedService<T>()
-        {
-            return Service.CreateScope().ServiceProvider.GetService<T>();
-        }
-
-        protected T GetService<T>()
-        {
-            return Service.GetService<T>();
-        }
+    protected T GetService<T>()
+    {
+        return Service.GetService<T>();
     }
 }

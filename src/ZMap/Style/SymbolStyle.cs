@@ -1,38 +1,37 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace ZMap.Style
+namespace ZMap.Style;
+
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+public class SymbolStyle : VectorStyle
 {
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    public class SymbolStyle : VectorStyle
+    public CSharpExpression<int?> Size { get; set; }
+    public CSharpExpression<string> Uri { get; set; }
+    public CSharpExpression<float?> Opacity { get; set; }
+    public CSharpExpression<float?> Rotation { get; set; }
+
+    public override void Accept(IZMapStyleVisitor visitor, Feature feature)
     {
-        public CSharpExpression<int?> Size { get; set; }
-        public CSharpExpression<string> Uri { get; set; }
-        public CSharpExpression<float?> Opacity { get; set; }
-        public CSharpExpression<float?> Rotation { get; set; }
+        base.Accept(visitor, feature);
 
-        public override void Accept(IZMapStyleVisitor visitor, Feature feature)
+        Size?.Invoke(feature, 24);
+        Uri?.Invoke(feature);
+        Opacity?.Invoke(feature, 1);
+        Rotation?.Invoke(feature);
+    }
+
+    public override Style Clone()
+    {
+        return new SymbolStyle
         {
-            base.Accept(visitor, feature);
-
-            Size?.Invoke(feature, 24);
-            Uri?.Invoke(feature);
-            Opacity?.Invoke(feature, 1);
-            Rotation?.Invoke(feature);
-        }
-
-        public override Style Clone()
-        {
-            return new SymbolStyle
-            {
-                MaxZoom = MaxZoom,
-                MinZoom = MinZoom,
-                ZoomUnit = ZoomUnit,
-                Filter = Filter?.Clone(),
-                Size = Size?.Clone(),
-                Uri = Uri?.Clone(),
-                Opacity = Opacity?.Clone(),
-                Rotation = Rotation?.Clone()
-            };
-        }
+            MaxZoom = MaxZoom,
+            MinZoom = MinZoom,
+            ZoomUnit = ZoomUnit,
+            Filter = Filter?.Clone(),
+            Size = Size?.Clone(),
+            Uri = Uri?.Clone(),
+            Opacity = Opacity?.Clone(),
+            Rotation = Rotation?.Clone()
+        };
     }
 }

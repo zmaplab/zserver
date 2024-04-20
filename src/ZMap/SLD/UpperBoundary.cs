@@ -1,7 +1,3 @@
-namespace ZMap.SLD
-{
-    public class UpperBoundary : Constant
-    {
+namespace ZMap.SLD;
 
-    }
-}
+public class UpperBoundary : Constant;

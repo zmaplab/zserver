@@ -1,12 +1,11 @@
 // ReSharper disable InconsistentNaming
-namespace ZMap
+namespace ZMap;
+
+public enum ServiceType
 {
-    public enum ServiceType
-    {
-        WMTS,
-        WCS,
-        WFS,
-        WMS,
-        RESTFUL
-    }
+    WMTS,
+    WCS,
+    WFS,
+    WMS,
+    RESTFUL
 }

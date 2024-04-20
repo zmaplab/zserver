@@ -6,34 +6,26 @@ using ZMap.Ogc.Wmts;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMTS;
 
-namespace ZServer.Grains.WMTS
+namespace ZServer.Grains.WMTS;
+
+// ReSharper disable once InconsistentNaming
+public class WMTSGrain(WmtsService wmtsService) : Grain, IWMTSGrain
 {
-    // ReSharper disable once InconsistentNaming
-    public class WMTSGrain : Grain, IWMTSGrain
+    public async ValueTask<ZServerResponse> GetTileAsync(string layers, string styles, string format,
+        string tileMatrixSet,
+        string tileMatrix, int tileRow,
+        int tileCol, string cqlFilter, IDictionary<string, object> arguments)
     {
-        private readonly WmtsService _wmtsService;
-
-        public WMTSGrain(WmtsService wmtsService)
+        var result = await wmtsService.GetTileAsync(layers, styles, format, tileMatrixSet, tileMatrix, tileRow,
+            tileCol, cqlFilter,
+            arguments);
+        if (!result.IsSuccess())
         {
-            _wmtsService = wmtsService;
+            return ZServerResponseFactory.Failed(result.Message, result.Code);
         }
 
-        public async ValueTask<MapResult> GetTileAsync(string layers, string styles, string format,
-            string tileMatrixSet,
-            string tileMatrix, int tileRow,
-            int tileCol, string cqlFilter, IDictionary<string, object> arguments)
-        {
-            var result = await _wmtsService.GetTileAsync(layers, styles, format, tileMatrixSet, tileMatrix, tileRow,
-                tileCol, cqlFilter,
-                arguments);
-            if (!string.IsNullOrEmpty(result.Code))
-            {
-                return MapResult.Failed(result.Message, result.Code);
-            }
-
-            await using var stream = result.Image;
-            var bytes = await result.Image.ToArrayAsync();
-            return MapResult.Ok(bytes, format);
-        }
+        await using var stream = result.Stream;
+        var bytes = result.Stream.ToArray();
+        return ZServerResponseFactory.Ok(bytes, format);
     }
 }

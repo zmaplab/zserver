@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using ZMap.TileGrid;
 
-namespace ZMap.Store
+namespace ZMap.Store;
+
+public interface IGridSetStore : IRefresher
 {
-    public interface IGridSetStore : IRefresher
-    {
-        Task<GridSet> FindAsync(string name);
-    }
+    Task<GridSet> FindAsync(string name);
 }

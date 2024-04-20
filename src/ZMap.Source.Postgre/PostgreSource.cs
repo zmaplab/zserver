@@ -1,130 +1,143 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Dapper;
-using Microsoft.Extensions.Caching.Memory;
+using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using Newtonsoft.Json;
 using Npgsql;
 using ZMap.Infrastructure;
 
-namespace ZMap.Source.Postgre
-{
-    public sealed class PostgreSource : SpatialDatabaseSource
-    {
-        // private static readonly ConcurrentDictionary<string, DbContext> DbContexts =
-        //     new ConcurrentDictionary<string, DbContext>();
+namespace ZMap.Source.Postgre;
 
-        public PostgreSource(string connectionString, string database) : base(connectionString,
-            database)
+public sealed class PostgreSource(string connectionString, string database) : SpatialDatabaseSource(connectionString,
+    database)
+{
+    private static readonly ConcurrentDictionary<string, IFreeSql> FreeSqlCache = new();
+
+    public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
+    {
+        if (string.IsNullOrEmpty(Geometry))
         {
-            // DbContexts.GetOrAdd($"{database}_{Table}", (key) => new BridgeDbContext(connectionString, database, Table));
+            throw new ArgumentException("未设置图形在数据库中的列名");
         }
 
-        public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
+        // todo: 使用 PG 的 Simplify 达不到效果, 需要继续研究
+        // sql =
+        //     $"SELECT CASE WHEN ST_HasArc({Geometry}) THEN {Geometry} ELSE ST_Simplify(ST_Force2D({Geometry}), 0.00001, true) END as geom{columnSql} from (SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {@where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID})) t";
+
+        var sqlBuilder = new StringBuilder();
+        if (Properties == null || Properties.Count == 0)
         {
-            if (string.IsNullOrWhiteSpace(Geometry))
+            sqlBuilder.Append("SELECT * ").Append("FROM ").Append(Table).Append(" WHERE ");
+        }
+        else
+        {
+            sqlBuilder.Append("SELECT");
+            foreach (var property in Properties)
             {
-                throw new ArgumentException("未设置图形在数据库中的列名");
+                if (property == Geometry)
+                {
+                    continue;
+                }
+
+                sqlBuilder.Append(' ').Append(property).Append(',');
             }
 
-            // todo: Filter 怎么才能保证没有 SQL 注入: 不真接暴露地图接口，由后端服务构造请求
-            var filter = Filter?.ToQuerySql();
-            var where = string.IsNullOrWhiteSpace(filter) ? string.Empty : $"{filter} AND ";
+            sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
+        }
 
-            // todo: 使用 PG 的 Simplify 达不到效果, 需要继续研究
-            // sql =
-            //     $"SELECT CASE WHEN ST_HasArc({Geometry}) THEN {Geometry} ELSE ST_Simplify(ST_Force2D({Geometry}), 0.00001, true) END as geom{columnSql} from (SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {@where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID})) t";
+        sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+        if (!string.IsNullOrEmpty(Where))
+        {
+            sqlBuilder.Append(" AND ").Append(Where);
+        }
 
-            string sql;
-            if (Properties == null || Properties.Count == 0)
+        var freeSql = GetFreeSql();
+        var select = freeSql.Select<object>()
+            .WithSql(sqlBuilder.ToString(), new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid });
+        if (!string.IsNullOrEmpty(Filter))
+        {
+            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(Filter);
+            select = select.WhereDynamicFilter(filterInfo);
+        }
+
+        if (EnvironmentVariables.EnableSensitiveDataLogging)
+        {
+            var sql = select.ToSql();
+            Log.Logger.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
+                bbox.MinY, bbox.MaxY, Srid);
+        }
+
+        var items = await select.ToListAsync();
+        return items.Select(x =>
+        {
+            var f = new Feature(Geometry, x as IDictionary<string, object>);
+            if (f.Geometry.SRID != -1)
             {
-                sql =
-                    $"SELECT * FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {Srid}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                return f;
+            }
+
+            if (f.Geometry is GeometryCollection geometryCollection)
+            {
+                foreach (var geom in geometryCollection)
+                {
+                    geom.SRID = Srid;
+                }
             }
             else
             {
-                var columnSql = Properties == null || Properties.Count == 0
-                    ? string.Empty
-                    : $" , {string.Join(", ", Properties.Where(x => x != "geom"))}";
-
-                sql =
-                    $"SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY}, {bbox.MaxX}, {bbox.MaxY}, {Srid}) AND {(string.IsNullOrWhiteSpace(Where) ? "1 = 1" : Where)}";
+                f.Geometry.SRID = Srid;
             }
 
-            if (EnvironmentVariables.EnableSensitiveDataLogging)
-            {
-                Log.Logger.LogInformation("{Sql}", sql);
-            }
+            return f;
+        });
+    }
 
-            using var conn = CreateDbConnection();
+    public override Envelope GetEnvelope()
+    {
+        return null;
+    }
 
-            return (await conn.QueryAsync(sql, null, null, 30)).Select(x =>
-            {
-                var f = new Feature(Geometry, x);
-                if (f.Geometry.SRID != -1)
+    public override ISource Clone()
+    {
+        // return new PostgreSource(ConnectionString, Database)
+        // {
+        //     Table= Table,
+        //     Id= Id,
+        //     Geometry= Geometry,
+        //     Where= Where,
+        //     Name= Name,
+        //     Properties= Properties.ToHashSet(),
+        //     Srid= Srid,
+        // };
+        return (ISource)MemberwiseClone();
+    }
+
+    public override void Dispose()
+    {
+    }
+
+    private IFreeSql GetFreeSql()
+    {
+        return FreeSqlCache.GetOrAdd(Name, _ =>
+        {
+            return new FreeSql.FreeSqlBuilder()
+                .UseAdoConnectionPool(true)
+                .UseConnectionFactory(FreeSql.DataType.PostgreSQL, () =>
                 {
-                    return f;
-                }
-
-                if (f.Geometry is GeometryCollection geometryCollection)
-                {
-                    foreach (var geom in geometryCollection)
-                    {
-                        geom.SRID = Srid;
-                    }
-                }
-                else
-                {
-                    f.Geometry.SRID = Srid;
-                }
-
-                return f;
-            });
-        }
-
-        public override Envelope GetEnvelope()
-        {
-            return null;
-        }
-
-        public override ISource Clone()
-        {
-            // return new PostgreSource(ConnectionString, Database)
-            // {
-            //     Table= Table,
-            //     Id= Id,
-            //     Geometry= Geometry,
-            //     Where= Where,
-            //     Name= Name,
-            //     Properties= Properties.ToHashSet(),
-            //     Srid= Srid,
-            // };
-            return (ISource)MemberwiseClone();
-        }
-
-        public override void Dispose()
-        {
-        }
-
-        private IDbConnection CreateDbConnection()
-        {
-            var dataSource = Cache.GetOrCreate(Name, entry =>
-            {
-                var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
-                    { Database = Database };
-                var connectionString = builder.ToString();
-                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-                dataSourceBuilder.UseNetTopologySuite();
-                var dataSource = dataSourceBuilder.Build();
-                entry.SetValue(dataSource);
-                entry.SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                return dataSource;
-            });
-
-            return dataSource.CreateConnection();
-        }
+                    var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
+                        { Database = Database };
+                    var connectionString = builder.ToString();
+                    var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+                    dataSourceBuilder.UseNetTopologySuite();
+                    var dataSource = dataSourceBuilder.Build();
+                    return dataSource.CreateConnection();
+                })
+                .Build();
+        });
     }
 }

@@ -105,11 +105,7 @@ public class NamedParameter : ParameterValue
 }
 
 [XmlRoot("SvgParameter")]
-public class SvgParameter : NamedParameter
-{
-}
+public class SvgParameter : NamedParameter;
 
 [XmlRoot("CssParameter")]
-public class CssParameter : NamedParameter
-{
-}
+public class CssParameter : NamedParameter;

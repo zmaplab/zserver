@@ -67,10 +67,6 @@ public class SkiaGraphicsService : IGraphicsService
 
     private IRenderer Create<TStyle>(TStyle style) where TStyle : Style.Style
     {
-        if (style == null)
-        {
-            
-        }
         return style switch
         {
             ResourceFillStyle resourceFillStyle => new ResourceFillStyleRenderer(resourceFillStyle),

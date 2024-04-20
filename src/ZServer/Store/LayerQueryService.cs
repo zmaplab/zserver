@@ -8,22 +8,14 @@ using ZMap.Store;
 
 namespace ZServer.Store;
 
-public class LayerQueryService : ILayerQueryService
+public class LayerQueryService(
+    ILayerGroupStore layerGroupStore,
+    ILayerStore layerStore,
+    ILogger<LayerQueryService> logger)
+    : ILayerQueryService
 {
-    private readonly ILayerGroupStore _layerGroupStore;
-    private readonly ILayerStore _layerStore;
-    private readonly ILogger<LayerQueryService> _logger;
-
-    public LayerQueryService(ILayerGroupStore layerGroupStore, ILayerStore layerStore,
-        ILogger<LayerQueryService> logger)
-    {
-        _layerGroupStore = layerGroupStore;
-        _layerStore = layerStore;
-        _logger = logger;
-    }
-
     public async Task<List<Layer>> GetLayersAsync(
-        List<QueryLayerParams> queryLayerRequests, string traceIdentifier)
+        List<LayerQuery> queryLayerRequests, string traceIdentifier)
     {
         var list = new List<Layer>();
         var hashSet = new HashSet<string>();
@@ -32,18 +24,18 @@ public class LayerQueryService : ILayerQueryService
         {
             if (layerQuery.ResourceGroup == null)
             {
-                var layer = await _layerStore.FindAsync(null, layerQuery.Layer);
+                var layer = await layerStore.FindAsync(null, layerQuery.Layer);
                 if (layer != null)
                 {
                     TryAdd(hashSet, list, layerQuery, layer);
                     continue;
                 }
 
-                _logger.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
+                logger.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
             }
             else
             {
-                var layerGroup = await _layerGroupStore.FindAsync(layerQuery.ResourceGroup, layerQuery.Layer);
+                var layerGroup = await layerGroupStore.FindAsync(layerQuery.ResourceGroup, layerQuery.Layer);
                 if (layerGroup != null)
                 {
                     foreach (var layer in layerGroup.Layers)
@@ -55,7 +47,7 @@ public class LayerQueryService : ILayerQueryService
                 }
                 else
                 {
-                    var layer = await _layerStore.FindAsync(layerQuery.ResourceGroup, layerQuery.Layer);
+                    var layer = await layerStore.FindAsync(layerQuery.ResourceGroup, layerQuery.Layer);
                     if (layer != null)
                     {
                         TryAdd(hashSet, list, layerQuery, layer);
@@ -63,7 +55,7 @@ public class LayerQueryService : ILayerQueryService
                     }
                 }
 
-                _logger.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
+                logger.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
                     layerQuery.ResourceGroup, layerQuery.Layer);
             }
         }
@@ -71,17 +63,14 @@ public class LayerQueryService : ILayerQueryService
         return list;
     }
 
-    private void TryAdd(ISet<string> hashSet, ICollection<Layer> list, QueryLayerParams layerQuery, Layer layer)
+    private void TryAdd(ISet<string> hashSet, ICollection<Layer> list, LayerQuery layerQuery, Layer layer)
     {
-        if (hashSet.Contains(layer.Name))
+        if (!hashSet.Add(layer.Name))
         {
             return;
         }
-        else
-        {
-            hashSet.Add(layer.Name);
-            list.Add(layer);
-        }
+
+        list.Add(layer);
 
         if (layer.Source is not IVectorSource vectorSource)
         {
@@ -96,9 +85,6 @@ public class LayerQueryService : ILayerQueryService
         }
 
         var filter = layerQuery.Arguments[Defaults.AdditionalFilter].ToString();
-        if (!string.IsNullOrWhiteSpace(filter))
-        {
-            vectorSource.Filter = new CQLFilter(filter);
-        }
+        vectorSource.Filter = filter;
     }
 }

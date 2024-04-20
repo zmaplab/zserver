@@ -97,8 +97,8 @@ public static class GeographicUtilities
         double pixelHeight, int x,
         int y)
     {
-        var lon = bbox.MinX + pixelWidth * x;
-        var lat = bbox.MinY + pixelHeight * y;
+        var lon = (float)bbox.MinX + pixelWidth * x;
+        var lat = (float)bbox.MinY + pixelHeight * y;
         return (lat, lon);
     }
 }

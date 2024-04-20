@@ -1,13 +1,12 @@
 using System;
 
-namespace ZMap.Extensions
+namespace ZMap.Extensions;
+
+public static class UriExtensions
 {
-    public static class UriExtensions
+    public static string ToPath(this Uri uri)
     {
-        public static string ToPath(this Uri uri)
-        {
-            var schemaLenght = uri.Scheme.Length + 3;
-            return uri.OriginalString.Substring(schemaLenght, uri.OriginalString.Length - schemaLenght);
-        }
+        var schemaLength = uri.Scheme.Length + 3;
+        return uri.OriginalString.Substring(schemaLength, uri.OriginalString.Length - schemaLength);
     }
 }

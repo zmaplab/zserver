@@ -8,15 +8,9 @@ namespace ZMap.Style;
 
 public class SldStyleVisitor : IStyleVisitor, IFilterVisitor
 {
-    private readonly Stack<dynamic> _stack;
+    private readonly Stack<dynamic> _stack = new();
 
-    public List<StyleGroup> StyleGroups { get; }
-
-    public SldStyleVisitor()
-    {
-        _stack = new Stack<dynamic>();
-        StyleGroups = new List<StyleGroup>();
-    }
+    public List<StyleGroup> StyleGroups { get; } = new();
 
     public void Push(dynamic obj)
     {

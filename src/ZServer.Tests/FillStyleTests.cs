@@ -9,80 +9,21 @@ using ZMap.Extensions;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Style;
 
-namespace ZServer.Tests
+namespace ZServer.Tests;
+
+public class FillStyleTests : BaseTests
 {
-    public class FillStyleTests : BaseTests
+    [Fact]
+    public void ParallelFill()
     {
-        [Fact]
-        public void ParallelFill()
+        var data = GetFeatures();
+
+        Parallel.For(0, 10000, _ =>
         {
-            var data = GetFeatures();
-
-            Parallel.For(0, 10000, _ =>
-            {
-                var style = new FillStyle
-                {
-                    Antialias = true,
-                    Opacity = CSharpExpression<float?>.New(1),
-                    Color = CSharpExpression<string>.New("#3ed53e")
-                };
-
-                using var bitmap = new SKBitmap(256, 256);
-
-                using var canvas = new SKCanvas(bitmap);
-                canvas.Clear(SKColors.White);
-
-                var width = 256;
-                var height = 256;
-                new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
-                var graphicsService =
-                    new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
-
-                foreach (var feature in data)
-                {
-                    graphicsService.Render(Extent, feature.Geometry, style);
-                }
-
-                graphicsService.GetImage("image/png");
-            });
-        }
-
-        [Fact]
-        public async Task Fill()
-        {
-            var data = GetFeatures();
-
             var style = new FillStyle
             {
                 Antialias = true,
                 Opacity = CSharpExpression<float?>.New(1),
-                Color = CSharpExpression<string>.New("#3ed53e")
-            };
-
-            var width = 256;
-            var height = 256;
-            new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
-            var graphicsService =
-                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
-
-            foreach (var feature in data)
-            {
-                graphicsService.Render(Extent, feature.Geometry, style);
-            }
-
-            var stream = graphicsService.GetImage("image/png");
-            await File.WriteAllBytesAsync($"images/Fill.png", await stream.ToArrayAsync());
-        }
-
-        [Fact]
-        public async Task Opacity()
-        {
-            var data = GetFeatures();
-
-            var style = new FillStyle
-            {
-                Antialias = true,
-                Opacity = CSharpExpression<float?>.New(0.5f),
                 Color = CSharpExpression<string>.New("#3ed53e")
             };
 
@@ -102,36 +43,94 @@ namespace ZServer.Tests
                 graphicsService.Render(Extent, feature.Geometry, style);
             }
 
-            var stream = graphicsService.GetImage("image/png");
-            await File.WriteAllBytesAsync($"images/Fill.png", await stream.ToArrayAsync());
-        }
+            graphicsService.GetImage("image/png");
+        });
+    }
 
-        [Fact]
-        public async Task LocalImageFill()
+    [Fact]
+    public async Task Fill()
+    {
+        var data = GetFeatures();
+
+        var style = new FillStyle
         {
-            var data = GetFeatures();
+            Antialias = true,
+            Opacity = CSharpExpression<float?>.New(1),
+            Color = CSharpExpression<string>.New("#3ed53e")
+        };
 
-            var style = new ResourceFillStyle
-            {
-                Antialias = true,
-                Opacity = CSharpExpression<float?>.New(0.5f),
-                Color = CSharpExpression<string>.New("#3ed53e"),
-                Uri = CSharpExpression<string>.New("file://images/colorblocks1.png")
-            };
+        var width = 256;
+        var height = 256;
+        new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+        var graphicsService =
+            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
 
-            var width = 256;
-            var height = 256;
-            new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
-            var graphicsService =
-                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
-
-            foreach (var feature in data)
-            {
-                graphicsService.Render(Extent, feature.Geometry, style);
-            }
-
-            var stream = graphicsService.GetImage("image/png");
-            await File.WriteAllBytesAsync($"images/LocalImageFill.png", await stream.ToArrayAsync());
+        foreach (var feature in data)
+        {
+            graphicsService.Render(Extent, feature.Geometry, style);
         }
+
+        var stream = graphicsService.GetImage("image/png");
+        await File.WriteAllBytesAsync($"images/Fill.png", stream.ToArray());
+    }
+
+    [Fact]
+    public async Task Opacity()
+    {
+        var data = GetFeatures();
+
+        var style = new FillStyle
+        {
+            Antialias = true,
+            Opacity = CSharpExpression<float?>.New(0.5f),
+            Color = CSharpExpression<string>.New("#3ed53e")
+        };
+
+        using var bitmap = new SKBitmap(256, 256);
+
+        using var canvas = new SKCanvas(bitmap);
+        canvas.Clear(SKColors.White);
+
+        var width = 256;
+        var height = 256;
+        new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+        var graphicsService =
+            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+
+        foreach (var feature in data)
+        {
+            graphicsService.Render(Extent, feature.Geometry, style);
+        }
+
+        var stream = graphicsService.GetImage("image/png");
+        await File.WriteAllBytesAsync($"images/Fill.png", stream.ToArray());
+    }
+
+    [Fact]
+    public async Task LocalImageFill()
+    {
+        var data = GetFeatures();
+
+        var style = new ResourceFillStyle
+        {
+            Antialias = true,
+            Opacity = CSharpExpression<float?>.New(0.5f),
+            Color = CSharpExpression<string>.New("#3ed53e"),
+            Uri = CSharpExpression<string>.New("file://images/colorblocks1.png")
+        };
+
+        var width = 256;
+        var height = 256;
+        new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
+        var graphicsService =
+            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+
+        foreach (var feature in data)
+        {
+            graphicsService.Render(Extent, feature.Geometry, style);
+        }
+
+        var stream = graphicsService.GetImage("image/png");
+        await File.WriteAllBytesAsync($"images/LocalImageFill.png", stream.ToArray());
     }
 }

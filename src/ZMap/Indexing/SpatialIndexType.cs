@@ -1,11 +1,10 @@
 // ReSharper disable InconsistentNaming
 
-namespace ZMap.Indexing
+namespace ZMap.Indexing;
+
+public enum SpatialIndexType
 {
-    public enum SpatialIndexType
-    {
-        STRTree,
-        HPRTree,
-        Quadtree
-    }
+    STRTree,
+    HPRTree,
+    Quadtree
 }

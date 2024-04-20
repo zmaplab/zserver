@@ -13,31 +13,24 @@ using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 
 namespace ZServer;
 
-public class ConfigurationStoreRefreshService : IHostedService
+public class ConfigurationStoreRefreshService(
+    IServiceProvider serviceProvider,
+    ILogger<ConfigurationStoreRefreshService> logger)
+    : IHostedService
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<ConfigurationStoreRefreshService> _logger;
-
-    public ConfigurationStoreRefreshService(IServiceProvider serviceProvider,
-        ILogger<ConfigurationStoreRefreshService> logger)
-    {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-    }
-
     public Task StartAsync(CancellationToken cancellationToken)
     {
         return Task.Factory.StartNew(async () =>
         {
-            var configurationProvider = _serviceProvider.GetRequiredService<ConfigurationProvider>();
+            var configurationProvider = serviceProvider.GetRequiredService<ConfigurationProvider>();
             if (File.Exists(configurationProvider.Path))
             {
-                _logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
+                logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
                     configurationProvider.Path);
             }
             else
             {
-                _logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
+                logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
             }
 
             while (!cancellationToken.IsCancellationRequested)
@@ -48,7 +41,7 @@ public class ConfigurationStoreRefreshService : IHostedService
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("加载配置文件失败: {Exception}", e);
+                    logger.LogError("加载配置文件失败: {Exception}", e);
                 }
 
                 await Task.Delay(15000, cancellationToken);
@@ -62,7 +55,7 @@ public class ConfigurationStoreRefreshService : IHostedService
         if (configuration != null)
         {
             var configurations = new List<JObject> { configuration };
-            using var scope = _serviceProvider.CreateScope();
+            using var scope = serviceProvider.CreateScope();
             var gridSetStore = scope.ServiceProvider.GetRequiredService<IGridSetStore>();
             await gridSetStore.Refresh(configurations);
             var sourceStore = scope.ServiceProvider.GetRequiredService<ISourceStore>();
@@ -78,7 +71,7 @@ public class ConfigurationStoreRefreshService : IHostedService
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
             await layerGroupStore.Refresh(configurations);
 
-            _logger.LogInformation("刷新配置文件成功");
+            logger.LogInformation("刷新配置文件成功");
         }
     }
 

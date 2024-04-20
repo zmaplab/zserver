@@ -1,27 +1,26 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace ZMap.SLD
+namespace ZMap.SLD;
+
+public abstract class Constant
+    : IFilterDeserializer
 {
-    public abstract class Constant
-        : IFilterDeserializer
+    public string Value { get; private set; }
+
+    public override string ToString()
     {
-        public string Value { get; private set; }
+        return Value;
+    }
 
-        public override string ToString()
-        {
-            return Value;
-        }
+    public void Start(Stack<dynamic> stack, XmlReader reader)
+    {
+        var constant = (Constant)MemberwiseClone();
+        constant.Value = $"\"{reader.ReadString()}\"";
+        stack.Push(constant);
+    }
 
-        public void Start(Stack<dynamic> stack, XmlReader reader)
-        {
-            var constant = (Constant)MemberwiseClone();
-            constant.Value = $"\"{reader.ReadString()}\"";
-            stack.Push(constant);
-        }
-
-        public void End(Stack<dynamic> stack)
-        {
-        }
+    public void End(Stack<dynamic> stack)
+    {
     }
 }

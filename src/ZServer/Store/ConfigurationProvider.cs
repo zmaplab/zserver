@@ -7,27 +7,21 @@ using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
-public class ConfigurationProvider
+public class ConfigurationProvider(string path)
 {
-    private readonly string _path;
     private DateTime _lastWriteTime;
     private string _lastHash;
 
-    public string Path => _path;
-
-    public ConfigurationProvider(string path)
-    {
-        _path = path;
-    }
+    public string Path => path;
 
     public JObject GetConfiguration()
     {
-        if (!File.Exists(_path))
+        if (!File.Exists(path))
         {
             return null;
         }
 
-        var file = new FileInfo(_path);
+        var file = new FileInfo(path);
         if (file.LastWriteTime == _lastWriteTime)
         {
             return null;
@@ -35,7 +29,7 @@ public class ConfigurationProvider
 
         _lastWriteTime = file.LastWriteTime;
 
-        var bytes = File.ReadAllBytes(_path);
+        var bytes = File.ReadAllBytes(path);
         var hash = MurmurHashAlgorithmUtilities.ComputeHash(bytes);
         if (hash == _lastHash)
         {

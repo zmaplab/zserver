@@ -37,8 +37,7 @@ public static class OrleansExtensions
 
         siloBuilder.AddMemoryGrainStorageAsDefault();
 
-        if ("true".Equals(context.Configuration["standalone"]) ||
-            "true".Equals(Environment.GetEnvironmentVariable("standalone")?.ToLower()))
+        if ("true".Equals(context.Configuration["standalone"], StringComparison.OrdinalIgnoreCase))
         {
             siloBuilder.UseLocalhostClustering(11111, 30000, null, "zserver", "zserver");
             siloBuilder.UseInMemoryReminderService();
@@ -84,7 +83,12 @@ public static class OrleansExtensions
         }
 
         using var conn =
-            (IDbConnection)Activator.CreateInstance(connectionType, connectString);
+            Activator.CreateInstance(connectionType, connectString) as IDbConnection;
+        if (conn == null)
+        {
+            throw new ArgumentException("无法创建数据库连接");
+        }
+
         conn.Execute(sql);
 
         siloBuilder.UseAdoNetClustering(options =>

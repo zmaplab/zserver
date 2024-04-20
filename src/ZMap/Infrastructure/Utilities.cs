@@ -20,26 +20,42 @@ public static class Utilities
                      / /  \___ \ / _ \ '__\ \ / / _ \ '__|
                     / /__ ____) |  __/ |   \ V /  __/ |
                    /_____|_____/ \___|_|    \_/ \___|_|
-                   :: zserver api ::         (v0.9.0.beta)
+                   :: zserver ::             (v0.9.0.beta)
 
                    """;
         Console.WriteLine(info);
     }
 
-    public static string GetWmtsKey(string layers, string cqlFilter, string format, string tileMatrix, string tileRow,
-        string tileCol)
+    /// <summary>
+    /// WMTS 缓存文件的 Key
+    /// </summary>
+    /// <param name="layers"></param>
+    /// <param name="cqlFilter"></param>
+    /// <param name="format"></param>
+    /// <param name="tileMatrix"></param>
+    /// <param name="tileRow"></param>
+    /// <param name="tileCol"></param>
+    /// <returns></returns>
+    public static string GetWmtsPath(string layers, string cqlFilter, string format, string tileMatrix, int tileRow,
+        int tileCol)
     {
-        var layerKey = MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(layers));
-
-        var cqlFilterHash = string.IsNullOrWhiteSpace(cqlFilter)
+        var layerKey = layers.Replace(',', '_');
+        var cqlFilterKey = string.IsNullOrWhiteSpace(cqlFilter)
             ? string.Empty
             : MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
 
-        var imageExtension = Utilities.GetImageExtension(format);
-        return Path.Combine(AppContext.BaseDirectory,
-            string.IsNullOrEmpty(cqlFilterHash)
-                ? $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{imageExtension}"
-                : $"cache/wmts/{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterHash}{imageExtension}");
+        var imageExtension = GetImageExtension(format);
+        return Path.Combine(AppContext.BaseDirectory, "cache", "wmts",
+            string.IsNullOrEmpty(cqlFilterKey)
+                ? $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{imageExtension}"
+                : $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterKey}{imageExtension}");
+    }
+
+    public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,
+        int tileCol)
+    {
+        var layerKey = layers.Replace(',', '_');
+        return $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}";
     }
 
     public static int GetDpi(string formatOptions)

@@ -3,11 +3,11 @@
     <Import Project="../../package.props" />
     <Import Project="../../version.props" />
     <ItemGroup>
-        <PackageReference Include="Microsoft.Orleans.Client" Version="7.2.1"/>
-        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="7.2.1"/>
-        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="7.2.1"/>
-        <PackageReference Include="Microsoft.Orleans.Persistence.AdoNet" Version="7.2.1"/>
-        <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.1"/>
+        <PackageReference Include="Microsoft.Orleans.Client" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Persistence.AdoNet" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.2" />
         <PackageReference Include="OrleansDashboard" Version="7.2.2"/>
     </ItemGroup>
     <ItemGroup>

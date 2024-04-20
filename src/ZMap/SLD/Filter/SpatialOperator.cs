@@ -1,6 +1,3 @@
 namespace ZMap.SLD.Filter;
 
-public class SpatialOperator
-{
-    
-}
+public class SpatialOperator;

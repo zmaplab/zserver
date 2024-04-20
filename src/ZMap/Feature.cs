@@ -7,94 +7,93 @@ using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using ZMap.Infrastructure;
 
-namespace ZMap
+namespace ZMap;
+
+public record Feature : IDisposable
 {
-    public record Feature : IDisposable
+    private readonly IDictionary<string, dynamic> _attributes;
+    private IReadOnlyDictionary<string, dynamic> _environments;
+
+    public Feature(Geometry geometry, IDictionary<string, dynamic> attributes)
     {
-        private readonly IDictionary<string, dynamic> _attributes;
-        private IReadOnlyDictionary<string, dynamic> _environments;
+        Geometry = geometry;
+        _attributes = attributes;
+    }
 
-        public Feature(Geometry geometry, IDictionary<string, dynamic> attributes)
+    public Feature(string geomColumn, IDictionary<string, dynamic> attributes)
+    {
+        _attributes = attributes;
+
+        if (attributes == null || !attributes.TryGetValue(geomColumn, out var attribute))
         {
-            Geometry = geometry;
-            _attributes = attributes;
+            return;
         }
 
-        public Feature(string geomColumn, IDictionary<string, dynamic> attributes)
+        Geometry = attribute;
+        attributes.Remove(geomColumn);
+    }
+
+    /// <summary>
+    /// 是否空图斑
+    /// </summary>
+    public bool IsEmpty => Geometry == null || Geometry.IsEmpty;
+
+    /// <summary>
+    /// 图形
+    /// </summary>
+    public Geometry Geometry { get; private set; }
+
+    public dynamic this[string name] =>
+        _attributes == null ? null : _attributes.ContainsKey(name) ? _attributes[name] : null;
+
+    public void SetEnvironment(IReadOnlyDictionary<string, dynamic> environments)
+    {
+        _environments = environments ?? new Dictionary<string, dynamic>();
+    }
+
+    public dynamic GetEnvironmentValue(string name)
+    {
+        return _environments.GetValueOrDefault(name);
+    }
+
+    public IDictionary<string, dynamic> GetAttributes() => _attributes;
+
+    /// <summary>
+    /// 坐标系转换
+    /// </summary>
+    /// <param name="transformation"></param>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public Feature Transform(ICoordinateTransformation transformation)
+    {
+        Geometry = CoordinateReferenceSystem.Transform(Geometry, transformation);
+        return this;
+    }
+
+    public void Simplify()
+    {
+        // todo: 哪些情况不能简化？
+        if (Geometry.OgcGeometryType == OgcGeometryType.Point)
         {
-            _attributes = attributes;
-
-            if (attributes == null || !attributes.ContainsKey(geomColumn))
-            {
-                return;
-            }
-
-            Geometry = attributes[geomColumn];
-            attributes.Remove(geomColumn);
+            return;
         }
 
-        /// <summary>
-        /// 是否空图斑
-        /// </summary>
-        public bool IsEmpty => Geometry == null || Geometry.IsEmpty;
-
-        /// <summary>
-        /// 图形
-        /// </summary>
-        public Geometry Geometry { get; private set; }
-
-        public dynamic this[string name] =>
-            _attributes == null ? null : _attributes.ContainsKey(name) ? _attributes[name] : null;
-
-        public void SetEnvironment(IReadOnlyDictionary<string, dynamic> environments)
+        var srid = Geometry.SRID;
+        var coordinateSystem = CoordinateReferenceSystem.Get(srid);
+        if (coordinateSystem == null)
         {
-            _environments = environments ?? new Dictionary<string, dynamic>();
+            return;
         }
 
-        public dynamic GetEnvironmentValue(string name)
-        {
-            return _environments.TryGetValue(name, out var v) ? v : null;
-        }
+        // 84 最小可用精度是 0.00001 度， 0.0001 以上图形异常
+        // 大地坐标系最大可用精度是 0.0001 米， 0.00001 开始会消除不掉异常点
+        var distanceTolerance = coordinateSystem is GeographicCoordinateSystem ? 0.00001 : 0.0001;
+        Geometry = VWSimplifier.Simplify(Geometry, distanceTolerance);
+    }
 
-        public IDictionary<string, dynamic> GetAttributes() => _attributes;
-
-        /// <summary>
-        /// 坐标系转换
-        /// </summary>
-        /// <param name="transformation"></param>
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public Feature Transform(ICoordinateTransformation transformation)
-        {
-            Geometry = CoordinateReferenceSystem.Transform(Geometry, transformation);
-            return this;
-        }
-
-        public void Simplify()
-        {
-            // todo: 哪些情况不能简化？
-            if (Geometry.OgcGeometryType == OgcGeometryType.Point)
-            {
-                return;
-            }
-
-            var srid = Geometry.SRID;
-            var coordinateSystem = CoordinateReferenceSystem.Get(srid);
-            if (coordinateSystem == null)
-            {
-                return;
-            }
-
-            // 84 最小可用精度是 0.00001 度， 0.0001 以上图形异常
-            // 大地坐标系最大可用精度是 0.0001 米， 0.00001 开始会消除不掉异常点
-            var distanceTolerance = coordinateSystem is GeographicCoordinateSystem ? 0.00001 : 0.0001;
-            Geometry = VWSimplifier.Simplify(Geometry, distanceTolerance);
-        }
-
-        public void Dispose()
-        {
-            Geometry = null;
-            _attributes.Clear();
-            _environments = null;
-        }
+    public void Dispose()
+    {
+        Geometry = null;
+        _attributes.Clear();
+        _environments = null;
     }
 }

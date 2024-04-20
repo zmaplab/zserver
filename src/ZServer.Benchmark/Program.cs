@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace ZServer.Benchmark
+namespace ZServer.Benchmark;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
 //             var testClass = new RendererTest();
 //             testClass.DrawAllStyle256OneTime();
 // #if !DEBUG
 //             BenchmarkDotNet.Running.BenchmarkRunner.Run<RendererTest>();
 // #endif
-            Console.WriteLine("Bye!");
-        }
+        Console.WriteLine("Bye!");
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System.Xml;
 
-namespace ZMap.SLD
+namespace ZMap.SLD;
+
+public class PerpendicularOffset
 {
-    public class PerpendicularOffset
-    {
-        public void ReadXml(XmlReader reader)
-        { 
-        }
+    public void ReadXml(XmlReader reader)
+    { 
     }
 }

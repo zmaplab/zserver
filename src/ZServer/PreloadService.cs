@@ -8,78 +8,70 @@ using Microsoft.Extensions.Logging;
 using ZMap.Source.ShapeFile;
 using ZMap.TileGrid;
 
-namespace ZServer
+namespace ZServer;
+
+public class PreloadService(ILogger<PreloadService> logger) : IHostedService
 {
-    public class PreloadService : IHostedService
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        private readonly ILogger<PreloadService> _logger;
-
-        public PreloadService(ILogger<PreloadService> logger)
+        return Task.Run(async () =>
         {
-            _logger = logger;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            return Task.Run(async () =>
+            if (string.Equals(Environment.GetEnvironmentVariable("PREHEAT"), "true",
+                    StringComparison.InvariantCultureIgnoreCase)
+                ||
+                string.Equals(Environment.GetEnvironmentVariable("PRE_LOAD_SHP"), "true",
+                    StringComparison.InvariantCultureIgnoreCase))
             {
-                if (string.Equals(Environment.GetEnvironmentVariable("PREHEAT"), "true",
-                        StringComparison.InvariantCultureIgnoreCase)
-                    ||
-                    string.Equals(Environment.GetEnvironmentVariable("PRE_LOAD_SHP"), "true",
-                        StringComparison.InvariantCultureIgnoreCase))
-                {
-                    await LoadAllShapes();
-                    _logger.LogInformation("预加载矢量文件成功");
-                }
-            }, cancellationToken);
-        }
-
-        private async Task LoadAllShapes()
-        {
-            await LoadDirectory(Path.Combine(AppContext.BaseDirectory, "shapes"));
-        }
-
-        private async Task LoadDirectory(string directory)
-        {
-            if (!Directory.Exists(directory))
-            {
-                return;
+                await LoadAllShapes();
+                logger.LogInformation("预加载矢量文件成功");
             }
+        }, cancellationToken);
+    }
 
-            var directories = Directory.GetDirectories(directory);
-            if (directories.Length > 0)
-            {
-                foreach (var directory1 in directories)
-                {
-                    await LoadDirectory(directory1);
-                }
-            }
+    private async Task LoadAllShapes()
+    {
+        await LoadDirectory(Path.Combine(AppContext.BaseDirectory, "shapes"));
+    }
 
-            var files = Directory.GetFiles(directory).Where(x => x.EndsWith(".shp"));
-            foreach (var file in files)
+    private async Task LoadDirectory(string directory)
+    {
+        if (!Directory.Exists(directory))
+        {
+            return;
+        }
+
+        var directories = Directory.GetDirectories(directory);
+        if (directories.Length > 0)
+        {
+            foreach (var directory1 in directories)
             {
-                await LoadShape(file);
+                await LoadDirectory(directory1);
             }
         }
 
-        private async Task LoadShape(string path)
+        var files = Directory.GetFiles(directory).Where(x => x.EndsWith(".shp"));
+        foreach (var file in files)
         {
-            _logger.LogInformation("开始加载矢量文件: {Path}", path);
-            var shapeFileSource = new ShapeFileSource(path);
+            await LoadShape(file);
+        }
+    }
 
-            // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
-            // ReSharper disable once UnusedVariable
-            foreach (var feature in await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326))
-            {
-            }
+    private async Task LoadShape(string path)
+    {
+        logger.LogInformation("开始加载矢量文件: {Path}", path);
+        var shapeFileSource = new ShapeFileSource(path);
 
-            _logger.LogInformation("加载矢量文件 {Path} 成功", path);
+        // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
+        // ReSharper disable once UnusedVariable
+        foreach (var feature in await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326))
+        {
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        logger.LogInformation("加载矢量文件 {Path} 成功", path);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

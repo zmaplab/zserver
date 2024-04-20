@@ -1,6 +1,3 @@
-﻿namespace ZMap.SLD
-{
-    public class RedChannel:Channel
-    {
-    }
-}
+﻿namespace ZMap.SLD;
+
+public class RedChannel:Channel;

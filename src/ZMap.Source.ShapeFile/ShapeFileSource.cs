@@ -16,204 +16,205 @@ using ProjNet.CoordinateSystems;
 using ZMap.Indexing;
 using ZMap.Infrastructure;
 
-namespace ZMap.Source.ShapeFile
+namespace ZMap.Source.ShapeFile;
+
+public class ShapeFileSource : VectorSourceBase
 {
-    public class ShapeFileSource : VectorSourceBase
+    /// <summary>
+    /// 文件路径
+    /// </summary>
+    public string File { get; }
+
+    private static readonly CoordinateSystemFactory CoordinateSystemFactory = new();
+
+    private readonly GeometryFactory _geometryFactory;
+
+    // ReSharper disable once InconsistentNaming
+    public ShapeFileSource(string file)
     {
-        /// <summary>
-        /// 文件路径
-        /// </summary>
-        public string File { get; }
+        File = new FileInfo(file).FullName;
+        Srid = GetSrid(file);
+        _geometryFactory =
+            NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), Srid);
+    }
 
-        private static readonly CoordinateSystemFactory CoordinateSystemFactory = new();
+    public override ISource Clone()
+    {
+        return (ISource)MemberwiseClone();
+    }
 
-        private readonly GeometryFactory _geometryFactory;
-
-        // ReSharper disable once InconsistentNaming
-        public ShapeFileSource(string file)
+    public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
+    {
+        if (Srid == -1)
         {
-            File = new FileInfo(file).FullName;
-            Srid = GetSrid(file);
-            _geometryFactory =
-                NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), Srid);
+            return Task.FromResult(Enumerable.Empty<Feature>());
         }
 
-        public override ISource Clone()
+        var features = new List<Feature>();
+
+        // TODO:
+        // var predicate = Filter?.ToPredicate();
+        FileReader tuple;
+        lock (typeof(ShapeFileSource))
         {
-            return (ISource)MemberwiseClone();
-        }
-
-        public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
-        {
-            if (Srid == -1)
-            {
-                return Task.FromResult(Enumerable.Empty<Feature>());
-            }
-
-            var features = new List<Feature>();
-
-            var predicate = Filter?.ToPredicate();
-            FileReader tuple;
-            lock (typeof(ShapeFileSource))
-            {
-                tuple = Cache.GetOrCreate(File,
-                    entry =>
-                    {
-                        var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
-                        var stream = mmf.CreateViewStream();
-                        var reader = new BinaryReader(stream, Encoding.Unicode);
-                        var spatialIndex = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
-
-                        var result = new FileReader
-                        {
-                            Reader = reader,
-                            SpatialIndex = spatialIndex
-                        };
-                        entry.SetValue(result);
-                        entry.SetSlidingExpiration(TimeSpan.FromDays(365));
-                        return result;
-                    });
-            }
-
-            var spatialIndexItems = GetObjectIDsInView(tuple.SpatialIndex, extent);
-            if (spatialIndexItems.Count == 0)
-            {
-                return Task.FromResult<IEnumerable<Feature>>(Array.Empty<Feature>());
-            }
-
-            // ISpatialIndex<SpatialIndexEntry> _tree;
-            // 不能使用 using，会关闭流
-
-            using var dbaseFile = new DbaseReader(Path.ChangeExtension(File, ".dbf"));
-
-            foreach (var spatialIndexItem in spatialIndexItems)
-            {
-                var feature = GetOrCreate(extent, tuple.Reader, dbaseFile, spatialIndexItem);
-
-                if (predicate != null)
+            tuple = Cache.GetOrCreate(File,
+                entry =>
                 {
-                    if (predicate(feature))
-                    {
-                        features.Add(feature);
-                    }
-                }
-                else
-                {
-                    features.Add(feature);
-                }
-            }
+                    var mmf = MemoryMappedFile.CreateFromFile(File, FileMode.Open);
+                    var stream = mmf.CreateViewStream();
+                    var reader = new BinaryReader(stream, Encoding.Unicode);
+                    var spatialIndex = SpatialIndexFactory.Create(File, reader, SpatialIndexType.STRTree);
 
-            return Task.FromResult<IEnumerable<Feature>>(features);
+                    var result = new FileReader
+                    {
+                        Reader = reader,
+                        SpatialIndex = spatialIndex
+                    };
+                    entry.SetValue(result);
+                    entry.SetSlidingExpiration(TimeSpan.FromDays(365));
+                    return result;
+                });
         }
 
-        public override Envelope GetEnvelope()
+        var spatialIndexItems = GetObjectIDsInView(tuple.SpatialIndex, extent);
+        if (spatialIndexItems.Count == 0)
+        {
+            return Task.FromResult<IEnumerable<Feature>>(Array.Empty<Feature>());
+        }
+
+        // ISpatialIndex<SpatialIndexEntry> _tree;
+        // 不能使用 using，会关闭流
+
+        using var dbaseFile = new DbaseReader(Path.ChangeExtension(File, ".dbf"));
+
+        foreach (var spatialIndexItem in spatialIndexItems)
+        {
+            var feature = GetOrCreate(extent, tuple.Reader, dbaseFile, spatialIndexItem);
+
+            // TODO:
+            // if (predicate != null)
+            // {
+            //     if (predicate(feature))
+            //     {
+            //         features.Add(feature);
+            //     }
+            // }
+            // else
+            {
+                features.Add(feature);
+            }
+        }
+
+        return Task.FromResult<IEnumerable<Feature>>(features);
+    }
+
+    public override Envelope GetEnvelope()
+    {
+        return null;
+    }
+
+    public override string ToString()
+    {
+        return $"Path: {File}";
+    }
+
+    public override void Dispose()
+    {
+    }
+
+    public Func<Feature, bool> Predicate { get; set; }
+
+    private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
+        SpatialIndexItem spatialIndexItem)
+    {
+        var attributes = GetAttribute(dbaseFile, (int)spatialIndexItem.Index);
+        var geometry = ReadGeometry(spatialIndexItem, binaryReader);
+
+        if (geometry == null
+            || !geometry.IsValid
+            || !queryExtent.Intersects(geometry.EnvelopeInternal))
         {
             return null;
         }
 
-        public override string ToString()
+        var dict = new Dictionary<string, object>();
+        foreach (var name in attributes.GetNames())
         {
-            return $"Path: {File}";
+            var value = attributes[name];
+            if (value is string v)
+            {
+                value = v.Replace("\0", "").Trim();
+            }
+
+            dict.Add(name, value);
         }
 
-        public override void Dispose()
+        var feature = new Feature(geometry, dict);
+        return feature;
+    }
+
+    private IAttributesTable GetAttribute(DbaseReader dbaseFile, int index)
+    {
+        return dbaseFile.ReadEntry(index);
+    }
+
+    private int GetSrid(string path)
+    {
+        var projPath = path.Replace(".shp", ".prj");
+        if (!System.IO.File.Exists(projPath))
         {
+            return -1;
         }
 
-        public Func<Feature, bool> Predicate { get; set; }
+        var coordinateSystem =
+            CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(projPath)));
+        return (int)coordinateSystem.AuthorityCode;
+    }
 
-        private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
-            SpatialIndexItem spatialIndexItem)
+    private List<SpatialIndexItem> GetObjectIDsInView(ISpatialIndex<SpatialIndexItem> tree, Envelope bbox)
+    {
+        //Use the spatial index to get a list of features whose boundingBox intersects bbox
+        var res = tree.Query(bbox);
+
+        /*Sort oids so we get a forward only read of the shapefile*/
+        var ret = new List<SpatialIndexItem>(res);
+        ret.Sort((a, b) => (int)(a.Index - b.Index));
+
+        return ret;
+    }
+
+    private Geometry ReadGeometry(SpatialIndexItem item, BinaryReader reader)
+    {
+        lock (typeof(ShapeFileSource))
         {
-            var attributes = GetAttribute(dbaseFile, (int)spatialIndexItem.Index);
-            var geometry = ReadGeometry(spatialIndexItem, binaryReader);
+            var diff = item.Offset - reader.BaseStream.Position;
+            reader.BaseStream.Seek(diff, SeekOrigin.Current);
 
-            if (geometry == null
-                || !geometry.IsValid
-                || !queryExtent.Intersects(geometry.EnvelopeInternal))
+            //Skip record number
+            reader.BaseStream.Seek(8, SeekOrigin.Current);
+
+            var bytes = reader.ReadBytes(item.Length);
+            using var geometryReader = new BigEndianBinaryReader(new MemoryStream(bytes));
+
+            var typeValue = geometryReader.ReadInt32();
+            if (typeValue == 0)
             {
                 return null;
             }
 
-            var dict = new Dictionary<string, object>();
-            foreach (var name in attributes.GetNames())
-            {
-                var value = attributes[name];
-                if (value is string v)
-                {
-                    value = v.Replace("\0", "").Trim();
-                }
+            var type = (ShapeGeometryType)typeValue;
+            var handler = Shapefile.GetShapeHandler(type);
 
-                dict.Add(name, value);
-            }
+            geometryReader.BaseStream.Seek(0, 0);
 
-            var feature = new Feature(geometry, dict);
-            return feature;
+            var geometry = handler.Read(geometryReader, item.Length, _geometryFactory);
+            return geometry;
         }
+    }
 
-        private IAttributesTable GetAttribute(DbaseReader dbaseFile, int index)
-        {
-            return dbaseFile.ReadEntry(index);
-        }
-
-        private int GetSrid(string path)
-        {
-            var projPath = path.Replace(".shp", ".prj");
-            if (!System.IO.File.Exists(projPath))
-            {
-                return -1;
-            }
-
-            var coordinateSystem =
-                CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(projPath)));
-            return (int)coordinateSystem.AuthorityCode;
-        }
-
-        private List<SpatialIndexItem> GetObjectIDsInView(ISpatialIndex<SpatialIndexItem> tree, Envelope bbox)
-        {
-            //Use the spatial index to get a list of features whose boundingBox intersects bbox
-            var res = tree.Query(bbox);
-
-            /*Sort oids so we get a forward only read of the shapefile*/
-            var ret = new List<SpatialIndexItem>(res);
-            ret.Sort((a, b) => (int)(a.Index - b.Index));
-
-            return ret;
-        }
-
-        private Geometry ReadGeometry(SpatialIndexItem item, BinaryReader reader)
-        {
-            lock (typeof(ShapeFileSource))
-            {
-                var diff = item.Offset - reader.BaseStream.Position;
-                reader.BaseStream.Seek(diff, SeekOrigin.Current);
-
-                //Skip record number
-                reader.BaseStream.Seek(8, SeekOrigin.Current);
-
-                var bytes = reader.ReadBytes(item.Length);
-                using var geometryReader = new BigEndianBinaryReader(new MemoryStream(bytes));
-
-                var typeValue = geometryReader.ReadInt32();
-                if (typeValue == 0)
-                {
-                    return null;
-                }
-
-                var type = (ShapeGeometryType)typeValue;
-                var handler = Shapefile.GetShapeHandler(type);
-
-                geometryReader.BaseStream.Seek(0, 0);
-
-                var geometry = handler.Read(geometryReader, item.Length, _geometryFactory);
-                return geometry;
-            }
-        }
-
-        record FileReader
-        {
-            public BinaryReader Reader { get; init; }
-            public ISpatialIndex<SpatialIndexItem> SpatialIndex { get; init; }
-        }
+    record FileReader
+    {
+        public BinaryReader Reader { get; init; }
+        public ISpatialIndex<SpatialIndexItem> SpatialIndex { get; init; }
     }
 }

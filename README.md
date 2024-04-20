@@ -95,5 +95,28 @@ dotnet run --Standalone false --ClusterSiloPort 10002 --ClusterGatewayPort 20002
 2. 支持影像数据的实时渲染/切片
 3. 数据基本操作接口(CRUD）
 4. 图形操作（切割、合并、相交）等
+5. 过滤条件
+
+``` JSON
+{
+  Logic: 'And',
+  Filters:
+  [
+    { Field: 'id', Operator: 'Equals', Value: 1 },
+    {
+      Logic: 'Or',
+      Filters:
+      [
+        { Field: 'id', Operator: 'Equals', Value: 2 },
+        {
+            Field: '{{ DynamicFilterCustomImpl.CustomLinq }}', 
+            Operator: 'Custom', 
+            Value: 'Title.StartsWith(\'new topic 1\')'
+        }
+      ]
+    }
+  ]
+}
+```
 
  
