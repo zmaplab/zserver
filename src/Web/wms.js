@@ -23,7 +23,7 @@ for (let z = 0; z < 22; ++z) {
   matrixIds[z] = z
 }
 
-let centerXY = [52.4956246, 13.3106302]
+let centerXY = [12.477070574987795, 41.85776175318455]
 
 const searchParams = new URLSearchParams(window.location.search)
 const source = searchParams.get('source')
