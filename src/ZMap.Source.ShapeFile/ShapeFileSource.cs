@@ -122,7 +122,7 @@ public class ShapeFileSource : VectorSourceBase
     {
     }
 
-    public Func<Feature, bool> Predicate { get; set; }
+    // public Func<Feature, bool> Predicate { get; set; }
 
     private Feature GetOrCreate(Envelope queryExtent, BinaryReader binaryReader, DbaseReader dbaseFile,
         SpatialIndexItem spatialIndexItem)

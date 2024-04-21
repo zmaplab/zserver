@@ -29,7 +29,7 @@ public static class Program
             CoordinateArraySequenceFactory.Instance,
             PrecisionModel.Floating.Value,
             4490, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
-        FontUtilities.Load();
+        FontUtility.Load();
         CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 

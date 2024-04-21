@@ -36,6 +36,6 @@ public class SymbolStyleTests : BaseTests
 
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/{GetType().Name}_ImageSymbol.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/{GetType().Name}_ImageSymbol.png", await stream.ToArrayAsync());
     }
 }

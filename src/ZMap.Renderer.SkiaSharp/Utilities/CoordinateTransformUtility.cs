@@ -5,7 +5,7 @@ using ZMap.Extensions;
 
 namespace ZMap.Renderer.SkiaSharp.Utilities;
 
-public static class CoordinateTransformUtilities
+public static class CoordinateTransformUtility
 {
     public static SKPoint[] WordToExtent(Envelope extent, int width, int height,
         Coordinate[] coordinates)

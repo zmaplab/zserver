@@ -5,7 +5,7 @@ using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
 
-public class LineStyleRenderer(LineStyle style) : SkiaRenderer, ILineStyleRenderer<SKCanvas>
+public class LineRenderer(LineStyle style) : SkiaRenderer, ILineRenderer<SKCanvas>
 {
     protected override SKPaint CreatePaint()
     {
@@ -28,7 +28,7 @@ public class LineStyleRenderer(LineStyle style) : SkiaRenderer, ILineStyleRender
             Style = SKPaintStyle.Stroke,
             StrokeWidth = width,
             IsAntialias = true,
-            Color = ColorUtilities.GetColor(color, opacity)
+            Color = ColorUtility.GetColor(color, opacity)
         };
 
         if (Enum.TryParse<SKStrokeCap>(cap, out var strokeCap))

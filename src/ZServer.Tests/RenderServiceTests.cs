@@ -4,7 +4,7 @@
 // using NetTopologySuite.Geometries;
 // using Xunit;
 // using ZMap;
-// using ZMap.Utilities;
+// using ZMap.Utility;
 //
 // namespace ZServer.Tests
 // {

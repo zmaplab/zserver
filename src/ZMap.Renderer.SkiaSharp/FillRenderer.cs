@@ -4,7 +4,7 @@ using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
 
-public class FillStyleRenderer(FillStyle style) : SkiaRenderer, IFillStyleRenderer<SKCanvas>
+public class FillRenderer(FillStyle style) : SkiaRenderer, IFillRenderer<SKCanvas>
 {
     protected readonly FillStyle Style = style;
 
@@ -18,7 +18,7 @@ public class FillStyleRenderer(FillStyle style) : SkiaRenderer, IFillStyleRender
         {
             Style = SKPaintStyle.Fill,
             IsAntialias = antialias,
-            Color = ColorUtilities.GetColor(color, opacity)
+            Color = ColorUtility.GetColor(color, opacity)
         };
     }
 }

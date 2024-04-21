@@ -69,12 +69,12 @@ public class SkiaGraphicsService : IGraphicsService
     {
         return style switch
         {
-            ResourceFillStyle resourceFillStyle => new ResourceFillStyleRenderer(resourceFillStyle),
-            FillStyle fillStyle => new FillStyleRenderer(fillStyle),
-            LineStyle lineStyle => new LineStyleRenderer(lineStyle),
-            TextStyle textStyle => new TextStyleRenderer(textStyle),
-            SymbolStyle symbolStyle => new SymbolStyleRenderer(symbolStyle),
-            RasterStyle rasterStyle => new RasterStyleRender(rasterStyle),
+            ResourceFillStyle resourceFillStyle => new ResourceFillRenderer(resourceFillStyle),
+            FillStyle fillStyle => new FillRenderer(fillStyle),
+            LineStyle lineStyle => new LineRenderer(lineStyle),
+            TextStyle textStyle => new TextRenderer(textStyle),
+            SymbolStyle symbolStyle => new SymbolRenderer(symbolStyle),
+            RasterStyle rasterStyle => new RasterRender(rasterStyle),
             _ => throw new NotSupportedException($"不支持的样式: {style.GetType().Name}")
         };
     }

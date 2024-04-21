@@ -42,7 +42,7 @@ public class LineStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/Stroke.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/Stroke.png", await stream.ToArrayAsync());
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class LineStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/Dash.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/Dash.png", await stream.ToArrayAsync());
     }
 
     [Fact]
@@ -112,6 +112,6 @@ public class LineStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/CapDash.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/CapDash.png", await stream.ToArrayAsync());
     }
 }

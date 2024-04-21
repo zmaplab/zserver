@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace ZMap.Extensions;
 
@@ -9,13 +11,20 @@ public static class StreamExtensions
     /// </summary>
     /// <param name="stream"></param>
     /// <returns></returns>
-    public static byte[] ToArray(this Stream stream)
+    public static async Task<byte[]> ToArrayAsync(this Stream stream)
     {
-        // TODO:  benchmark this
-        var reader = new BinaryReader(stream);
-        return reader.ReadBytes((int)stream.Length);
-        // var bytes = new byte[stream.Length];
-        // _ = await stream.ReadAsync(bytes, 0, bytes.Length);
-        // return bytes;
+        if (stream is MemoryStream ms)
+        {
+            return ms.ToArray();
+        }
+
+        if (stream.Length == 0)
+        {
+            return Array.Empty<byte>();
+        }
+
+        var bytes = new byte[stream.Length];
+        _ = await stream.ReadAsync(bytes, 0, bytes.Length);
+        return bytes;
     }
 }

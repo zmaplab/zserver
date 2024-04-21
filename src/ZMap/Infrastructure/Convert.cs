@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ZMap.Infrastructure;
 
-public static class ConvertUtilities
+public static class Convert
 {
     public static T ToObject<T>(dynamic v)
     {
@@ -31,7 +31,7 @@ public static class ConvertUtilities
             return default;
         }
 
-        return targetType == typeof(string) ? (T)v.ToString() : (T)Convert.ChangeType(v, targetType);
+        return targetType == typeof(string) ? (T)v.ToString() : (T)System.Convert.ChangeType(v, targetType);
     }
 
     public static T[] ToArray<T>(string text)
@@ -42,8 +42,7 @@ public static class ConvertUtilities
 
     public static IEnumerable<object> ToArray(string text, Type type)
     {
-        
-        var data = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-        return data.Select(x => type == typeof(string) ? x : Convert.ChangeType(x, type));
+        return text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => type == typeof(string) ? x : System.Convert.ChangeType(x, type));
     }
 }

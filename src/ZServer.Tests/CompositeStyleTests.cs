@@ -51,7 +51,7 @@ public class CompositeStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        var bytes = stream.ToArray();
+        var bytes = await stream.ToArrayAsync();
         await File.WriteAllBytesAsync($"images/StrokeAndFill.png", bytes);
     }
 
@@ -94,6 +94,6 @@ public class CompositeStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/Hatching.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/Hatching.png", await stream.ToArrayAsync());
     }
 }

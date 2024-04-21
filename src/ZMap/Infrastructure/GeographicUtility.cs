@@ -7,7 +7,7 @@ namespace ZMap.Infrastructure;
 /// <summary>
 /// 地理空间计算相关的方法
 /// </summary>
-public static class GeographicUtilities
+public static class GeographicUtility
 {
     /// <summary>
     /// 经纬度坐标系的比例尺计算
@@ -94,8 +94,7 @@ public static class GeographicUtilities
     }
 
     public static (double Lat, double Lon) CalculateLatLongFromGrid(Envelope bbox, double pixelWidth,
-        double pixelHeight, int x,
-        int y)
+        double pixelHeight, int x, int y)
     {
         var lon = (float)bbox.MinX + pixelWidth * x;
         var lat = (float)bbox.MinY + pixelHeight * y;

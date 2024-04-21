@@ -4,16 +4,16 @@ using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Extensions;
 using ZMap.Infrastructure;
+using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
-using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 
 namespace ZMap.Renderer.SkiaSharp;
 
-public class SymbolStyleRenderer(SymbolStyle style) : SkiaRenderer, ISymbolStyleRenderer<SKCanvas>
+public class SymbolRenderer(SymbolStyle style) : SkiaRenderer, ISymbolRenderer<SKCanvas>
 {
     private static readonly SKBitmap DefaultImage;
 
-    static SymbolStyleRenderer()
+    static SymbolRenderer()
     {
         DefaultImage = SKBitmap.Decode("108.png");
     }
@@ -36,7 +36,7 @@ public class SymbolStyleRenderer(SymbolStyle style) : SkiaRenderer, ISymbolStyle
 
         var half = (style.Size.Value ?? 14) / 2;
 
-        var centroidPoint = CoordinateTransformUtilities.WordToExtent(extent,
+        var centroidPoint = CoordinateTransformUtility.WordToExtent(extent,
             width, height, centroid);
 
         var left = centroidPoint.X - half;

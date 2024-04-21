@@ -30,7 +30,7 @@ public class ConfigurationProvider(string path)
         _lastWriteTime = file.LastWriteTime;
 
         var bytes = File.ReadAllBytes(path);
-        var hash = MurmurHashAlgorithmUtilities.ComputeHash(bytes);
+        var hash = MurmurHashAlgorithmUtility.ComputeHash(bytes);
         if (hash == _lastHash)
         {
             return null;

@@ -2,10 +2,11 @@ using System;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using ZMap.Infrastructure;
+using Convert = System.Convert;
 
 namespace ZMap.Renderer.SkiaSharp.Utilities;
 
-public static class ColorUtilities
+public static class ColorUtility
 {
     private static readonly SKColor DefaultColor = SKColors.Black;
 

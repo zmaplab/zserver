@@ -9,25 +9,25 @@ public class FontManagerTest
     [Fact]
     public void Load()
     {
-        FontUtilities.Load();
+        FontUtility.Load();
     }
 
     [Fact]
     public void GetFontByFamilyName()
     {
-        FontUtilities.Load();
+        FontUtility.Load();
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            var f1 = FontUtilities.Get("Academy Engraved LET", "Al Bayan");
-            var f2 = FontUtilities.Get("Klee", "Academy Engraved LET");
+            var f1 = FontUtility.Get("Academy Engraved LET", "Al Bayan");
+            var f2 = FontUtility.Get("Klee", "Academy Engraved LET");
             Assert.Equal("Academy Engraved LET", f1.FamilyName);
             Assert.Equal("Klee", f2.FamilyName);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var f1 = FontUtilities.Get("Arial", "Calibri");
-            var f2 = FontUtilities.Get("微软雅黑", "Segoe");
+            var f1 = FontUtility.Get("Arial", "Calibri");
+            var f2 = FontUtility.Get("微软雅黑", "Segoe");
             Assert.Equal("Arial", f1.FamilyName);
             Assert.Equal("Microsoft YaHei", f2.FamilyName);
         }

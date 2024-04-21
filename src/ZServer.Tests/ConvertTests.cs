@@ -3,12 +3,12 @@ using ZMap.Infrastructure;
 
 namespace ZServer.Tests;
 
-public class ConvertUtilitiesTests
+public class ConvertTests
 {
     [Fact]
     public void String()
     {
-        var result = ConvertUtilities.ToArray<string>("1 2 3");
+        var result = Convert.ToArray<string>("1 2 3");
         Assert.Equal(3, result.Length);
         Assert.Equal("1", result[0]);
         Assert.Equal("2", result[1]);
@@ -18,7 +18,7 @@ public class ConvertUtilitiesTests
     [Fact]
     public void Int()
     {
-        var result = ConvertUtilities.ToArray<int>("1 2 3");
+        var result = Convert.ToArray<int>("1 2 3");
         Assert.Equal(3, result.Length);
         Assert.Equal(1, result[0]);
         Assert.Equal(2, result[1]);

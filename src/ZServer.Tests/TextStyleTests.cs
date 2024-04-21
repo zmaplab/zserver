@@ -40,6 +40,6 @@ public class TextStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/{GetType().Name}_Label.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/{GetType().Name}_Label.png", await stream.ToArrayAsync());
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using ZMap.Infrastructure;
 using ZMap.SLD.Filter.Expression;
 using ZMap.Style;
+using Convert = ZMap.Infrastructure.Convert;
 
 namespace ZMap.SLD;
 
@@ -41,7 +41,7 @@ public static class ParameterValueListExtensions
                 valueType = type;
             }
 
-            return CSharpExpression<T>.From(Convert.ChangeType(value, valueType), defaultValue);
+            return CSharpExpression<T>.From(System.Convert.ChangeType(value, valueType), defaultValue);
         }
     }
 
@@ -81,7 +81,7 @@ public static class ParameterValueListExtensions
             }
             else
             {
-                var array = ConvertUtilities.ToArray<T>(text);
+                var array = Convert.ToArray<T>(text);
                 return CSharpExpression<T[]>.New(array);
             }
         }

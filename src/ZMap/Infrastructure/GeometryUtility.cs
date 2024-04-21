@@ -6,7 +6,7 @@ namespace ZMap.Infrastructure;
 /// <summary>
 /// 图形计算相关的方法
 /// </summary>
-public static class GeometryUtilities
+public static class GeometryUtility
 {
     public const double Tolerance = 0.0001;
         

@@ -13,8 +13,7 @@ using ZMap.Infrastructure;
 
 namespace ZMap.Source.Postgre;
 
-public sealed class PostgreSource(string connectionString, string database) : SpatialDatabaseSource(connectionString,
-    database)
+public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
     private static readonly ConcurrentDictionary<string, IFreeSql> FreeSqlCache = new();
 
@@ -51,6 +50,7 @@ public sealed class PostgreSource(string connectionString, string database) : Sp
         }
 
         sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+
         if (!string.IsNullOrEmpty(Where))
         {
             sqlBuilder.Append(" AND ").Append(Where);
@@ -123,14 +123,13 @@ public sealed class PostgreSource(string connectionString, string database) : Sp
 
     private IFreeSql GetFreeSql()
     {
-        return FreeSqlCache.GetOrAdd(Name, _ =>
+        return FreeSqlCache.GetOrAdd(ConnectionString, _ =>
         {
             return new FreeSql.FreeSqlBuilder()
                 .UseAdoConnectionPool(true)
                 .UseConnectionFactory(FreeSql.DataType.PostgreSQL, () =>
                 {
-                    var builder = new NpgsqlConnectionStringBuilder(ConnectionString)
-                        { Database = Database };
+                    var builder = new NpgsqlConnectionStringBuilder(ConnectionString);
                     var connectionString = builder.ToString();
                     var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
                     dataSourceBuilder.UseNetTopologySuite();

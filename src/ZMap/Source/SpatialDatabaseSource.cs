@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ZMap.Source;
 
-public abstract class SpatialDatabaseSource(string connectionString, string database) : VectorSourceBase
+public abstract class SpatialDatabaseSource(string connectionString) : VectorSourceBase
 {
     /// <summary>
     /// 连接字符串
@@ -13,10 +13,10 @@ public abstract class SpatialDatabaseSource(string connectionString, string data
     /// </summary>
     public string ConnectionString { get; } = connectionString;
 
-    /// <summary>
-    /// 数据库名
-    /// </summary>
-    public string Database { get; } = database;
+    // /// <summary>
+    // /// 数据库名
+    // /// </summary>
+    // public string Database { get; } = database;
 
     /// <summary>
     /// 表名
@@ -46,6 +46,6 @@ public abstract class SpatialDatabaseSource(string connectionString, string data
     public override string ToString()
     {
         return
-            $"ConnectionString: {ConnectionString}, Database: {Database}, Table: {Table}, SRID: {Srid}, Geometry: {Geometry}";
+            $"ConnectionString: {ConnectionString}, Table: {Table}, SRID: {Srid}, Geometry: {Geometry}";
     }
 }

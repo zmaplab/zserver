@@ -37,7 +37,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
         string tileMatrixSet = "EPSG:4326", [FromQuery(Name = "CQL_FILTER")] string cqlFilter = null)
     {
         // 使用相同的缓存路径
-        var path = Utilities.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileRow, tileCol);
+        var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileRow, tileCol);
         if (System.IO.File.Exists(path))
         {
             if (EnvironmentVariables.EnableSensitiveDataLogging)
@@ -56,7 +56,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
         }
 
         // 同一个 Grid 使用同一个对象进行管理， 保证缓存文件在同一个 Silo 目录下
-        var key = Utilities.GetWmtsKey(layers, tileMatrixSet, tileRow, tileCol);
+        var key = Utility.GetWmtsKey(layers, tileMatrixSet, tileRow, tileCol);
         var friend = clusterClient.GetGrain<IWMTSGrain>(key);
         var result =
             await friend.GetTileAsync(layers, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,

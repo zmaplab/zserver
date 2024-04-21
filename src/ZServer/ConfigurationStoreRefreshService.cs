@@ -41,7 +41,7 @@ public class ConfigurationStoreRefreshService(
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("加载配置文件失败: {Exception}", e);
+                    logger.LogError(e, "加载配置文件失败");
                 }
 
                 await Task.Delay(15000, cancellationToken);
