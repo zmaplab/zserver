@@ -1,21 +1,37 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using FreeSql.Internal.Model;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Npgsql;
 using ZMap.Infrastructure;
+using DataType = FreeSql.DataType;
 
 namespace ZMap.Source.Postgre;
 
 public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
-    private static readonly ConcurrentDictionary<string, IFreeSql> FreeSqlCache = new();
+    private static readonly Lazy<IFreeSql> FreeSql = new(() =>
+    {
+        return new FreeSql.FreeSqlBuilder()
+            .UseConnectionFactory(DataType.PostgreSQL, () =>
+            {
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+                    "User ID=postgres;Password=11111;Host=127.0.0.1;Port=8888;Database=zserver_dev;Pooling=true;");
+                dataSourceBuilder.UseNetTopologySuite();
+                var dataSource = dataSourceBuilder.Build();
+                return dataSource.CreateConnection();
+            })
+            .Build();
+    });
 
     public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
     {
@@ -56,45 +72,47 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             sqlBuilder.Append(" AND ").Append(Where);
         }
 
-        var freeSql = GetFreeSql();
-        var select = freeSql.Select<object>()
-            .WithSql(sqlBuilder.ToString(), new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid });
+        var select = FreeSql.Value.Select<object>()
+            .WithSql(sqlBuilder.ToString());
         if (!string.IsNullOrEmpty(Filter))
         {
             var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(Filter);
             select = select.WhereDynamicFilter(filterInfo);
         }
 
+        var sql = select.ToSql();
+
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            var sql = select.ToSql();
             Log.Logger.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
                 bbox.MinY, bbox.MaxY, Srid);
         }
 
-        var items = await select.ToListAsync();
-        return items.Select(x =>
-        {
-            var f = new Feature(Geometry, x as IDictionary<string, object>);
-            if (f.Geometry.SRID != -1)
-            {
-                return f;
-            }
+        await using var conn = CreateDbConnection();
 
-            if (f.Geometry is GeometryCollection geometryCollection)
+        return (await conn.QueryAsync(sql, new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid }, null, 30)).Select(
+            x =>
             {
-                foreach (var geom in geometryCollection)
+                var f = new Feature(Geometry, x);
+                if (f.Geometry.SRID != -1)
                 {
-                    geom.SRID = Srid;
+                    return f;
                 }
-            }
-            else
-            {
-                f.Geometry.SRID = Srid;
-            }
 
-            return f;
-        });
+                if (f.Geometry is GeometryCollection geometryCollection)
+                {
+                    foreach (var geom in geometryCollection)
+                    {
+                        geom.SRID = Srid;
+                    }
+                }
+                else
+                {
+                    f.Geometry.SRID = Srid;
+                }
+
+                return f;
+            });
     }
 
     public override Envelope GetEnvelope()
@@ -121,22 +139,18 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
     {
     }
 
-    private IFreeSql GetFreeSql()
+    private DbConnection CreateDbConnection()
     {
-        return FreeSqlCache.GetOrAdd(ConnectionString, _ =>
+        var dataSource = Cache.GetOrCreate(Name, entry =>
         {
-            return new FreeSql.FreeSqlBuilder()
-                .UseAdoConnectionPool(true)
-                .UseConnectionFactory(FreeSql.DataType.PostgreSQL, () =>
-                {
-                    var builder = new NpgsqlConnectionStringBuilder(ConnectionString);
-                    var connectionString = builder.ToString();
-                    var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-                    dataSourceBuilder.UseNetTopologySuite();
-                    var dataSource = dataSourceBuilder.Build();
-                    return dataSource.CreateConnection();
-                })
-                .Build();
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(ConnectionString);
+            dataSourceBuilder.UseNetTopologySuite();
+            var dataSource = dataSourceBuilder.Build();
+            entry.SetValue(dataSource);
+            entry.SetSlidingExpiration(TimeSpan.FromMinutes(15));
+            return dataSource;
         });
+
+        return dataSource.CreateConnection();
     }
 }

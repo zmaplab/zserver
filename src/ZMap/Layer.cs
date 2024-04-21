@@ -77,7 +77,7 @@ public class Layer : IVisibleLimit
     /// 资源组
     /// </summary>
     public ResourceGroup ResourceGroup { get; set; }
-        
+
     public Layer(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name, ISource source,
         List<StyleGroup> styleGroups, Envelope envelope = null) :
         this(name, source, styleGroups, envelope)
@@ -179,7 +179,7 @@ public class Layer : IVisibleLimit
                     renderEnvelope = extent;
                 }
 
-                await RenderVectorAsync(graphicsService, vectorSource, renderEnvelope, viewport.Extent, zoom,
+                await RenderVectorAsync(graphicsService, vectorSource, renderEnvelope, srid, viewport.Extent, zoom,
                     transformation, environments);
                 break;
             case IRasterSource rasterSource:
@@ -236,7 +236,7 @@ public class Layer : IVisibleLimit
     }
 
     private async Task RenderVectorAsync(IGraphicsService service, IVectorSource vectorSource,
-        Envelope queryEnvelope,
+        Envelope queryEnvelope, int srid,
         Envelope targetExtent,
         Zoom zoom, ICoordinateTransformation transformation, IReadOnlyDictionary<string, dynamic> environments
     )
@@ -311,8 +311,9 @@ public class Layer : IVisibleLimit
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
             Log.Logger.LogInformation(
-                "[{Identifier}] layer: {Name}, width: {Width}, height: {Height}, filter: {Filter}, feature count: {Count}, rendering: {ElapsedMilliseconds}",
-                service.Identifier, this.Name, service.Width, service.Height, vectorSource.Filter, count,
+                "[{Identifier}] layer: {Name}, bbox: {MinX},{MinY},{MaxX},{MaxY}, srid: {srid} width: {Width}, height: {Height}, filter: {Filter}, feature count: {Count}, rendering: {ElapsedMilliseconds}",
+                service.Identifier, Name, queryEnvelope.MinX, queryEnvelope.MinY, queryEnvelope.MaxX,
+                queryEnvelope.MaxY, srid, service.Width, service.Height, vectorSource.Filter, count,
                 stopwatch.ElapsedMilliseconds);
         }
     }
