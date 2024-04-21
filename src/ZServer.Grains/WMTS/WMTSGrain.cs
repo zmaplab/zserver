@@ -25,7 +25,7 @@ public class WMTSGrain(WmtsService wmtsService) : Grain, IWMTSGrain
         }
 
         await using var stream = result.Stream;
-        var bytes = result.Stream.ToArray();
+        var bytes = await result.Stream.ToArrayAsync();
         return ZServerResponseFactory.Ok(bytes, format);
     }
 }

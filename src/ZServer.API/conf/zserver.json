@@ -2,7 +2,6 @@
   "sources": {
     "zserver": {
       "provider": "ZMap.Source.Postgre.PostgreSource, ZMap.Source.Postgre",
-      "database": "zserver_dev",
       "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=192.168.100.254;Port=5432;Database=zserver_dev;Pooling=true;"
     },
     "zserver_4326_shp": {

@@ -40,7 +40,7 @@ public class WmsService(
 
             var requestArguments = validateResult.Arguments;
 
-            var dpi = Utilities.GetDpi(formatOptions);
+            var dpi = Utility.GetDpi(formatOptions);
 
             var filterList = string.IsNullOrWhiteSpace(cqlFilter)
                 ? []
@@ -80,7 +80,7 @@ public class WmsService(
                 Bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b
             };
 
-            var scale = GeographicUtilities.CalculateOGCScale(validateResult.Arguments.Envelope,
+            var scale = GeographicUtility.CalculateOGCScale(validateResult.Arguments.Envelope,
                 validateResult.Arguments.SRID,
                 width, dpi);
             var map = new Map();
@@ -172,7 +172,7 @@ public class WmsService(
         var pixelHeight = (bbox.MaxY - bbox.MinY) / height;
         var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
 
-        var latLon = GeographicUtilities.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
+        var latLon = GeographicUtility.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
 
         var minX = latLon.Lon - pixelSensitivity * pixelWidth;
         var maxX = latLon.Lon + pixelSensitivity * pixelWidth;

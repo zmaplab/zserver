@@ -53,7 +53,7 @@ public class WmtsService(
                     $"Could not find tile matrix set {tileMatrixSet}");
             }
 
-            var path = Utilities.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileRow, tileCol);
+            var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileRow, tileCol);
             if (string.IsNullOrEmpty(path))
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,

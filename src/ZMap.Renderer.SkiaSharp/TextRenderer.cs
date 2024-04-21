@@ -4,11 +4,10 @@ using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZMap.Style;
-using CoordinateTransformUtilities = ZMap.Renderer.SkiaSharp.Utilities.CoordinateTransformUtilities;
 
 namespace ZMap.Renderer.SkiaSharp;
 
-public class TextStyleRenderer(TextStyle style) : SkiaRenderer, ITextStyleRenderer<SKCanvas>
+public class TextRenderer(TextStyle style) : SkiaRenderer, ITextRenderer<SKCanvas>
 {
     public override void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
     {
@@ -38,7 +37,7 @@ public class TextStyleRenderer(TextStyle style) : SkiaRenderer, ITextStyleRender
         //     text = func?.Value;
         // }
 
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrEmpty(text))
         {
             return;
         }
@@ -60,7 +59,7 @@ public class TextStyleRenderer(TextStyle style) : SkiaRenderer, ITextStyleRender
         }
 
         // ReSharper disable once InconsistentNaming
-        var centroidSKPoint = CoordinateTransformUtilities.WordToExtent(extent,
+        var centroidSKPoint = CoordinateTransformUtility.WordToExtent(extent,
             width,
             height, interiorCoordinate);
 
@@ -105,7 +104,7 @@ public class TextStyleRenderer(TextStyle style) : SkiaRenderer, ITextStyleRender
             Style = SKPaintStyle.StrokeAndFill,
             StrokeWidth = size,
             IsAntialias = true,
-            Color = ColorUtilities.GetColor(color)
+            Color = ColorUtility.GetColor(color)
         };
     }
 
@@ -124,11 +123,11 @@ public class TextStyleRenderer(TextStyle style) : SkiaRenderer, ITextStyleRender
         {
             Style = SKPaintStyle.Fill,
             IsAntialias = true,
-            Color = ColorUtilities.GetColor(color),
+            Color = ColorUtility.GetColor(color),
             TextSize = size,
             TextSkewX = rotate,
             TextAlign = align,
-            Typeface = FontUtilities.Get(fontFamily)
+            Typeface = FontUtility.Get(fontFamily)
         };
     }
 }

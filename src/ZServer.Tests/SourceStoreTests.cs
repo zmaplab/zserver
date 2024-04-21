@@ -47,7 +47,6 @@ public class SourceStoreTests : BaseTests
         Assert.Equal(
             "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
             dataSource.ConnectionString);
-        Assert.Equal("berlin", dataSource.Database);
         Assert.True(string.IsNullOrEmpty(dataSource.Where));
             
         var dataSources = await store.GetAllAsync();
@@ -56,8 +55,7 @@ public class SourceStoreTests : BaseTests
         Assert.Equal(
             "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
             dataSource1.ConnectionString);
-        Assert.Equal("berlin", dataSource1.Database);
-
+ 
         var dataSource2 = (ShapeFileSource)dataSources.First(x => x is ShapeFileSource);
         Assert.NotNull(dataSource2);
 
@@ -85,7 +83,7 @@ public class SourceStoreTests : BaseTests
         Assert.Equal(
             "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
             dataSource.ConnectionString);
-        Assert.Equal("berlin", dataSource.Database);
+ 
     }
 
     [Fact]
@@ -109,8 +107,7 @@ public class SourceStoreTests : BaseTests
         Assert.Equal(
             "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;",
             dataSource1.ConnectionString);
-        Assert.Equal("berlin", dataSource1.Database);
-
+ 
         var dataSource2 = (ShapeFileSource)dataSources.First(x => x is ShapeFileSource);
         Assert.NotNull(dataSource2);
 

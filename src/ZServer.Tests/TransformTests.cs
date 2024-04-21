@@ -1,8 +1,8 @@
-using System;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using Xunit;
 using ZMap.Infrastructure;
+using Convert = System.Convert;
 
 namespace ZServer.Tests;
 

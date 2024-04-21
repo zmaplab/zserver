@@ -14,7 +14,7 @@ public class MurmurHashAlgorithmServiceTests
         Parallel.For(0, 1000, i =>
         {
             var key = Guid.NewGuid().ToString();
-            MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(key));
+            MurmurHashAlgorithmUtility.ComputeHash(Encoding.UTF8.GetBytes(key));
         });
     }
 }

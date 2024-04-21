@@ -5,7 +5,7 @@ using SkiaSharp;
 
 namespace ZMap.Renderer.SkiaSharp.Utilities;
 
-public static class FontUtilities
+public static class FontUtility
 {
     /// <summary>
     /// Family as key
@@ -24,6 +24,12 @@ public static class FontUtilities
         // mkfontscale
         // mkfontdir
         // fc-cache
+
+        // 应该使用系统级字体
+        if (!"true".Equals(Environment.GetEnvironmentVariable("LOAD_FONT"), StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
 
         var folder = Path.Combine(AppContext.BaseDirectory, "fonts");
         var ttcFiles = Directory.GetFiles(folder, "*.ttc");

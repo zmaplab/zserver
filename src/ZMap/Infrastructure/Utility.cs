@@ -9,7 +9,7 @@ namespace ZMap.Infrastructure;
 /// <summary>
 /// 常用的方法
 /// </summary>
-public static class Utilities
+public static class Utility
 {
     public static void PrintInfo()
     {
@@ -42,7 +42,7 @@ public static class Utilities
         var layerKey = layers.Replace(',', '_');
         var cqlFilterKey = string.IsNullOrWhiteSpace(cqlFilter)
             ? string.Empty
-            : MurmurHashAlgorithmUtilities.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
+            : MurmurHashAlgorithmUtility.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
 
         var imageExtension = GetImageExtension(format);
         return Path.Combine(AppContext.BaseDirectory, "cache", "wmts",

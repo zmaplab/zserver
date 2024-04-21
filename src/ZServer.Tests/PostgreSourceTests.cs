@@ -17,8 +17,7 @@ public class PostgreSourceTests
 
         var source =
             new PostgreSource(
-                "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;",
-                "zserver_dev");
+                "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;");
         source.Table = "osmbuildings";
         source.Geometry = "geom";
         source.Srid = 4326;

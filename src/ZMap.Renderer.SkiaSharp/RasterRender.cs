@@ -3,7 +3,7 @@ using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
 
-public class RasterStyleRender(RasterStyle style) : SkiaRenderer, IRasterStyleRender<SKCanvas>
+public class RasterRender(RasterStyle style) : SkiaRenderer, IRasterRender<SKCanvas>
 {
     protected override SKPaint CreatePaint()
     {

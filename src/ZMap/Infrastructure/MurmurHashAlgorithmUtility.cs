@@ -3,7 +3,7 @@ using Murmur;
 
 namespace ZMap.Infrastructure;
 
-public static class MurmurHashAlgorithmUtilities
+public static class MurmurHashAlgorithmUtility
 {
     public static string ComputeHash(byte[] bytes)
     {

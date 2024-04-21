@@ -8,17 +8,17 @@ public class CommonTests
     [Fact]
     public void GetDpi()
     {
-        var dpi1 = Utilities.GetDpi("dpi:180");
+        var dpi1 = Utility.GetDpi("dpi:180");
         Assert.Equal(180, dpi1);
 
-        var dpi2 = Utilities.GetDpi("dpi:90");
+        var dpi2 = Utility.GetDpi("dpi:90");
         Assert.Equal(90, dpi2);
     }
 
     [Fact]
     public void Convert()
     {
-        var result = ConvertUtilities.ToObject<int?>("2");
+        var result = ZMap.Infrastructure.Convert.ToObject<int?>("2");
         Assert.Equal(2, result);
     }
 }

@@ -35,7 +35,7 @@ public class CSharpExpression<TV> : CSharpExpression
         }
         else
         {
-            var v = ConvertUtilities.ToObject<TV>(value);
+            var v = Convert.ToObject<TV>(value);
             return New(Equals(v, default(TV)) ? defaultValue : v);
         }
     }

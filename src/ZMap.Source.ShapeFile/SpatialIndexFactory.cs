@@ -36,7 +36,7 @@ public static class SpatialIndexFactory
             }
             catch (Exception e)
             {
-                Log.Logger.LogError("加载空间索引失败， 矢量文件： {ShapeFile}， 异常： {Exception}", shapeFile, e.ToString());
+                Log.Logger.LogError(e,"加载空间索引失败， 矢量文件： {ShapeFile}", shapeFile);
                 entries = new List<SpatialIndexItem>();
             }
 

@@ -27,7 +27,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Utilities.PrintInfo();
+        Utility.PrintInfo();
 
         // FixOrleansPublishSingleFileIssue();
 
@@ -37,10 +37,9 @@ public class Program
             PrecisionModel.Floating.Value,
             4326, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
 
-        if ("true".Equals(Environment.GetEnvironmentVariable("LOAD_FONT"), StringComparison.OrdinalIgnoreCase))
-        {
-            FontUtilities.Load();
-        }
+
+        FontUtility.Load();
+
 
         CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
         DefaultTypeMap.MatchNamesWithUnderscores = true;

@@ -78,7 +78,7 @@ public class SKPaintCache
             Style = SKPaintStyle.Stroke,
             StrokeWidth = width,
             IsAntialias = true,
-            Color = ColorUtilities.GetColor(color, opacity)
+            Color = ColorUtility.GetColor(color, opacity)
         };
 
         if (Enum.TryParse<SKStrokeCap>(cap, out var strokeCap))

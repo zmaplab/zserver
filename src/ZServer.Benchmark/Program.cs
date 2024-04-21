@@ -11,6 +11,7 @@ class Program
 // #if !DEBUG
 //             BenchmarkDotNet.Running.BenchmarkRunner.Run<RendererTest>();
 // #endif
+        BenchmarkDotNet.Running.BenchmarkRunner.Run<StreamToArray>();
         Console.WriteLine("Bye!");
     }
 }

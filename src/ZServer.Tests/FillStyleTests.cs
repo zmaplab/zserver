@@ -71,7 +71,7 @@ public class FillStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/Fill.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/Fill.png", await stream.ToArrayAsync());
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class FillStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/Fill.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/Fill.png", await stream.ToArrayAsync());
     }
 
     [Fact]
@@ -131,6 +131,6 @@ public class FillStyleTests : BaseTests
         }
 
         var stream = graphicsService.GetImage("image/png");
-        await File.WriteAllBytesAsync($"images/LocalImageFill.png", stream.ToArray());
+        await File.WriteAllBytesAsync($"images/LocalImageFill.png", await stream.ToArrayAsync());
     }
 }

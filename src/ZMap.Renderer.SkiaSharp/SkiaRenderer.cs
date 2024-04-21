@@ -42,7 +42,7 @@ public abstract class SkiaRenderer
         }
 
         var shellPoints =
-            CoordinateTransformUtilities.WordToExtent(extent, width, height, polygon.Shell.Coordinates);
+            CoordinateTransformUtility.WordToExtent(extent, width, height, polygon.Shell.Coordinates);
 
         using var path = new SKPath();
         path.FillType = SKPathFillType.EvenOdd;
@@ -54,7 +54,7 @@ public abstract class SkiaRenderer
         foreach (var polygonHole in polygon.Holes)
         {
             var holePoints =
-                CoordinateTransformUtilities.WordToExtent(extent, width, height, polygonHole.Coordinates);
+                CoordinateTransformUtility.WordToExtent(extent, width, height, polygonHole.Coordinates);
             path.MoveTo(holePoints[0]);
             path.AddPoly(holePoints);
         }
@@ -65,7 +65,7 @@ public abstract class SkiaRenderer
     private void DrawLineString(SKCanvas canvas, SKPaint paint, LineString lineString, Envelope extent,
         int width, int height)
     {
-        var points = CoordinateTransformUtilities.WordToExtent(extent, width, height, lineString.Coordinates);
+        var points = CoordinateTransformUtility.WordToExtent(extent, width, height, lineString.Coordinates);
         canvas.DrawPoints(SKPointMode.Lines, points, paint);
     }
 

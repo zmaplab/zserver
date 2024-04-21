@@ -433,7 +433,7 @@ public class Layer : IVisibleLimit
     //         foreach (var style in styleGroup.Styles)
     //         {
     //             // 若有配置过滤表达式， 则计算
-    //             if (context.RendererFactory.Create(style) is IRasterStyleRender render)
+    //             if (context.RendererFactory.Create(style) is IRasterRender render)
     //             {
     //                 await render.PaintAsync(context, image);
     //             }

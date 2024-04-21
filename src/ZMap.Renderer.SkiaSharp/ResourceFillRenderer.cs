@@ -8,7 +8,7 @@ using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
 
-public class ResourceFillStyleRenderer(ResourceFillStyle style) : FillStyleRenderer(style)
+public class ResourceFillRenderer(ResourceFillStyle style) : FillRenderer(style)
 {
     private static readonly SKPathEffect Times1 = SKPathEffect.Create2DLine(1,
         SKMatrix.CreateSkew(10, 10).Concat(SKMatrix.CreateRotationDegrees(45)));
@@ -74,7 +74,7 @@ public class ResourceFillStyleRenderer(ResourceFillStyle style) : FillStyleRende
         {
             Style = SKPaintStyle.Fill,
             IsAntialias = antialias,
-            Color = ColorUtilities.GetColor(color, opacity)
+            Color = ColorUtility.GetColor(color, opacity)
         };
         return paint;
     }

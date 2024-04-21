@@ -45,12 +45,12 @@
 //                 Color = Expression<string>.New("#3ed53e"),
 //                 Uri = Expression<Uri>.New(new Uri("file://108.png", UriKind.Absolute))
 //             };
-//             Assert.IsType<FillStyleRenderer>(GetRendererFactory().Create(fill));
-//             Assert.IsType<LineStyleRenderer>(GetRendererFactory().Create(line));
-//             Assert.IsType<TextStyleRenderer>(GetRendererFactory().Create(textStyle));
-//             Assert.IsType<SymbolStyleRenderer>(GetRendererFactory().Create(symbolStyle));
-//             Assert.IsType<SymbolStyleRenderer>(GetRendererFactory().Create(symbolStyle));
-//             Assert.IsType<ResourceFillStyleRenderer>(GetRendererFactory().Create(resourceFillStyle));
+//             Assert.IsType<FillRenderer>(GetRendererFactory().Create(fill));
+//             Assert.IsType<LineRenderer>(GetRendererFactory().Create(line));
+//             Assert.IsType<TextRenderer>(GetRendererFactory().Create(textStyle));
+//             Assert.IsType<SymbolRenderer>(GetRendererFactory().Create(symbolStyle));
+//             Assert.IsType<SymbolRenderer>(GetRendererFactory().Create(symbolStyle));
+//             Assert.IsType<ResourceFillRenderer>(GetRendererFactory().Create(resourceFillStyle));
 //         }
 //
 //         [Fact]
