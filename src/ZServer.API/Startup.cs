@@ -1,14 +1,18 @@
 using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
 using Serilog.Context;
+using ZMap.Permission;
 using ZServer.API.Filters;
 using Log = ZMap.Infrastructure.Log;
 
@@ -16,8 +20,6 @@ namespace ZServer.API;
 
 public class Startup(IConfiguration configuration)
 {
-    public IConfiguration Configuration { get; } = configuration;
-
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -40,10 +42,10 @@ public class Startup(IConfiguration configuration)
         services.AddResponseCaching();
         services.AddRouting(x => { x.LowercaseUrls = true; });
 
-        services.AddZServer(Configuration, "conf/zserver.json").AddSkiaSharpRenderer();
+        services.AddZServer(configuration, "conf/zserver.json").AddSkiaSharpRenderer();
         services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
-        services.Configure<ServerOptions>(Configuration);
-        services.Configure<ClusterOptions>("Orleans", Configuration);
+        services.Configure<ServerOptions>(configuration);
+        services.Configure<ClusterOptions>("Orleans", configuration);
 
         // services.AddOrleansClient(builder =>
         // {
@@ -81,6 +83,47 @@ public class Startup(IConfiguration configuration)
                         .AllowCredentials().SetPreflightMaxAge(TimeSpan.FromDays(30))
                 );
         });
+        services.AddHttpContextAccessor();
+        services.AddHttpClient();
+        services.Configure<PermissionOptions>(configuration);
+        services.AddSingleton<IPermissionService, PermissionService>();
+
+        if ("true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase))
+        {
+            // 认证
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            context.Response.StatusCode = 401;
+                            return Task.CompletedTask;
+                        }
+                    };
+                    options.Authority = configuration["Authority"];
+                    options.RequireHttpsMetadata = configuration["RequireHttpsMetadata"] == "true";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false, ValidateIssuer = false
+                    };
+                });
+            // 授权
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("JWT", policy =>
+                {
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", configuration["ApiName"] ?? "zserver-api");
+                });
+            });
+        }
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,22 +136,37 @@ public class Startup(IConfiguration configuration)
             app.UseDeveloperExceptionPage();
         }
 
-        if (Configuration["Swagger"]?.ToLower() == "true")
+        if (configuration["Swagger"]?.ToLower() == "true")
         {
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZServer API v1"));
         }
 
+
         // app.UseResponseCompression();
         app.UseResponseCaching();
 
         app.UseRouting();
+
+        if ("true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase))
+        {
+            app.UseAuthorization();
+            app.UseAuthentication();
+        }
+
         app.UseCors("cors");
         app.Use((context, next) =>
         {
             LogContext.Push(new WithExtraEnricher(context));
             return next.Invoke();
         });
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseEndpoints(endpoints =>
+        {
+            var endpointConventionBuilder = endpoints.MapControllers();
+            if ("true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase))
+            {
+                endpointConventionBuilder.RequireAuthorization("JWT");
+            }
+        });
     }
 }
