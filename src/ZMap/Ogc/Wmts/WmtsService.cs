@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ZMap.Extensions;
 using ZMap.Infrastructure;
+using ZMap.Permission;
 using ZMap.Store;
 
 namespace ZMap.Ogc.Wmts;
@@ -14,6 +15,7 @@ public class WmtsService(
     ILogger<WmtsService> logger,
     IGraphicsServiceProvider graphicsServiceProvider,
     ILayerQueryService layerQueryService,
+    IPermissionService permissionService,
     IGridSetStore gridSetStore)
 {
     public async ValueTask<MapResult> GetTileAsync(string layers, string styles,
@@ -133,6 +135,18 @@ public class WmtsService(
             }
 
             var layerList = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            foreach (var layer in layerList)
+            {
+                var permission =
+                    await permissionService.EnforceAsync("read", layer.GetResourceId(), PolicyEffect.Allow);
+                if (permission)
+                {
+                    continue;
+                }
+
+                return new MapResult(Stream.Null, "403", "Forbidden");
+            }
+
             var scale = tuple.ScaleDenominator;
             var viewPort = new Viewport
             {

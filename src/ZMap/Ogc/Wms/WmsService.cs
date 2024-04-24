@@ -8,6 +8,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using ZMap.Extensions;
 using ZMap.Infrastructure;
+using ZMap.Permission;
 using ZMap.Source;
 using ZMap.Store;
 
@@ -15,6 +16,7 @@ namespace ZMap.Ogc.Wms;
 
 public class WmsService(
     ILogger<WmsService> logger,
+    IPermissionService permissionService,
     IGraphicsServiceProvider graphicsServiceProvider,
     ILayerQueryService layerQueryService)
 {
@@ -69,6 +71,17 @@ public class WmsService(
             if (layerList.Count == 0)
             {
                 return new MapResult(Stream.Null, null, null);
+            }
+
+            foreach (var layer in layerList)
+            {
+                var permission = await permissionService.EnforceAsync("read", layer.GetResourceId(), PolicyEffect.Allow);
+                if (permission)
+                {
+                    continue;
+                }
+
+                return new MapResult(Stream.Null, "403", "Forbidden");
             }
 
             var viewPort = new Viewport

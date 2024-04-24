@@ -21,7 +21,12 @@ public class Layer : IVisibleLimit
     /// <summary>
     /// 图层名称
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string ResourceId { get; set; }
 
     /// <summary>
     /// 最小可视缩放
@@ -198,6 +203,7 @@ public class Layer : IVisibleLimit
 
         return new Layer(ResourceGroup, Services, Name, Source.Clone(), styleGroups, Envelope)
         {
+            ResourceId = ResourceId,
             MinZoom = MinZoom,
             MaxZoom = MaxZoom,
             ZoomUnit = ZoomUnit,
@@ -441,4 +447,8 @@ public class Layer : IVisibleLimit
     //         }
     //     }
     // }
+    public string GetResourceId()
+    {
+        return string.IsNullOrEmpty(ResourceId) ? Name : ResourceId;
+    }
 }

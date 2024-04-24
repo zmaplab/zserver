@@ -58,7 +58,7 @@ const map = new Map({
   layers: [
     new TileLayer({
       source: new TileWMS({
-        url: 'http://localhost:8200/wms',
+        url: 'http://192.168.31.78:8201/wms',
         params: {
           VERSION: '1.1.1',
           TILED: true,

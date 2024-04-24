@@ -12,8 +12,11 @@ namespace ZServer.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[ZServerAuthorize]
 // ReSharper disable once InconsistentNaming
-public class WMSController(IClusterClient clusterClient, IOptions<ServerOptions> options) : ControllerBase
+public class WMSController(
+    IClusterClient clusterClient,
+    IOptions<ServerOptions> options) : ControllerBase
 {
     // private static readonly Random Rnd = new();
 
@@ -60,6 +63,19 @@ public class WMSController(IClusterClient clusterClient, IOptions<ServerOptions>
         string exceptions,
         float x, float y, int featureCount = 1, int buffer = 0, bool bordered = false)
     {
+        // var layerList = layers.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        // foreach (var layer in layerList)
+        // {
+        //     var permission = await permissionService.EnforceAsync("read", layer, PolicyEffect.Allow);
+        //     if (permission)
+        //     {
+        //         continue;
+        //     }
+        //
+        //     HttpContext.Response.StatusCode = 403;
+        //     return;
+        // }
+
         switch (request)
         {
             case "GetMap":
