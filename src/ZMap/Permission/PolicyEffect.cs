@@ -1,7 +1,14 @@
 namespace ZMap.Permission;
 
-public record PolicyEffect(string Name)
+public record PolicyEffect
 {
+    public string Name { get; }
+
+    private PolicyEffect(string name)
+    {
+        Name = name;
+    }
+
     /// <summary>
     /// 存在任意一条通过
     /// </summary>

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Ogc;
 using ZMap.Source;
 using ZMap.Store;
@@ -11,9 +12,11 @@ namespace ZServer.Store;
 public class LayerQueryService(
     ILayerGroupStore layerGroupStore,
     ILayerStore layerStore,
-    ILogger<LayerQueryService> logger)
+    IStyleGroupStore styleStore)
     : ILayerQueryService
 {
+    private static readonly ILogger Logger = Log.CreateLogger<LayerQueryService>();
+
     public async Task<List<Layer>> GetLayersAsync(
         List<LayerQuery> queryLayerRequests, string traceIdentifier)
     {
@@ -27,11 +30,12 @@ public class LayerQueryService(
                 var layer = await layerStore.FindAsync(null, layerQuery.Layer);
                 if (layer != null)
                 {
+                    await SetStyle(layer, layerQuery.Style);
                     TryAdd(hashSet, list, layerQuery, layer);
                     continue;
                 }
 
-                logger.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
+                Logger.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
             }
             else
             {
@@ -40,6 +44,7 @@ public class LayerQueryService(
                 {
                     foreach (var layer in layerGroup.Layers)
                     {
+                        await SetStyle(layer, layerQuery.Style);
                         TryAdd(hashSet, list, layerQuery, layer);
                     }
 
@@ -50,17 +55,30 @@ public class LayerQueryService(
                     var layer = await layerStore.FindAsync(layerQuery.ResourceGroup, layerQuery.Layer);
                     if (layer != null)
                     {
+                        await SetStyle(layer, layerQuery.Style);
                         TryAdd(hashSet, list, layerQuery, layer);
                         continue;
                     }
                 }
 
-                logger.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
+                Logger.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
                     layerQuery.ResourceGroup, layerQuery.Layer);
             }
         }
 
         return list;
+    }
+
+    private async Task SetStyle(Layer layer, string styleName)
+    {
+        if (!string.IsNullOrEmpty(styleName))
+        {
+            var style = await styleStore.FindAsync(styleName);
+            if (style != null)
+            {
+                layer.SetStyle(style);
+            }
+        }
     }
 
     private void TryAdd(ISet<string> hashSet, ICollection<Layer> list, LayerQuery layerQuery, Layer layer)

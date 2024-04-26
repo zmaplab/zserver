@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json.Linq;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Source;
 using ZMap.Style;
 
@@ -18,13 +19,12 @@ public class LayerStore(
     IStyleGroupStore styleStore,
     IResourceGroupStore resourceGroupStore,
     ISourceStore sourceStore,
-    ISldStore sldStore,
-    ILogger<LayerStore> logger)
+    ISldStore sldStore)
     : ILayerStore
 {
     private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> PropertyCache =
         new();
-
+    private static readonly ILogger Logger = Log.CreateLogger<LayerStore>();
     private static readonly ConcurrentDictionary<string, Layer> Cache = new();
 
     public async Task Refresh(List<JObject> configurations)
@@ -315,14 +315,14 @@ public class LayerStore(
         var sourceName = section.GetValue<string>("source");
         if (string.IsNullOrWhiteSpace(sourceName))
         {
-            logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
+            Logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
             return null;
         }
 
         var source = await sourceStore.FindAsync(sourceName);
         if (source == null)
         {
-            logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
+            Logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
             return null;
         }
 
@@ -362,14 +362,14 @@ public class LayerStore(
         var sourceName = section["source"]?.ToObject<string>();
         if (string.IsNullOrEmpty(sourceName))
         {
-            logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
+            Logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
             return null;
         }
 
         var source = await sourceStore.FindAsync(sourceName);
         if (source == null)
         {
-            logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
+            Logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
             return null;
         }
 

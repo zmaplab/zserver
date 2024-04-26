@@ -42,7 +42,7 @@ public class CompositeStyleTests : BaseTests
         var height = 1024;
 
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
 
         foreach (var feature in data)
         {
@@ -86,7 +86,7 @@ public class CompositeStyleTests : BaseTests
         var height = 1024;
 
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
         foreach (var feature in data)
         {
             graphicsService.Render(Extent, feature.Geometry, style1);

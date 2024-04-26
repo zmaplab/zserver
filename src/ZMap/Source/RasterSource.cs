@@ -19,7 +19,6 @@ public abstract class RasterSource : IRasterSource
     /// <param name="extent"></param>
     /// <returns></returns>
     public abstract Task<byte[]> GetImageInExtentAsync(Envelope extent);
-
     public abstract Envelope GetEnvelope();
     public abstract ISource Clone();
     public abstract void Dispose();

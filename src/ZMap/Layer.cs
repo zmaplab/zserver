@@ -13,10 +13,14 @@ using ZMap.Style;
 
 namespace ZMap;
 
+/// <summary>
+/// 图层
+/// </summary>
 public class Layer : IVisibleLimit
 {
     private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
-    private readonly List<StyleGroup> _styleGroups;
+    private List<StyleGroup> _styleGroups;
+    private static readonly ILogger Logger = Log.CreateLogger<Layer>();
 
     /// <summary>
     /// 图层名称
@@ -50,7 +54,6 @@ public class Layer : IVisibleLimit
 
     /// <summary>
     /// 是否启用
-    /// </summary>
     public bool Enabled { get; set; }
 
     /// <summary>
@@ -111,6 +114,11 @@ public class Layer : IVisibleLimit
         _styleGroups = styleGroups ?? new();
     }
 
+    public void SetStyle(StyleGroup styleGroup)
+    {
+        _styleGroups = [styleGroup];
+    }
+
     public async Task RenderAsync(IGraphicsService graphicsService, Viewport viewport, Zoom zoom, int srid)
     {
         // 图层未启用或者不在显示级别
@@ -166,8 +174,8 @@ public class Layer : IVisibleLimit
         {
             case IVectorSource vectorSource:
                 Envelope renderEnvelope;
-                // 不同级别使用不同的 Buffer，比如左右两个相领的图形，右边图形绘制文字特别长，但图形若没有交在左边，会导到文字只显示部分
-                // 不过，文字的绘制可以优化到 TextRender 如果超过边界，就进行移动
+                // 不同级别使用不同的 Buffer， 比如左右两个相领的图形， 右边图形绘制文字特别长， 但图形若没有交在左边， 会导到文字只显示部分
+                // 不过，文字的绘制可以优化到 TextRender 如果超过边界，就进行移动（不一定合适， 只能在无 buffer 的情况下使用)
                 var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
                 if (buffer is { Size: > 0 })
                 {
@@ -316,9 +324,9 @@ public class Layer : IVisibleLimit
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            Log.Logger.LogInformation(
+            Logger.LogInformation(
                 "[{Identifier}] layer: {Name}, bbox: {MinX},{MinY},{MaxX},{MaxY}, srid: {srid} width: {Width}, height: {Height}, filter: {Filter}, feature count: {Count}, rendering: {ElapsedMilliseconds}",
-                service.Identifier, Name, queryEnvelope.MinX, queryEnvelope.MinY, queryEnvelope.MaxX,
+                service.TraceIdentifier, Name, queryEnvelope.MinX, queryEnvelope.MinY, queryEnvelope.MaxX,
                 queryEnvelope.MaxY, srid, service.Width, service.Height, vectorSource.Filter, count,
                 stopwatch.ElapsedMilliseconds);
         }

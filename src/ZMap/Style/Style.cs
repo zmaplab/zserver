@@ -1,3 +1,5 @@
+using System;
+
 namespace ZMap.Style;
 
 public abstract class Style : IVisibleLimit
@@ -29,4 +31,14 @@ public abstract class Style : IVisibleLimit
     }
 
     public abstract Style Clone();
+
+    protected T GetOrDefault<T>(Func<Feature, T> func, Feature feature, T defaultValue = default)
+    {
+        if (func == null)
+        {
+            return defaultValue;
+        }
+
+        return func.Invoke(feature) ?? defaultValue;
+    }
 }

@@ -16,7 +16,7 @@ public class SldStore : ISldStore
 
     public Task<List<StyleGroup>> FindAsync(string name)
     {
-        var result = Cache.TryGetValue(name, out var value) ? value : null;
+        var result = Cache.GetValueOrDefault(name);
         return Task.FromResult(result);
     }
 

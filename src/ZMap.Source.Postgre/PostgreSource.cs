@@ -18,6 +18,8 @@ namespace ZMap.Source.Postgre;
 
 public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
+    private static readonly ILogger Logger = Log.CreateLogger<PostgreSource>();
+    
     private static readonly Lazy<IFreeSql> FreeSql = new(() =>
     {
         return new FreeSql.FreeSqlBuilder()
@@ -51,6 +53,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
         else
         {
             sqlBuilder.Append("SELECT");
+            var containsId = false;
             foreach (var property in Properties)
             {
                 if (property == Geometry)
@@ -58,7 +61,17 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                     continue;
                 }
 
+                if (containsId == false && property == Id)
+                {
+                    containsId = true;
+                }
+
                 sqlBuilder.Append(' ').Append(property).Append(',');
+            }
+
+            if (!containsId)
+            {
+                sqlBuilder.Append(' ').Append(Id).Append(',');
             }
 
             sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
@@ -83,7 +96,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            Log.Logger.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
+            Logger.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
                 bbox.MinY, bbox.MaxY, Srid);
         }
 

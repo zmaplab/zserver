@@ -36,6 +36,7 @@ public static class OrleansExtensions
         }
 
         siloBuilder.AddMemoryGrainStorageAsDefault();
+        var logger = Log.CreateLogger("OrleansExtensions");
 
         if ("true".Equals(context.Configuration["standalone"], StringComparison.OrdinalIgnoreCase))
         {
@@ -46,7 +47,8 @@ public static class OrleansExtensions
                 siloBuilder.UseDashboard(options => { options.Port = int.Parse(dashboardPort); });
             }
 
-            Log.Logger.LogInformation(
+
+            logger.LogInformation(
                 $"Standalone: true, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
             return;
         }
@@ -63,7 +65,7 @@ public static class OrleansExtensions
             int.Parse(EnvironmentVariables.GetValue(context.Configuration, "ClusterGatewayPort",
                 "Orleans:GatewayPort"));
 
-        Log.Logger.LogInformation(
+        logger.LogInformation(
             $"Standalone: false, Invariant: {invariant}, SiloName: {siloName}, ClusterId: {clusterId}, ServiceId: {serviceId}, SiloPort: {siloPort}, GatewayPort: {gatewayPort}, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
         var assembly = Assembly.Load($"{invariant}");
 

@@ -9,7 +9,7 @@ public abstract class CSharpDynamicCompiler
 
     protected abstract Func<Feature, dynamic> BuildFunc(string script);
     protected abstract Func<Feature, T> BuildFunc<T>(string script);
-    public abstract Type BuildType(string script);
+    //public abstract Type BuildType(string script);
 
     protected abstract void Initialize();
 
