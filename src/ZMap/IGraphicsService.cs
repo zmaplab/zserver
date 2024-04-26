@@ -7,9 +7,27 @@ namespace ZMap;
 
 public interface IGraphicsService : IDisposable
 {
-    string Identifier { get; }
+    /// <summary>
+    /// 应用跟踪标识符
+    /// </summary>
+    string TraceIdentifier { get; set; }
+
+    /// <summary>
+    /// 渲染宽度
+    /// </summary>
     int Width { get; }
+
+    /// <summary>
+    /// 渲染高度
+    /// </summary>
     int Height { get; }
+
+    /// <summary>
+    /// 获取渲染的图像
+    /// </summary>
+    /// <param name="imageFormat"></param>
+    /// <param name="bordered"></param>
+    /// <returns></returns>
     Stream GetImage(string imageFormat, bool bordered = false);
 
     /// <summary>

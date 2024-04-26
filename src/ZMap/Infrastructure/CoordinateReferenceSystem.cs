@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Xml;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
@@ -67,7 +68,7 @@ public static class CoordinateReferenceSystem
         {
             4326 => GeographicCoordinateSystem.WGS84,
             3857 => ProjectedCoordinateSystem.WebMercator,
-            _ => SRIDCache.TryGetValue(srid, out var coordinateSystem) ? coordinateSystem : null
+            _ => SRIDCache.GetValueOrDefault(srid)
         };
     }
 

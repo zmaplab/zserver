@@ -36,7 +36,7 @@ public class FillStyleTests : BaseTests
             var height = 256;
             new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
             var graphicsService =
-                new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+                new SkiaGraphicsService( width, height);
 
             foreach (var feature in data)
             {
@@ -63,7 +63,7 @@ public class FillStyleTests : BaseTests
         var height = 256;
         new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService( width, height);
 
         foreach (var feature in data)
         {
@@ -95,7 +95,7 @@ public class FillStyleTests : BaseTests
         var height = 256;
         new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService( width, height);
 
         foreach (var feature in data)
         {
@@ -123,7 +123,7 @@ public class FillStyleTests : BaseTests
         var height = 256;
         new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService( width, height);
 
         foreach (var feature in data)
         {

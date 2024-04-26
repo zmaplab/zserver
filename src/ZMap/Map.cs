@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using ZMap.Infrastructure;
 
 namespace ZMap;
 
 public class Map : IDisposable
 {
-    private ILogger _logger = NullLogger.Instance;
+    private static readonly ILogger Logger = Log.CreateLogger<Map>();
     private readonly List<Layer> _layers = new();
     private IGraphicsServiceProvider _graphicsServiceProvider;
     private Zoom _zoom;
@@ -51,12 +51,6 @@ public class Map : IDisposable
         return this;
     }
 
-    public Map SetLogger(ILogger logger)
-    {
-        _logger = logger;
-        return this;
-    }
-
     public async Task<Stream> GetImageAsync(Viewport viewport, string imageFormat)
     {
         if (viewport.Extent == null || viewport.Extent.IsNull)
@@ -65,12 +59,14 @@ public class Map : IDisposable
         }
 
         using var graphicsService =
-            _graphicsServiceProvider.Create(Id, viewport.Width, viewport.Height);
+            _graphicsServiceProvider.Create(viewport.Width, viewport.Height);
         if (graphicsService == null)
         {
-            _logger.LogWarning("创建图形服务失败");
+            Logger.LogWarning("创建图形服务失败");
             return Stream.Null;
         }
+
+        graphicsService.TraceIdentifier = Id;
 
         for (var i = _layers.Count - 1; i >= 0; --i)
         {

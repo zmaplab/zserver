@@ -25,13 +25,12 @@ public class LayerStoreTests : BaseTests
         await styleGroupStore.Refresh(new List<JObject> { json });
         var resourceGroupStore = new ResourceGroupStore();
         await resourceGroupStore.Refresh(new List<JObject> { json });
-        var sourceStore = new SourceStore(NullLogger<SourceStore>.Instance);
+        var sourceStore = new SourceStore();
         await sourceStore.Refresh(new List<JObject> { json });
         var sldStore = new SldStore();
         await sldStore.Refresh(new List<JObject> { json });
 
-        var store = new LayerStore(styleGroupStore, resourceGroupStore, sourceStore, sldStore,
-            NullLogger<LayerStore>.Instance);
+        var store = new LayerStore(styleGroupStore, resourceGroupStore, sourceStore, sldStore);
         await store.Refresh(new List<JObject> { json });
 
         var layer = await store.FindAsync("resourceGroup1", "berlin_db");

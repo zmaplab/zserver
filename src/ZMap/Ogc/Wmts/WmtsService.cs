@@ -12,12 +12,13 @@ using ZMap.Store;
 namespace ZMap.Ogc.Wmts;
 
 public class WmtsService(
-    ILogger<WmtsService> logger,
     IGraphicsServiceProvider graphicsServiceProvider,
     ILayerQueryService layerQueryService,
     IPermissionService permissionService,
     IGridSetStore gridSetStore)
 {
+    private static readonly ILogger Logger = Log.CreateLogger<WmtsService>();
+
     public async ValueTask<MapResult> GetTileAsync(string layers, string styles,
         string format,
         string tileMatrixSet, string tileMatrix, int tileRow,
@@ -32,7 +33,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, cqlFilter);
-                logger.LogError("{Url}, no layers have been requested", displayUrl);
+                Logger.LogError("{Url}, no layers have been requested", displayUrl);
                 return new MapResult(Stream.Null, "LayerNotDefined", "No layers have been requested");
             }
 
@@ -40,7 +41,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, cqlFilter);
-                logger.LogError("{Url}, no tile matrix set requested", displayUrl);
+                Logger.LogError("{Url}, no tile matrix set requested", displayUrl);
                 return new MapResult(Stream.Null, "InvalidTileMatrixSet", "No tile matrix set requested");
             }
 
@@ -50,7 +51,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, cqlFilter);
-                logger.LogError("{Url}, could not find tile matrix set", displayUrl);
+                Logger.LogError("{Url}, could not find tile matrix set", displayUrl);
                 return new MapResult(Stream.Null, "TileMatrixSetNotDefined",
                     $"Could not find tile matrix set {tileMatrixSet}");
             }
@@ -60,7 +61,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, cqlFilter);
-                logger.LogError("{Url}, wmts key is empty", displayUrl);
+                Logger.LogError("{Url}, wmts key is empty", displayUrl);
                 return new MapResult(Stream.Null, "WMTSKeyIsEmpty",
                     "wmts key is empty");
             }
@@ -71,7 +72,7 @@ public class WmtsService(
                 {
                     displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                         tileRow, tileCol, cqlFilter);
-                    logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
+                    Logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
                 }
 
                 return new MapResult(File.OpenRead(path), null, null);
@@ -88,7 +89,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, cqlFilter);
-                logger.LogError("{Url}, could not get envelope from grid set", displayUrl);
+                Logger.LogError("{Url}, could not get envelope from grid set", displayUrl);
                 return new MapResult(Stream.Null, null, null);
             }
 
@@ -96,6 +97,9 @@ public class WmtsService(
             var filterList = string.IsNullOrWhiteSpace(cqlFilter)
                 ? []
                 : cqlFilter.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            var styleList = string.IsNullOrWhiteSpace(styles)
+                ? []
+                : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
             var layerQueries =
                 new List<LayerQuery>();
@@ -111,23 +115,25 @@ public class WmtsService(
                 {
                     case 2:
                         layerQueries.Add(new LayerQuery(layerQuery[0], layerQuery[1],
+                            styleList.ElementAtOrDefault(i),
                             new Dictionary<string, object>
                             {
                                 { Defaults.AdditionalFilter, filter }
                             }));
                         break;
                     case 1:
-                        layerQueries.Add(new LayerQuery(null, layerQuery[0], new Dictionary<string, object>
-                        {
-                            { Defaults.AdditionalFilter, filter }
-                        }));
+                        layerQueries.Add(new LayerQuery(null, layerQuery[0], styleList.ElementAtOrDefault(i),
+                            new Dictionary<string, object>
+                            {
+                                { Defaults.AdditionalFilter, filter }
+                            }));
                         break;
                     default:
                     {
                         displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet,
                             tileMatrix,
                             tileRow, tileCol, cqlFilter);
-                        logger.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
+                        Logger.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
                         return new MapResult(Stream.Null, "LayerFormatIncorrect",
                             $"layer format is incorrect {layerName}");
                     }
@@ -161,7 +167,6 @@ public class WmtsService(
             map.SetId(traceIdentifier)
                 .SetSrid(gridSet.SRID)
                 .SetZoom(new Zoom(scale, ZoomUnits.Scale))
-                .SetLogger(logger)
                 .SetGraphicsContextFactory(graphicsServiceProvider)
                 .AddLayers(layerList);
             var image = await map.GetImageAsync(viewPort, format);
@@ -174,7 +179,7 @@ public class WmtsService(
         {
             displayUrl ??= GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                 tileRow, tileCol, cqlFilter);
-            logger.LogError(e, "请求 {Url} 失败", displayUrl);
+            Logger.LogError(e, "请求 {Url} 失败", displayUrl);
             return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }

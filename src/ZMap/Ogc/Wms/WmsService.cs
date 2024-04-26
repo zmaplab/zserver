@@ -15,15 +15,16 @@ using ZMap.Store;
 namespace ZMap.Ogc.Wms;
 
 public class WmsService(
-    ILogger<WmsService> logger,
     IPermissionService permissionService,
     IGraphicsServiceProvider graphicsServiceProvider,
     ILayerQueryService layerQueryService)
 {
+    private static readonly ILogger Logger = Log.CreateLogger<WmsService>();
+    
     public async ValueTask<MapResult> GetMapAsync(string layers, string styles,
         string srs, string bbox, int width,
         int height, string format,
-        bool transparent, string bgColor, int time, string formatOptions, string cqlFilter,
+        bool transparent, string bgColor, int time, string formatOptions, string zFilter,
         IDictionary<string, object> arguments)
     {
         var traceIdentifier = arguments.GetTraceIdentifier();
@@ -35,8 +36,8 @@ public class WmsService(
             if (!string.IsNullOrEmpty(validateResult.Code))
             {
                 displayUrl = GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
-                    cqlFilter);
-                logger.LogError("{Url}, arguments error", displayUrl);
+                    zFilter);
+                Logger.LogError("{Url}, arguments error", displayUrl);
                 return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
 
@@ -44,13 +45,13 @@ public class WmsService(
 
             var dpi = Utility.GetDpi(formatOptions);
 
-            var filterList = string.IsNullOrWhiteSpace(cqlFilter)
+            var filterList = string.IsNullOrWhiteSpace(zFilter)
                 ? []
-                : cqlFilter.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                : zFilter.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
-            // var styleList = string.IsNullOrWhiteSpace(styles)
-            //     ? []
-            //     : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            var styleList = string.IsNullOrWhiteSpace(styles)
+                ? []
+                : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
             var layerQueries =
                 new List<LayerQuery>();
@@ -58,9 +59,8 @@ public class WmsService(
             for (var i = 0; i < requestArguments.Layers.Count; ++i)
             {
                 var layer = validateResult.Arguments.Layers.ElementAt(i);
-                // var style = styleList.ElementAtOrDefault(i);
                 layerQueries.Add(new LayerQuery(layer.ResourceGroup,
-                    layer.Layer,
+                    layer.Layer, styleList.ElementAtOrDefault(i),
                     new Dictionary<string, object>
                     {
                         { Defaults.AdditionalFilter, filterList.ElementAtOrDefault(i) }
@@ -75,7 +75,8 @@ public class WmsService(
 
             foreach (var layer in layerList)
             {
-                var permission = await permissionService.EnforceAsync("read", layer.GetResourceId(), PolicyEffect.Allow);
+                var permission =
+                    await permissionService.EnforceAsync("read", layer.GetResourceId(), PolicyEffect.Allow);
                 if (permission)
                 {
                     continue;
@@ -100,7 +101,6 @@ public class WmsService(
             map.SetId(traceIdentifier)
                 .SetSrid(validateResult.Arguments.SRID)
                 .SetZoom(new Zoom(scale, ZoomUnits.Scale))
-                .SetLogger(logger)
                 .SetGraphicsContextFactory(graphicsServiceProvider)
                 .AddLayers(layerList);
             var image = await map.GetImageAsync(viewPort, format);
@@ -109,8 +109,8 @@ public class WmsService(
         catch (Exception e)
         {
             displayUrl ??= GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
-                cqlFilter);
-            logger.LogError(e, "请求 {Url} 失败", displayUrl);
+                zFilter);
+            Logger.LogError(e, "请求 {Url} 失败", displayUrl);
             return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }
@@ -130,7 +130,7 @@ public class WmsService(
             if (!string.IsNullOrEmpty(validateResult.Code))
             {
                 displayUrl = GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
-                logger.LogError("{Url}, arguments error", displayUrl);
+                Logger.LogError("{Url}, arguments error", displayUrl);
                 return new GetFeatureInfoResult(null, validateResult.Code, validateResult.Message);
             }
 
@@ -141,7 +141,7 @@ public class WmsService(
             {
                 var layer = validateResult.Arguments.Layers.ElementAt(i);
                 layerQueries.Add(new LayerQuery(layer.ResourceGroup,
-                    layer.Layer,
+                    layer.Layer, null,
                     new Dictionary<string, object>()));
             }
 
@@ -157,7 +157,7 @@ public class WmsService(
             }
 
             displayUrl = GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
-            logger.LogInformation("GetFeatureInfo {Url}, hit layers: {Layers}, count: {Count}", displayUrl,
+            Logger.LogInformation("GetFeatureInfo {Url}, hit layers: {Layers}, count: {Count}", displayUrl,
                 string.Join(", ", layerList.Select(z => z.Name)), featureCollection.Count);
 
             return new GetFeatureInfoResult(featureCollection, null, null);
@@ -165,7 +165,7 @@ public class WmsService(
         catch (Exception e)
         {
             displayUrl ??= GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
-            logger.LogError(e, "请求 {Url} 失败", displayUrl);
+            Logger.LogError(e, "请求 {Url} 失败", displayUrl);
             return new GetFeatureInfoResult(null, "InternalError", e.Message);
         }
     }

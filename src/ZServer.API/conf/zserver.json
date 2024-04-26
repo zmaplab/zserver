@@ -91,7 +91,7 @@
           "minZoom": 1,
           "maxZoom": 300000,
           "zoomUnit": "scale",
-          "size": 32
+          "size": 64
         }
       ],
       "styleGroups": [

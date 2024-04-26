@@ -6,9 +6,10 @@ using Convert = System.Convert;
 
 namespace ZMap.Renderer.SkiaSharp.Utilities;
 
-public static class ColorUtility
+public class ColorUtility
 {
     private static readonly SKColor DefaultColor = SKColors.Black;
+    private static readonly ILogger Logger = Log.CreateLogger<ColorUtility>();
 
     public static SKColor GetColor(string hexString, float opacity = 1)
     {
@@ -19,7 +20,7 @@ public static class ColorUtility
 
         if (!SKColor.TryParse(hexString, out var color))
         {
-            Log.Logger.LogWarning("RGB {IncorrectColorHexString} 不是一个合法的颜色", color);
+            Logger.LogWarning("RGB {IncorrectColorHexString} 不是一个合法的颜色", color);
             return DefaultColor;
         }
 

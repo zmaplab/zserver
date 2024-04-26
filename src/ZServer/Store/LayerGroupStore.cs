@@ -7,17 +7,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMap;
+using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
 public class LayerGroupStore(
     IResourceGroupStore resourceGroupStore,
-    ILayerStore layerStore,
-    ILogger<LayerGroupStore> logger)
+    ILayerStore layerStore)
     : ILayerGroupStore
 {
     private static readonly ConcurrentDictionary<string, LayerGroup> Cache = new();
-
+    private static readonly ILogger Logger = Log.CreateLogger<LayerGroupStore>();
+    
     public Task Refresh(List<JObject> configurations)
     {
         return Task.CompletedTask;
@@ -184,7 +185,7 @@ public class LayerGroupStore(
                         layer = await layerStore.FindAsync(parts[0], parts[1]);
                         break;
                     default:
-                        logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
+                        Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
                         break;
                 }
 

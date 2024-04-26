@@ -34,7 +34,7 @@ public class LineStyleTests : BaseTests
         var width = 1024;
         var height = 1024;
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
 
         foreach (var feature in data)
         {
@@ -69,7 +69,7 @@ public class LineStyleTests : BaseTests
         var width = 1024;
         var height = 1024;
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
 
         foreach (var feature in data)
         {
@@ -104,7 +104,7 @@ public class LineStyleTests : BaseTests
         var width = 1024;
         var height = 1024;
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
 
         foreach (var feature in data)
         {

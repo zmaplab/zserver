@@ -5,7 +5,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "HOST_IP": "192.168.31.111",
-        "EnableAuthorization": "true",
+        "EnableAuthorization": "false",
         "EnableSensitiveDataLogging": "true",
         "standalone": "false"
       }

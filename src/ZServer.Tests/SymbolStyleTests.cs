@@ -27,7 +27,7 @@ public class SymbolStyleTests : BaseTests
         var height = 512;
         new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
 
         foreach (var feature in data)
         {

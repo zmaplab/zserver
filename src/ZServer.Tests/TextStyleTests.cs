@@ -32,7 +32,7 @@ public class TextStyleTests : BaseTests
         var height = 450 * 2;
 
         var graphicsService =
-            new SkiaGraphicsService(Guid.NewGuid().ToString(), width, height);
+            new SkiaGraphicsService(width, height);
 
         foreach (var feature in data)
         {

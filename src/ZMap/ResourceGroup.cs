@@ -1,5 +1,3 @@
-using System;
-
 namespace ZMap;
 
 /// <summary>
@@ -10,7 +8,7 @@ public class ResourceGroup
     /// <summary>
     /// 标识
     /// </summary>
-    public Guid Id { get; set; }
+    public string Id { get; set; }
 
     /// <summary>
     /// 名称

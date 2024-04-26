@@ -21,7 +21,7 @@ public class PermissionService(
     IHttpClientFactory clientFactory,
     IMemoryCache memoryCache) : IPermissionService
 {
-    public async Task<bool> EnforceAsync(string action, string resource,
+    public async ValueTask<bool> EnforceAsync(string action, string resource,
         PolicyEffect policyEffect)
     {
         var api = optionsMonitor.CurrentValue.PermissionApi;

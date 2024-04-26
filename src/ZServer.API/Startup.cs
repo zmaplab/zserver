@@ -129,7 +129,7 @@ public class Startup(IConfiguration configuration)
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        Log.Logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("ZServer");
+        Log.SetLoggerFactory(app.ApplicationServices.GetRequiredService<ILoggerFactory>());
 
         if (env.IsDevelopment())
         {

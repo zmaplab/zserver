@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using ZMap.Infrastructure;
 using ZMap.Store;
 using ZServer.Store;
 using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
@@ -14,10 +15,11 @@ using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 namespace ZServer;
 
 public class ConfigurationStoreRefreshService(
-    IServiceProvider serviceProvider,
-    ILogger<ConfigurationStoreRefreshService> logger)
+    IServiceProvider serviceProvider)
     : IHostedService
 {
+    private static readonly ILogger Logger = Log.CreateLogger<ConfigurationStoreRefreshService>();
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
         return Task.Factory.StartNew(async () =>
@@ -25,12 +27,12 @@ public class ConfigurationStoreRefreshService(
             var configurationProvider = serviceProvider.GetRequiredService<ConfigurationProvider>();
             if (File.Exists(configurationProvider.Path))
             {
-                logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
+                Logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
                     configurationProvider.Path);
             }
             else
             {
-                logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
+                Logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
             }
 
             while (!cancellationToken.IsCancellationRequested)
@@ -41,7 +43,7 @@ public class ConfigurationStoreRefreshService(
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "加载配置文件失败");
+                    Logger.LogError(e, "加载配置文件失败");
                 }
 
                 await Task.Delay(15000, cancellationToken);
@@ -71,7 +73,7 @@ public class ConfigurationStoreRefreshService(
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
             await layerGroupStore.Refresh(configurations);
 
-            logger.LogInformation("刷新配置文件成功");
+            Logger.LogInformation("刷新配置文件成功");
         }
     }
 

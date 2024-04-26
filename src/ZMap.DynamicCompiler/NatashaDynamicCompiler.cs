@@ -19,12 +19,12 @@ return {script};
         return f;
     }
 
-    public override Type BuildType(string script)
-    {
-        var nClass = NClass.DefaultDomain();
-        nClass.Body(script);
-        return nClass.GetType();
-    }
+    // public override Type BuildType(string script)
+    // {
+    //     var nClass = NClass.DefaultDomain();
+    //     nClass.Body(script);
+    //     return nClass.GetType();
+    // }
 
     protected override Func<Feature, T> BuildFunc<T>(string script)
     {

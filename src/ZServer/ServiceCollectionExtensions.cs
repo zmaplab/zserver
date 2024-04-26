@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ZMap;
 using ZMap.Ogc.Wms;
 using ZMap.Ogc.Wmts;
 using ZMap.Renderer.SkiaSharp;

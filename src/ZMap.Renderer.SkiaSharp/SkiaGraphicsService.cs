@@ -22,17 +22,16 @@ public class SkiaGraphicsService : IGraphicsService
         };
     }
 
-    public string Identifier { get; }
+    public string TraceIdentifier { get;   set; }
     public int Width { get; }
     public int Height { get; }
 
-    public SkiaGraphicsService(string identifier, int width, int height)
+    public SkiaGraphicsService(int width, int height)
     {
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         Width = width;
         Height = height;
-        Identifier = identifier;
     }
 
     public Stream GetImage(string imageFormat, bool bordered = false)

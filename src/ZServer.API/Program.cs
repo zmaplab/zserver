@@ -35,11 +35,9 @@ public class Program
             CoordinateArraySequenceFactory.Instance,
             PrecisionModel.Floating.Value,
             4326, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
-
-
+        
         FontUtility.Load();
-
-
+        
         CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
