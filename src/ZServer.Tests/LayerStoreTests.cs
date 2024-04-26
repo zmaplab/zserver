@@ -7,7 +7,6 @@ using ZMap.Source;
 using ZMap.Style;
 using ZMap.Source.ShapeFile;
 using System.Linq;
-using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ZMap;

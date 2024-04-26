@@ -5,7 +5,6 @@ namespace ZMap.Infrastructure;
 
 public static class Log
 {
-    // public static ILogger Logger = NullLogger.Instance;
     private static ILoggerFactory _loggerFactory;
 
     static Log()
