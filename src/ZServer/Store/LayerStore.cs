@@ -24,6 +24,7 @@ public class LayerStore(
 {
     private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> PropertyCache =
         new();
+
     private static readonly ILogger Logger = Log.CreateLogger<LayerStore>();
     private static readonly ConcurrentDictionary<string, Layer> Cache = new();
 
@@ -248,7 +249,7 @@ public class LayerStore(
 
         var layer = new Layer(resourceGroup, services, name, source, styleGroups, envelope)
         {
-            Buffers = section["buffers"]?.ToObject<List<GridBuffer>>(),
+            Buffers = section["buffers"]?.ToObject<List<GridBuffer>>() ?? new List<GridBuffer>(),
             Enabled = section["enabled"]?.ToObject<bool>() ?? true
         };
         return layer;
