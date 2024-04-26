@@ -64,7 +64,7 @@ public class Layer : IVisibleLimit
     /// <summary>
     /// 栅格缓冲
     /// </summary>
-    public List<GridBuffer> Buffers { get; set; } = new();
+    public List<GridBuffer> Buffers { get; set; } 
 
     /// <summary>
     /// 数据源
