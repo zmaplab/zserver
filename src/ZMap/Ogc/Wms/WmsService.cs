@@ -10,7 +10,6 @@ using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.Permission;
 using ZMap.Source;
-using ZMap.Store;
 
 namespace ZMap.Ogc.Wms;
 
@@ -20,7 +19,7 @@ public class WmsService(
     ILayerQueryService layerQueryService)
 {
     private static readonly ILogger Logger = Log.CreateLogger<WmsService>();
-    
+
     public async ValueTask<MapResult> GetMapAsync(string layers, string styles,
         string srs, string bbox, int width,
         int height, string format,
@@ -37,7 +36,8 @@ public class WmsService(
             {
                 displayUrl = GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
                     zFilter);
-                Logger.LogError("{Url}, arguments error", displayUrl);
+                Logger.LogError("{Url}, arguments error: {Code}, message: {Message}", displayUrl, validateResult.Code,
+                    validateResult.Message);
                 return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
 
