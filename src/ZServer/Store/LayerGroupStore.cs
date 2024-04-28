@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMap;
@@ -61,36 +59,6 @@ public class LayerGroupStore(
         }
 
         _cache = dict;
-    }
-
-    private async Task RestoreAsync(LayerGroup layerGroup, JObject section)
-    {
-        var layerNames = section["layers"]?.ToObject<HashSet<string>>();
-        if (layerNames != null)
-        {
-            foreach (var layerName in layerNames)
-            {
-                var parts = layerName.Split(':');
-                Layer layer = null;
-                switch (parts.Length)
-                {
-                    case 1:
-                        layer = await layerStore.FindAsync(null, layerName);
-                        break;
-                    case 2:
-                        layer = await layerStore.FindAsync(parts[0], parts[1]);
-                        break;
-                    default:
-                        Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
-                        break;
-                }
-
-                if (layer != null)
-                {
-                    layerGroup.Layers.Add(layer);
-                }
-            }
-        }
     }
 
     // public async Task Refresh(IEnumerable<IConfiguration> configurations)
@@ -233,6 +201,36 @@ public class LayerGroupStore(
         }
 
         return Task.FromResult(result);
+    }
+
+    private async Task RestoreAsync(LayerGroup layerGroup, JObject section)
+    {
+        var layerNames = section["layers"]?.ToObject<HashSet<string>>();
+        if (layerNames != null)
+        {
+            foreach (var layerName in layerNames)
+            {
+                var parts = layerName.Split(':');
+                Layer layer = null;
+                switch (parts.Length)
+                {
+                    case 1:
+                        layer = await layerStore.FindAsync(null, layerName);
+                        break;
+                    case 2:
+                        layer = await layerStore.FindAsync(parts[0], parts[1]);
+                        break;
+                    default:
+                        Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
+                        break;
+                }
+
+                if (layer != null)
+                {
+                    layerGroup.Layers.Add(layer);
+                }
+            }
+        }
     }
 
     // private async Task RestoreAsync(LayerGroup layerGroup, IConfigurationSection section)

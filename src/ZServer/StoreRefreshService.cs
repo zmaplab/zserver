@@ -7,14 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using ZMap.Infrastructure;
 using ZMap.Store;
 using ZServer.Store;
-using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 
 namespace ZServer;
 
-public class ConfigurationStoreRefreshService(
+public class StoreRefreshService(
     IServiceProvider serviceProvider)
     : IHostedService
 {
@@ -22,8 +20,8 @@ public class ConfigurationStoreRefreshService(
     {
         return Task.Factory.StartNew(async () =>
         {
-            var logger = serviceProvider.GetRequiredService<ILogger<ConfigurationStoreRefreshService>>();
-            var configurationProvider = serviceProvider.GetRequiredService<ConfigurationProvider>();
+            var logger = serviceProvider.GetRequiredService<ILogger<StoreRefreshService>>();
+            var configurationProvider = serviceProvider.GetRequiredService<JsonStoreProvider>();
             if (File.Exists(configurationProvider.Path))
             {
                 logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
@@ -34,12 +32,21 @@ public class ConfigurationStoreRefreshService(
                 logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
             }
 
+            var logged = false;
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     await RefreshAsync(configurationProvider);
-                    logger.LogInformation("刷新配置文件成功");
+                    if (!logged)
+                    {
+                        logger.LogInformation("刷新配置文件成功");
+                        logged = true;
+                    }
+                    else
+                    {
+                        logger.LogDebug("刷新配置文件成功");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -51,9 +58,9 @@ public class ConfigurationStoreRefreshService(
         }, cancellationToken);
     }
 
-    public async Task RefreshAsync(ConfigurationProvider configurationProvider)
+    public async Task RefreshAsync(JsonStoreProvider jsonStoreProvider)
     {
-        var configuration = configurationProvider.GetConfiguration();
+        var configuration = jsonStoreProvider.GetConfiguration();
         if (configuration != null)
         {
             var configurations = new List<JObject> { configuration };

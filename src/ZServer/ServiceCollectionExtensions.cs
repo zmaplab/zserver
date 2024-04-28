@@ -11,7 +11,6 @@ using ZMap.Ogc.Wmts;
 using ZMap.Renderer.SkiaSharp;
 using ZMap.Store;
 using ZServer.Store;
-using ConfigurationProvider = ZServer.Store.ConfigurationProvider;
 
 [assembly: InternalsVisibleTo("ZServer.Tests")]
 
@@ -36,8 +35,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.TryAddScoped<IStyleGroupStore, StyleGroupStore>();
         serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
         serviceCollection.TryAddScoped<ISldStore, SldStore>();
-        serviceCollection.TryAddSingleton(_ => new ConfigurationProvider(layersConfiguration));
-        serviceCollection.AddHostedService<ConfigurationStoreRefreshService>();
+        serviceCollection.TryAddSingleton(_ => new JsonStoreProvider(layersConfiguration));
+        serviceCollection.AddHostedService<StoreRefreshService>();
 
         serviceCollection.AddHostedService<PreloadService>();
         serviceCollection.TryAddScoped<ILayerQueryService, LayerQueryService>();

@@ -56,39 +56,39 @@ public class SldStore : ISldStore
         return Task.CompletedTask;
     }
 
-    public Task Refresh(IEnumerable<IConfiguration> __)
-    {
-        var dir = "sld";
-        if (!Directory.Exists(dir))
-        {
-            return Task.CompletedTask;
-        }
-
-        var existKeys = Cache.Keys.ToList();
-        var keys = new List<string>();
-
-        var files = Directory.GetFiles(dir);
-        foreach (var file in files)
-        {
-            var sld = StyledLayerDescriptor.Load(File.OpenRead(file));
-            var visitor = new SldStyleVisitor();
-            sld.Accept(visitor, null);
-
-            if (string.IsNullOrWhiteSpace(sld.Name))
-            {
-                continue;
-            }
-
-            keys.Add(sld.Name);
-            Cache.AddOrUpdate(sld.Name, visitor.StyleGroups, (_, _) => visitor.StyleGroups);
-        }
-
-        var removedKeys = existKeys.Except(keys);
-        foreach (var removedKey in removedKeys)
-        {
-            Cache.TryRemove(removedKey, out _);
-        }
-
-        return Task.CompletedTask;
-    }
+    // public Task Refresh(IEnumerable<IConfiguration> __)
+    // {
+    //     var dir = "sld";
+    //     if (!Directory.Exists(dir))
+    //     {
+    //         return Task.CompletedTask;
+    //     }
+    //
+    //     var existKeys = Cache.Keys.ToList();
+    //     var keys = new List<string>();
+    //
+    //     var files = Directory.GetFiles(dir);
+    //     foreach (var file in files)
+    //     {
+    //         var sld = StyledLayerDescriptor.Load(File.OpenRead(file));
+    //         var visitor = new SldStyleVisitor();
+    //         sld.Accept(visitor, null);
+    //
+    //         if (string.IsNullOrWhiteSpace(sld.Name))
+    //         {
+    //             continue;
+    //         }
+    //
+    //         keys.Add(sld.Name);
+    //         Cache.AddOrUpdate(sld.Name, visitor.StyleGroups, (_, _) => visitor.StyleGroups);
+    //     }
+    //
+    //     var removedKeys = existKeys.Except(keys);
+    //     foreach (var removedKey in removedKeys)
+    //     {
+    //         Cache.TryRemove(removedKey, out _);
+    //     }
+    //
+    //     return Task.CompletedTask;
+    // }
 }
