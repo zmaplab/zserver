@@ -72,8 +72,7 @@
     "layer_group": {
       "resourceGroup": "zserver",
       "layers": [
-        "polygon",
-        "polygon_3857"
+        "polygon"
       ]
     }
   },
