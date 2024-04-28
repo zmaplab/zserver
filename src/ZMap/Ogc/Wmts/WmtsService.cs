@@ -56,7 +56,7 @@ public class WmtsService(
                     $"Could not find tile matrix set {tileMatrixSet}");
             }
 
-            var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileRow, tileCol);
+            var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
             if (string.IsNullOrEmpty(path))
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
@@ -66,6 +66,7 @@ public class WmtsService(
                     "wmts key is empty");
             }
 
+#if !DEBUG
             if (File.Exists(path))
             {
                 if (EnvironmentVariables.EnableSensitiveDataLogging)
@@ -77,6 +78,7 @@ public class WmtsService(
 
                 return new MapResult(File.OpenRead(path), null, null);
             }
+#endif
 
             var folder = Path.GetDirectoryName(path);
             if (folder != null && !Directory.Exists(folder))

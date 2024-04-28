@@ -32,11 +32,13 @@ public static class Utility
     /// <param name="layers"></param>
     /// <param name="cqlFilter"></param>
     /// <param name="format"></param>
+    /// <param name="tileMatrixSet"></param>
     /// <param name="tileMatrix"></param>
     /// <param name="tileRow"></param>
     /// <param name="tileCol"></param>
     /// <returns></returns>
-    public static string GetWmtsPath(string layers, string cqlFilter, string format, string tileMatrix, int tileRow,
+    public static string GetWmtsPath(string layers, string cqlFilter, string format, string tileMatrixSet,
+        string tileMatrix, int tileRow,
         int tileCol)
     {
         var layerKey = layers.Replace(',', '_');
@@ -47,8 +49,8 @@ public static class Utility
         var imageExtension = GetImageExtension(format);
         return Path.Combine(AppContext.BaseDirectory, "cache", "wmts",
             string.IsNullOrEmpty(cqlFilterKey)
-                ? $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}{imageExtension}"
-                : $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterKey}{imageExtension}");
+                ? $"{layerKey}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}{imageExtension}"
+                : $"{layerKey}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterKey}{imageExtension}");
     }
 
     public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,

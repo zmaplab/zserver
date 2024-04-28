@@ -9,18 +9,18 @@ import WMTSTileGrid from 'ol/tilegrid/WMTS'
 import proj4 from 'proj4'
 import { register } from 'ol/proj/proj4'
 
-const projection = getProjection('EPSG:3857')
+const projection = getProjection('EPSG:4326')
 const projectionExtent = projection.getExtent()
 const size = getWidth(projectionExtent) / 256
 const resolutions = new Array(22)
 const matrixIds = new Array(22)
-for (let z = 1; z < 22; ++z) {
+for (let z = 0; z < 22; ++z) {
   // generate resolutions and matrixIds arrays for this WMTS
-  resolutions[z - 1] = size / Math.pow(2, z)
-  matrixIds[z - 1] = z
+  resolutions[z] = size / Math.pow(2, z)
+  matrixIds[z] = z
 }
 debugger
-let centerXY = [1388941.1429993785, 5139696.600312929]
+let centerXY = [12.477070574987795, 41.85776175318455]
 
 const map = new Map({
   target: 'map',
@@ -28,8 +28,8 @@ const map = new Map({
     new TileLayer({
       source: new WMTS({
         url: 'http://localhost:8200/wmts',
-        layer: 'zserver:polygon_3857_shp',
-        matrixSet: 'EPSG:3857',
+        layer: 'zserver:layer_group',
+        matrixSet: 'EPSG:4326',
         format: 'image/webp',
         projection: projection,
         tileGrid: new WMTSTileGrid({
@@ -45,7 +45,7 @@ const map = new Map({
   view: new View({
     projection: projection,
     center: centerXY,
-    zoom: 16,
+    zoom: 12,
   }),
 })
 

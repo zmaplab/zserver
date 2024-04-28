@@ -32,13 +32,18 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
     /// <param name="cqlFilter"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task GetAsync([Required] [FromQuery(Name = "layer")] string layers, string style,
-        [Required] string tileMatrix,
-        [Required] int tileRow, [Required] int tileCol, string format = "image/png",
-        string tileMatrixSet = "EPSG:4326", [FromQuery(Name = "CQL_FILTER")] string cqlFilter = null)
+    public async Task GetAsync([Required] [FromQuery(Name = "layer"), StringLength(100)] string layers,
+        [StringLength(100)] string style,
+        [Required, StringLength(50)] string tileMatrix, [Required] int tileRow, [Required] int tileCol,
+        string format = "image/png",
+        [Required, StringLength(50)] string tileMatrixSet = "EPSG:4326",
+        [FromQuery(Name = "CQL_FILTER"), StringLength(1000)]
+        string cqlFilter = null)
     {
+#if !DEBUG
         // 使用相同的缓存路径
-        var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileRow, tileCol);
+        var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
+
         if (System.IO.File.Exists(path))
         {
             if (EnvironmentVariables.EnableSensitiveDataLogging)
@@ -55,6 +60,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
             await stream.CopyToAsync(HttpContext.Response.Body, (int)stream.Length);
             return;
         }
+#endif
 
         // 同一个 Grid 使用同一个对象进行管理， 保证缓存文件在同一个 Silo 目录下
         var key = Utility.GetWmtsKey(layers, tileMatrixSet, tileRow, tileCol);
