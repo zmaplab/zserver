@@ -28,7 +28,7 @@ public static class ConfigurationSectionExtensions
         switch (targetSection)
         {
             case null:
-                return CSharpExpression<T>.New(default);
+                return null;
             case JValue v:
             {
                 var value = v.ToObject<T>();
@@ -71,6 +71,15 @@ public static class ConfigurationSectionExtensions
         }
 
         var expression = filterToken.ToObject<string>();
+        // // C# Script
+        // if (expression.StartsWith("{{"))
+        // {
+        //     
+        // }
+        // else
+        // {
+        //     
+        // }
         return bool.TryParse(expression, out var result)
             ? CSharpExpression<bool?>.New(result)
             : CSharpExpression<bool?>.New(null, string.IsNullOrEmpty(expression) ? null : expression);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace ZMap.Style;
 
@@ -48,6 +49,7 @@ public class TextStyle : VectorStyle
             Label.Value = result;
         }
 
+ 
         Color?.Invoke(feature, "#000000");
         Opacity?.Invoke(feature, 1);
         BackgroundColor?.Invoke(feature);
