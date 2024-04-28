@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json.Linq;
@@ -255,32 +254,32 @@ public class LayerStore(
         return layer;
     }
 
-    private async Task<List<StyleGroup>> RestoreStyleGroupsAsync(IConfigurationSection section)
-    {
-        var group = new List<StyleGroup>();
-
-        var styleNames = section.GetSection("styleGroups").Get<string[]>();
-
-        if (styleNames is { Length: > 0 })
-        {
-            foreach (var name in styleNames)
-            {
-                var styleGroup = await styleStore.FindAsync(name);
-                if (styleGroup != null)
-                {
-                    group.Add(styleGroup.Clone());
-                }
-
-                var sldStyleGroups = await sldStore.FindAsync(name);
-                if (sldStyleGroups != null)
-                {
-                    group.AddRange(sldStyleGroups);
-                }
-            }
-        }
-
-        return group;
-    }
+    // private async Task<List<StyleGroup>> RestoreStyleGroupsAsync(IConfigurationSection section)
+    // {
+    //     var group = new List<StyleGroup>();
+    //
+    //     var styleNames = section.GetSection("styleGroups").Get<string[]>();
+    //
+    //     if (styleNames is { Length: > 0 })
+    //     {
+    //         foreach (var name in styleNames)
+    //         {
+    //             var styleGroup = await styleStore.FindAsync(name);
+    //             if (styleGroup != null)
+    //             {
+    //                 group.Add(styleGroup.Clone());
+    //             }
+    //
+    //             var sldStyleGroups = await sldStore.FindAsync(name);
+    //             if (sldStyleGroups != null)
+    //             {
+    //                 group.AddRange(sldStyleGroups);
+    //             }
+    //         }
+    //     }
+    //
+    //     return group;
+    // }
 
     private async Task<List<StyleGroup>> RestoreStyleGroupsAsync(JObject section)
     {
@@ -311,52 +310,52 @@ public class LayerStore(
         return group;
     }
 
-    private async Task<ISource> RestoreSourceAsync(string resourceGroup, string name, IConfigurationSection section)
-    {
-        var sourceName = section.GetValue<string>("source");
-        if (string.IsNullOrWhiteSpace(sourceName))
-        {
-            Logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
-            return null;
-        }
-
-        var source = await sourceStore.FindAsync(sourceName);
-        if (source == null)
-        {
-            Logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
-            return null;
-        }
-
-        var properties = PropertyCache.GetOrAdd(source.GetType(), t =>
-        {
-            return t.GetProperties().Where(z => z.CanWrite)
-                .ToList();
-        });
-
-        foreach (var child in section.GetChildren())
-        {
-            if (!child.Key.StartsWith("source") || child.Key == "source")
-            {
-                continue;
-            }
-
-            var propertyName = child.Key.Replace("source", string.Empty);
-            var property = properties
-                .FirstOrDefault(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
-            if (property == null)
-            {
-                continue;
-            }
-
-            var value = child.Get(property.PropertyType);
-            if (value != null)
-            {
-                property.SetValue(source, value);
-            }
-        }
-
-        return source;
-    }
+    // private async Task<ISource> RestoreSourceAsync(string resourceGroup, string name, IConfigurationSection section)
+    // {
+    //     var sourceName = section.GetValue<string>("source");
+    //     if (string.IsNullOrWhiteSpace(sourceName))
+    //     {
+    //         Logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
+    //         return null;
+    //     }
+    //
+    //     var source = await sourceStore.FindAsync(sourceName);
+    //     if (source == null)
+    //     {
+    //         Logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
+    //         return null;
+    //     }
+    //
+    //     var properties = PropertyCache.GetOrAdd(source.GetType(), t =>
+    //     {
+    //         return t.GetProperties().Where(z => z.CanWrite)
+    //             .ToList();
+    //     });
+    //
+    //     foreach (var child in section.GetChildren())
+    //     {
+    //         if (!child.Key.StartsWith("source") || child.Key == "source")
+    //         {
+    //             continue;
+    //         }
+    //
+    //         var propertyName = child.Key.Replace("source", string.Empty);
+    //         var property = properties
+    //             .FirstOrDefault(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+    //         if (property == null)
+    //         {
+    //             continue;
+    //         }
+    //
+    //         var value = child.Get(property.PropertyType);
+    //         if (value != null)
+    //         {
+    //             property.SetValue(source, value);
+    //         }
+    //     }
+    //
+    //     return source;
+    // }
 
     private async Task<ISource> RestoreSourceAsync(string resourceGroup, string name, JObject section)
     {

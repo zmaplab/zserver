@@ -28,7 +28,7 @@ public static class ConfigurationSectionExtensions
         switch (targetSection)
         {
             case null:
-                return null;
+                return CSharpExpression<T>.New(default);
             case JValue v:
             {
                 var value = v.ToObject<T>();

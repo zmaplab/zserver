@@ -7,7 +7,7 @@ using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
-public class ConfigurationProvider(string path)
+public class JsonStoreProvider(string path)
 {
     private DateTime _lastWriteTime;
     private string _lastHash;
