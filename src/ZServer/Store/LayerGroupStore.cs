@@ -16,48 +16,117 @@ public class LayerGroupStore(
     ILayerStore layerStore)
     : ILayerGroupStore
 {
-    private static readonly ConcurrentDictionary<string, LayerGroup> Cache = new();
+    private static Dictionary<string, LayerGroup> _cache = new();
     private static readonly ILogger Logger = Log.CreateLogger<LayerGroupStore>();
-    
-    public Task Refresh(List<JObject> configurations)
-    {
-        return Task.CompletedTask;
-    }
 
-    public async Task Refresh(IEnumerable<IConfiguration> configurations)
+    public async Task Refresh(List<JObject> configurations)
     {
-        var existKeys = Cache.Keys.ToList();
-        var keys = new List<string>();
+        var dict = new Dictionary<string, LayerGroup>();
 
         foreach (var configuration in configurations)
         {
-            var sections = configuration.GetSection("layerGroups");
-            foreach (var section in sections.GetChildren())
+            var sections = configuration.SelectToken("layerGroups");
+            if (sections == null)
             {
-                var resourceGroupName = section.GetValue<string>("resourceGroup");
+                continue;
+            }
+
+            foreach (var section in sections.Children<JProperty>())
+            {
+                var name = section.Name;
+                var obj = section.Value as JObject;
+                if (obj == null)
+                {
+                    continue;
+                }
+
+                var resourceGroupName = obj["resourceGroup"]?.ToObject<string>();
 
                 var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
                     ? null
                     : await resourceGroupStore.FindAsync(resourceGroupName);
+                var servicesToken = obj["services"];
+                var services = servicesToken == null
+                    ? new HashSet<ServiceType>()
+                    : servicesToken.ToObject<HashSet<ServiceType>>();
 
                 var layerGroup = Activator.CreateInstance<LayerGroup>();
-                layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
-                layerGroup.Name = section.Key;
+                layerGroup.Services = services;
+                layerGroup.Name = name;
                 layerGroup.ResourceGroup = resourceGroup;
                 layerGroup.Layers = new List<Layer>();
-                await RestoreAsync(layerGroup, section);
-
-                keys.Add(layerGroup.Name);
-                Cache.AddOrUpdate(layerGroup.Name, layerGroup, (_, _) => layerGroup);
+                await RestoreAsync(layerGroup, obj);
+                dict.Add(name, layerGroup);
             }
         }
 
-        var removedKeys = existKeys.Except(keys);
-        foreach (var removedKey in removedKeys)
+        _cache = dict;
+    }
+
+    private async Task RestoreAsync(LayerGroup layerGroup, JObject section)
+    {
+        var layerNames = section["layers"]?.ToObject<HashSet<string>>();
+        if (layerNames != null)
         {
-            Cache.TryRemove(removedKey, out _);
+            foreach (var layerName in layerNames)
+            {
+                var parts = layerName.Split(':');
+                Layer layer = null;
+                switch (parts.Length)
+                {
+                    case 1:
+                        layer = await layerStore.FindAsync(null, layerName);
+                        break;
+                    case 2:
+                        layer = await layerStore.FindAsync(parts[0], parts[1]);
+                        break;
+                    default:
+                        Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
+                        break;
+                }
+
+                if (layer != null)
+                {
+                    layerGroup.Layers.Add(layer);
+                }
+            }
         }
     }
+
+    // public async Task Refresh(IEnumerable<IConfiguration> configurations)
+    // {
+    //     var existKeys = Cache.Keys.ToList();
+    //     var keys = new List<string>();
+    //
+    //     foreach (var configuration in configurations)
+    //     {
+    //         var sections = configuration.GetSection("layerGroups");
+    //         foreach (var section in sections.GetChildren())
+    //         {
+    //             var resourceGroupName = section.GetValue<string>("resourceGroup");
+    //
+    //             var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
+    //                 ? null
+    //                 : await resourceGroupStore.FindAsync(resourceGroupName);
+    //
+    //             var layerGroup = Activator.CreateInstance<LayerGroup>();
+    //             layerGroup.Services = section.GetSection("ogcWebServices").Get<HashSet<ServiceType>>();
+    //             layerGroup.Name = section.Key;
+    //             layerGroup.ResourceGroup = resourceGroup;
+    //             layerGroup.Layers = new List<Layer>();
+    //             await RestoreAsync(layerGroup, section);
+    //
+    //             keys.Add(layerGroup.Name);
+    //             Cache.AddOrUpdate(layerGroup.Name, layerGroup, (_, _) => layerGroup);
+    //         }
+    //     }
+    //
+    //     var removedKeys = existKeys.Except(keys);
+    //     foreach (var removedKey in removedKeys)
+    //     {
+    //         Cache.TryRemove(removedKey, out _);
+    //     }
+    // }
 
     public async Task<LayerGroup> FindAsync(string resourceGroupName, string layerGroupName)
     {
@@ -66,7 +135,7 @@ public class LayerGroupStore(
             return null;
         }
 
-        if (!Cache.TryGetValue(layerGroupName, out var layerGroup))
+        if (!_cache.TryGetValue(layerGroupName, out var layerGroup))
         {
             return null;
         }
@@ -143,7 +212,7 @@ public class LayerGroupStore(
 
     public Task<List<LayerGroup>> GetAllAsync()
     {
-        var items = Cache.Values.Select(x => x.Clone()).ToList();
+        var items = _cache.Values.Select(x => x.Clone()).ToList();
         return Task.FromResult(items);
     }
 
@@ -155,7 +224,7 @@ public class LayerGroupStore(
             return Task.FromResult(result);
         }
 
-        foreach (var value in Cache.Values)
+        foreach (var value in _cache.Values)
         {
             if (value.ResourceGroup?.Name == resourceGroup)
             {
@@ -166,34 +235,33 @@ public class LayerGroupStore(
         return Task.FromResult(result);
     }
 
-
-    private async Task RestoreAsync(LayerGroup layerGroup, IConfigurationSection section)
-    {
-        var layerNames = section.GetSection("layers").Get<HashSet<string>>();
-        if (layerNames != null)
-        {
-            foreach (var layerName in layerNames)
-            {
-                var parts = layerName.Split(':');
-                Layer layer = null;
-                switch (parts.Length)
-                {
-                    case 1:
-                        layer = await layerStore.FindAsync(null, layerName);
-                        break;
-                    case 2:
-                        layer = await layerStore.FindAsync(parts[0], parts[1]);
-                        break;
-                    default:
-                        Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
-                        break;
-                }
-
-                if (layer != null)
-                {
-                    layerGroup.Layers.Add(layer);
-                }
-            }
-        }
-    }
+    // private async Task RestoreAsync(LayerGroup layerGroup, IConfigurationSection section)
+    // {
+    //     var layerNames = section.GetSection("layers").Get<HashSet<string>>();
+    //     if (layerNames != null)
+    //     {
+    //         foreach (var layerName in layerNames)
+    //         {
+    //             var parts = layerName.Split(':');
+    //             Layer layer = null;
+    //             switch (parts.Length)
+    //             {
+    //                 case 1:
+    //                     layer = await layerStore.FindAsync(null, layerName);
+    //                     break;
+    //                 case 2:
+    //                     layer = await layerStore.FindAsync(parts[0], parts[1]);
+    //                     break;
+    //                 default:
+    //                     Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
+    //                     break;
+    //             }
+    //
+    //             if (layer != null)
+    //             {
+    //                 layerGroup.Layers.Add(layer);
+    //             }
+    //         }
+    //     }
+    // }
 }

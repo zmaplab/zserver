@@ -18,21 +18,20 @@ public class ConfigurationStoreRefreshService(
     IServiceProvider serviceProvider)
     : IHostedService
 {
-    private static readonly ILogger Logger = Log.CreateLogger<ConfigurationStoreRefreshService>();
-
     public Task StartAsync(CancellationToken cancellationToken)
     {
         return Task.Factory.StartNew(async () =>
         {
+            var logger = serviceProvider.GetRequiredService<ILogger<ConfigurationStoreRefreshService>>();
             var configurationProvider = serviceProvider.GetRequiredService<ConfigurationProvider>();
             if (File.Exists(configurationProvider.Path))
             {
-                Logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
+                logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
                     configurationProvider.Path);
             }
             else
             {
-                Logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
+                logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
             }
 
             while (!cancellationToken.IsCancellationRequested)
@@ -40,10 +39,11 @@ public class ConfigurationStoreRefreshService(
                 try
                 {
                     await RefreshAsync(configurationProvider);
+                    logger.LogInformation("刷新配置文件成功");
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e, "加载配置文件失败");
+                    logger.LogError(e, "加载配置文件失败");
                 }
 
                 await Task.Delay(15000, cancellationToken);
@@ -72,8 +72,6 @@ public class ConfigurationStoreRefreshService(
             await layerStore.Refresh(configurations);
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
             await layerGroupStore.Refresh(configurations);
-
-            Logger.LogInformation("刷新配置文件成功");
         }
     }
 

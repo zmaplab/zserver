@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using ZMap;
 
@@ -37,29 +36,29 @@ public class ResourceGroupStore : IResourceGroupStore
         return Task.CompletedTask;
     }
 
-    public Task Refresh(IEnumerable<IConfiguration> configurations)
-    {
-        var dict = new Dictionary<string, ResourceGroup>();
-
-        foreach (var configuration in configurations)
-        {
-            var sections = configuration.GetSection("resourceGroups");
-            foreach (var section in sections.GetChildren())
-            {
-                var resourceGroup = section.Get<ResourceGroup>();
-                if (resourceGroup == null)
-                {
-                    continue;
-                }
-
-                resourceGroup.Name = section.Key;
-                dict.TryAdd(section.Key, resourceGroup);
-            }
-        }
-
-        _cache = dict;
-        return Task.CompletedTask;
-    }
+    // public Task Refresh(IEnumerable<IConfiguration> configurations)
+    // {
+    //     var dict = new Dictionary<string, ResourceGroup>();
+    //
+    //     foreach (var configuration in configurations)
+    //     {
+    //         var sections = configuration.GetSection("resourceGroups");
+    //         foreach (var section in sections.GetChildren())
+    //         {
+    //             var resourceGroup = section.Get<ResourceGroup>();
+    //             if (resourceGroup == null)
+    //             {
+    //                 continue;
+    //             }
+    //
+    //             resourceGroup.Name = section.Key;
+    //             dict.TryAdd(section.Key, resourceGroup);
+    //         }
+    //     }
+    //
+    //     _cache = dict;
+    //     return Task.CompletedTask;
+    // }
 
     public async Task<ResourceGroup> FindAsync(string name)
     {

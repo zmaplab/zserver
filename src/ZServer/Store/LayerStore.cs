@@ -68,39 +68,39 @@ public class LayerStore(
         }
     }
 
-    public async Task Refresh(IEnumerable<IConfiguration> configurations)
-    {
-        var existKeys = Cache.Keys.ToList();
-        var keys = new List<string>();
-
-        foreach (var configuration in configurations)
-        {
-            var sections = configuration.GetSection("layers");
-            foreach (var section in sections.GetChildren())
-            {
-                var resourceGroupName = section.GetValue<string>("resourceGroup");
-
-                var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
-                    ? null
-                    : await resourceGroupStore.FindAsync(resourceGroupName);
-
-                var layer = await BindLayerAsync(section, resourceGroup);
-                if (layer == null)
-                {
-                    continue;
-                }
-
-                keys.Add(layer.Name);
-                Cache.AddOrUpdate(layer.Name, layer, (_, _) => layer);
-            }
-        }
-
-        var removedKeys = existKeys.Except(keys);
-        foreach (var removedKey in removedKeys)
-        {
-            Cache.TryRemove(removedKey, out _);
-        }
-    }
+    // public async Task Refresh(IEnumerable<IConfiguration> configurations)
+    // {
+    //     var existKeys = Cache.Keys.ToList();
+    //     var keys = new List<string>();
+    //
+    //     foreach (var configuration in configurations)
+    //     {
+    //         var sections = configuration.GetSection("layers");
+    //         foreach (var section in sections.GetChildren())
+    //         {
+    //             var resourceGroupName = section.GetValue<string>("resourceGroup");
+    //
+    //             var resourceGroup = string.IsNullOrWhiteSpace(resourceGroupName)
+    //                 ? null
+    //                 : await resourceGroupStore.FindAsync(resourceGroupName);
+    //
+    //             var layer = await BindLayerAsync(section, resourceGroup);
+    //             if (layer == null)
+    //             {
+    //                 continue;
+    //             }
+    //
+    //             keys.Add(layer.Name);
+    //             Cache.AddOrUpdate(layer.Name, layer, (_, _) => layer);
+    //         }
+    //     }
+    //
+    //     var removedKeys = existKeys.Except(keys);
+    //     foreach (var removedKey in removedKeys)
+    //     {
+    //         Cache.TryRemove(removedKey, out _);
+    //     }
+    // }
 
     public async Task<Layer> FindAsync(string resourceGroupName, string layerName)
     {
@@ -196,29 +196,29 @@ public class LayerStore(
         return Task.FromResult(result);
     }
 
-    private async Task<Layer> BindLayerAsync(IConfigurationSection section,
-        ResourceGroup resourceGroup)
-    {
-        var services = section.GetSection("services").Get<HashSet<ServiceType>>();
-        var sourceOrigin = await RestoreSourceAsync(resourceGroup?.Name, section.Key, section);
-        if (sourceOrigin == null)
-        {
-            return null;
-        }
-
-        var source = sourceOrigin.Clone();
-        var styleGroups = await RestoreStyleGroupsAsync(section);
-        var extent = section.GetSection("extent").Get<double[]>();
-        Envelope envelope = null;
-        if (extent is { Length: 4 })
-        {
-            envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
-        }
-
-        var layer = new Layer(resourceGroup, services, section.Key, source, styleGroups, envelope);
-        section.Bind(layer);
-        return layer;
-    }
+    // private async Task<Layer> BindLayerAsync(IConfigurationSection section,
+    //     ResourceGroup resourceGroup)
+    // {
+    //     var services = section.GetSection("services").Get<HashSet<ServiceType>>();
+    //     var sourceOrigin = await RestoreSourceAsync(resourceGroup?.Name, section.Key, section);
+    //     if (sourceOrigin == null)
+    //     {
+    //         return null;
+    //     }
+    //
+    //     var source = sourceOrigin.Clone();
+    //     var styleGroups = await RestoreStyleGroupsAsync(section);
+    //     var extent = section.GetSection("extent").Get<double[]>();
+    //     Envelope envelope = null;
+    //     if (extent is { Length: 4 })
+    //     {
+    //         envelope = new Envelope(extent[0], extent[1], extent[2], extent[3]);
+    //     }
+    //
+    //     var layer = new Layer(resourceGroup, services, section.Key, source, styleGroups, envelope);
+    //     section.Bind(layer);
+    //     return layer;
+    // }
 
     private async Task<Layer> BindLayerAsync(string name, JObject section,
         ResourceGroup resourceGroup)

@@ -54,22 +54,23 @@ public class Layer : IVisibleLimit
 
     /// <summary>
     /// 是否启用
+    /// </summary>
     public bool Enabled { get; set; }
 
     /// <summary>
     /// 显示范围(一般由数据源覆盖范围决定)
     /// </summary>
-    public Envelope Envelope { get; private set; }
+    public Envelope Envelope { get; set; }
 
     /// <summary>
     /// 栅格缓冲
     /// </summary>
-    public List<GridBuffer> Buffers { get; set; } 
+    public List<GridBuffer> Buffers { get; set; }
 
     /// <summary>
     /// 数据源
     /// </summary>
-    public ISource Source { get; private set; }
+    public ISource Source { get; set; }
 
     /// <summary>
     /// 空间标识符
@@ -86,8 +87,8 @@ public class Layer : IVisibleLimit
     /// </summary>
     public ResourceGroup ResourceGroup { get; set; }
 
-    public Layer(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name, ISource source,
-        List<StyleGroup> styleGroups, Envelope envelope = null) :
+    public Layer(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name,
+        ISource source, List<StyleGroup> styleGroups, Envelope envelope = null) :
         this(name, source, styleGroups, envelope)
     {
         ResourceGroup = resourceGroup;
