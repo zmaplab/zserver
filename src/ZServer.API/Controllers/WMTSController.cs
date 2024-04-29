@@ -29,7 +29,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
     /// <param name="tileCol"></param>
     /// <param name="format"></param>
     /// <param name="tileMatrixSet"></param>
-    /// <param name="cqlFilter"></param>
+    /// <param name="filter"></param>
     /// <returns></returns>
     [HttpGet]
     public async Task GetAsync([Required] [FromQuery(Name = "layer"), StringLength(100)] string layers,
@@ -37,12 +37,12 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
         [Required, StringLength(50)] string tileMatrix, [Required] int tileRow, [Required] int tileCol,
         string format = "image/png",
         [Required, StringLength(50)] string tileMatrixSet = "EPSG:4326",
-        [FromQuery(Name = "CQL_FILTER"), StringLength(1000)]
-        string cqlFilter = null)
+        [FromQuery(Name = "Z_FILTER"), StringLength(2048)]
+        string filter = null)
     {
 #if !DEBUG
         // 使用相同的缓存路径
-        var path = Utility.GetWmtsPath(layers, cqlFilter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
+        var path = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
 
         if (System.IO.File.Exists(path))
         {
@@ -67,7 +67,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
         var friend = clusterClient.GetGrain<IWMTSGrain>(key);
         var result =
             await friend.GetTileAsync(layers, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
-                cqlFilter,
+                filter,
                 new Dictionary<string, object>
                 {
                     { "TraceIdentifier", HttpContext.TraceIdentifier }
