@@ -30,21 +30,21 @@ public static class Utility
     /// WMTS 缓存文件的 Key
     /// </summary>
     /// <param name="layers"></param>
-    /// <param name="cqlFilter"></param>
+    /// <param name="filter"></param>
     /// <param name="format"></param>
     /// <param name="tileMatrixSet"></param>
     /// <param name="tileMatrix"></param>
     /// <param name="tileRow"></param>
     /// <param name="tileCol"></param>
     /// <returns></returns>
-    public static string GetWmtsPath(string layers, string cqlFilter, string format, string tileMatrixSet,
+    public static string GetWmtsPath(string layers, string filter, string format, string tileMatrixSet,
         string tileMatrix, int tileRow,
         int tileCol)
     {
         var layerKey = layers.Replace(',', '_');
-        var cqlFilterKey = string.IsNullOrWhiteSpace(cqlFilter)
+        var cqlFilterKey = string.IsNullOrWhiteSpace(filter)
             ? string.Empty
-            : MurmurHashAlgorithmUtility.ComputeHash(Encoding.UTF8.GetBytes(cqlFilter));
+            : MurmurHashAlgorithmUtility.ComputeHash(Encoding.UTF8.GetBytes(filter));
 
         var imageExtension = GetImageExtension(format);
         return Path.Combine(AppContext.BaseDirectory, "cache", "wmts",
