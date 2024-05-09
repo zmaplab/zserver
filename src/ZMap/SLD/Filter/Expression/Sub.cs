@@ -1,6 +1,3 @@
-using System;
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter.Expression;
 
 [XmlRoot("Sub")]
@@ -14,13 +11,15 @@ public class Sub : BinaryOperatorType
 
         var left = Items[0];
         visitor.Visit(left, extraData);
-        var leftExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var leftExpression = (CSharpExpressionV2)visitor.Pop();
 
         var right = Items[1];
         visitor.Visit(right, extraData);
-        var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var rightExpression = (CSharpExpressionV2)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New($"{leftExpression.Expression} - {rightExpression.Expression}"));
+        visitor.Push(
+            CSharpExpressionV2.Create<dynamic>(
+                $"{leftExpression.FuncName}(feature) - {rightExpression.FuncName}(feature)"));
         return null;
     }
 }

@@ -1,10 +1,7 @@
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("PropertyIsLike")]
 public class PropertyIsLikeType : ComparisonOpsType
@@ -32,13 +29,15 @@ public class PropertyIsLikeType : ComparisonOpsType
     public override object Accept(IFilterVisitor visitor, object extraData)
     {
         visitor.VisitObject(PropertyName, extraData);
-        var propertyExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var propertyExpression = (CSharpExpressionV2)visitor.Pop();
 
         visitor.VisitObject(Literal, extraData);
-        var literalExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var literalExpression = (CSharpExpressionV2)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"ZMap.SLD.Filter.Methods.Like({propertyExpression.Expression}, {literalExpression.Expression}, \"{WildCard}\", \"{SingleChar}\", \"{EscapeChar}\")"));
+        throw new NotImplementedException();
+        // visitor.Push(ZMap.Style.CSharpExpressionV2.Create<bool>(
+        //     $"ZMap.SLD.Filter.Methods.Like({propertyExpression.Expression}, {literalExpression.Expression}, \"{WildCard}\", \"{SingleChar}\", \"{EscapeChar}\")"));
+
         return null;
     }
 }

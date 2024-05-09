@@ -1,6 +1,3 @@
-using System;
-using System.Xml.Serialization;
-
 namespace ZMap.SLD;
 
 [XmlInclude(typeof(RasterSymbolizer))]

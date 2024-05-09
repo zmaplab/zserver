@@ -1,23 +1,21 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace ZMap.Style;
 
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class SymbolStyle : VectorStyle
 {
-    public CSharpExpression<int?> Size { get; set; }
-    public CSharpExpression<string> Uri { get; set; }
-    public CSharpExpression<float?> Opacity { get; set; }
-    public CSharpExpression<float?> Rotation { get; set; }
+    public CSharpExpressionV2<int?> Size { get; set; }
+    public CSharpExpressionV2<string> Uri { get; set; }
+    public CSharpExpressionV2<float?> Opacity { get; set; }
+    public CSharpExpressionV2<float?> Rotation { get; set; }
 
     public override void Accept(IZMapStyleVisitor visitor, Feature feature)
     {
         base.Accept(visitor, feature);
 
-        Size?.Invoke(feature, 24);
-        Uri?.Invoke(feature);
-        Opacity?.Invoke(feature, 1);
-        Rotation?.Invoke(feature);
+        Size?.Accept(feature, 24);
+        Uri?.Accept(feature);
+        Opacity?.Accept(feature, 1);
+        Rotation?.Accept(feature);
     }
 
     public override Style Clone()

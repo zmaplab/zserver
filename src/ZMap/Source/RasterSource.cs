@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-using NetTopologySuite.Geometries;
-
 namespace ZMap.Source;
 
 public abstract class RasterSource : IRasterSource

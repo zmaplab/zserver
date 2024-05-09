@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace ZMap.Ogc;
 
 public record MapResult(Stream Stream, string Code, string Message, string Locator = null)

@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace ZMap.SLD;
+﻿namespace ZMap.SLD;
 
 public class ContrastEnhancement
 {

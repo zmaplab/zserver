@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace ZMap.Source;

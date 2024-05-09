@@ -7,6 +7,7 @@ using ZMap.Source;
 using ZMap.Style;
 using ZMap.Source.ShapeFile;
 using System.Linq;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ZMap;
@@ -107,6 +108,10 @@ public class LayerStoreTests : BaseTests
         var fillStyle = (FillStyle)layer.StyleGroups.ElementAt(0).Styles.ElementAt(0);
         var lineStyle = (LineStyle)layer.StyleGroups.ElementAt(0).Styles[1];
         var textStyle = (TextStyle)layer.StyleGroups.ElementAt(0).Styles[2];
+        
+        fillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        lineStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        textStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
 
         Assert.True(fillStyle.Antialias);
         Assert.Equal(1, fillStyle.Opacity.Value);
@@ -132,7 +137,7 @@ public class LayerStoreTests : BaseTests
 
     private async Task Test2(ILayerStore store)
     {
-        var layer = await store.FindAsync(null, "berlin_shp");
+        var layer = await store.FindAsync("berlin_shp");
         Assert.NotNull(layer);
         Assert.Equal("berlin_shp", layer.Name);
 
@@ -160,7 +165,10 @@ public class LayerStoreTests : BaseTests
         var fillStyle = (FillStyle)layer.StyleGroups.ElementAt(0).Styles.ElementAt(0);
         var lineStyle = (LineStyle)layer.StyleGroups.ElementAt(0).Styles[1];
         var textStyle = (TextStyle)layer.StyleGroups.ElementAt(0).Styles[2];
-
+        fillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        lineStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        textStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        
         Assert.True(fillStyle.Antialias);
         Assert.Equal(1, fillStyle.Opacity.Value);
         Assert.Equal("#3ed53e", fillStyle.Color.Value);
@@ -217,7 +225,10 @@ public class LayerStoreTests : BaseTests
         var pgFillStyle = (FillStyle)pgLayer.StyleGroups.ElementAt(0).Styles.ElementAt(0);
         var pgLineStyle = (LineStyle)pgLayer.StyleGroups.ElementAt(0).Styles[1];
         var pgTextStyle = (TextStyle)pgLayer.StyleGroups.ElementAt(0).Styles[2];
-
+        pgFillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        pgLineStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        pgTextStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        
         Assert.True(pgFillStyle.Antialias);
         Assert.Equal(1, pgFillStyle.Opacity.Value);
         Assert.Equal("#3ed53e", pgFillStyle.Color.Value);
@@ -256,7 +267,10 @@ public class LayerStoreTests : BaseTests
         var shpFillStyle = (FillStyle)shpLayer.StyleGroups.ElementAt(0).Styles.ElementAt(0);
         var shpLineStyle = (LineStyle)shpLayer.StyleGroups.ElementAt(0).Styles[1];
         var shpTextStyle = (TextStyle)shpLayer.StyleGroups.ElementAt(0).Styles[2];
-
+        shpFillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        shpLineStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        shpTextStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(0, 0), new Dictionary<string, dynamic>()));
+        
         Assert.True(shpFillStyle.Antialias);
         Assert.Equal(1, shpFillStyle.Opacity.Value);
         Assert.Equal("#3ed53e", shpFillStyle.Color.Value);

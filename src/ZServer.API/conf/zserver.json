@@ -37,9 +37,7 @@
           "color": "#FF3333",
           "size": 16,
           "maxZoom": 6000,
-          "label": {
-            "expression": "feature[\"name\"]"
-          },
+          "label": "{{ feature[\"name\"] }}",
           "minZoom": 100,
           "type": "text",
           "font": [

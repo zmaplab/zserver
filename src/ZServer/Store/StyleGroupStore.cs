@@ -36,7 +36,7 @@ public class StyleGroupStore : IStyleGroupStore
                 var minZoomToken = obj["minZoom"];
                 var maxZoomToken = obj["maxZoom"];
                 var zoomUnitValue = obj["zoomUnit"]?.ToString();
-                var filter = section.GetFilterExpression();
+                var filter = obj.GetFilterExpressionV2();
                 var zoomUnit = Enum.TryParse(zoomUnitValue, out ZoomUnits v) ? v : ZoomUnits.Scale;
                 var stylesToken = obj.SelectToken("styles") as JArray;
                 var styleGroup = new StyleGroup
@@ -59,20 +59,17 @@ public class StyleGroupStore : IStyleGroupStore
         return Task.CompletedTask;
     }
 
-    public async Task<StyleGroup> FindAsync(string name)
+    public ValueTask<StyleGroup> FindAsync(string name)
     {
-        if (_cache.TryGetValue(name, out var styleGroup))
-        {
-            return await Task.FromResult(styleGroup);
-        }
-
-        return null;
+        return _cache.TryGetValue(name, out var item)
+            ? new ValueTask<StyleGroup>(item.Clone())
+            : new ValueTask<StyleGroup>();
     }
 
-    public Task<List<StyleGroup>> GetAllAsync()
+    public ValueTask<List<StyleGroup>> GetAllAsync()
     {
         var items = _cache.Values.Select(x => x.Clone()).ToList();
-        return Task.FromResult(items);
+        return new ValueTask<List<StyleGroup>>(items);
     }
 
     private List<Style> GetStyles(JArray section)
@@ -112,7 +109,7 @@ public class StyleGroupStore : IStyleGroupStore
             var maxZoomToken = styleSection["maxZoom"];
             var zoomUnitValue = styleSection["zoomUnit"]?.ToString();
 
-            result.Filter = styleSection.GetFilterExpression();
+            result.Filter = styleSection.GetFilterExpressionV2();
             result.MinZoom = minZoomToken?.Value<float>() ?? 0;
             result.MaxZoom = maxZoomToken?.Value<float>() ?? 0;
             result.ZoomUnit = Enum.TryParse(zoomUnitValue, out ZoomUnits zoomUnit) ? zoomUnit : ZoomUnits.Scale;
@@ -126,8 +123,8 @@ public class StyleGroupStore : IStyleGroupStore
     {
         return new SymbolStyle
         {
-            Size = section.GetExpression<int?>("size"),
-            Uri = section.GetExpression<string>("uri")
+            Size = section.GetExpressionV2<int?>("size"),
+            Uri = section.GetExpressionV2<string>("uri")
         };
     }
 
@@ -135,46 +132,49 @@ public class StyleGroupStore : IStyleGroupStore
     {
         return new RasterStyle
         {
-            Opacity = section.GetExpression<float?>("opacity"),
-            HueRotate = section.GetExpression<float?>("hueRotate"),
-            BrightnessMin = section.GetExpression<float?>("brightnessMin"),
-            BrightnessMax = section.GetExpression<float?>("brightnessMax"),
-            Saturation = section.GetExpression<float?>("saturation"),
-            Contrast = section.GetExpression<float?>("contrast")
+            Opacity = section.GetExpressionV2<float?>("opacity"),
+            HueRotate = section.GetExpressionV2<float?>("hueRotate"),
+            BrightnessMin = section.GetExpressionV2<float?>("brightnessMin"),
+            BrightnessMax = section.GetExpressionV2<float?>("brightnessMax"),
+            Saturation = section.GetExpressionV2<float?>("saturation"),
+            Contrast = section.GetExpressionV2<float?>("contrast")
         };
     }
 
     private Style GetLineStyle(JObject section)
     {
-        return new LineStyle
+        var opacityFunc = section.GetExpressionV2<float?>("opacity");
+        var widthFunc = section.GetExpressionV2<int?>("width");
+        var style = new LineStyle
         {
-            Opacity = section.GetExpression<float?>("opacity"),
-            Width = section.GetExpression<int?>("width"),
-            Color = section.GetExpression<string>("color"),
-            DashArray = section.GetExpression<float[]>("dashArray"),
-            DashOffset = section.GetExpression<float?>("dashOffset"),
-            LineJoin = section.GetExpression<string>("lineJoin"),
-            LineCap = section.GetExpression<string>("lineCap"),
-            Translate = section.GetExpression<double[]>("translate"),
-            TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor"),
-            GapWidth = section.GetExpression<int?>("gapWidth"),
-            Offset = section.GetExpression<int?>("offset"),
-            Blur = section.GetExpression<int?>("blur"),
-            Gradient = section.GetExpression<int?>("gradient"),
-            Pattern = section.GetExpression<string>("pattern")
+            Opacity = opacityFunc,
+            Width = widthFunc,
+            Color = section.GetExpressionV2<string>("color"),
+            DashArray = section.GetExpressionV2<float[]>("dashArray"),
+            DashOffset = section.GetExpressionV2<float?>("dashOffset"),
+            LineJoin = section.GetExpressionV2<string>("lineJoin"),
+            LineCap = section.GetExpressionV2<string>("lineCap"),
+            Translate = section.GetExpressionV2<double[]>("translate"),
+            TranslateAnchor = section.GetExpressionV2<TranslateAnchor>("translateAnchor"),
+            GapWidth = section.GetExpressionV2<int?>("gapWidth"),
+            Offset = section.GetExpressionV2<int?>("offset"),
+            Blur = section.GetExpressionV2<int?>("blur"),
+            Gradient = section.GetExpressionV2<int?>("gradient"),
+            Pattern = section.GetExpressionV2<string>("pattern")
         };
+        return style;
     }
 
     private Style GetSpriteFillStyle(JObject section)
     {
         return new SpriteFillStyle
         {
-            Opacity = section.GetExpression<float?>("opacity"),
-            Color = section.GetExpression<string>("color"),
-            Translate = section.GetExpression<double[]>("translate"),
-            TranslateAnchor = section.GetExpression<TranslateAnchor?>("translateAnchor"),
-            Pattern = section.GetExpression<string>("pattern"),
-            Uri = section.GetExpression<string>("uri")
+            Opacity = section.GetExpressionV2<float?>("opacity"),
+            Color = section.GetExpressionV2<string>("color"),
+            Translate = section.GetExpressionV2<double[]>("translate"),
+            TranslateAnchor = section.GetExpressionV2<TranslateAnchor?>("translateAnchor"),
+            Pattern = section.GetExpressionV2<string>("pattern"),
+            Uri = section.GetExpressionV2<string>("uri")
         };
     }
 
@@ -182,52 +182,53 @@ public class StyleGroupStore : IStyleGroupStore
     {
         return new SpriteLineStyle
         {
-            Opacity = section.GetExpression<float?>("opacity"),
-            Width = section.GetExpression<int?>("width"),
-            Color = section.GetExpression<string>("color"),
-            DashArray = section.GetExpression<float[]>("dashArray"),
-            DashOffset = section.GetExpression<float?>("dashOffset"),
-            LineJoin = section.GetExpression<string>("lineJoin"),
-            LineCap = section.GetExpression<string>("lineCap"),
-            Translate = section.GetExpression<double[]>("translate"),
-            TranslateAnchor = section.GetExpression<TranslateAnchor>("translateAnchor"),
-            GapWidth = section.GetExpression<int?>("gapWidth"),
-            Offset = section.GetExpression<int?>("offset"),
-            Blur = section.GetExpression<int?>("blur"),
-            Gradient = section.GetExpression<int?>("gradient"),
-            Pattern = section.GetExpression<string>("pattern"),
-            Uri = section.GetExpression<string>("uri")
+            Opacity = section.GetExpressionV2<float?>("opacity"),
+            Width = section.GetExpressionV2<int?>("width"),
+            Color = section.GetExpressionV2<string>("color"),
+            DashArray = section.GetExpressionV2<float[]>("dashArray"),
+            DashOffset = section.GetExpressionV2<float?>("dashOffset"),
+            LineJoin = section.GetExpressionV2<string>("lineJoin"),
+            LineCap = section.GetExpressionV2<string>("lineCap"),
+            Translate = section.GetExpressionV2<double[]>("translate"),
+            TranslateAnchor = section.GetExpressionV2<TranslateAnchor>("translateAnchor"),
+            GapWidth = section.GetExpressionV2<int?>("gapWidth"),
+            Offset = section.GetExpressionV2<int?>("offset"),
+            Blur = section.GetExpressionV2<int?>("blur"),
+            Gradient = section.GetExpressionV2<int?>("gradient"),
+            Pattern = section.GetExpressionV2<string>("pattern"),
+            Uri = section.GetExpressionV2<string>("uri")
         };
     }
 
     private Style GetTextStyle(JObject section)
     {
-        var label = section.GetExpression<string>("property");
+        var label = section.GetExpressionV2<string>("property");
 
-        if (label == null || (string.IsNullOrEmpty(label.Value) && string.IsNullOrEmpty(label.Expression)))
+        if (label == null || string.IsNullOrEmpty(label.Value))
         {
-            label = section.GetExpression<string>("label");
+            label = section.GetExpressionV2<string>("label");
         }
 
+        var transform = section.GetExpressionV2<TextTransform>("transform");
         return new TextStyle
         {
             Label = label,
-            Align = section.GetExpression<string>("align"),
-            Color = section.GetExpression<string>("color"),
-            Opacity = section.GetExpression<float?>("opacity"),
-            BackgroundColor = section.GetExpression<string>("backgroundColor"),
-            BackgroundOpacity = section.GetExpression<float?>("backgroundOpacity"),
-            Radius = section.GetExpression<float?>("radius"),
-            RadiusColor = section.GetExpression<string>("radiusColor"),
-            RadiusOpacity = section.GetExpression<float?>("radiusOpacity"),
-            Style = section.GetExpression<string>("style"),
-            Font = section.GetExpression<List<string>>("font"),
-            Size = section.GetExpression<int?>("size"),
-            Weight = section.GetExpression<string>("weight"),
-            Rotate = section.GetExpression<float?>("rotate"),
-            Transform = section.GetExpression<TextTransform>("transform"),
-            Offset = section.GetExpression<float[]>("offset"),
-            OutlineSize = section.GetExpression<int?>("outlineSize")
+            Align = section.GetExpressionV2<string>("align"),
+            Color = section.GetExpressionV2<string>("color"),
+            Opacity = section.GetExpressionV2<float?>("opacity"),
+            BackgroundColor = section.GetExpressionV2<string>("backgroundColor"),
+            BackgroundOpacity = section.GetExpressionV2<float?>("backgroundOpacity"),
+            Radius = section.GetExpressionV2<float?>("radius"),
+            RadiusColor = section.GetExpressionV2<string>("radiusColor"),
+            RadiusOpacity = section.GetExpressionV2<float?>("radiusOpacity"),
+            Style = section.GetExpressionV2<string>("style"),
+            Font = section.GetExpressionV2<List<string>>("font"),
+            Size = section.GetExpressionV2<int?>("size"),
+            Weight = section.GetExpressionV2<string>("weight"),
+            Rotate = section.GetExpressionV2<float?>("rotate"),
+            Transform = transform,
+            Offset = section.GetExpressionV2<float[]>("offset"),
+            OutlineSize = section.GetExpressionV2<int?>("outlineSize")
         };
     }
 
@@ -235,30 +236,30 @@ public class StyleGroupStore : IStyleGroupStore
     {
         FillStyle fillStyle;
         var pattern = section["pattern"]?.ToObject<string>();
-        var patternExpression = section.GetExpression<string>("pattern");
+        var patternExpression = section.GetExpressionV2<string>("pattern");
 
         var resource = section["resource"]?.ToObject<string>();
-        var resourceExpression = section.GetExpression<string>("resource");
+        var resourceExpression = section.GetExpressionV2<string>("resource");
 
-        if (patternExpression != null && (!string.IsNullOrEmpty(patternExpression.Expression) ||
-                                          !string.IsNullOrEmpty(patternExpression.Value)))
+        if (patternExpression != null && (
+                // !string.IsNullOrEmpty(patternExpression.Script) ||
+                !string.IsNullOrEmpty(patternExpression.Value)))
         {
             fillStyle = new SpriteFillStyle
             {
                 Pattern = patternExpression,
-                Uri = section.GetExpression<string>("uri")
+                Uri = section.GetExpressionV2<string>("uri")
             };
         }
         else if (!string.IsNullOrEmpty(pattern))
         {
             fillStyle = new SpriteFillStyle
             {
-                Pattern = CSharpExpression<string>.New(pattern),
-                Uri = section.GetExpression<string>("uri")
+                Pattern = CSharpExpressionV2.Create<string>(pattern),
+                Uri = section.GetExpressionV2<string>("uri")
             };
         }
-        else if (resourceExpression != null && (!string.IsNullOrEmpty(resourceExpression.Expression) ||
-                                                !string.IsNullOrEmpty(resourceExpression.Value)))
+        else if (resourceExpression != null && !string.IsNullOrEmpty(resourceExpression.Value))
         {
             fillStyle = new ResourceFillStyle
             {
@@ -269,7 +270,7 @@ public class StyleGroupStore : IStyleGroupStore
         {
             fillStyle = new ResourceFillStyle
             {
-                Uri = CSharpExpression<string>.New(resource)
+                Uri = CSharpExpressionV2.Create<string>(resource)
             };
         }
         else
@@ -277,13 +278,14 @@ public class StyleGroupStore : IStyleGroupStore
             fillStyle = new FillStyle();
         }
 
-        fillStyle.Opacity = section.GetExpression<float?>("opacity");
-        fillStyle.Pattern = section.GetExpression<string>("pattern");
+        var o = section.GetExpressionV2<float?>("opacity");
+        fillStyle.Opacity = o;
+        fillStyle.Pattern = section.GetExpressionV2<string>("pattern");
         fillStyle.Antialias = section["antialias"]?.ToObject<bool>() ?? true;
-        fillStyle.Color = section.GetExpression<string>("color");
+        fillStyle.Color = section.GetExpressionV2<string>("color");
         // symbol.OutlineColor = section.GetExpression<string>("outlineColor");
-        fillStyle.Translate = section.GetExpression<double[]>("translate");
-        fillStyle.TranslateAnchor = section.GetExpression<TranslateAnchor?>("translateAnchor");
+        fillStyle.Translate = section.GetExpressionV2<double[]>("translate");
+        fillStyle.TranslateAnchor = section.GetExpressionV2<TranslateAnchor?>("translateAnchor");
         return fillStyle;
     }
 }

@@ -22,8 +22,8 @@ public class FillStyleTests : BaseTests
             var style = new FillStyle
             {
                 Antialias = true,
-                Opacity = CSharpExpression<float?>.New(1),
-                Color = CSharpExpression<string>.New("#3ed53e")
+                Opacity = CSharpExpressionV2.Create<float?>("1"),
+                Color = CSharpExpressionV2.Create<string>("#3ed53e")
             };
 
             using var bitmap = new SKBitmap(256, 256);
@@ -54,8 +54,8 @@ public class FillStyleTests : BaseTests
         var style = new FillStyle
         {
             Antialias = true,
-            Opacity = CSharpExpression<float?>.New(1),
-            Color = CSharpExpression<string>.New("#3ed53e")
+            Opacity = CSharpExpressionV2.Create<float?>("1"),
+            Color = CSharpExpressionV2.Create<string>("#3ed53e")
         };
 
         var width = 256;
@@ -81,8 +81,8 @@ public class FillStyleTests : BaseTests
         var style = new FillStyle
         {
             Antialias = true,
-            Opacity = CSharpExpression<float?>.New(0.5f),
-            Color = CSharpExpression<string>.New("#3ed53e")
+            Opacity = CSharpExpressionV2.Create<float?>("0.5f"),
+            Color = CSharpExpressionV2.Create<string>("#3ed53e")
         };
 
         using var bitmap = new SKBitmap(256, 256);
@@ -113,9 +113,9 @@ public class FillStyleTests : BaseTests
         var style = new ResourceFillStyle
         {
             Antialias = true,
-            Opacity = CSharpExpression<float?>.New(0.5f),
-            Color = CSharpExpression<string>.New("#3ed53e"),
-            Uri = CSharpExpression<string>.New("file://images/colorblocks1.png")
+            Opacity = CSharpExpressionV2.Create<float?>("0.5f"),
+            Color = CSharpExpressionV2.Create<string>("#3ed53e"),
+            Uri = CSharpExpressionV2.Create<string>("file://images/colorblocks1.png")
         };
 
         var width = 256;

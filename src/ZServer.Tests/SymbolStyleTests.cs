@@ -18,8 +18,8 @@ public class SymbolStyleTests : BaseTests
 
         var style = new SymbolStyle
         {
-            Uri = CSharpExpression<string>.New("file://108.png"),
-            Size = CSharpExpression<int?>.New(30)
+            Uri = CSharpExpressionV2.Create<string>("file://108.png"),
+            Size = CSharpExpressionV2.Create<int?>("30")
         };
 
         var width = 512;

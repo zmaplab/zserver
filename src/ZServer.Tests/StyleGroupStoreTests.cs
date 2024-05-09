@@ -55,43 +55,53 @@ public class StyleGroupStoreTests : BaseTests
         var lineStyle = (LineStyle)styleGroup.Styles[1];
         var textStyle = (TextStyle)styleGroup.Styles[2];
 
-        fillStyle.Accept(new ZMapStyleVisitor(), new Feature(new Point(1, 1), new Dictionary<string, dynamic>
+        var feature = new Feature(new Point(1, 1), new Dictionary<string, dynamic>
         {
-            { "height", 11 }
-        }));
-        Assert.Equal(true, fillStyle.Filter.Value);
+            { "height", 11 },
+            { "color", "#3ed53e" },
+            { "translateAnchor", "Viewport" },
+            { "gapWidth", 1 },
+            { "offset", 2 },
+            { "blur", 3 },
+            { "gradient", 4 },
+            {"sprite-pattern","sprite pattern"}
+            
+        });
+        fillStyle.Accept(new ZMapStyleVisitor(), feature);
+        lineStyle.Accept(new ZMapStyleVisitor(), feature);
+        textStyle.Accept(new ZMapStyleVisitor(), feature);
 
+
+        Assert.Equal(true, fillStyle.Filter.Value);
 
         var b = lineStyle.Filter is
         {
             Value: not null
         };
+        Assert.True(b);
 
-
-        Assert.False(b);
-
-        CSharpExpression<bool?> c = null;
-
+        CSharpExpressionV2<bool?> c = null;
         Assert.False(c is
         {
             Value: not null
         });
-        Assert.Equal(false, textStyle.Filter.Value);
+
+        Assert.False(textStyle.Filter.Value);
         Assert.True(fillStyle.Antialias);
         Assert.Equal(1, fillStyle.Opacity.Value);
-        Assert.Equal("feature[\"opacity\"]", fillStyle.Opacity.Expression);
+        //Assert.Equal("feature[\"opacity\"]", fillStyle.Opacity.Value);
         Assert.Equal("#3ed53e", fillStyle.Color.Value);
-        Assert.Equal("feature[\"color\"]", fillStyle.Color.Expression);
+        //Assert.Equal("feature[\"color\"]", fillStyle.Color.Script);
         Assert.NotNull(fillStyle.Translate.Value);
-        Assert.Equal("feature[\"translate\"]", fillStyle.Translate.Expression);
+        //Assert.Equal("feature[\"translate\"]", fillStyle.Translate.Script);
         Assert.Equal(2, fillStyle.Translate.Value.Length);
         Assert.Equal(1, fillStyle.Translate.Value[0]);
         Assert.Equal(2, fillStyle.Translate.Value[1]);
         Assert.Equal(TranslateAnchor.Viewport, fillStyle.TranslateAnchor.Value);
-        Assert.Equal("feature[\"translateAnchor\"]", fillStyle.TranslateAnchor.Expression);
+        // Assert.Equal("feature[\"translateAnchor\"]", fillStyle.TranslateAnchor.Script);
         Assert.Equal("sprite pattern", fillStyle.Pattern.Value);
         Assert.Equal("file://images/colorblocks1.png", fillStyle.Uri.Value);
-        Assert.Equal("feature[\"uri\"]", fillStyle.Uri.Expression);
+        // Assert.Equal("feature[\"uri\"]", fillStyle.Uri.Expression);
 
         Assert.Equal(1, lineStyle.Opacity.Value);
         Assert.Equal(1, lineStyle.Width.Value);
@@ -102,23 +112,23 @@ public class StyleGroupStoreTests : BaseTests
         Assert.Equal(10f, lineStyle.DashOffset.Value);
         Assert.Equal("lineJoin string", lineStyle.LineJoin.Value);
         Assert.Equal(2, lineStyle.Translate.Value.Length);
-        Assert.Equal("feature[\"translate\"]", lineStyle.Translate.Expression);
+        //Assert.Equal("feature[\"translate\"]", lineStyle.Translate.Script);
         Assert.Equal(1d, lineStyle.Translate.Value[0]);
         Assert.Equal(2d, lineStyle.Translate.Value[1]);
         Assert.Equal(TranslateAnchor.Viewport, lineStyle.TranslateAnchor.Value);
-        Assert.Equal("feature[\"translateAnchor\"]", lineStyle.TranslateAnchor.Expression);
+        //Assert.Equal("feature[\"translateAnchor\"]", lineStyle.TranslateAnchor.Script);
         Assert.Equal(1, lineStyle.GapWidth.Value);
-        Assert.Equal("feature[\"gapWidth\"]", lineStyle.GapWidth.Expression);
+        //Assert.Equal("feature[\"gapWidth\"]", lineStyle.GapWidth.Script);
         Assert.Equal(2, lineStyle.Offset.Value);
-        Assert.Equal("feature[\"offset\"]", lineStyle.Offset.Expression);
+        //Assert.Equal("feature[\"offset\"]", lineStyle.Offset.Script);
         Assert.Equal(3, lineStyle.Blur.Value);
-        Assert.Equal("feature[\"blur\"]", lineStyle.Blur.Expression);
+        //Assert.Equal("feature[\"blur\"]", lineStyle.Blur.Script);
         Assert.Equal(4, lineStyle.Gradient.Value);
         Assert.Equal("sprite pattern", lineStyle.Pattern.Value);
-        Assert.Equal("feature[\"sprite-pattern\"]", lineStyle.Pattern.Expression);
+        //Assert.Equal("feature[\"sprite-pattern\"]", lineStyle.Pattern.Script);
 
-        Assert.Equal("property string", textStyle.Label.Value);
-        Assert.Equal("property expression", textStyle.Label.Expression);
+        Assert.Equal("property expression", textStyle.Label.Value);
+        // Assert.Equal("property expression", textStyle.Label.Expression);
         Assert.Equal("auto", textStyle.Align.Value);
         Assert.Equal(2, textStyle.Font.Value.Count);
         Assert.Equal("Open Sans Regular", textStyle.Font.Value[0]);

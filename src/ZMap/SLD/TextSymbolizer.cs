@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
-using ZMap.Style;
-
 namespace ZMap.SLD;
 
 public class TextSymbolizer : Symbolizer
@@ -57,39 +51,48 @@ public class TextSymbolizer : Symbolizer
         {
             MinZoom = 0,
             MaxZoom = Defaults.MaxZoomValue,
-            Filter = CSharpExpression<bool?>.New(null),
-            Label = CSharpExpression<string>.New(null, $"feature[\"{Label.PropertyName}\"]"),
-            Offset = CSharpExpression<float[]>.New(Array.Empty<float>()),
-            Color = CSharpExpression<string>.New("#000000"),
-            Opacity = CSharpExpression<float?>.New(1),
-            BackgroundColor = CSharpExpression<string>.New(null),
-            BackgroundOpacity = CSharpExpression<float?>.New(1),
-            Radius = CSharpExpression<float?>.New(0),
-            RadiusColor = CSharpExpression<string>.New(null),
-            RadiusOpacity = CSharpExpression<float?>.New(0),
-            Weight = CSharpExpression<string>.New(null),
-            Align = CSharpExpression<string>.New(null),
-            Rotate = CSharpExpression<float?>.New(0),
-            Transform = CSharpExpression<TextTransform>.New(TextTransform.Lowercase),
-            OutlineSize = CSharpExpression<int?>.New(0),
-            Font = CSharpExpression<List<string>>.New(new List<string>())
+            Filter = CSharpExpressionV2.Create<bool?>(null),
+            Label = CSharpExpressionV2.Create<string>($"{{{{ feature[\"{Label.PropertyName}\"] }}}}"),
+            Offset = CSharpExpressionV2.Create<float[]>("{{ default }}"),
+            Color = CSharpExpressionV2.Create<string>("#000000"),
+            Opacity = CSharpExpressionV2.Create<float?>("1"),
+            BackgroundColor = CSharpExpressionV2.Create<string>(null),
+            BackgroundOpacity = CSharpExpressionV2.Create<float?>("1"),
+            Radius = CSharpExpressionV2.Create<float?>("0"),
+            RadiusColor = CSharpExpressionV2.Create<string>(null),
+            RadiusOpacity = CSharpExpressionV2.Create<float?>("0"),
+            Weight = CSharpExpressionV2.Create<string>(null),
+            Align = CSharpExpressionV2.Create<string>(null),
+            Rotate = CSharpExpressionV2.Create<float?>("0"),
+            Transform = CSharpExpressionV2.Create<TextTransform>("Lowercase"),
+            OutlineSize = CSharpExpressionV2.Create<int?>("0")
         };
 
         var size = Font.GetOrDefault("font-size");
         textStyle.Size =
-            size.BuildExpression(visitor, extraData, (int?)FontType.Defaults["font-size"]);
+            size.BuildExpressionV2<int?>(visitor, extraData);
 
         var families = Font.Where(x => x.Name == "font-family").ToList();
-        foreach (var family in families)
+        var fontList = new StringBuilder();
+        fontList.Append("new List<string>() {");
+        for (var i = 0; i < families.Count; ++i)
         {
+            var family = families[i];
             family.Accept(visitor, extraData);
-            var value = visitor.Pop();
-            if (value != null)
+
+            if (visitor.Pop() is string value)
             {
-                textStyle.Font.Value.Add(value);
+                fontList.Append('"').Append(value).Append('"');
+            }
+
+            if (i < families.Count - 1)
+            {
+                fontList.Append(',');
             }
         }
 
+        fontList.Append('}');
+        textStyle.Font = CSharpExpressionV2.Create<List<string>>(fontList.ToString());
         Fill?.Accept(visitor, extraData);
         return null;
     }

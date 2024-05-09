@@ -1,16 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
-using ProjNet.CoordinateSystems.Transformations;
-using ZMap.Extensions;
-using ZMap.Infrastructure;
-using ZMap.Source;
-using ZMap.Style;
-
 namespace ZMap;
 
 /// <summary>
@@ -18,7 +5,7 @@ namespace ZMap;
 /// </summary>
 public class Layer : IVisibleLimit
 {
-    private static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
+    public static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
     private List<StyleGroup> _styleGroups;
     private static readonly ILogger Logger = Log.CreateLogger<Layer>();
 

@@ -1,5 +1,3 @@
-using System;
-
 namespace ZMap;
 
 public static class Defaults

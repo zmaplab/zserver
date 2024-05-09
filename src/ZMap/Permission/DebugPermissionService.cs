@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace ZMap.Permission;
 
 public class DebugPermissionService

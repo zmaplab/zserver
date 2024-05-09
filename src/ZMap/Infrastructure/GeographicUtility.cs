@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using NetTopologySuite.Geometries;
-
-namespace ZMap.Infrastructure;
+﻿namespace ZMap.Infrastructure;
 
 /// <summary>
 /// 地理空间计算相关的方法

@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-using ZMap.Style;
-
 namespace ZMap.SLD;
 
 [XmlRoot("Fill")]
@@ -70,13 +63,12 @@ public class Fill : IStyle
         }
 
         fillStyle.Color =
-            Color.BuildExpression(visitor, extraData, (string)DefaultValues["fill"]);
-        fillStyle.Opacity = Opacity.BuildExpression(visitor, extraData, (float?)DefaultValues["fill-opacity"]);
+            Color.BuildExpressionV2<string>(visitor, extraData);
+        fillStyle.Opacity = Opacity.BuildExpressionV2<float?>(visitor, extraData);
 
         var translate = Parameters.FirstOrDefault(x => x.Name == "fill-translate");
         fillStyle.Translate =
-            translate.BuildArrayExpression(visitor as IExpressionVisitor, extraData,
-                (double[])DefaultValues["fill-translate"]);
+            translate.BuildArrayExpressionV2<double[]>(visitor as IExpressionVisitor, extraData);
 
         visitor.Push(fillStyle);
 

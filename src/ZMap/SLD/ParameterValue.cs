@@ -1,8 +1,3 @@
-using System;
-using System.Linq;
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD;
 
 [Serializable]

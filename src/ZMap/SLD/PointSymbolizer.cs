@@ -1,6 +1,4 @@
-﻿using ZMap.Style;
-
-namespace ZMap.SLD;
+﻿namespace ZMap.SLD;
 
 public class PointSymbolizer : Symbolizer
 {
@@ -20,7 +18,7 @@ public class PointSymbolizer : Symbolizer
         {
             MinZoom = 0,
             MaxZoom = Defaults.MaxZoomValue,
-            Filter = CSharpExpression<bool?>.New(null)
+            Filter = CSharpExpressionV2.Create<bool?>(null)
         };
         visitor.Push(symbolStyle);
         visitor.Visit(Graphic, extraData);

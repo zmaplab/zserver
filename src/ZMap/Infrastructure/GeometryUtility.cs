@@ -1,6 +1,3 @@
-using System;
-using NetTopologySuite.Geometries;
-
 namespace ZMap.Infrastructure;
 
 /// <summary>

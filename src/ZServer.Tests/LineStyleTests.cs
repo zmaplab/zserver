@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,18 +16,18 @@ public class LineStyleTests : BaseTests
 
         var style = new LineStyle
         {
-            Opacity = CSharpExpression<float?>.New(1),
-            Width = CSharpExpression<int?>.New(2),
-            Color = CSharpExpression<string>.New("#3ed53e"),
-            LineJoin = CSharpExpression<string>.New("Round"),
-            Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
-            DashArray = CSharpExpression<float[]>.New(Array.Empty<float>()),
-            DashOffset = CSharpExpression<float?>.New(0),
-            LineCap = CSharpExpression<string>.New("Round"),
-            GapWidth = CSharpExpression<int?>.New(10),
-            Offset = CSharpExpression<int?>.New(0),
-            Blur = CSharpExpression<int?>.New(0),
-            Gradient = CSharpExpression<int?>.New(0)
+            Opacity = CSharpExpressionV2.Create<float?>("1"),
+            Width = CSharpExpressionV2.Create<int?>("2"),
+            Color = CSharpExpressionV2.Create<string>("#3ed53e"),
+            LineJoin = CSharpExpressionV2.Create<string>("Round"),
+            Translate = CSharpExpressionV2.Create<double[]>("new double[] { 1, 1 }"),
+            DashArray = CSharpExpressionV2.Create<float[]>("default"),
+            DashOffset = CSharpExpressionV2.Create<float?>("0"),
+            LineCap = CSharpExpressionV2.Create<string>("Round"),
+            GapWidth = CSharpExpressionV2.Create<int?>("10"),
+            Offset = CSharpExpressionV2.Create<int?>("0"),
+            Blur = CSharpExpressionV2.Create<int?>("0"),
+            Gradient = CSharpExpressionV2.Create<int?>("0")
         };
 
         var width = 1024;
@@ -52,18 +51,18 @@ public class LineStyleTests : BaseTests
 
         var style = new LineStyle
         {
-            Opacity = CSharpExpression<float?>.New(1),
-            Width = CSharpExpression<int?>.New(2),
-            Color = CSharpExpression<string>.New("#3ed53e"),
-            DashArray = CSharpExpression<float[]>.New(new[] { 20, 20f }),
-            DashOffset = CSharpExpression<float?>.New(20),
-            LineCap = CSharpExpression<string>.New("Round"),
-            LineJoin = CSharpExpression<string>.New("Round"),
-            Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
-            GapWidth = CSharpExpression<int?>.New(10),
-            Offset = CSharpExpression<int?>.New(0),
-            Blur = CSharpExpression<int?>.New(0),
-            Gradient = CSharpExpression<int?>.New(0)
+            Opacity = CSharpExpressionV2.Create<float?>("1"),
+            Width = CSharpExpressionV2.Create<int?>("2"),
+            Color = CSharpExpressionV2.Create<string>("#3ed53e"),
+            DashArray = CSharpExpressionV2.Create<float[]>("new[] { 20, 20f }"),
+            DashOffset = CSharpExpressionV2.Create<float?>("20"),
+            LineCap = CSharpExpressionV2.Create<string>("Round"),
+            LineJoin = CSharpExpressionV2.Create<string>("Round"),
+            Translate = CSharpExpressionV2.Create<double[]>("new double[] { 1, 1 }"),
+            GapWidth = CSharpExpressionV2.Create<int?>("10"),
+            Offset = CSharpExpressionV2.Create<int?>("0"),
+            Blur = CSharpExpressionV2.Create<int?>("0"),
+            Gradient = CSharpExpressionV2.Create<int?>("0")
         };
 
         var width = 1024;
@@ -87,18 +86,18 @@ public class LineStyleTests : BaseTests
 
         var style = new LineStyle
         {
-            Opacity = CSharpExpression<float?>.New(1),
-            Width = CSharpExpression<int?>.New(2),
-            Color = CSharpExpression<string>.New("#3ed53e"),
-            DashArray = CSharpExpression<float[]>.New(new[] { 5, 5f }),
-            DashOffset = CSharpExpression<float?>.New(10),
-            LineCap = CSharpExpression<string>.New("Round"),
-            LineJoin = CSharpExpression<string>.New("Round"),
-            Translate = CSharpExpression<double[]>.New(new double[] { 1, 1 }),
-            GapWidth = CSharpExpression<int?>.New(10),
-            Offset = CSharpExpression<int?>.New(0),
-            Blur = CSharpExpression<int?>.New(0),
-            Gradient = CSharpExpression<int?>.New(0)
+            Opacity = CSharpExpressionV2.Create<float?>("1"),
+            Width = CSharpExpressionV2.Create<int?>("2"),
+            Color = CSharpExpressionV2.Create<string>("#3ed53e"),
+            DashArray = CSharpExpressionV2.Create<float[]>("new[] { 5, 5f }"),
+            DashOffset = CSharpExpressionV2.Create<float?>("10"),
+            LineCap = CSharpExpressionV2.Create<string>("Round"),
+            LineJoin = CSharpExpressionV2.Create<string>("Round"),
+            Translate = CSharpExpressionV2.Create<double[]>("new double[] { 1, 1 }"),
+            GapWidth = CSharpExpressionV2.Create<int?>("10"),
+            Offset = CSharpExpressionV2.Create<int?>("0"),
+            Blur = CSharpExpressionV2.Create<int?>("0"),
+            Gradient = CSharpExpressionV2.Create<int?>("0")
         };
 
         var width = 1024;

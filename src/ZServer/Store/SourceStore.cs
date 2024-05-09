@@ -23,6 +23,25 @@ public class SourceStore : ISourceStore
         StorageTypeCache =
             new();
 
+    /// <summary>
+    /// 不需要缓存，Source 直接存于 Layer 中，Layer 会缓存
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public ValueTask<ISource> FindAsync(string name)
+    {
+        return Cache.TryGetValue(name, out var item)
+            ? new ValueTask<ISource>(item.Clone())
+            : new ValueTask<ISource>();
+        // comments: 必须复制对像，不然并发情况会异常
+    }
+
+    public ValueTask<List<ISource>> GetAllAsync()
+    {
+        var items = Cache.Values.Select(x => x.Clone()).ToList();
+        return new ValueTask<List<ISource>>(items);
+    }
+
     public Task Refresh(List<JObject> configurations)
     {
         var existKeys = Cache.Keys.ToList();
@@ -89,28 +108,6 @@ public class SourceStore : ISourceStore
     //
     //     return Task.CompletedTask;
     // }
-
-    /// <summary>
-    /// 不需要缓存，Source 直接存于 Layer 中，Layer 会缓存
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public async Task<ISource> FindAsync(string name)
-    {
-        if (Cache.TryGetValue(name, out var source))
-        {
-            return await Task.FromResult(source.Clone());
-        }
-
-        return null;
-        // comments: 必须复制对像，不然并发情况会异常
-    }
-
-    public Task<List<ISource>> GetAllAsync()
-    {
-        var items = Cache.Values.Select(x => x.Clone()).ToList();
-        return Task.FromResult(items);
-    }
 
     // private ISource Get(IConfigurationSection section)
     // {

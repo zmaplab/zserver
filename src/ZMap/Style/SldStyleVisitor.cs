@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using ZMap.SLD;
 using ZMap.SLD.Filter;
-using ZMap.SLD.Filter.Expression;
 
 namespace ZMap.Style;
 
@@ -116,16 +113,23 @@ public class SldStyleVisitor : IStyleVisitor, IFilterVisitor
             ZoomUnit = ZoomUnits.Scale,
             Name = rule.Name,
             Description = rule.Description?.Title,
-            Filter = CSharpExpression<bool?>.New(null)
+            Filter = CSharpExpressionV2.Create<bool?>("default")
         };
 
         if (rule.FilterType != null)
         {
             rule.FilterType.Accept(this, data);
-            if (_stack.Pop() is CSharpExpression filterExpression)
+            if (_stack.Pop() is CSharpExpressionV2 filterExpression)
             {
-                styleGroup.Filter = CSharpExpression<bool?>.New(null,
-                    $"{(rule.ElseFilter ? "!" : string.Empty)}{filterExpression.Expression}");
+                if (!rule.ElseFilter)
+                {
+                    styleGroup.Filter = filterExpression.Clone() as CSharpExpressionV2<bool?>;
+                }
+                else
+                {
+                    styleGroup.Filter = CSharpExpressionV2.Create<bool?>(
+                        $"!{filterExpression.FuncName}(feature)");
+                }
             }
         }
 

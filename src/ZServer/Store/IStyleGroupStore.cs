@@ -8,6 +8,6 @@ namespace ZServer.Store;
 
 public interface IStyleGroupStore : IRefresher
 {
-    Task<StyleGroup> FindAsync(string name);
-    Task<List<StyleGroup>> GetAllAsync();
+    ValueTask<StyleGroup> FindAsync(string name);
+    ValueTask<List<StyleGroup>> GetAllAsync();
 }

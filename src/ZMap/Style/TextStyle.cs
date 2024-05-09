@@ -1,32 +1,30 @@
-using System.Collections.Generic;
-
 namespace ZMap.Style;
 
 public class TextStyle : VectorStyle
 {
-    public CSharpExpression<string> Label { get; set; }
-    public CSharpExpression<string> Color { get; set; }
-    public CSharpExpression<double[]> Translate { get; set; }
-    public CSharpExpression<float?> Opacity { get; set; }
-    public CSharpExpression<string> BackgroundColor { get; set; }
-    public CSharpExpression<float?> BackgroundOpacity { get; set; }
-    public CSharpExpression<float?> Radius { get; set; }
-    public CSharpExpression<string> RadiusColor { get; set; }
-    public CSharpExpression<float?> RadiusOpacity { get; set; }
-    public CSharpExpression<List<string>> Font { get; set; }
-    public CSharpExpression<int?> Size { get; set; }
-    public CSharpExpression<string> Weight { get; set; }
+    public CSharpExpressionV2<string> Label { get; set; }
+    public CSharpExpressionV2<string> Color { get; set; }
+    public CSharpExpressionV2<double[]> Translate { get; set; }
+    public CSharpExpressionV2<float?> Opacity { get; set; }
+    public CSharpExpressionV2<string> BackgroundColor { get; set; }
+    public CSharpExpressionV2<float?> BackgroundOpacity { get; set; }
+    public CSharpExpressionV2<float?> Radius { get; set; }
+    public CSharpExpressionV2<string> RadiusColor { get; set; }
+    public CSharpExpressionV2<float?> RadiusOpacity { get; set; }
+    public CSharpExpressionV2<List<string>> Font { get; set; }
+    public CSharpExpressionV2<int?> Size { get; set; }
+    public CSharpExpressionV2<string> Weight { get; set; }
 
     /// <summary>
     /// 斜体
     /// </summary>
-    public CSharpExpression<string> Style { get; set; }
+    public CSharpExpressionV2<string> Style { get; set; }
 
-    public CSharpExpression<string> Align { get; set; }
-    public CSharpExpression<float?> Rotate { get; set; }
-    public CSharpExpression<TextTransform> Transform { get; set; }
-    public CSharpExpression<float[]> Offset { get; set; }
-    public CSharpExpression<int?> OutlineSize { get; set; }
+    public CSharpExpressionV2<string> Align { get; set; }
+    public CSharpExpressionV2<float?> Rotate { get; set; }
+    public CSharpExpressionV2<TextTransform> Transform { get; set; }
+    public CSharpExpressionV2<float[]> Offset { get; set; }
+    public CSharpExpressionV2<int?> OutlineSize { get; set; }
 
     public override void Accept(IZMapStyleVisitor visitor, Feature feature)
     {
@@ -38,33 +36,33 @@ public class TextStyle : VectorStyle
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(Label.Expression))
-        {
-            Label.Invoke(feature);
-        }
-        else
-        {
-            var result = feature[Label.Value];
-            Label.Value = result;
-        }
+        // if (!string.IsNullOrWhiteSpace(Label.Expression))
+        // {
+        //     Label.Accept(feature);
+        // }
+        // else
+        // {
+        //     var result = feature[Label.Value];
+        //     Label.Value = result;
+        // }
 
- 
-        Color?.Invoke(feature, "#000000");
-        Opacity?.Invoke(feature, 1);
-        BackgroundColor?.Invoke(feature);
-        BackgroundOpacity?.Invoke(feature, 1);
-        Radius?.Invoke(feature);
-        RadiusColor?.Invoke(feature, "#000000");
-        RadiusOpacity?.Invoke(feature, 1);
-        Font?.Invoke(feature);
-        Weight?.Invoke(feature);
-        Size?.Invoke(feature, 24);
-        Style?.Invoke(feature);
-        Align?.Invoke(feature);
-        Rotate?.Invoke(feature);
-        Transform?.Invoke(feature);
-        Offset?.Invoke(feature);
-        OutlineSize?.Invoke(feature, 2);
+        Label.Accept(feature);
+        Color?.Accept(feature, "#000000");
+        Opacity?.Accept(feature, 1);
+        BackgroundColor?.Accept(feature);
+        BackgroundOpacity?.Accept(feature, 1);
+        Radius?.Accept(feature);
+        RadiusColor?.Accept(feature, "#000000");
+        RadiusOpacity?.Accept(feature, 1);
+        Font?.Accept(feature);
+        Weight?.Accept(feature);
+        Size?.Accept(feature, 24);
+        Style?.Accept(feature);
+        Align?.Accept(feature);
+        Rotate?.Accept(feature);
+        Transform?.Accept(feature);
+        Offset?.Accept(feature);
+        OutlineSize?.Accept(feature, 2);
     }
 
     public override Style Clone()

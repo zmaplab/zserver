@@ -1,9 +1,3 @@
-using System;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using static System.Int32;
-
 namespace ZMap.Infrastructure;
 
 /// <summary>
@@ -75,7 +69,7 @@ public static class Utility
         }
 
         var value = match.Value.Substring(4, match.Value.Length - 4);
-        TryParse(value, out dpi);
+        int.TryParse(value, out dpi);
 
         return dpi;
     }

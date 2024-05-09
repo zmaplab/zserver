@@ -1,5 +1,3 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter.Expression;
 
 [XmlRoot("PropertyName")]
@@ -13,7 +11,7 @@ public class PropertyNameType : ExpressionType
 
     public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        visitor.Push(ZMap.Style.CSharpExpression.New($"feature[\"{Text.Trim()}\"]"));
+        visitor.Push(CSharpExpressionV2.Create<dynamic>($"feature[\"{Text.Trim()}\"]"));
         return null;
     }
 }

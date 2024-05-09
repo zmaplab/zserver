@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace ZMap.Permission;
 
 public interface IPermissionService

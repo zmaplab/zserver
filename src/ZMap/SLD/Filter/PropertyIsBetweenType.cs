@@ -1,10 +1,7 @@
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("PropertyIsBetween")]
 public class PropertyIsBetweenType : ComparisonOpsType
@@ -21,21 +18,21 @@ public class PropertyIsBetweenType : ComparisonOpsType
     public override object Accept(IFilterVisitor visitor, object extraData)
     {
         visitor.VisitObject(Item, extraData);
-        var propertyExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var propertyExpression = (CSharpExpressionV2)visitor.Pop();
 
         visitor.VisitObject(LowerBoundary, extraData);
-        var lowerBoundaryExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var lowerBoundaryExpression = (CSharpExpressionV2)visitor.Pop();
 
         visitor.VisitObject(UpperBoundary, extraData);
-        var upperBoundaryExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var upperBoundaryExpression = (CSharpExpressionV2)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({propertyExpression.Expression}, {lowerBoundaryExpression.Expression}, {upperBoundaryExpression.Expression})"));
+        visitor.Push(CSharpExpressionV2.Create<bool>(
+            $"{propertyExpression.FuncName}(feature) >= {lowerBoundaryExpression.FuncName}(feature) && {propertyExpression.FuncName}(feature) <= {upperBoundaryExpression.FuncName}(feature)"));
 
         return null;
     }
 
-    [System.SerializableAttribute]
+    [Serializable]
     public enum PropertyIsBetweenChoiceType
     {
         /// <remarks/>

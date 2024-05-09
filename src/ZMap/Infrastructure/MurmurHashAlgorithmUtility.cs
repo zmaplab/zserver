@@ -1,6 +1,3 @@
-using System.Text;
-using Murmur;
-
 namespace ZMap.Infrastructure;
 
 public static class MurmurHashAlgorithmUtility

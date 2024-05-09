@@ -1,5 +1,4 @@
 using ZMap.SLD.Filter;
-using ZMap.SLD.Filter.Expression;
 
 namespace ZMap.SLD;
 

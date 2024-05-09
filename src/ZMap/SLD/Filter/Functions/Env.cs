@@ -1,5 +1,3 @@
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter.Functions;
 
 public class Env(FunctionType1 functionType1)
@@ -8,10 +6,10 @@ public class Env(FunctionType1 functionType1)
     {
         visitor.Visit(functionType1.Items[0], extraData);
 
-        var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
-        var resultExpression = ZMap.Style.CSharpExpression.New($$"""
-feature.GetEnvValue({{expression.Expression}})
-""");
+        var expression = (CSharpExpressionV2)visitor.Pop();
+        var resultExpression = CSharpExpressionV2.Create<dynamic>($$"""
+                                                                   feature.GetEnvironmentValue({{expression.FuncName}}(feature))
+                                                                   """);
         visitor.Push(resultExpression);
 
         return null;

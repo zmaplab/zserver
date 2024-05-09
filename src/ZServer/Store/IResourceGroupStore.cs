@@ -15,11 +15,11 @@ public interface IResourceGroupStore : IRefresher
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    Task<ResourceGroup> FindAsync(string name);
+    ValueTask<ResourceGroup> FindAsync(string name);
 
     /// <summary>
     /// 查询所有资源组
     /// </summary>
     /// <returns></returns>
-    Task<List<ResourceGroup>> GetAllAsync();
+    ValueTask<List<ResourceGroup>> GetAllAsync();
 }

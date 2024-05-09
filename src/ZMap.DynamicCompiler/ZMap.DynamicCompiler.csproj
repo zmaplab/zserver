@@ -10,8 +10,9 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="DotNetCore.Natasha.CSharp" Version="5.2.2.1" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+        <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler.Domain" Version="8.0.0" />
+        <PackageReference Include="DotNetCore.Natasha.CSharp.Template.Core" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ZMap\ZMap.csproj" />

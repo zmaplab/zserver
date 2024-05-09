@@ -1,9 +1,3 @@
-using System;
-using System.Linq;
-using ZMap.SLD.Filter.Expression;
-using ZMap.Style;
-using Convert = ZMap.Infrastructure.Convert;
-
 namespace ZMap.SLD;
 
 public static class ParameterValueListExtensions
@@ -13,13 +7,12 @@ public static class ParameterValueListExtensions
         return parameters.FirstOrDefault(x => x.Name == name);
     }
 
-    public static CSharpExpression<T> BuildExpression<T>(this ParameterValue parameter, IStyleVisitor visitor,
-        object extraData,
-        T defaultValue)
+    public static CSharpExpressionV2<T> BuildExpressionV2<T>(this ParameterValue parameter, IStyleVisitor visitor,
+        object extraData)
     {
         if (parameter == null)
         {
-            return CSharpExpression<T>.New(defaultValue);
+            return CSharpExpressionV2.Create<T>("default");
         }
         else
         {
@@ -27,32 +20,65 @@ public static class ParameterValueListExtensions
             var value = visitor.Pop();
             if (value == null)
             {
-                return CSharpExpression<T>.New(defaultValue);
+                return CSharpExpressionV2.Create<T>("default");
             }
 
-            var type = typeof(T);
-            Type valueType;
-            if (type.Name == "Nullable`1" && type.Namespace == "System")
-            {
-                valueType = type.GenericTypeArguments.ElementAt(0);
-            }
-            else
-            {
-                valueType = type;
-            }
+            return CSharpExpressionV2.Create<T>(value.ToString());
 
-            return CSharpExpression<T>.From(System.Convert.ChangeType(value, valueType), defaultValue);
+            // var type = typeof(T);
+            // Type valueType;
+            // if (type.Name == "Nullable`1" && type.Namespace == "System")
+            // {
+            //     valueType = type.GenericTypeArguments.ElementAt(0);
+            // }
+            // else
+            // {
+            //     valueType = type;
+            // }
+            //
+            // return CSharpExpression<T>.From(System.Convert.ChangeType(value, valueType), defaultValue);
         }
     }
 
-    public static CSharpExpression<T[]> BuildArrayExpression<T>(this ParameterValue parameter,
+    // public static CSharpExpression<T> BuildExpression<T>(this ParameterValue parameter, IStyleVisitor visitor,
+    //     object extraData,
+    //     T defaultValue)
+    // {
+    //     if (parameter == null)
+    //     {
+    //         return CSharpExpression<T>.New(defaultValue);
+    //     }
+    //     else
+    //     {
+    //         parameter.Accept(visitor, extraData);
+    //         var value = visitor.Pop();
+    //         if (value == null)
+    //         {
+    //             return CSharpExpression<T>.New(defaultValue);
+    //         }
+    //
+    //         var type = typeof(T);
+    //         Type valueType;
+    //         if (type.Name == "Nullable`1" && type.Namespace == "System")
+    //         {
+    //             valueType = type.GenericTypeArguments.ElementAt(0);
+    //         }
+    //         else
+    //         {
+    //             valueType = type;
+    //         }
+    //
+    //         return CSharpExpression<T>.From(System.Convert.ChangeType(value, valueType), defaultValue);
+    //     }
+    // }
+
+    public static CSharpExpressionV2<T> BuildArrayExpressionV2<T>(this ParameterValue parameter,
         IExpressionVisitor visitor,
-        object extraData,
-        T[] defaultValue)
+        object extraData)
     {
         if (parameter == null)
         {
-            return CSharpExpression<T[]>.New(defaultValue);
+            return CSharpExpressionV2.Create<T>("default");
         }
         else
         {
@@ -65,25 +91,66 @@ public static class ParameterValueListExtensions
                 }
 
                 var result = visitor.Pop();
-                if (result is CSharpExpression expression)
+                if (result is CSharpExpressionV2<T>)
                 {
-                    return result as CSharpExpression<T[]> ?? CSharpExpression<T[]>.New(null, expression.Expression);
+                    // return result as CSharpExpression<T[]> ?? CSharpExpression<T[]>.New(null, expression.Expression);
+                    return result;
                 }
-                else
-                {
-                    text = result.ToString();
-                }
+
+                text = result.ToString();
             }
 
             if (string.IsNullOrWhiteSpace(text))
             {
-                return CSharpExpression<T[]>.New(defaultValue);
+                return CSharpExpressionV2.Create<T>("default");
             }
-            else
-            {
-                var array = Convert.ToArray<T>(text);
-                return CSharpExpression<T[]>.New(array);
-            }
+
+            var array = text.Replace(' ', ',');
+            return CSharpExpressionV2.Create<T>($$"""
+                                               new {{typeof(T).FullName}} { {{array}} }
+                                               """);
         }
     }
+
+    // public static CSharpExpression<T[]> BuildArrayExpression<T>(this ParameterValue parameter,
+    //     IExpressionVisitor visitor,
+    //     object extraData,
+    //     T[] defaultValue)
+    // {
+    //     if (parameter == null)
+    //     {
+    //         return CSharpExpression<T[]>.New(defaultValue);
+    //     }
+    //     else
+    //     {
+    //         var text = parameter.Text?.ElementAtOrDefault(0);
+    //         if (text == null)
+    //         {
+    //             foreach (var expressionType in parameter.Items)
+    //             {
+    //                 expressionType.Accept(visitor, extraData);
+    //             }
+    //
+    //             var result = visitor.Pop();
+    //             if (result is CSharpExpression expression)
+    //             {
+    //                 return result as CSharpExpression<T[]> ?? CSharpExpression<T[]>.New(null, expression.Expression);
+    //             }
+    //             else
+    //             {
+    //                 text = result.ToString();
+    //             }
+    //         }
+    //
+    //         if (string.IsNullOrWhiteSpace(text))
+    //         {
+    //             return CSharpExpression<T[]>.New(defaultValue);
+    //         }
+    //         else
+    //         {
+    //             var array = Convert.ToArray<T>(text);
+    //             return CSharpExpression<T[]>.New(array);
+    //         }
+    //     }
+    // }
 }

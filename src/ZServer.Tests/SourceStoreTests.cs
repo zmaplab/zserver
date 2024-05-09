@@ -20,7 +20,7 @@ public class SourceStoreTests : BaseTests
         /// 
         /// </summary>
         // [JsonProperty("value")]
-        public CSharpExpression<string> Value { get; set; }
+        public CSharpExpressionV2<string> Value { get; set; }
 
         /// <summary>
         /// 

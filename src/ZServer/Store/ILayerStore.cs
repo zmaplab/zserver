@@ -16,19 +16,19 @@ public interface ILayerStore : IRefresher
     /// <param name="resourceGroupName"></param>
     /// <param name="layerName"></param>
     /// <returns></returns>
-    Task<Layer> FindAsync(string resourceGroupName, string layerName);
+    ValueTask<Layer> FindAsync(string resourceGroupName, string layerName);
 
-    // Task<ILayer> FindAsync(string layerName);
-
-    /// <summary>
-    /// 查询所有图层配置
-    /// </summary>
-    /// <returns></returns>
-    Task<List<Layer>> GetAllAsync();
+    ValueTask<Layer> FindAsync(string layerName);
 
     /// <summary>
     /// 查询所有图层配置
     /// </summary>
     /// <returns></returns>
-    Task<List<Layer>> GetListAsync(string resourceGroupName);
+    ValueTask<List<Layer>> GetAllAsync();
+
+    /// <summary>
+    /// 查询所有图层配置
+    /// </summary>
+    /// <returns></returns>
+    ValueTask<List<Layer>> GetListAsync(string resourceGroupName);
 }

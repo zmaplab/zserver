@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-
-namespace ZMap.SLD;
+﻿namespace ZMap.SLD;
 
 /// <summary>
 /// https://schemas.opengis.net/sld/1.1/StyledLayerDescriptor.xsd

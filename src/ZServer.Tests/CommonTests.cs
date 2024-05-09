@@ -18,7 +18,7 @@ public class CommonTests
     [Fact]
     public void Convert()
     {
-        var result = ZMap.Infrastructure.Convert.ToObject<int?>("2");
+        var result = ZConvert.ToObject<int?>("2");
         Assert.Equal(2, result);
     }
 }

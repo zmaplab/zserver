@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Xml;
-using NetTopologySuite.Geometries;
-using ProjNet.CoordinateSystems;
-using ProjNet.CoordinateSystems.Transformations;
+
 
 namespace ZMap.Infrastructure;
 
