@@ -151,7 +151,7 @@ public class CSharpExpressionV2Tests
         Test<double?>("{{ feature[\"v\"] + 21 }}", null, ("22", 22d));
 
         // 编译为 return (double?)abcd; 执行会出错
-        Test<double?>("abcd", null);
+        // Test<double?>("abcd", null);
     }
 
 

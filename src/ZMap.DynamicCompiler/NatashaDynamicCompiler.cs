@@ -1,38 +1,30 @@
-﻿using Natasha.CSharp.Template;
-using ZMap.Infrastructure;
+﻿using ZMap.Infrastructure;
 
 namespace ZMap.DynamicCompiler;
 
 public class NatashaDynamicCompiler : CSharpDynamicCompiler
 {
-    protected override Func<Feature, dynamic> BuildFunc(string script)
-    {
-        var body = script.EndsWith(";")
-            ? script
-            : $"""
-               return {script};
-               """;
-
-        var f = FastMethodOperator.DefaultDomain()
-            .Param(typeof(Feature), "feature")
-            .Using("System")
-            .Using("System.Collections")
-            .Using("System.Collections.Generic")
-            .Using("System.Linq")
-            .Using("System.Text.Json")
-            .Using("NetTopologySuite.Features")
-            .Using("Newtonsoft.Json.Linq")
-            .Body(body)
-            .Compile<Func<Feature, dynamic>>();
-        return f;
-    }
-
-    // public override Type BuildType(string script)
-    // {
-    //     var nClass = NClass.DefaultDomain();
-    //     nClass.Body(script);
-    //     return nClass.GetType();
-    // }
+//     protected override Func<Feature, dynamic> BuildFunc(string script)
+//     {
+//         var body = script.EndsWith(";")
+//             ? script
+//             : $"""
+//                return {script};
+//                """;
+//
+//         var f = FastMethodOperator.DefaultDomain()
+//             .Param(typeof(Feature), "feature")
+//             .Using("System")
+//             .Using("System.Collections")
+//             .Using("System.Collections.Generic")
+//             .Using("System.Linq")
+//             .Using("System.Text.Json")
+//             .Using("NetTopologySuite.Features")
+//             .Using("Newtonsoft.Json.Linq")
+//             .Body(body)
+//             .Compile<Func<Feature, dynamic>>();
+//         return f;
+//     }
 
     protected override Func<Feature, T> BuildFunc<T>(string script)
     {
@@ -40,9 +32,7 @@ public class NatashaDynamicCompiler : CSharpDynamicCompiler
         var body = $"""
                     return ({type})({script});
                     """;
-
-        var f = FastMethodOperator.DefaultDomain()
-            .Param(typeof(Feature), "feature")
+        var f = FastMethodOperator.DefaultDomain().Param(typeof(Feature), "feature")
             .Using("System")
             .Using("System.Collections")
             .Using("System.Collections.Generic")
@@ -57,7 +47,6 @@ public class NatashaDynamicCompiler : CSharpDynamicCompiler
 
     protected override void Initialize()
     {
-        NatashaManagement.RegistDomainCreator<NatashaDomainCreator>();
-        NatashaManagement.Preheating(false, false);
+        NatashaManagement.Preheating<NatashaDomainCreator>(false, true, true);
     }
 }
