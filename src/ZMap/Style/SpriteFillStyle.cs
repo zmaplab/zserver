@@ -6,7 +6,7 @@ public class SpriteFillStyle : ResourceFillStyle
     {
         base.Accept(visitor, feature);
 
-        Pattern?.Invoke(feature);
+        Pattern?.Accept(feature);
     }
 
     public override Style Clone()

@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using ZMap.Extensions;
-using ZMap.Infrastructure;
-using ZMap.Permission;
-using ZMap.Source;
+﻿
 
 namespace ZMap.Ogc.Wms;
 

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Orleans;
-using ZMap;
 using ZMap.Infrastructure;
 using ZServer.Interfaces.WMTS;
 
@@ -46,7 +45,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
 
         if (System.IO.File.Exists(path))
         {
-            if (EnvironmentVariables.EnableSensitiveDataLogging)
+            if (ZMap.EnvironmentVariables.EnableSensitiveDataLogging)
             {
                 var displayUrl =
                     $"[{HttpContext.TraceIdentifier}] LAYERS={layers}&STYLES={style}&FORMAT={format}&TILEMATRIXSET={tileMatrixSet}&TILEMATRIX={tileMatrix}&TILEROW={tileRow}&TILECOL={tileCol}";

@@ -34,6 +34,7 @@ public abstract class BaseTests
         Service = serviceCollection.BuildServiceProvider();
         var syncService = Service.GetRequiredService<StoreRefreshService>();
         var configurationProvider = Service.GetRequiredService<JsonStoreProvider>();
+ 
         syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
     }
 

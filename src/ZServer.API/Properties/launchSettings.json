@@ -6,7 +6,7 @@
       "environmentVariables": {
         "HOST_IP": "192.168.31.111",
         "EnableAuthorization": "false",
-        "EnableSensitiveDataLogging": "true",
+        "EnableSensitiveDataLogging": "false",
         "standalone": "false"
       }
     }

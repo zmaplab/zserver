@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Concurrent;
-
 namespace ZMap.Infrastructure;
 
 public abstract class CSharpDynamicCompiler
@@ -47,7 +44,7 @@ public abstract class CSharpDynamicCompiler
             return null;
         }
 
-        return FuncCache.GetOrAdd(expression, _ => _instance.BuildFunc(expression));
+        return FuncCache.GetOrAdd(expression.GetHashCode().ToString(), _ => _instance.BuildFunc(expression));
     }
 
     public static Func<Feature, T> GetOrCreateFunc<T>(string expression)
@@ -57,6 +54,12 @@ public abstract class CSharpDynamicCompiler
             return null;
         }
 
-        return FuncCache.GetOrAdd(expression, _ => _instance.BuildFunc<T>(expression));
+        return FuncCache.GetOrAdd($"{expression.GetHashCode()}:{typeof(T).FullName}",
+            _ => _instance.BuildFunc<T>(expression));
+    }
+
+    public static Func<Feature, T> GetOrCreateFuncWithoutCache<T>(string expression)
+    {
+        return _instance?.BuildFunc<T>(expression);
     }
 }

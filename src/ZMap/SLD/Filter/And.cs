@@ -1,9 +1,7 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("And")]
 public class And : BinaryLogicOpType
@@ -13,10 +11,10 @@ public class And : BinaryLogicOpType
         var left = Items[0];
         var right = Items[1];
         visitor.VisitObject(left, extraData);
-        var leftExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var leftExpression = (CSharpExpressionV2)visitor.Pop();
         visitor.VisitObject(right, extraData);
-        var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
-        visitor.Push(ZMap.Style.CSharpExpression.New($"{leftExpression.Expression} && {rightExpression.Expression}"));
+        var rightExpression = (CSharpExpressionV2)visitor.Pop();
+        visitor.Push(CSharpExpressionV2.Create<bool>($"{leftExpression.FuncName}(feature) && {rightExpression.FuncName}(feature)"));
         return null;
     }
 }

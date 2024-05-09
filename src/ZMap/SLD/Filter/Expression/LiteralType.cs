@@ -1,5 +1,3 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter.Expression;
 
 [XmlRoot("Literal")]
@@ -13,7 +11,7 @@ public class LiteralType : ExpressionType
 
     public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        visitor.Push(ZMap.Style.CSharpExpression.New($"\"{Value}\""));
+        visitor.Push(CSharpExpressionV2.Create<string>(Value));
         return null;
     }
 }

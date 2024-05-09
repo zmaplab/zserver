@@ -1,5 +1,3 @@
-using NetTopologySuite.Geometries;
-
 namespace ZMap.Renderer;
 
 public interface IRenderer;

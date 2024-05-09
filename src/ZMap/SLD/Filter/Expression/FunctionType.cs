@@ -1,5 +1,3 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter.Expression;
 
 /// <remarks/>
@@ -14,7 +12,7 @@ namespace ZMap.SLD.Filter.Expression;
 // [XmlIncludeAttribute(typeof(SubstringType))]
 // [XmlIncludeAttribute(typeof(FormatDateType))]
 // [XmlIncludeAttribute(typeof(FormatNumberType))]
-[System.SerializableAttribute]
+[Serializable]
 [XmlType(Namespace = "http://www.opengis.net/ogc")]
 public abstract class FunctionType : ExpressionType
 {

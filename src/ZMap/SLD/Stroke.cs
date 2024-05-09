@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-using ZMap.Style;
-
 namespace ZMap.SLD;
 
 public class Stroke
@@ -75,20 +69,19 @@ public class Stroke
         }
 
         strokeStyle.Color =
-            Color.BuildExpression(visitor, extraData, (string)DefaultValues["stroke"]);
+            Color.BuildExpressionV2<string>(visitor, extraData);
         strokeStyle.Width =
-            Width.BuildExpression(visitor, extraData, (int?)DefaultValues["stroke-width"]);
+            Width.BuildExpressionV2<int?>(visitor, extraData);
         strokeStyle.Opacity =
-            Opacity.BuildExpression(visitor, extraData, (float?)DefaultValues["stroke-opacity"]);
+            Opacity.BuildExpressionV2<float?>(visitor, extraData);
         strokeStyle.LineJoin =
-            LineJoin.BuildExpression(visitor, extraData, (string)DefaultValues["stroke-linejoin"]);
+            LineJoin.BuildExpressionV2<string>(visitor, extraData);
         strokeStyle.LineCap =
-            LineCap.BuildExpression(visitor, extraData, (string)DefaultValues["stroke-linecap"]);
+            LineCap.BuildExpressionV2<string>(visitor, extraData);
         strokeStyle.DashOffset =
-            DashOffset.BuildExpression(visitor, extraData, (float?)DefaultValues["stroke-dashoffset"]);
+            DashOffset.BuildExpressionV2<float?>(visitor, extraData);
         strokeStyle.DashArray =
-            DashArray.BuildArrayExpression<float>(visitor as IExpressionVisitor, extraData, null);
-
+            DashArray.BuildArrayExpressionV2<float[]>(visitor as IExpressionVisitor, extraData);
 
         visitor.Push(strokeStyle);
     }

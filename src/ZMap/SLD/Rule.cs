@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
-using ZMap.SLD.Filter;
+﻿using ZMap.SLD.Filter;
 
 namespace ZMap.SLD;
 

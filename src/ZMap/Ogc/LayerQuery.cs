@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace ZMap.Ogc;
 
 public record LayerQuery(

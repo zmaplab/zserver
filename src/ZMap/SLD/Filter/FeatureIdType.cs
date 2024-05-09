@@ -1,9 +1,7 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("FeatureId")]
 public class FeatureIdType : AbstractIdType

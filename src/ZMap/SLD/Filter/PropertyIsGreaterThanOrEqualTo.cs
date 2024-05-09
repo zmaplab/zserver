@@ -1,7 +1,3 @@
-using System;
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
@@ -25,12 +21,12 @@ public class PropertyIsGreaterThanOrEqualTo
         var compareExpression = Items[index == 0 ? 1 : 0];
 
         visitor.VisitObject(propertyExpression, extraData);
-        var leftExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var leftExpression = (CSharpExpressionV2)visitor.Pop();
         visitor.VisitObject(compareExpression, extraData);
-        var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var rightExpression = (CSharpExpressionV2)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.GreaterThanOrEqualTo({leftExpression.Expression}, {rightExpression.Expression})"));
+        visitor.Push(CSharpExpressionV2.Create<bool>(
+            $"{(MatchCase ? string.Empty : "!")}({leftExpression.FuncName}(feature) >= {rightExpression.FuncName}(feature))"));
 
         return null;
     }

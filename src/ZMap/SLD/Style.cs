@@ -1,5 +1,3 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD;
 
 public abstract class Style : IStyle

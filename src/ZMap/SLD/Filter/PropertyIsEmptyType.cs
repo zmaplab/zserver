@@ -1,10 +1,7 @@
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("PropertyIsEmpty")]
 public class PropertyIsEmptyType : ComparisonOpsType
@@ -16,9 +13,9 @@ public class PropertyIsEmptyType : ComparisonOpsType
     {
         visitor.VisitObject(PropertyName, extraData);
 
-        var expression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var expression = (CSharpExpressionV2)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New($"string.IsNullOrWhiteSpace({expression.Expression}?.ToString())"));
+        visitor.Push(CSharpExpressionV2.Create<bool>($"string.IsNullOrWhiteSpace({expression.FuncName}(feature)?.ToString())"));
 
         return null;
     }

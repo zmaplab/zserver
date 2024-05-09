@@ -1,5 +1,3 @@
-using NetTopologySuite.Geometries;
-
 // ReSharper disable InconsistentNaming
 
 namespace ZMap;

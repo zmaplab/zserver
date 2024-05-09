@@ -2,7 +2,6 @@
   "sources": {
     "berlin_db": {
       "provider": "ZMap.Source.Postgre.PostgreSource, ZMap.Source.Postgre",
-      "database": "berlin",
       "connectionString": "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=berlin;Pooling=true;"
     },
     "berlin_shp": {
@@ -19,32 +18,17 @@
       "styles": [
         {
           "type": "fill",
-          "filter": "feature[\"height\"] > 10",
+          "filter": "{{ feature[\"height\"] > 10 }}",
           "antialias": true,
-          "opacity": {
-            "value": "1",
-            "expression": "feature[\"opacity\"]"
-          },
-          "color": {
-            "value": "#3ed53e",
-            "expression": "feature[\"color\"]"
-          },
-          "translate": {
-            "value": [
-              1,
-              2
-            ],
-            "expression": "feature[\"translate\"]"
-          },
-          "translateAnchor": {
-            "value": "viewport",
-            "expression": "feature[\"translateAnchor\"]"
-          },
+          "opacity": "{{ feature[\"opacity\"] }}",
+          "color": "{{ feature[\"color\"] }}",
+          "translate": [
+            1,
+            2
+          ],
+          "translateAnchor": "{{ (ZMap.Style.TranslateAnchor)Enum.Parse(typeof(ZMap.Style.TranslateAnchor), feature[\"translateAnchor\"]) }}",
           "pattern": "sprite pattern",
-          "uri": {
-            "value": "file://images/colorblocks1.png",
-            "expression": "feature[\"uri\"]"
-          }
+          "uri": "file://images/colorblocks1.png"
         },
         {
           "type": "line",
@@ -57,49 +41,22 @@
           ],
           "dashOffset": 10,
           "lineJoin": "lineJoin string",
-          "translate": {
-            "value": [
-              1,
-              2
-            ],
-            "expression": "feature[\"translate\"]"
-          },
-          "translateAnchor": {
-            "value": "viewport",
-            "expression": "feature[\"translateAnchor\"]"
-          },
-          "gapWidth": {
-            "value": 1,
-            "expression": "feature[\"gapWidth\"]"
-          },
-          "offset": {
-            "value": 2,
-            "expression": "feature[\"offset\"]"
-          },
-          "blur": {
-            "value": 3,
-            "expression": "feature[\"blur\"]"
-          },
-          "gradient": {
-            "value": 4,
-            "expression": "feature[\"blur\"]"
-          },
-          "pattern": {
-            "value": "sprite pattern",
-            "expression": "feature[\"sprite-pattern\"]"
-          },
-          "uri": {
-            "value": "file://images/colorblocks1.png",
-            "expression": "feature[\"uri\"]"
-          }
+          "translate": [
+            1.0,
+            2.0
+          ],
+          "translateAnchor": "{{ (ZMap.Style.TranslateAnchor)Enum.Parse(typeof(ZMap.Style.TranslateAnchor), feature[\"translateAnchor\"]) }}",
+          "gapWidth": "{{ feature[\"gapWidth\"] }}",
+          "offset": "{{ feature[\"offset\"] }}",
+          "blur": "{{ feature[\"blur\"] }}",
+          "gradient": "{{ feature[\"gradient\"] }}",
+          "pattern": "{{ feature[\"sprite-pattern\"] }}",
+          "uri": "{{ feature[\"uri\"] }}"
         },
         {
           "filter": false,
           "type": "text",
-          "label": {
-            "value": "property string",
-            "expression": "property expression"
-          },
+          "label": "property expression",
           "align": "auto",
           "font": [
             "Open Sans Regular",
@@ -108,7 +65,7 @@
           "color": "#3ed53e",
           "size": 16,
           "rotate": 10,
-          "transform": "none",
+          "transform": "None",
           "offset": [
             90,
             90

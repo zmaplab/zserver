@@ -5,8 +5,8 @@ using Xunit;
 
 namespace ZServer.Tests;
 
-public class ApiTests(WebApplicationFactory<ZServer.API.Program> factory)
-    : IClassFixture<WebApplicationFactory<ZServer.API.Program>>
+public class ApiTests(WebApplicationFactory<API.Program> factory)
+    : IClassFixture<WebApplicationFactory<API.Program>>
 {
     [Fact]
     public async Task Wms()

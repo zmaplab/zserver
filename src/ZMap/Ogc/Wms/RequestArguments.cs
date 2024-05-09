@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using NetTopologySuite.Geometries;
-
-namespace ZMap.Ogc.Wms;
+﻿namespace ZMap.Ogc.Wms;
 
 public record RequestArguments(
     Envelope Envelope,

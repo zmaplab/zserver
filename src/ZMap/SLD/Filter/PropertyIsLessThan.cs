@@ -1,9 +1,7 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("PropertyIsLessThan")]
 public class PropertyIsLessThan
@@ -14,12 +12,12 @@ public class PropertyIsLessThan
         var left = Items[0];
         var right = Items[1];
         visitor.VisitObject(left, extraData);
-        var leftExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var leftExpression = (CSharpExpressionV2)visitor.Pop();
         visitor.VisitObject(right, extraData);
-        var rightExpression = (ZMap.Style.CSharpExpression)visitor.Pop();
+        var rightExpression = (CSharpExpressionV2)visitor.Pop();
 
-        visitor.Push(ZMap.Style.CSharpExpression.New(
-            $"{(MatchCase ? string.Empty : "!")}ZMap.SLD.Filter.Methods.LessThan({leftExpression.Expression}, {rightExpression.Expression})"));
+        visitor.Push(CSharpExpressionV2.Create<bool>(
+            $"{(MatchCase ? string.Empty : "!")}({leftExpression.FuncName}(feature) < {rightExpression.FuncName}(feature))"));
 
         return null;
     }

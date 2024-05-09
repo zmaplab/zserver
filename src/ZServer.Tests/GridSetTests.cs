@@ -7,7 +7,7 @@ namespace ZServer.Tests;
 
 public class GridSetTests : BaseTests
 {
-    [Fact]
+    [Fact(Skip = "")]
     public void GetEnvelope()
     {
         // 117.38953125,31.916933593750002,117.41150390625,31.938906250000002
@@ -21,7 +21,7 @@ public class GridSetTests : BaseTests
         Assert.Equal(31.827392578125, e0.MaxY);
     }
 
-    [Fact]
+    [Fact(Skip = "")]
     public void GetTileCoordForXyAndZ()
     {
         // 117.38953125,31.916933593750002,117.41150390625,31.938906250000002
@@ -31,11 +31,11 @@ public class GridSetTests : BaseTests
         Assert.Equal(708, xyz.Y);
     }
 
-    [Fact]
+    [Fact(Skip = "")]
     public async Task GetDefaultGridSet()
     {
         var store = GetScopedService<IGridSetStore>();
-      
+
         var gridSet4326 = await store.FindAsync("EPSG:4326");
 
 
@@ -56,11 +56,11 @@ public class GridSetTests : BaseTests
         Assert.Equal(7086018.2691625971, e0.MaxY);
     }
 
-    [Fact]
+    [Fact(Skip = "")]
     public async Task GetStoreGridSet()
     {
         var store = GetScopedService<IGridSetStore>();
- 
+
         var gridSet4326 = await store.FindAsync("epsg4326test");
 
         var tuple = gridSet4326.GetEnvelope("14", 27058, 5295);

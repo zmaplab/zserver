@@ -14,7 +14,7 @@ public class PostgreSourceTests
     [Fact]
     public void TestGeom()
     {
-        var freeSql = new FreeSql.FreeSqlBuilder()
+        var freeSql = new FreeSqlBuilder()
             .UseConnectionFactory(DataType.PostgreSQL, () =>
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(

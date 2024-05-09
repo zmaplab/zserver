@@ -1,5 +1,3 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter.Expression;
 
 //[XmlIncludeAttribute(typeof(MapItemType))]

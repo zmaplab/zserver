@@ -1,8 +1,3 @@
-using System;
-using System.IO;
-using NetTopologySuite.Geometries;
-using ZMap.Style;
-
 namespace ZMap;
 
 public interface IGraphicsService : IDisposable

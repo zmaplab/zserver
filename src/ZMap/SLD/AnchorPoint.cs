@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace ZMap.SLD;
+﻿namespace ZMap.SLD;
 
 public class AnchorPoint
 {

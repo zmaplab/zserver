@@ -1,10 +1,7 @@
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 public class LowerBoundaryType
 {
@@ -25,7 +22,7 @@ public class LowerBoundaryType
     [XmlElement("ItemElementName")]
     public LowerBoundaryChoiceType ItemElementName { get; set; }
 
-    [System.SerializableAttribute]
+    [Serializable]
     [XmlType]
     public enum LowerBoundaryChoiceType
     {

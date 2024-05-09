@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-
 namespace ZMap.Style;
 
 public class StyleGroup : IVisibleLimit
 {
-    public CSharpExpression<bool?> Filter { get; set; }
+    public CSharpExpressionV2<bool?> Filter { get; set; }
 
     /// <summary>
     /// 样式组名称
@@ -63,7 +61,7 @@ public class StyleGroup : IVisibleLimit
             return;
         }
 
-        Filter?.Invoke(feature);
+        Filter?.Accept(feature);
 
         foreach (var style in Styles)
         {

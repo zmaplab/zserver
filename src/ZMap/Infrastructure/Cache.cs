@@ -1,6 +1,3 @@
-using System;
-using Microsoft.Extensions.Caching.Memory;
-
 namespace ZMap.Infrastructure;
 
 public static class Cache

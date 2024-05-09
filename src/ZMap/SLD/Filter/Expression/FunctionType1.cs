@@ -1,10 +1,7 @@
-using System.Xml.Serialization;
-using ZMap.SLD.Filter.Functions;
-
 namespace ZMap.SLD.Filter.Expression;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType(TypeName = "FunctionType")]
 [XmlRoot("Function")]
 public class FunctionType1 : ExpressionType
@@ -34,18 +31,18 @@ public class FunctionType1 : ExpressionType
         // TODO: 登录反射来注册，不再使用 Switch
         switch (Name)
         {
-            case "ToArray":
-            {
-                var func = new ToArray(this);
-                func.Accept(visitor, extraData);
-                break;
-            }
-            case "ToString":
-            {
-                var func = new ToString(this);
-                func.Accept(visitor, extraData);
-                break;
-            }
+            // case "ToArray":
+            // {
+            //     var func = new ToArray(this);
+            //     func.Accept(visitor, extraData);
+            //     break;
+            // }
+            // case "ToString":
+            // {
+            //     var func = new ToString(this);
+            //     func.Accept(visitor, extraData);
+            //     break;
+            // }
             case "Env":
             {
                 var func = new Env(this);
@@ -58,7 +55,7 @@ public class FunctionType1 : ExpressionType
     }
 
     /// <remarks/>
-    [System.SerializableAttribute]
+    [Serializable]
     [XmlType]
     public enum Function1ItemsChoiceType
     {

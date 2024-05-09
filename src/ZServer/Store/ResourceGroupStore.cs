@@ -10,6 +10,19 @@ public class ResourceGroupStore : IResourceGroupStore
 {
     private static Dictionary<string, ResourceGroup> _cache = new();
 
+    public ValueTask<ResourceGroup> FindAsync(string name)
+    {
+        return _cache.TryGetValue(name, out var resourceGroup)
+            ? new ValueTask<ResourceGroup>(resourceGroup.Clone())
+            : new ValueTask<ResourceGroup>();
+    }
+
+    public ValueTask<List<ResourceGroup>> GetAllAsync()
+    {
+        var items = _cache.Values.Select(x => x.Clone()).ToList();
+        return new ValueTask<List<ResourceGroup>>(items);
+    }
+
     public Task Refresh(List<JObject> configurations)
     {
         var dict = new Dictionary<string, ResourceGroup>();
@@ -59,20 +72,4 @@ public class ResourceGroupStore : IResourceGroupStore
     //     _cache = dict;
     //     return Task.CompletedTask;
     // }
-
-    public async Task<ResourceGroup> FindAsync(string name)
-    {
-        if (_cache.TryGetValue(name, out var resourceGroup))
-        {
-            return await Task.FromResult(resourceGroup.Clone());
-        }
-
-        return null;
-    }
-
-    public Task<List<ResourceGroup>> GetAllAsync()
-    {
-        var items = _cache.Values.Select(x => x.Clone()).ToList();
-        return Task.FromResult(items);
-    }
 }

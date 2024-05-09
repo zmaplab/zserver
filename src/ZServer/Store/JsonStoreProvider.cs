@@ -37,7 +37,8 @@ public class JsonStoreProvider(string path)
         }
 
         _lastHash = hash;
-        var json = Encoding.UTF8.GetString(bytes);
+        var json = Encoding.UTF8.GetString(bytes).Replace("\uFEFF", "").Replace("\u200B", "");
+        ;
         return JsonConvert.DeserializeObject(json) as JObject;
     }
 }

@@ -2,13 +2,12 @@ namespace ZMap.Style;
 
 public class SpriteLineStyle : LineStyle
 {
-    public CSharpExpression<string> Uri { get; set; }
+    public CSharpExpressionV2<string> Uri { get; set; }
 
     public override void Accept(IZMapStyleVisitor visitor, Feature feature)
     {
         base.Accept(visitor, feature);
-
-        Uri?.Invoke(feature);
+        Uri?.Accept(feature);
     }
         
     public override Style Clone()

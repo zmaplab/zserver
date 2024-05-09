@@ -1,5 +1,3 @@
-using ZMap.SLD.Filter.Expression;
-
 namespace ZMap.SLD.Filter;
 
 public interface IFilterVisitor : IExpressionVisitor

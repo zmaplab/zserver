@@ -7,6 +7,6 @@ namespace ZServer.Store;
 
 public interface ISourceStore : IRefresher
 {
-    Task<ISource> FindAsync(string name);
-    Task<List<ISource>> GetAllAsync();
+    ValueTask<ISource> FindAsync(string name);
+    ValueTask<List<ISource>> GetAllAsync();
 }

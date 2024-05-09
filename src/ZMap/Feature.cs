@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using NetTopologySuite.Geometries;
 using NetTopologySuite.Simplify;
-using ProjNet.CoordinateSystems;
-using ProjNet.CoordinateSystems.Transformations;
-using ZMap.Infrastructure;
 
 namespace ZMap;
 

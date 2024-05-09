@@ -1,5 +1,3 @@
-using NetTopologySuite.Geometries;
-
 namespace ZMap.Extensions;
 
 public static class CoordinateExtensions

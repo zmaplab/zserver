@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace ZMap.Infrastructure;
 
-public static class Convert
+public static class ZConvert
 {
     public static T ToObject<T>(dynamic v)
     {
@@ -31,7 +27,7 @@ public static class Convert
             return default;
         }
 
-        return targetType == typeof(string) ? (T)v.ToString() : (T)System.Convert.ChangeType(v, targetType);
+        return targetType == typeof(string) ? (T)v.ToString() : (T)Convert.ChangeType(v, targetType);
     }
 
     public static T[] ToArray<T>(string text)
@@ -43,6 +39,6 @@ public static class Convert
     public static IEnumerable<object> ToArray(string text, Type type)
     {
         return text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => type == typeof(string) ? x : System.Convert.ChangeType(x, type));
+            .Select(x => type == typeof(string) ? x : Convert.ChangeType(x, type));
     }
 }

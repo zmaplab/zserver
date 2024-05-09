@@ -1,9 +1,7 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter.Expression;
 
 /// <remarks/>
-[System.SerializableAttribute]
+[Serializable]
 [XmlType]
 [XmlRoot("Trim")]
 public class TrimType : FunctionType
@@ -26,7 +24,7 @@ public class TrimType : FunctionType
     public string StripOffChar { get; set; }
 
     /// <remarks/>
-    [System.SerializableAttribute]
+    [Serializable]
     [XmlType]
     public enum StripOffPositionType
     {
@@ -42,6 +40,6 @@ public class TrimType : FunctionType
 
     public override object Accept(IExpressionVisitor visitor, object extraData)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

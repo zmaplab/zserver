@@ -1,7 +1,3 @@
-using System;
-using System.Xml.Serialization;
-using ZMap.Style;
-
 namespace ZMap.SLD;
 
 public class LineSymbolizer : Symbolizer
@@ -28,16 +24,16 @@ public class LineSymbolizer : Symbolizer
         {
             MinZoom = 0,
             MaxZoom = Defaults.MaxZoomValue,
-            Filter = CSharpExpression<bool?>.New(null),
-            Translate = CSharpExpression<double[]>.New(Array.Empty<double>()),
-            TranslateAnchor = CSharpExpression<TranslateAnchor>.New(TranslateAnchor.Map),
-            GapWidth = CSharpExpression<int?>.New(0),
-            Gradient = CSharpExpression<int?>.New(0),
-            Offset = CSharpExpression<int?>.New(0),
-            LineCap = CSharpExpression<string>.New("round"),
-            LineJoin = CSharpExpression<string>.New("round"),
-            Opacity = CSharpExpression<float?>.New(1),
-            Blur = CSharpExpression<int?>.New(0),
+            Filter = CSharpExpressionV2.Create<bool?>(null),
+            Translate = CSharpExpressionV2.Create<double[]>("{{ default }}"),
+            TranslateAnchor = CSharpExpressionV2.Create<TranslateAnchor>("Map"),
+            GapWidth = CSharpExpressionV2.Create<int?>("0"),
+            Gradient = CSharpExpressionV2.Create<int?>("0"),
+            Offset = CSharpExpressionV2.Create<int?>("0"),
+            LineCap = CSharpExpressionV2.Create<string>("round"),
+            LineJoin = CSharpExpressionV2.Create<string>("round"),
+            Opacity = CSharpExpressionV2.Create<float?>("1"),
+            Blur = CSharpExpressionV2.Create<int?>("0"),
         };
         visitor.Push(lineStyle);
         visitor.Visit(Stroke, extraData);

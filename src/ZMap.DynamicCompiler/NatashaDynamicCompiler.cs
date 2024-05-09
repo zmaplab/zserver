@@ -1,4 +1,5 @@
-﻿using ZMap.Infrastructure;
+﻿using Natasha.CSharp.Template;
+using ZMap.Infrastructure;
 
 namespace ZMap.DynamicCompiler;
 
@@ -9,13 +10,20 @@ public class NatashaDynamicCompiler : CSharpDynamicCompiler
         var body = script.EndsWith(";")
             ? script
             : $"""
-return {script};
-""";
+               return {script};
+               """;
+
         var f = FastMethodOperator.DefaultDomain()
             .Param(typeof(Feature), "feature")
+            .Using("System")
+            .Using("System.Collections")
+            .Using("System.Collections.Generic")
+            .Using("System.Linq")
+            .Using("System.Text.Json")
+            .Using("NetTopologySuite.Features")
+            .Using("Newtonsoft.Json.Linq")
             .Body(body)
             .Compile<Func<Feature, dynamic>>();
-
         return f;
     }
 
@@ -28,19 +36,28 @@ return {script};
 
     protected override Func<Feature, T> BuildFunc<T>(string script)
     {
+        var type = typeof(T).GetDevelopName();
         var body = $"""
-return {script};
-""";
+                    return ({type})({script});
+                    """;
+
         var f = FastMethodOperator.DefaultDomain()
             .Param(typeof(Feature), "feature")
+            .Using("System")
+            .Using("System.Collections")
+            .Using("System.Collections.Generic")
+            .Using("System.Linq")
+            .Using("System.Text.Json")
+            .Using("NetTopologySuite.Features")
+            .Using("Newtonsoft.Json.Linq")
             .Body(body)
             .Compile<Func<Feature, T>>();
-
         return f;
     }
 
     protected override void Initialize()
     {
-        NatashaManagement.Preheating();
+        NatashaManagement.RegistDomainCreator<NatashaDomainCreator>();
+        NatashaManagement.Preheating(false, false);
     }
 }

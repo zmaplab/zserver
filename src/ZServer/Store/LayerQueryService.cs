@@ -26,7 +26,7 @@ public class LayerQueryService(
         {
             if (layerQuery.ResourceGroup == null)
             {
-                var layer = await layerStore.FindAsync(null, layerQuery.Layer);
+                var layer = await layerStore.FindAsync(layerQuery.Layer);
                 if (layer != null)
                 {
                     await SetStyle(layer, layerQuery.Style);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace ZMap.Extensions;
+﻿namespace ZMap.Extensions;
 
 public static class StreamExtensions
 {

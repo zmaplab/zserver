@@ -1,5 +1,3 @@
-using System.Xml.Serialization;
-
 namespace ZMap.SLD.Filter;
 
 [XmlRoot("Filter")]
@@ -32,7 +30,7 @@ public class FilterType
     {
         if (Items == null || Items.Length == 0)
         {
-            visitor.Push(default(ZMap.Style.CSharpExpression));
+            visitor.Push(default(CSharpExpressionV2));
             return null;
         }
 

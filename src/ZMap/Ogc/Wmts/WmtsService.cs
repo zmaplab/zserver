@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using ZMap.Extensions;
-using ZMap.Infrastructure;
-using ZMap.Permission;
-using ZMap.Store;
+﻿ 
+
 
 namespace ZMap.Ogc.Wmts;
 

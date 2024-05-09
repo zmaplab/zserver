@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using NetTopologySuite.Geometries;
-
 namespace ZMap.Source;
 
 public abstract class VectorSourceBase : IVectorSource

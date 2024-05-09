@@ -101,87 +101,41 @@ public class LayerStore(
     //     }
     // }
 
-    public async Task<Layer> FindAsync(string resourceGroupName, string layerName)
+    public ValueTask<Layer> FindAsync(string layerName)
     {
-        if (string.IsNullOrWhiteSpace(resourceGroupName) && string.IsNullOrWhiteSpace(layerName))
-        {
-            return null;
-        }
+        return Cache.TryGetValue(layerName, out var item)
+            ? new ValueTask<Layer>(item.Clone())
+            : new ValueTask<Layer>();
+    }
 
-        if (!Cache.TryGetValue(layerName, out var layer))
-        {
-            return null;
-        }
-
+    public async ValueTask<Layer> FindAsync(string resourceGroupName, string layerName)
+    {
         if (string.IsNullOrEmpty(resourceGroupName))
         {
-            return await Task.FromResult(layer.Clone());
+            return null;
         }
 
-        if (layer.ResourceGroup?.Name != resourceGroupName)
+        var layer = await FindAsync(layerName);
+        if (layer == null || layer.ResourceGroup?.Name != resourceGroupName)
         {
             return null;
         }
 
-        return await Task.FromResult(layer.Clone());
-
-        // var result = await Cache.GetOrCreate($"{GetType().FullName}:{resourceGroupName}:{layerName}",
-        //     async entry =>
-        //     {
-        //         ResourceGroup resourceGroup = null;
-        //         // 若传的资源组不为空，才需要查询资源组信息
-        //         if (!string.IsNullOrEmpty(resourceGroupName))
-        //         {
-        //             // 若资源组不存在，则返回空
-        //             resourceGroup = await _resourceGroupStore.FindAsync(resourceGroupName);
-        //             if (resourceGroup == null)
-        //             {
-        //                 _logger.LogError("资源组 {ResourceGroupName} 不存在", resourceGroupName);
-        //                 return null;
-        //             }
-        //         }
-        //
-        //         var section =
-        //             _configuration.GetSection($"layers:{layerName}");
-        //         var configResourceGroupName = section.GetValue<string>("resourceGroup");
-        //
-        //         // 若传的资源组不为空，并且代码执行到此处，说明资源组存在
-        //         if (!string.IsNullOrEmpty(resourceGroupName))
-        //         {
-        //             // 若配置的资源组与查询资源组不一致，则返回空
-        //             if (configResourceGroupName != resourceGroupName)
-        //             {
-        //                 return null;
-        //             }
-        //         }
-        //
-        //         if (resourceGroup == null && !string.IsNullOrEmpty(configResourceGroupName))
-        //         {
-        //             resourceGroup = await _resourceGroupStore.FindAsync(configResourceGroupName);
-        //         }
-        //
-        //         var layer = await BindLayerAsync(layerName, resourceGroup);
-        //
-        //         entry.SetValue(layer);
-        //         entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(_options.ConfigurationCacheTtl));
-        //         return layer;
-        //     });
-        //
-        // return result?.DeepClone();
+        return layer;
     }
 
-    public Task<List<Layer>> GetAllAsync()
+    public ValueTask<List<Layer>> GetAllAsync()
     {
         var items = Cache.Values.Select(x => x.Clone()).ToList();
-        return Task.FromResult(items);
+        return new ValueTask<List<Layer>>(items);
     }
 
-    public Task<List<Layer>> GetListAsync(string resourceGroup)
+    public ValueTask<List<Layer>> GetListAsync(string resourceGroup)
     {
         var result = new List<Layer>();
-        if (string.IsNullOrWhiteSpace(resourceGroup))
+        if (string.IsNullOrEmpty(resourceGroup))
         {
-            return Task.FromResult(result);
+            return new ValueTask<List<Layer>>(result);
         }
 
         foreach (var value in Cache.Values)
@@ -192,7 +146,7 @@ public class LayerStore(
             }
         }
 
-        return Task.FromResult(result);
+        return new ValueTask<List<Layer>>(result);
     }
 
     // private async Task<Layer> BindLayerAsync(IConfigurationSection section,
