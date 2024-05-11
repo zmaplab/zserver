@@ -2,6 +2,8 @@ namespace ZMap.Source;
 
 public abstract class VectorSourceBase : IVectorSource
 {
+    public string Key { get; set; }
+
     /// <summary>
     /// 数据源名称
     /// </summary>

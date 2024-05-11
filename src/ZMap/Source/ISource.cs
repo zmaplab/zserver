@@ -5,6 +5,8 @@ namespace ZMap.Source;
 /// </summary>
 public interface ISource : IDisposable
 {
+    string Key { get; set; }
+
     /// <summary>
     /// 数据源名称
     /// </summary>
