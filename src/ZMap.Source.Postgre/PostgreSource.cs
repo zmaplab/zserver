@@ -48,59 +48,59 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
         // sql =
         //     $"SELECT CASE WHEN ST_HasArc({Geometry}) THEN {Geometry} ELSE ST_Simplify(ST_Force2D({Geometry}), 0.00001, true) END as geom{columnSql} from (SELECT {Geometry} as geom{columnSql} FROM {Table} WHERE {@where} {Geometry} && ST_MakeEnvelope({bbox.MinX}, {bbox.MinY},{bbox.MaxX},{bbox.MaxY}, {SRID})) t";
 
-        var baseSql = BaseSql.GetOrAdd(Name, (_) =>
+        var sqlBuilder = new StringBuilder();
+        if (Properties == null || Properties.Count == 0)
         {
-            var sqlBuilder = new StringBuilder();
-            if (Properties == null || Properties.Count == 0)
+            sqlBuilder.Append("SELECT * ").Append("FROM ").Append(Table).Append(" WHERE ");
+        }
+        else
+        {
+            sqlBuilder.Append("SELECT");
+            var containsId = false;
+            foreach (var property in Properties)
             {
-                sqlBuilder.Append("SELECT * ").Append("FROM ").Append(Table).Append(" WHERE ");
-            }
-            else
-            {
-                sqlBuilder.Append("SELECT");
-                var containsId = false;
-                foreach (var property in Properties)
+                if (property == Geometry)
                 {
-                    if (property == Geometry)
-                    {
-                        continue;
-                    }
-
-                    if (containsId == false && property == Id)
-                    {
-                        containsId = true;
-                    }
-
-                    sqlBuilder.Append(' ').Append(property).Append(',');
+                    continue;
                 }
 
-                if (!containsId)
+                if (containsId == false && property == Id)
                 {
-                    sqlBuilder.Append(' ').Append(Id).Append(',');
+                    containsId = true;
                 }
 
-                sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
+                sqlBuilder.Append(' ').Append(property).Append(',');
             }
 
-            sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
-
-            if (!string.IsNullOrEmpty(Where))
+            if (!containsId)
             {
-                sqlBuilder.Append(" AND ").Append(Where);
+                sqlBuilder.Append(' ').Append(Id).Append(',');
             }
 
-            return sqlBuilder.ToString();
-        });
-
-
-        var select = FreeSql.Value.Select<object>().WithSql(baseSql);
-        if (!string.IsNullOrEmpty(Filter))
-        {
-            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(Filter);
-            select = select.WhereDynamicFilter(filterInfo);
+            sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
         }
 
-        var sql = select.ToSql();
+        sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+
+        if (!string.IsNullOrEmpty(Where))
+        {
+            sqlBuilder.Append(" AND ").Append(Where);
+        }
+
+        var baseSql = sqlBuilder.ToString();
+
+        string sql;
+        if (!string.IsNullOrEmpty(Filter))
+        {
+            var select = FreeSql.Value.Select<object>().WithSql(baseSql);
+            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(Filter);
+            select = select.WhereDynamicFilter(filterInfo);
+            sql = select.ToSql();
+        }
+        else
+        {
+            sql = baseSql;
+        }
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
