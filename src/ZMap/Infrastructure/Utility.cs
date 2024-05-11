@@ -47,12 +47,12 @@ public static class Utility
                 : $"{layerKey}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterKey}{imageExtension}");
     }
 
-    public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,
-        int tileCol)
-    {
-        var layerKey = layers.Replace(',', '_');
-        return $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}";
-    }
+    // public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,
+    //     int tileCol)
+    // {
+    //     var layerKey = layers.Replace(',', '_');
+    //     return $"{layerKey}/{tileMatrix}/{tileRow}/{tileCol}";
+    // }
 
     public static int GetDpi(string formatOptions)
     {
