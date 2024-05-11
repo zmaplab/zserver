@@ -327,6 +327,7 @@ public class LayerStore(
             return null;
         }
 
+        source.Key = name;
         var properties = PropertyCache.GetOrAdd(source.GetType(), t =>
         {
             return t.GetProperties().Where(z => z.CanWrite)
