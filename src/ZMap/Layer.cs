@@ -270,8 +270,10 @@ public class Layer : IVisibleLimit
 
             feature.SetEnvironment(environments);
 
-            foreach (var styleGroup in StyleGroups)
+            foreach (var sg in StyleGroups)
             {
+                var styleGroup = sg.Clone();
+
                 // 若有配置过滤表达式， 则计算
                 if (styleGroup.Filter is { Value: not null } && !styleGroup.Filter.Value.Value)
                 {

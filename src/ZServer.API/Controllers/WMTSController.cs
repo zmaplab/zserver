@@ -62,11 +62,12 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
 #endif
 
         // 同一个 Grid 使用同一个对象进行管理， 保证缓存文件在同一个 Silo 目录下
-        var key = Utility.GetWmtsKey(layers, tileMatrixSet, tileRow, tileCol);
+        var key = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
         var friend = clusterClient.GetGrain<IWMTSGrain>(key);
         var result =
             await friend.GetTileAsync(layers, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
-                filter,
+                filter
+                ,
                 new Dictionary<string, object>
                 {
                     { "TraceIdentifier", HttpContext.TraceIdentifier }
