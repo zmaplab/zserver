@@ -29,10 +29,12 @@ public class SymbolRenderer(SymbolStyle style) : SkiaRenderer, ISymbolRenderer<S
         var interiorPoint = geometry.InteriorPoint;
         var centroid = new Coordinate(interiorPoint.X, interiorPoint.Y);
 
-        if (!extent.Contains(centroid))
-        {
-            return;
-        }
+        // comment by lewis at 20240522
+        // 不能过滤， 有一些越界的矢量也必须绘制
+        // if (!extent.Contains(centroid))
+        // {
+        //     return;
+        // }
 
         var half = (style.Size.Value ?? 14) / 2;
 
