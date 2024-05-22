@@ -167,6 +167,77 @@ public static class GridSetFactory
         return gridSet;
     }
 
+    // public static GridSet CreateGridSet(
+    //     string name,
+    //     int srs,
+    //     Envelope extent,
+    //     bool alignTopLeft,
+    //     int levels,
+    //     double? metersPerUnit,
+    //     double pixelSize,
+    //     int tileWidth,
+    //     int tileHeight,
+    //     bool yCoordinateFirst)
+    // {
+    //     var extentWidth = extent.Width;
+    //     var extentHeight = extent.Height;
+    //
+    //     var resX = extentWidth / tileWidth;
+    //     var resY = extentHeight / tileHeight;
+    //
+    //     int tilesWide, tilesHigh;
+    //
+    //     if (resX <= resY)
+    //     {
+    //         // use one tile wide by N tiles high
+    //         tilesWide = 1;
+    //         tilesHigh = (int)Math.Round(resY / resX);
+    //         // previous resY was assuming 1 tile high, recompute with the actual number of tiles
+    //         // high
+    //         resY /= tilesHigh;
+    //     }
+    //     else
+    //     {
+    //         // use one tile high by N tiles wide
+    //         tilesHigh = 1;
+    //         tilesWide = (int)Math.Round(resX / resY);
+    //         // previous resX was assuming 1 tile wide, recompute with the actual number of tiles
+    //         // wide
+    //         resX /= tilesWide;
+    //     }
+    //
+    //     // the maximum of resX and resY is the one that adjusts better
+    //     var res = Math.Max(resX, resY);
+    //
+    //     var adjustedExtentWidth = tilesWide * tileWidth * res;
+    //     var adjustedExtentHeight = tilesHigh * tileHeight * res;
+    //
+    //     var adjExtent = new Envelope(extent.MinX, extent.MinX + adjustedExtentWidth,
+    //         extent.MaxY - adjustedExtentHeight, extent.MinY + adjustedExtentHeight);
+    //
+    //     var resolutions = new double[levels];
+    //     resolutions[0] = res;
+    //
+    //     for (var i = 1; i < levels; i++)
+    //     {
+    //         resolutions[i] = resolutions[i - 1] / 2;
+    //     }
+    //
+    //     return CreateGridSet(
+    //         name,
+    //         srs,
+    //         adjExtent,
+    //         alignTopLeft,
+    //         resolutions,
+    //         null,
+    //         metersPerUnit,
+    //         pixelSize,
+    //         null,
+    //         tileWidth,
+    //         tileHeight,
+    //         yCoordinateFirst);
+    // }
+
     public static GridSet CreateGridSet(
         string name,
         int srs,
@@ -179,50 +250,13 @@ public static class GridSetFactory
         int tileHeight,
         bool yCoordinateFirst)
     {
-        // var extentWidth = extent.Width;
-        // var extentHeight = extent.Height;
-        //
-        // var resX = extentWidth / tileWidth;
-        // var resY = extentHeight / tileHeight;
-
-        // int tilesWide, tilesHigh;
-        //
-        // if (resX <= resY)
-        // {
-        //     // use one tile wide by N tiles high
-        //     tilesWide = 1;
-        //     tilesHigh = (int)Math.Round(resY / resX);
-        //     // previous resY was assuming 1 tile high, recompute with the actual number of tiles
-        //     // high
-        //     resY /= tilesHigh;
-        // }
-        // else
-        // {
-        //     // use one tile high by N tiles wide
-        //     tilesHigh = 1;
-        //     tilesWide = (int)Math.Round(resX / resY);
-        //     // previous resX was assuming 1 tile wide, recompute with the actual number of tiles
-        //     // wide
-        //     resX /= tilesWide;
-        // }
-        //
-        // // the maximum of resX and resY is the one that adjusts better
-        // var res = Math.Max(resX, resY);
-        //
-        // var adjustedExtentWidth = tilesWide * tileWidth * res;
-        // var adjustedExtentHeight = tilesHigh * tileHeight * res;
-        //
-        // var adjExtent = new Envelope(extent.MinX, extent.MinX + adjustedExtentWidth,
-        //     extent.MaxY - adjustedExtentHeight, extent.MinY + adjustedExtentHeight);
-
         var resolutions = new double[levels];
-        // resolutions[0] = res;
         var size = extent.Width / tileWidth;
         for (var i = 0; i < levels; i++)
         {
             resolutions[i] = size / Math.Pow(2, i);
         }
-
+    
         return CreateGridSet(
             name,
             srs,
