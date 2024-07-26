@@ -44,9 +44,16 @@ public static class OrleansExtensions
             siloBuilder.UseInMemoryReminderService();
             if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
             {
-                siloBuilder.UseDashboard(options => { options.Port = int.Parse(dashboardPort); });
+                siloBuilder.UseDashboard(options =>
+                {
+                    options.Port = int.Parse(dashboardPort);
+                    var basePath = context.Configuration["Orleans:DashboardBasePath"];
+                    if (!string.IsNullOrEmpty(basePath))
+                    {
+                        options.BasePath = basePath;
+                    }
+                });
             }
-
 
             logger.LogInformation(
                 $"Standalone: true, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
@@ -145,7 +152,15 @@ public static class OrleansExtensions
 
         if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
         {
-            siloBuilder.UseDashboard(options => { options.Port = int.Parse(dashboardPort); });
+            siloBuilder.UseDashboard(options =>
+            {
+                options.Port = int.Parse(dashboardPort);
+                var basePath = context.Configuration["Orleans:DashboardBasePath"];
+                if (!string.IsNullOrEmpty(basePath))
+                {
+                    options.BasePath = basePath;
+                }
+            });
         }
     }
 }
