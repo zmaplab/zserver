@@ -5,5 +5,22 @@ set -e
 # 例如，运行数据库迁移、配置检查等
 fc-cache -f -v
 
+# 输入文件名
+input_file="${CONFIG_SOURCE}"
+# 输出文件名
+output_file="/app/conf/appsettings.json"
+
+# 检查输入文件是否存在
+if [ -f "${input_file}" ]; then
+   awk '{
+       while (match($0, /\$\{[A-Za-z_][A-Za-z0-9_]*\}/)) {
+           var=substr($0, RSTART+2, RLENGTH-3)
+           gsub(/\$\{[A-Za-z_][A-Za-z0-9_]*\}/, ENVIRON[var])
+       }
+       print
+   }' "$input_file" >"$output_file"
+   echo "应用配置文件已生成"
+fi
+
 # 执行 Dockerfile 中 CMD 指定的命令
 exec "$@"
