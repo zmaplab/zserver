@@ -124,6 +124,8 @@ public class Startup(IConfiguration configuration)
                 });
             });
         }
+
+        services.AddHealthChecks();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -142,7 +144,7 @@ public class Startup(IConfiguration configuration)
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZServer API v1"));
         }
 
-
+        app.UseHealthChecks("/healthz");
         // app.UseResponseCompression();
         app.UseResponseCaching();
 
