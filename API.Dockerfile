@@ -30,7 +30,6 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ADD ./src/ZServer.API/fonts/* /usr/share/fonts/truetype/deng/
 COPY --from=api-builder /app/src/ZServer.API/out .
-
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["dotnet", "zapi.dll"]
 
