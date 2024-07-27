@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Dapper;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +11,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
+using Serilog.Events;
 using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
@@ -134,7 +137,42 @@ public class Program
                 EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(finalConfiguration, "HOST_IP", "HostIP");
 
                 var serilogSection = finalConfiguration.GetSection("Serilog");
-                Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(serilogSection).CreateLogger();
+                if (serilogSection.GetChildren().Any())
+                {
+                    Log.Logger = new LoggerConfiguration().ReadFrom
+                        .Configuration(finalConfiguration)
+                        .CreateLogger();
+                }
+                else
+                {
+                    var logFile = Environment.GetEnvironmentVariable("LOG_PATH");
+                    if (string.IsNullOrEmpty(logFile))
+                    {
+                        logFile = Environment.GetEnvironmentVariable("LOG");
+                    }
+
+                    if (string.IsNullOrEmpty(logFile))
+                    {
+                        logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                            "logs/log.txt".ToLowerInvariant());
+                    }
+
+                    Log.Logger = new LoggerConfiguration()
+                        .MinimumLevel.Information()
+                        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
+                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                        .MinimumLevel.Override("System", LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
+                        .Enrich.FromLogContext()
+                        // Serilog.Enrichers.Thread
+                        .Enrich.WithThreadId()
+                        // Serilog.Enrichers.Environment
+                        .Enrich.WithMachineName()
+                        .WriteTo.Console()
+                        .WriteTo.Async(x => x.File(logFile, rollingInterval: RollingInterval.Day))
+                        .CreateLogger();
+                }
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
