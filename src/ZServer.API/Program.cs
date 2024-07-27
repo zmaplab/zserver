@@ -35,9 +35,9 @@ public class Program
             CoordinateArraySequenceFactory.Instance,
             PrecisionModel.Floating.Value,
             4326, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
-        
+
         FontUtility.Load();
-        
+
         CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
@@ -132,7 +132,9 @@ public class Program
 
                 var finalConfiguration = builder.Build();
                 EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(finalConfiguration, "HOST_IP", "HostIP");
-                Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(finalConfiguration).CreateLogger();
+
+                var serilogSection = finalConfiguration.GetSection("Serilog");
+                Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(serilogSection).CreateLogger();
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
