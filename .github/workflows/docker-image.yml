@@ -19,4 +19,4 @@ jobs:
       - name: Build the Docker image
         run: docker build --target zserver-api -f API.Dockerfile -t zlzforever/zserver-api:202407 .
       - name: Publish the Docker image
-        run: docker push zlzforever/zserver-api:202404     
+        run: docker push zlzforever/zserver-api:202407     
