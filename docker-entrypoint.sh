@@ -19,7 +19,9 @@ if [ -f "${input_file}" ]; then
        }
        print
    }' "$input_file" >"$output_file"
-   echo "应用配置文件已生成"
+   echo "配置文件已生成"
+else
+   echo "使用默认配置文件"
 fi
 
 # 执行 Dockerfile 中 CMD 指定的命令
