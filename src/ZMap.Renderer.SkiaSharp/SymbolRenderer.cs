@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Extensions;
@@ -84,24 +86,43 @@ public class SymbolRenderer(SymbolStyle style) : SkiaRenderer, ISymbolRenderer<S
         var uri = style.Uri.Value;
         if (string.IsNullOrEmpty(uri) || !Uri.TryCreate(uri, UriKind.Absolute, out var u))
         {
+            Logger.Value.LogDebug("Invalid image uri: {Uri}", uri);
             image = DefaultImage;
         }
         else
         {
-            image = Cache.GetOrCreate($"SSI_{style.Uri.Value}", _ =>
+            image = Cache.GetOrCreate($"SSI_{style.Uri.Value}", entry =>
             {
+                SKBitmap i;
                 switch (u.Scheme)
                 {
                     case "file":
                     {
                         var path = u.ToPath();
-                        return File.Exists(path) ? SKBitmap.Decode(path) : DefaultImage;
+                        if (File.Exists(path))
+                        {
+                            Logger.Value.LogDebug("Load image from file: {Path}", path);
+                            i = SKBitmap.Decode(path);
+                        }
+                        else
+                        {
+                            Logger.Value.LogDebug("Image file not found: {Path}", path);
+                            i = DefaultImage;
+                        }
+
+                        break;
                     }
                     default:
                     {
-                        return DefaultImage;
+                        Logger.Value.LogDebug("Unsupported image uri scheme: {Scheme}", u.Scheme);
+                        i = DefaultImage;
+                        break;
                     }
                 }
+
+                entry.SetValue(i);
+                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                return i;
             });
         }
 

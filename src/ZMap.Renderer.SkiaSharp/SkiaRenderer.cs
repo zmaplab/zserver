@@ -1,6 +1,8 @@
 using System;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Infrastructure;
 using ZMap.Renderer.SkiaSharp.Utilities;
 
 namespace ZMap.Renderer.SkiaSharp;
@@ -8,6 +10,14 @@ namespace ZMap.Renderer.SkiaSharp;
 public abstract class SkiaRenderer
 {
     protected abstract SKPaint CreatePaint();
+
+    protected Lazy<ILogger> Logger { get; }
+
+    protected SkiaRenderer()
+    {
+        var name = GetType().Name;
+        Logger = new Lazy<ILogger>(() => Log.CreateLogger(name));
+    }
 
     protected virtual SKPaint CreateDefaultPaint()
     {
