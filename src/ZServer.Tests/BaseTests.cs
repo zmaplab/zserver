@@ -34,7 +34,7 @@ public abstract class BaseTests
         Service = serviceCollection.BuildServiceProvider();
         var syncService = Service.GetRequiredService<StoreRefreshService>();
         var configurationProvider = Service.GetRequiredService<JsonStoreProvider>();
- 
+
         syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
     }
 
@@ -57,7 +57,13 @@ public abstract class BaseTests
 
     protected List<Feature> GetFeatures()
     {
-        var c = GetGeometries();
+        var c = GetGeometries("polygons.json");
+        return c.Select(ToDictionary).ToList();
+    }
+
+    protected List<Feature> GetFeatures(string path)
+    {
+        var c = GetGeometries(path);
         return c.Select(ToDictionary).ToList();
     }
 
@@ -69,7 +75,15 @@ public abstract class BaseTests
         }
     }
 
-    private FeatureCollection GetGeometries()
+    private FeatureCollection GetGeometries(string path)
+    {
+        var json = File.ReadAllText(path);
+        var reader = new GeoJsonReader();
+        var collection = reader.Read<FeatureCollection>(json);
+        return collection;
+    }
+
+    private FeatureCollection GetMultiLine()
     {
         var json = File.ReadAllText("polygons.json");
         var reader = new GeoJsonReader();

@@ -75,8 +75,25 @@ public abstract class SkiaRenderer
     private void DrawLineString(SKCanvas canvas, SKPaint paint, LineString lineString, Envelope extent,
         int width, int height)
     {
+        if (lineString.IsEmpty)
+        {
+            return;
+        }
+
         var points = CoordinateTransformUtility.WordToExtent(extent, width, height, lineString.Coordinates);
-        canvas.DrawPoints(SKPointMode.Lines, points, paint);
+
+        // 创建SKPath对象
+        using var path = new SKPath();
+
+        var start = lineString.Coordinates[0];
+        path.MoveTo((float)start.X, (float)start.Y);
+
+        for (var i = 1; i < points.Length; i++)
+        {
+            path.LineTo(points[i]);
+        }
+
+        canvas.DrawPath(path, paint);
     }
 
     /// <summary>
