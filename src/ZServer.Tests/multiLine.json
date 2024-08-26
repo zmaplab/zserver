@@ -1,73 +1,8 @@
 {
   "type": "FeatureCollection",
-  "name": "MultiLine",
-  "crs": {
-    "type": "name",
-    "properties": {
-      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
-    }
-  },
+  "name": "errorGeom2",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
   "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "66cbdc3d5d1749e0c79ae6c0",
-        "xzq_dm": null,
-        "creator_id": "664188eba941ec87c8b81b40",
-        "creation_time": 1724636221,
-        "last_modifier_id": null,
-        "last_modification_time": null,
-        "is_deleted": false,
-        "deleter_id": null,
-        "deletion_time": null,
-        "___version": 1,
-        "deleter_name": null,
-        "task_name": "test",
-        "task_type": "HQJB",
-        "frequency_devise": "qweqw",
-        "cruise_time": 12331,
-        "cruise_number": null,
-        "last_cruise_date": null,
-        "device_manage_id": null,
-        "is_use": false,
-        "detail": null,
-        "cruise_type": "layer"
-      },
-      "geometry": {
-        "type": "MultiLineString",
-        "coordinates": [
-          [
-            [
-              120.591348946106024,
-              29.259428076208362
-            ],
-            [
-              120.591001894292276,
-              29.258271236829234
-            ],
-            [
-              120.59222102502261,
-              29.25706990362783
-            ],
-            [
-              120.593956284091306,
-              29.257808501077584
-            ],
-            [
-              120.59444571613632,
-              29.258760668874253
-            ],
-            [
-              120.595896214742439,
-              29.257541538143943
-            ],
-            [
-              120.595798328333444,
-              29.259000935514539
-            ]
-          ]
-        ]
-      }
-    }
+    { "type": "Feature", "properties": { "id": "66cbece75d1749e0c79ae769", "xzq_dm": null, "creator_id": "664188eba941ec87c8b81b40", "creation_time": 1724640487, "last_modifier_id": null, "last_modification_time": null, "is_deleted": false, "deleter_id": null, "deletion_time": null, "___version": 1, "deleter_name": null, "task_name": "test", "task_type": "HQJB", "frequency_devise": "test", "cruise_time": null, "cruise_number": null, "last_cruise_date": null, "device_manage_id": null, "is_use": false, "detail": null, "cruise_type": "layer" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 120.51596554195531, 29.302522257057777 ], [ 120.513969073395415, 29.300154763367281 ], [ 120.516619252899702, 29.299448048832804 ], [ 120.514481441432906, 29.297610591043163 ], [ 120.51407508057558, 29.295066418719045 ], [ 120.51646024212944, 29.294412707774654 ], [ 120.51707861734711, 29.296886208645326 ], [ 120.518439042825975, 29.295896808297055 ], [ 120.518439042825975, 29.294324368457847 ], [ 120.521424911734144, 29.29390033973716 ], [ 120.522202297722075, 29.295861472570333 ], [ 120.521036218740178, 29.296638858558257 ], [ 120.52259099071604, 29.297345573092734 ], [ 120.523315373113874, 29.298882677205221 ], [ 120.521477915324226, 29.299483384559526 ], [ 120.522431979945779, 29.30096748508193 ], [ 120.524993820133261, 29.301780206796579 ], [ 120.522997351573352, 29.302875614325018 ] ] ] } }
   ]
 }

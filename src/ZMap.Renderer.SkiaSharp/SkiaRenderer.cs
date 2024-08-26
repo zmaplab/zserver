@@ -85,8 +85,8 @@ public abstract class SkiaRenderer
         // 创建SKPath对象
         using var path = new SKPath();
 
-        var start = lineString.Coordinates[0];
-        path.MoveTo((float)start.X, (float)start.Y);
+        var start = points[0];
+        path.MoveTo(start.X, start.Y);
 
         for (var i = 1; i < points.Length; i++)
         {

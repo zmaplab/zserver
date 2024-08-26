@@ -57,6 +57,8 @@ public class LineStyleTests : BaseTests
             Width = CSharpExpressionV2.Create<int?>("2"),
             Color = CSharpExpressionV2.Create<string>("#3ed53e"),
             LineJoin = CSharpExpressionV2.Create<string>("Round"),
+            DashArray = CSharpExpressionV2.Create<float[]>("default"),
+            DashOffset = CSharpExpressionV2.Create<float?>("0"),
             Translate = CSharpExpressionV2.Create<double[]>("new double[] { 1, 1 }"),
             LineCap = CSharpExpressionV2.Create<string>("Round"),
             GapWidth = CSharpExpressionV2.Create<int?>("10"),
