@@ -43,6 +43,42 @@ public abstract class SkiaRenderer
     {
     }
 
+    private void DrawPoint(SKCanvas canvas, SKPaint paint, Point point, Envelope extent,
+        int width, int height)
+    {
+        if (point.IsEmpty)
+        {
+            return;
+        }
+
+        var targetPoint = CoordinateTransformUtility.WordToExtent(extent, width, height, point.Coordinate);
+        canvas.DrawPoint(targetPoint, paint);
+    }
+
+    private void DrawLineString(SKCanvas canvas, SKPaint paint, LineString lineString, Envelope extent,
+        int width, int height)
+    {
+        if (lineString.IsEmpty)
+        {
+            return;
+        }
+
+        var points = CoordinateTransformUtility.WordToExtent(extent, width, height, lineString.Coordinates);
+
+        // 创建SKPath对象
+        using var path = new SKPath();
+
+        var start = points[0];
+        path.MoveTo(start.X, start.Y);
+
+        for (var i = 1; i < points.Length; i++)
+        {
+            path.LineTo(points[i]);
+        }
+
+        canvas.DrawPath(path, paint);
+    }
+
     private void DrawPolygon(SKCanvas canvas, SKPaint paint,
         Polygon polygon, Envelope extent, int width, int height)
     {
@@ -72,30 +108,6 @@ public abstract class SkiaRenderer
         canvas.DrawPath(path, paint);
     }
 
-    private void DrawLineString(SKCanvas canvas, SKPaint paint, LineString lineString, Envelope extent,
-        int width, int height)
-    {
-        if (lineString.IsEmpty)
-        {
-            return;
-        }
-
-        var points = CoordinateTransformUtility.WordToExtent(extent, width, height, lineString.Coordinates);
-
-        // 创建SKPath对象
-        using var path = new SKPath();
-
-        var start = points[0];
-        path.MoveTo(start.X, start.Y);
-
-        for (var i = 1; i < points.Length; i++)
-        {
-            path.LineTo(points[i]);
-        }
-
-        canvas.DrawPath(path, paint);
-    }
-
     /// <summary>
     /// 递归是不是要展开成 foreach 以提升性能？
     /// </summary>
@@ -111,20 +123,12 @@ public abstract class SkiaRenderer
     {
         switch (geometry.OgcGeometryType)
         {
-            case OgcGeometryType.LineString:
-            {
-                DrawLineString(canvas, paint, (LineString)geometry, tile, width, height);
-                break;
-            }
-            case OgcGeometryType.Polygon:
-            {
-                DrawPolygon(canvas, paint, (Polygon)geometry, tile, width, height);
-                break;
-            }
             case OgcGeometryType.MultiPolygon:
             case OgcGeometryType.MultiLineString:
             case OgcGeometryType.GeometryCollection:
             case OgcGeometryType.MultiPoint:
+            case OgcGeometryType.MultiCurve:
+            case OgcGeometryType.MultiSurface:
             {
                 var geometries = (GeometryCollection)geometry;
 
@@ -136,16 +140,25 @@ public abstract class SkiaRenderer
                 break;
             }
             case OgcGeometryType.Point:
+            {
+                DrawPoint(canvas, paint, (Point)geometry, tile, width, height);
                 break;
+            }
+            case OgcGeometryType.LineString:
+            {
+                DrawLineString(canvas, paint, (LineString)geometry, tile, width, height);
+                break;
+            }
+            case OgcGeometryType.Polygon:
+            {
+                DrawPolygon(canvas, paint, (Polygon)geometry, tile, width, height);
+                break;
+            }
             case OgcGeometryType.CircularString:
                 break;
             case OgcGeometryType.CompoundCurve:
                 break;
             case OgcGeometryType.CurvePolygon:
-                break;
-            case OgcGeometryType.MultiCurve:
-                break;
-            case OgcGeometryType.MultiSurface:
                 break;
             case OgcGeometryType.Curve:
                 break;

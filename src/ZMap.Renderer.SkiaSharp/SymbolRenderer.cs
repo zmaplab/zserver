@@ -91,7 +91,7 @@ public class SymbolRenderer(SymbolStyle style) : SkiaRenderer, ISymbolRenderer<S
         }
         else
         {
-            image = Cache.GetOrCreate($"SSI_{style.Uri.Value}", entry =>
+            image = Cache.GetOrCreate($"img_{uri}", entry =>
             {
                 SKBitmap i;
                 switch (u.Scheme)
