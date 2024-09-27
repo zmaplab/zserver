@@ -73,6 +73,7 @@ public class WmtsService(
 #endif
 
             var folder = Path.GetDirectoryName(path);
+            // TODO: 优化减小磁盘 IO
             if (folder != null && !Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);

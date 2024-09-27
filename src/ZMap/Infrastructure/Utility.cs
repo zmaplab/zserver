@@ -35,16 +35,18 @@ public static class Utility
         string tileMatrix, int tileRow,
         int tileCol)
     {
-        var layerKey = layers.Replace(',', '_');
+        // group1:layer1,layer2 -> group1_layer1.group2_layer2
+        var layerKey = layers.Replace(',', '.').Replace(':', '_');
         var cqlFilterKey = string.IsNullOrWhiteSpace(filter)
             ? string.Empty
             : MurmurHashAlgorithmUtility.ComputeHash(Encoding.UTF8.GetBytes(filter));
 
         var imageExtension = GetImageExtension(format);
+
         return Path.Combine(AppContext.BaseDirectory, "cache", "wmts",
             string.IsNullOrEmpty(cqlFilterKey)
-                ? $"{layerKey}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}{imageExtension}"
-                : $"{layerKey}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}_{cqlFilterKey}{imageExtension}");
+                ? $"{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSet}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}{imageExtension}"
+                : $"{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSet}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}_{cqlFilterKey}{imageExtension}");
     }
 
     // public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,
