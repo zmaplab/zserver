@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +19,7 @@ namespace ZMap.Source.Postgre;
 public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
     private static readonly ILogger Logger = Log.CreateLogger<PostgreSource>();
+    private static readonly ConcurrentDictionary<string, string> BaseSql = new();
 
     private static readonly Lazy<IFreeSql> FreeSql = new(() =>
     {
@@ -27,7 +27,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .UseConnectionFactory(DataType.PostgreSQL, () =>
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    "User ID=postgres;Password=11111;Host=127.0.0.1;Port=8888;Database=zserver_dev;Pooling=true;");
+                    "User ID=postgres;Password=postgres;Host=127.0.0.1;Port=5432;Database=postgres;Pooling=true;");
                 dataSourceBuilder.UseNetTopologySuite();
                 var dataSource = dataSourceBuilder.Build();
                 return dataSource.CreateConnection();
@@ -35,7 +35,6 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .Build();
     });
 
-    private static ConcurrentDictionary<string, string> BaseSql = new ConcurrentDictionary<string, string>();
 
     public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
     {
@@ -111,7 +110,8 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 bbox.MinY, bbox.MaxY, Srid);
         }
 
-        await using var conn = CreateDbConnection();
+        await using var dataSource = GetNpgSqlDataSource();
+        await using var conn = dataSource.CreateConnection();
 
         return (await conn.QueryAsync(sql, new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid }, null, 30)).Select(
             x =>
@@ -162,18 +162,17 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
     {
     }
 
-    private DbConnection CreateDbConnection()
+    private NpgsqlDataSource GetNpgSqlDataSource()
     {
-        var dataSource = Cache.GetOrCreate(Name, entry =>
+        var dataSourceBuilder = Cache.GetOrCreate(ConnectionString, entry =>
         {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(ConnectionString);
-            dataSourceBuilder.UseNetTopologySuite();
-            var dataSource = dataSourceBuilder.Build();
-            entry.SetValue(dataSource);
-            entry.SetSlidingExpiration(TimeSpan.FromMinutes(15));
-            return dataSource;
-        });
+            var builder = new NpgsqlDataSourceBuilder(ConnectionString);
+            builder.UseNetTopologySuite();
 
-        return dataSource.CreateConnection();
+            entry.SetValue(builder);
+            entry.SetSlidingExpiration(TimeSpan.FromMinutes(5));
+            return builder;
+        });
+        return dataSourceBuilder.Build();
     }
 }
