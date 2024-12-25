@@ -10,14 +10,14 @@
     "MinimumLevel": {
       "Default": "Information",
       "Override": {
-        "Microsoft": "Warning",
+        "Microsoft": "Information",
         "System": "Information",
         "Microsoft.AspNetCore": "Warning",
         "Microsoft.EntityFrameworkCore": "Warning",
         "Microsoft.EntityFrameworkCore.Model.Validation": "Warning",
         "Microsoft.AspNetCore.Cors.Infrastructure.CorsService": "Warning",
         "Microsoft.AspNetCore.Mvc": "Warning",
-        "Microsoft.AspNetCore.Hosting": "Warning",
+        "Microsoft.AspNetCore.Hosting": "Information",
         "Orleans": "Error"
       }
     },

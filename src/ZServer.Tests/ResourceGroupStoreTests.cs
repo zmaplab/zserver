@@ -15,7 +15,7 @@ public class ResourceGroupStoreTests : BaseTests
     {
         var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
         var store = new ResourceGroupStore();
-        await store.Refresh(new List<JObject> { json });
+        await store.RefreshAsync(new List<JObject> { json });
 
         var resourceGroup = await store.FindAsync("resourceGroup1");
         Assert.NotNull(resourceGroup);

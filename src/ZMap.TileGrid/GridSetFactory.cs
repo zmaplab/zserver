@@ -1,13 +1,31 @@
 using System;
-using System.Collections.Generic;
 using NetTopologySuite.Geometries;
 
 namespace ZMap.TileGrid;
 
 public static class GridSetFactory
 {
-    private const double Epsg4326ToMeters = 6378137.0 * 2.0 * Math.PI / 360.0;
-    private const double Epsg3857ToMeters = 1;
+    public const double Epsg4326ToMeters = 6378137.0 * 2.0 * Math.PI / 360.0;
+    public const double Epsg3857ToMeters = 1.0D;
+    public static readonly Envelope GeographicWorld = new(-180.0, 180.0, -90.0, 90.0);
+
+    public static readonly Envelope ProjectedWorld = new(-20037508.342789244, 20037508.342789244, -20037508.342789244,
+        20037508.342789244);
+
+    /// <summary>
+    /// DPI 96
+    /// 一英寸等于 2.54 厘米、0.0254 米
+    /// 一英寸等于 96 像素
+    /// 则 1 像素等于 0.0254 / 96 米 = 
+    /// </summary>
+    public const double DefaultPixelSizeMeter = 0.0254 / 96D;
+
+    public const int DefaultLevels = 22;
+
+    /// <summary>
+    /// 中国区域
+    /// </summary>
+    public static readonly Envelope ChinaGeographicWorld = new(73.62, 134.77, 16.7, 53.56);
 
     /**
  * Note that you should provide EITHER resolutions or scales. Providing both will cause a
@@ -20,7 +38,7 @@ public static class GridSetFactory
         bool alignTopLeft,
         double[] resolutions,
         double[] scaleDenominators,
-        double? metersPerUnit,
+        double? unitsPerPixel,
         double pixelSize,
         string[] scaleNames,
         int tileWidth,
@@ -90,13 +108,14 @@ public static class GridSetFactory
             YCoordinateFirst = yCoordinateFirst
         };
 
-        if (metersPerUnit == null)
+        if (unitsPerPixel == null)
         {
-            if (srs == 4326)
+            // 地理坐标系
+            if (GeographicWorld.Equals(extent))
             {
                 gridSet.MetersPerUnit = Epsg4326ToMeters;
             }
-            else if (srs == 3857)
+            else if (ProjectedWorld.Equals(extent))
             {
                 gridSet.MetersPerUnit = Epsg3857ToMeters;
             }
@@ -126,42 +145,39 @@ public static class GridSetFactory
         }
         else
         {
-            gridSet.MetersPerUnit = metersPerUnit.Value;
+            gridSet.MetersPerUnit = unitsPerPixel.Value;
         }
 
-        gridSet.GridLevels = new Dictionary<string, Grid>();
         var length = resolutions?.Length ?? scaleDenominators.Length;
 
         for (var i = 0; i < length; i++)
         {
-            var curGrid = new Grid();
-
+            var curGrid = new Grid(i);
             if (scaleDenominators != null)
             {
                 curGrid.ScaleDenominator = scaleDenominators[i];
-                curGrid.Resolution = pixelSize * (scaleDenominators[i] / gridSet.MetersPerUnit);
+                curGrid.Resolution = pixelSize * (curGrid.ScaleDenominator / gridSet.MetersPerUnit);
             }
             else
             {
                 curGrid.Resolution = resolutions[i];
                 curGrid.ScaleDenominator =
-                    resolutions[i] * gridSet.MetersPerUnit / DefaultGridSets.DefaultPixelSizeMeter;
+                    curGrid.Resolution * gridSet.MetersPerUnit / DefaultPixelSizeMeter;
             }
 
             var mapUnitWidth = tileWidth * curGrid.Resolution;
             var mapUnitHeight = tileHeight * curGrid.Resolution;
 
             var tilesWide =
-                (long)Math.Ceiling((extent.Width - mapUnitWidth * 0.01) / mapUnitWidth);
+                (int)Math.Ceiling((extent.Width - mapUnitWidth * 0.01) / mapUnitWidth);
             var tilesHigh =
-                (long)Math.Ceiling((extent.Height - mapUnitHeight * 0.01) / mapUnitHeight);
+                (int)Math.Ceiling((extent.Height - mapUnitHeight * 0.01) / mapUnitHeight);
 
-            curGrid.NumTilesWide = tilesWide;
-            curGrid.NumTilesHigh = tilesHigh;
-
+            curGrid.NumTilesWidth = tilesWide;
+            curGrid.NumTilesHeight = tilesHigh;
             curGrid.Name = scaleNames?[i] == null ? i.ToString() : scaleNames[i];
 
-            gridSet.GridLevels.Add(curGrid.Name, curGrid);
+            gridSet.AppendGrid(curGrid);
         }
 
         return gridSet;
@@ -256,7 +272,7 @@ public static class GridSetFactory
         {
             resolutions[i] = size / Math.Pow(2, i);
         }
-    
+
         return CreateGridSet(
             name,
             srs,

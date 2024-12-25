@@ -34,7 +34,7 @@ public class SourceStoreTests : BaseTests
     {
         var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
         var store = new SourceStore();
-        await store.Refresh(new List<JObject> { json });
+        await store.RefreshAsync(new List<JObject> { json });
 
         var dataSource = (PostgreSource)await store.FindAsync("berlin_db");
 

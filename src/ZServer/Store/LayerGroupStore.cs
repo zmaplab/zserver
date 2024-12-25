@@ -17,7 +17,7 @@ public class LayerGroupStore(
     private static Dictionary<string, LayerGroup> _cache = new();
     private static readonly ILogger Logger = Log.CreateLogger<LayerGroupStore>();
 
-    public async Task Refresh(List<JObject> configurations)
+    public async Task RefreshAsync(List<JObject> configurations)
     {
         var dict = new Dictionary<string, LayerGroup>();
 

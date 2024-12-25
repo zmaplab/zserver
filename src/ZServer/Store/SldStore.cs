@@ -19,7 +19,7 @@ public class SldStore : ISldStore
         return Task.FromResult(result);
     }
 
-    public Task Refresh(List<JObject> configurations)
+    public Task RefreshAsync(List<JObject> configurations)
     {
         var dir = "sld";
         if (!Directory.Exists(dir))

@@ -7,5 +7,5 @@ namespace ZMap;
 /// </summary>
 public interface ILayerQueryService
 {
-    Task<List<Layer>> GetLayersAsync(List<LayerQuery> queryList, string traceIdentifier);
+    Task<(List<Layer> Layers, int FetchCount)> GetLayersAsync(List<LayerQuery> queryList, string traceIdentifier);
 }

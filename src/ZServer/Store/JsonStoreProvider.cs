@@ -30,7 +30,7 @@ public class JsonStoreProvider(string path)
         _lastWriteTime = file.LastWriteTime;
 
         var bytes = File.ReadAllBytes(path);
-        var hash = MurmurHashAlgorithmUtility.ComputeHash(bytes);
+        var hash = CryptographyUtility.ComputeHash(bytes);
         if (hash == _lastHash)
         {
             return null;
@@ -38,7 +38,7 @@ public class JsonStoreProvider(string path)
 
         _lastHash = hash;
         var json = Encoding.UTF8.GetString(bytes).Replace("\uFEFF", "").Replace("\u200B", "");
-        ;
+
         return JsonConvert.DeserializeObject(json) as JObject;
     }
 }

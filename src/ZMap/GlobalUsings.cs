@@ -15,7 +15,6 @@ global using System.Diagnostics.CodeAnalysis;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
 global using System.Text;
-global using Murmur;
 global using System.Text.RegularExpressions;
 global using NetTopologySuite.Features;
 global using ZMap.Extensions;

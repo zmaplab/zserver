@@ -1,12 +1,13 @@
+using System.Net.Http;
+
 namespace ZMap;
 
 /// <summary>
 /// 图层
 /// </summary>
-public class Layer : IVisibleLimit
+public partial class Layer : IVisibleLimit
 {
     public static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
-    private List<StyleGroup> _styleGroups;
     private static readonly ILogger Logger = Log.CreateLogger<Layer>();
 
     /// <summary>
@@ -15,9 +16,14 @@ public class Layer : IVisibleLimit
     public string Name { get; set; }
 
     /// <summary>
-    /// 
+    /// 资源组标识
     /// </summary>
     public string ResourceId { get; set; }
+
+    /// <summary>
+    /// 资源组
+    /// </summary>
+    public ResourceGroup ResourceGroup { get; set; }
 
     /// <summary>
     /// 最小可视缩放
@@ -37,7 +43,7 @@ public class Layer : IVisibleLimit
     /// <summary>
     /// 样式
     /// </summary>
-    public IReadOnlyCollection<StyleGroup> StyleGroups => _styleGroups;
+    public List<StyleGroup> StyleGroups { get; set; }
 
     /// <summary>
     /// 是否启用
@@ -65,24 +71,28 @@ public class Layer : IVisibleLimit
     public int Srid => Source.Srid;
 
     /// <summary>
+    /// 投影
+    /// </summary>
+    public CoordinateSystem CoordinateSystem => Source.CoordinateSystem;
+
+    /// <summary>
     /// 
     /// </summary>
     public HashSet<ServiceType> Services { get; set; }
 
     /// <summary>
-    /// 资源组
+    /// 过滤条件
     /// </summary>
-    public ResourceGroup ResourceGroup { get; set; }
+    public string Filter { get; set; }
+
+    /// <summary>
+    /// HttpClient 工厂
+    /// </summary>
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     public Layer(ResourceGroup resourceGroup, HashSet<ServiceType> services, string name,
-        ISource source, List<StyleGroup> styleGroups, Envelope envelope = null) :
-        this(name, source, styleGroups, envelope)
-    {
-        ResourceGroup = resourceGroup;
-        Services = services;
-    }
-
-    private Layer(string name, ISource source, List<StyleGroup> styleGroups, Envelope envelope = null)
+        ISource source, List<StyleGroup> styleGroups,
+        Envelope envelope = null, bool enabled = true)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -90,24 +100,28 @@ public class Layer : IVisibleLimit
         }
 
         Name = name;
-        Source = source ?? throw new ArgumentNullException(nameof(source), "图层数据源未配置");
-        Enabled = true;
-        Envelope = envelope ?? source.GetEnvelope();
-
-        // if (styleGroups == null || !styleGroups.Any())
-        // {
-        //     throw new ArgumentNullException(nameof(styleGroups), "图层样式未配置");
-        // }
-
-        _styleGroups = styleGroups ?? new();
+        Enabled = enabled;
+        ResourceGroup = resourceGroup;
+        ResourceId = resourceGroup?.Id ?? Name;
+        Services = services;
+        Source = source ?? throw new ArgumentNullException(nameof(source), "图层数据源不能为空");
+        // 若用户未指定显示范围， 则使用数据源的范围
+        // 注意： 用户可能会配错坐标系， 图层的坐标系和数据源的坐标系必须一致
+        Envelope = envelope ?? source.Envelope;
+        StyleGroups = styleGroups ?? [];
     }
 
     public void SetStyle(StyleGroup styleGroup)
     {
-        _styleGroups = [styleGroup];
+        StyleGroups = [styleGroup];
     }
 
-    public async Task RenderAsync(IGraphicsService graphicsService, Viewport viewport, Zoom zoom, int srid)
+    public Task LoadAsync()
+    {
+        return Source.LoadAsync();
+    }
+
+    public async Task RenderAsync(IGraphicsService graphicsService, Viewport viewport, int viewportSrid, Zoom zoom)
     {
         // 图层未启用或者不在显示级别
         if (!Enabled || !this.IsVisible(zoom))
@@ -118,17 +132,31 @@ public class Layer : IVisibleLimit
         // 数据源为空: 在构造中检测了
         // 没有样式: 在构造中检测了
         // 所有的样式都不可显示，则不需要渲染，提前退出，避免数据查询开销
-        if (!StyleGroups.Any(x => x.IsVisible(zoom)))
+        if (StyleGroups.Count > 0 && !StyleGroups.Any(x => x.IsVisible(zoom)))
         {
             return;
         }
 
         // 由前端的 SRID 的 extent 转换成数据源的 extent
         // 先转换成数据源的 SRID 数据， 才能做相交判断是否超出数据范围
-        var extent = viewport.Extent.Transform(srid, Srid);
+        var viewportCoordinateSystem = CoordinateReferenceSystem.Get(viewportSrid);
+        if (viewportCoordinateSystem == null)
+        {
+            throw new ArgumentException($"不支持的坐标系: {viewportSrid}");
+        }
+
+        var sourceCoordinateSystem = CoordinateSystem ?? CoordinateReferenceSystem.Get(Srid);
+        if (sourceCoordinateSystem == null)
+        {
+            throw new ArgumentException($"不支持的坐标系: {Srid}");
+        }
+
+        var viewportExtent = viewport.Extent;
+        // 将视窗的范围转换成数据源的范围
+        var dataSourceExtent = viewportExtent.Transform(viewportCoordinateSystem, sourceCoordinateSystem);
 
         // 不在当前图层的范围内，不需要渲染
-        if (Envelope != null && !Envelope.Intersects(extent))
+        if (Envelope != null && !Envelope.Intersects(dataSourceExtent))
         {
             return;
         }
@@ -142,50 +170,34 @@ public class Layer : IVisibleLimit
         //     }
         // }
 
-        // comments: 此转换不可少的原因是，若以数据源的坐标系绘制图片，会导致偏差，在图片与图片接缝处对不齐
-        // // 使用应用层投影转换的原因是规避数据库支持问题
-        // // 假如只是使用数据库当成存储层， 则不考虑空间计算问题， 完全可以把矢量数据存成二进制， 计算好图形的 extent 存为 minx, maxX, miny, maxy
-        // // 则可以通过计算求出相交的所有图形
-        ICoordinateTransformation transformation = null;
-
-        if (Srid != srid)
-        {
-            transformation = CoordinateReferenceSystem.CreateTransformation(Srid, srid);
-        }
-
         var environments = new Dictionary<string, dynamic>
         {
             { Defaults.WmsScaleKey, zoom.Value }
         };
 
+        if (Source is IRemoteHttpSource remoteHttpSource)
+        {
+            remoteHttpSource.HttpClientFactory = HttpClientFactory;
+        }
+
         switch (Source)
         {
             case IVectorSource vectorSource:
-                Envelope renderEnvelope;
-                // 不同级别使用不同的 Buffer， 比如左右两个相领的图形， 右边图形绘制文字特别长， 但图形若没有交在左边， 会导到文字只显示部分
-                // 不过，文字的绘制可以优化到 TextRender 如果超过边界，就进行移动（不一定合适， 只能在无 buffer 的情况下使用)
-                var buffer = Buffers.FirstOrDefault(x => x.IsVisible(zoom));
-                if (buffer is { Size: > 0 })
-                {
-                    var xPerPixel = extent.Width / viewport.Width;
-                    var yPerPixel = extent.Height / viewport.Height;
-                    var x = xPerPixel * buffer.Size;
-                    var y = yPerPixel * buffer.Size;
-                    renderEnvelope = new Envelope(extent.MinX - x, extent.MaxX + x,
-                        extent.MinY - y,
-                        extent.MaxY + y);
-                }
-                else
-                {
-                    renderEnvelope = extent;
-                }
-
-                await RenderVectorAsync(graphicsService, vectorSource, renderEnvelope, srid, viewport.Extent, zoom,
-                    transformation, environments);
+            {
+                await RenderAsync(graphicsService, vectorSource, viewportExtent, viewportSrid, zoom,
+                    viewport.Width, viewport.Height, dataSourceExtent, environments);
                 break;
+            }
+            case ITiledSource tiledSource:
+            {
+                await RenderAsync(graphicsService, tiledSource, viewportExtent, viewportSrid, zoom, dataSourceExtent);
+                break;
+            }
             case IRasterSource rasterSource:
-                await RenderRasterAsync(graphicsService, rasterSource, viewport.Extent, zoom);
+            {
+                await RenderAsync(graphicsService, rasterSource, zoom, dataSourceExtent);
                 break;
+            }
         }
     }
 
@@ -213,240 +225,8 @@ public class Layer : IVisibleLimit
     //     _environments?.Clear();
     // }
 
-    private async Task RenderRasterAsync(IGraphicsService service, IRasterSource rasterSource, Envelope extent,
-        Zoom zoom)
-    {
-        var image = await rasterSource.GetImageInExtentAsync(extent);
-
-        foreach (var styleGroup in StyleGroups)
-        {
-            if (!styleGroup.IsVisible(zoom))
-            {
-                continue;
-            }
-
-            foreach (var style in styleGroup.Styles)
-            {
-                if (!style.IsVisible(zoom) || style is not RasterStyle rasterStyle)
-                {
-                    continue;
-                }
-
-                service.Render(image, rasterStyle);
-            }
-        }
-    }
-
-    private async Task RenderVectorAsync(IGraphicsService service, IVectorSource vectorSource,
-        Envelope queryEnvelope, int srid,
-        Envelope targetExtent,
-        Zoom zoom, ICoordinateTransformation transformation, IReadOnlyDictionary<string, dynamic> environments
-    )
-    {
-        // 需要考虑 CRS 的 AxisOrder.NORTH_EAST， 影响 Feature -> Word 的转换算法
-
-        var features = await vectorSource.GetFeaturesInExtentAsync(queryEnvelope);
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-
-        var count = 0;
-
-        foreach (var feature in features)
-        {
-            if (feature == null || feature.IsEmpty)
-            {
-                continue;
-            }
-
-            // simplify 后可能会有点减少， 因此放前面可以减少 transform 的工作量
-            // simplify 的算法要控制，消点效果不是很好
-            // feature.Simplify();
-
-            if (transformation != null)
-            {
-                feature.Transform(transformation);
-            }
-
-            feature.SetEnvironment(environments);
-
-            foreach (var sg in StyleGroups)
-            {
-                var styleGroup = sg.Clone();
-
-                // 若有配置过滤表达式， 则计算
-                if (styleGroup.Filter is { Value: not null } && !styleGroup.Filter.Value.Value)
-                {
-                    continue;
-                }
-
-                if (!styleGroup.IsVisible(zoom))
-                {
-                    continue;
-                }
-
-                // 需要保证 StyleGroups 每次都是新对象
-                // 不然 Accept 后会导致数据异常
-                styleGroup.Accept(StyleVisitor, feature);
-
-                foreach (var style in styleGroup.Styles)
-                {
-                    if (!style.IsVisible(zoom) || style is not VectorStyle vectorStyle)
-                    {
-                        continue;
-                    }
-
-                    // 若有配置过滤表达式， 则计算
-                    if (style.Filter is { Value: not null } && !style.Filter.Value.Value)
-                    {
-                        continue;
-                    }
-
-                    service.Render(targetExtent, feature.Geometry, vectorStyle);
-                }
-            }
-
-            feature.Dispose();
-            count++;
-        }
-
-        stopwatch.Stop();
-
-        if (EnvironmentVariables.EnableSensitiveDataLogging)
-        {
-            Logger.LogInformation(
-                "[{Identifier}] layer: {Name}, bbox: {MinX},{MinY},{MaxX},{MaxY}, srid: {srid} width: {Width}, height: {Height}, filter: {Filter}, feature count: {Count}, rendering: {ElapsedMilliseconds}",
-                service.TraceIdentifier, Name, queryEnvelope.MinX, queryEnvelope.MinY, queryEnvelope.MaxX,
-                queryEnvelope.MaxY, srid, service.Width, service.Height, vectorSource.Filter, count,
-                stopwatch.ElapsedMilliseconds);
-        }
-    }
-
     public override string ToString()
     {
         return ResourceGroup == null ? Name : $"{ResourceGroup.Name}:{Name}";
-    }
-
-//         private async Task PaintAsync(IVectorSource vectorSource, Envelope envelope,
-//             ICoordinateTransformation transformation, RenderContext context,
-//             string filter = null,
-//             string traceId = null)
-//         {
-//             IEnumerable<Feature> features;
-//
-//             var fetching = string.Empty;
-//             if (string.Equals("TRACE_FETCH", "true",
-//                     StringComparison.InvariantCultureIgnoreCase))
-//             {
-//                 var stopwatch1 = new Stopwatch();
-//                 stopwatch1.Start();
-//                 features = (await vectorSource.GetFeaturesInExtentAsync(envelope)).ToArray();
-//                 stopwatch1.Stop();
-//                 fetching = stopwatch1.ElapsedMilliseconds.ToString();
-//             }
-//             else
-//             {
-//                 features = await vectorSource.GetFeaturesInExtentAsync(envelope);
-//             }
-//
-//             var stopwatch = new Stopwatch();
-//             stopwatch.Start();
-//
-//             var count = 0;
-//
-//             foreach (var feature in features)
-//             {
-//                 if (feature == null || feature.IsEmpty)
-//                 {
-//                     continue;
-//                 }
-//
-//                 // simplify 后可能会有点减少， 因此放前面可以减少 transform 的工作量
-//                 // feature.Simplify();
-//
-//                 if (transformation != null)
-//                 {
-//                     feature.Transform(transformation);
-//                 }
-//
-//                 foreach (var styleGroup in StyleGroups)
-//                 {
-//                     if (!styleGroup.IsVisible(context.Viewport.ZoomOrScale, context.Viewport.VisibilityUnits))
-//                     {
-//                         continue;
-//                     }
-//
-//                     foreach (var style in styleGroup.Styles)
-//                     {
-//                         if (!style.IsVisible(context.Viewport.ZoomOrScale, context.Viewport.VisibilityUnits))
-//                         {
-//                             continue;
-//                         }
-//
-//                         // 若有配置过滤表达式， 则计算
-//                         var expression = style.Filter?.Invoke(feature);
-//                         var func = DynamicCompilationUtilities.GetAvailableFunc(expression);
-//                         if (func != null && !func(feature))
-//                         {
-//                             continue;
-//                         }
-//
-//                         var renderer = context.RendererFactory.Create(style);
-//                         
-//                         if ( is IVectorRenderer render)
-//                         {
-//                               renderer.Render(context, feature);
-//                         }
-//                     }
-//                 }
-//
-//                 count++;
-//             }
-//
-//             stopwatch.Stop();
-//             if (count > 0)
-//             {
-//                 Log.Logger.LogInformation(
-//                     fetching == string.Empty
-//                         ? $"[{traceId}] layer: {this}, width: {context.Viewport.Width}, height: {context.Viewport.Height}, filter: {filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}"
-//                         : $"[{traceId}] layer: {this}, width: {context.Viewport.Width}, height: {context.Viewport.Height}, filter: {filter}, feature count: {count}, fetching: {fetching}, rendering: {stopwatch.ElapsedMilliseconds}");
-//             }
-//             else
-//             {
-// #if DEBUG
-//                 Log.Logger.LogInformation(
-//                     fetching == string.Empty
-//                         ? $"[{traceId}] layer: {this}, width: {context.Viewport.Width}, height: {context.Viewport.Height}, filter: {filter}, feature count: {count}, rendering: {stopwatch.ElapsedMilliseconds}"
-//                         : $"[{traceId}] layer: {this}, width: {context.Viewport.Width}, height: {context.Viewport.Height}, filter: {filter}, feature count: {count}, fetching: {fetching}, rendering: {stopwatch.ElapsedMilliseconds}");
-// #endif
-//             }
-//         }
-
-    // private async Task PaintAsync(IImageSource rasterSource, Envelope envelope, RenderContext context,
-    //     string filter = null,
-    //     string traceId = null)
-    // {
-    //     var image = await rasterSource.GetImageInExtentAsync(envelope);
-    //     foreach (var styleGroup in StyleGroups)
-    //     {
-    //         if (!styleGroup.IsVisible(context.Viewport.ZoomOrScale, context.Viewport.VisibilityUnits))
-    //         {
-    //             continue;
-    //         }
-    //
-    //         // transform points
-    //         foreach (var style in styleGroup.Styles)
-    //         {
-    //             // 若有配置过滤表达式， 则计算
-    //             if (context.RendererFactory.Create(style) is IRasterRender render)
-    //             {
-    //                 await render.PaintAsync(context, image);
-    //             }
-    //         }
-    //     }
-    // }
-    public string GetResourceId()
-    {
-        return string.IsNullOrEmpty(ResourceId) ? Name : ResourceId;
     }
 }

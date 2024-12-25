@@ -40,20 +40,21 @@ public class PostgreSourceTests
         source.Srid = 4326;
         source.Where = "id > 0";
         source.Name = "osmbuildings";
-        source.Filter = """
-                        {
-                          "Logic": "And",
-                          "Filters": [
-                            {
-                              "Field": "height",
-                              "Operator": "GreaterThanOrEqual",
-                              "Value": 10
-                            }
-                          ]
-                        }
-                        """;
+        var filter = """
+                     {
+                       "Logic": "And",
+                       "Filters": [
+                         {
+                           "Field": "height",
+                           "Operator": "GreaterThanOrEqual",
+                           "Value": 10
+                         }
+                       ]
+                     }
+                     """;
 
         var list =
-            (await source.GetFeaturesInExtentAsync(new Envelope(52.31301, 52.41318, 13.12318, 13.22347))).ToList();
+            (await source.GetFeaturesAsync(new Envelope(52.31301, 52.41318, 13.12318, 13.22347), filter))
+            .ToList();
     }
 }

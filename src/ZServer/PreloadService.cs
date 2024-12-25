@@ -63,7 +63,7 @@ public class PreloadService(ILogger<PreloadService> logger) : IHostedService
 
         // var fullExtent = DefaultGridSets.World4326.Transform(4326, shapeFileSource.SRID);
         // ReSharper disable once UnusedVariable
-        foreach (var feature in await shapeFileSource.GetFeaturesInExtentAsync(DefaultGridSets.World4326))
+        foreach (var feature in await shapeFileSource.GetFeaturesAsync(GridSetFactory.GeographicWorld, null))
         {
         }
 

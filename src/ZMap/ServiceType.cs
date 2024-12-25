@@ -6,6 +6,5 @@ public enum ServiceType
     WMTS,
     WCS,
     WFS,
-    WMS,
-    RESTFUL
+    WMS
 }

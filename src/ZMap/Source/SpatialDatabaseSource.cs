@@ -41,6 +41,11 @@ public abstract class SpatialDatabaseSource(string connectionString) : VectorSou
     /// </summary>
     public HashSet<string> Properties { get; set; }
 
+    public override Task LoadAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     public override string ToString()
     {
         return

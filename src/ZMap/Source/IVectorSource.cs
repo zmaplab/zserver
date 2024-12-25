@@ -6,15 +6,10 @@ namespace ZMap.Source;
 public interface IVectorSource : ISource
 {
     /// <summary>
-    /// 设置过滤器
-    /// </summary>
-    string Filter { get; set; }
-
-    /// <summary>
     /// 获取指定区域的图斑
-    /// TODO: 后面要转成表达式， 来解析成 SQL Expression<Func<Feature, bool>> filter 
     /// </summary>
     /// <param name="extent">区域</param>
+    /// <param name="filter"></param>
     /// <returns></returns>
-    Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
+    Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope extent, string filter);
 }

@@ -11,6 +11,18 @@
     "zserver_3857_shp": {
       "provider": "ZMap.Source.ShapeFile.ShapeFileSource, ZMap.Source.ShapeFile",
       "file": "shapes/polygon_3857.shp"
+    },
+    "cd": {
+      "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
+      "file": "/Users/lewis/Downloads/cd_common_cog.tif"
+    },
+    "tianditu_c": {
+      "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
+      "url": "https://t3.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk=7b5d52dbf12be8c8b626d68241708e08"
+    },
+    "tianditu_w": {
+      "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
+      "url": "https://t3.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk=7b5d52dbf12be8c8b626d68241708e08"
     }
   },
   "styleGroups": {
@@ -152,6 +164,24 @@
       "styleGroups": [
         "polygon"
       ]
+    },
+    "tianditu_c": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "tianditu_c"
+    },
+    "tianditu_w": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "tianditu_w"
+    },
+    "cd": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "cd"
     }
   }
 }

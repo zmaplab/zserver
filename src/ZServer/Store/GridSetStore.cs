@@ -12,11 +12,14 @@ using ZMap.TileGrid;
 
 namespace ZServer.Store;
 
+/// <summary>
+/// 自定义栅格金字塔集合
+/// </summary>
 public class GridSetStore : IGridSetStore
 {
     private static readonly ConcurrentDictionary<string, GridSet> Cache = new();
 
-    public Task Refresh(List<JObject> configurations)
+    public Task RefreshAsync(List<JObject> configurations)
     {
         var existKeys = Cache.Keys.ToList();
         var keys = new List<string>();
@@ -94,7 +97,7 @@ public class GridSetStore : IGridSetStore
                             ? null
                             : entity.ScaleDenominators,
                         entity.MetersPerUnit,
-                        entity.PixelSize ?? DefaultGridSets.DefaultPixelSizeMeter,
+                        entity.PixelSize ?? GridSetFactory.DefaultPixelSizeMeter,
                         null,
                         tileWidth,
                         tileHeight,
@@ -109,7 +112,7 @@ public class GridSetStore : IGridSetStore
                         entity.AlignTopLeft,
                         entity.Levels.Value,
                         entity.MetersPerUnit,
-                        entity.PixelSize ?? DefaultGridSets.DefaultPixelSizeMeter,
+                        entity.PixelSize ?? GridSetFactory.DefaultPixelSizeMeter,
                         tileWidth,
                         tileHeight,
                         entity.YCoordinateFirst);
@@ -248,9 +251,9 @@ public class GridSetStore : IGridSetStore
 
     public Task<GridSet> FindAsync(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrEmpty(name))
         {
-            return null;
+            return Task.FromResult<GridSet>(null);
         }
 
         var gridSet = Cache.GetValueOrDefault(name) ?? DefaultGridSets.TryGet(name);

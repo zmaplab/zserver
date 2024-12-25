@@ -84,9 +84,9 @@ public class WMSController(
                 {
                     // comments by lewis at 20230923
                     // 还是应该使用集群模式， 不然无法分布式分担渲染、查询开销， 要依赖外部负载组件
-                    var friend = clusterClient.GetGrain<IWMSGrain>(0);
+                    var grain = clusterClient.GetGrain<IWMSGrain>(0);
                     var response =
-                        await friend.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                        await grain.GetMapAsync(layers, styles, srs, bbox, width, height, format,
                             transparent, bgColor, time,
                             formatOptions, filter,
                             new Dictionary<string, object>
@@ -96,31 +96,33 @@ public class WMSController(
                                 { "Buffer", buffer }
                             });
                     await HttpContext.WriteZServerResponseAsync(response);
-                    break;
                 }
-
-                var wmsService = HttpContext.RequestServices.GetRequiredService<WmsService>();
-                var result = await wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
-                    transparent, bgColor, time,
-                    formatOptions, filter, new Dictionary<string, object>
-                    {
-                        { "TraceIdentifier", HttpContext.TraceIdentifier },
-                        { "Bordered", bordered },
-                        { "Buffer", buffer }
-                    });
-                if (!result.IsSuccess())
+                else
                 {
-                    var response = ZServerResponseFactory.Failed(result.Message, result.Code, result.Locator);
-                    await HttpContext.WriteZServerResponseAsync(response);
-                    break;
+                    var wmsService = HttpContext.RequestServices.GetRequiredService<WmsService>();
+                    using var result = await wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+                        transparent, bgColor, time,
+                        formatOptions, filter, new Dictionary<string, object>
+                        {
+                            { "TraceIdentifier", HttpContext.TraceIdentifier },
+                            { "Bordered", bordered },
+                            { "Buffer", buffer }
+                        });
+                    if (!result.IsSuccess())
+                    {
+                        var response = ZServerResponseFactory.Failed(result.Message, result.Code, result.Locator);
+                        await HttpContext.WriteZServerResponseAsync(response);
+                        break;
+                    }
+
+                    await using var stream = result.Stream;
+                    // var bytes = result.Stream.ToArray();
+                    // response = ZServerResponseFactory.Ok(bytes, format);
+                    HttpContext.Response.ContentType = format;
+                    HttpContext.Response.ContentLength = stream.Length;
+                    await stream.CopyToAsync(HttpContext.Response.Body, (int)stream.Length);
                 }
 
-                await using var stream = result.Stream;
-                // var bytes = result.Stream.ToArray();
-                // response = ZServerResponseFactory.Ok(bytes, format);
-                HttpContext.Response.ContentType = format;
-                HttpContext.Response.ContentLength = stream.Length;
-                await stream.CopyToAsync(HttpContext.Response.Body, (int)stream.Length);
                 break;
             }
             case "GetFeatureInfo":

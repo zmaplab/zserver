@@ -1,4 +1,4 @@
-namespace ZMap.SLD;
+namespace ZMap.Infrastructure;
 
 public class NamespaceIgnorantXmlTextReader(Stream stream) : XmlTextReader(stream)
 {
