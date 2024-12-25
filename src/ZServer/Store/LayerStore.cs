@@ -27,7 +27,7 @@ public class LayerStore(
     private static readonly ILogger Logger = Log.CreateLogger<LayerStore>();
     private static readonly ConcurrentDictionary<string, Layer> Cache = new();
 
-    public async Task Refresh(List<JObject> configurations)
+    public async Task RefreshAsync(List<JObject> configurations)
     {
         var existKeys = Cache.Keys.ToList();
         var keys = new List<string>();

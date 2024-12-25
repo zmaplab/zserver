@@ -37,7 +37,7 @@ public class ResourceFillRenderer(ResourceFillStyle style) : FillRenderer(style)
         {
             case "file":
             {
-                var path = u.ToPath();
+                var path = u.GetPath();
                 paint = GetDefaultPaint(color, opacity, antialias);
                 if (File.Exists(path))
                 {

@@ -15,22 +15,23 @@ public abstract class VectorSourceBase : IVectorSource
     public int Srid { get; set; }
 
     /// <summary>
-    /// 过滤器
+    /// 投影系统
     /// </summary>
-    public string Filter { get; set; }
+    public CoordinateSystem CoordinateSystem { get; set; }
 
     /// <summary>
     /// 查询指定范围内的要素
     /// </summary>
     /// <param name="extent"></param>
+    /// <param name="fitler"></param>
     /// <returns></returns>
-    public abstract Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent);
+    public abstract Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope extent, string fitler);
 
     /// <summary>
     /// 数据源覆盖范围
     /// </summary>
     /// <returns></returns>
-    public abstract Envelope GetEnvelope();
+    public abstract Envelope Envelope { get; }
 
     /// <summary>
     /// 复制数据源对象
@@ -42,4 +43,6 @@ public abstract class VectorSourceBase : IVectorSource
     /// 释放
     /// </summary>
     public abstract void Dispose();
+
+    public abstract Task LoadAsync();
 }

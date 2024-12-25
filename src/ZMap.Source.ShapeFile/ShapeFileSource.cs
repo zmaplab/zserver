@@ -33,7 +33,12 @@ public class ShapeFileSource : VectorSourceBase
     public ShapeFileSource(string file)
     {
         File = new FileInfo(file).FullName;
-        Srid = GetSrid(file);
+        CoordinateSystem = GetCoordinateSystem(file);
+        if (CoordinateSystem != null)
+        {
+            Srid = (int)CoordinateSystem.AuthorityCode;
+        }
+
         _geometryFactory =
             NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(), Srid);
     }
@@ -43,7 +48,12 @@ public class ShapeFileSource : VectorSourceBase
         return (ISource)MemberwiseClone();
     }
 
-    public override Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope extent)
+    public override Task LoadAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public override Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope extent, string fitler)
     {
         if (Srid == -1)
         {
@@ -108,10 +118,7 @@ public class ShapeFileSource : VectorSourceBase
         return Task.FromResult<IEnumerable<Feature>>(features);
     }
 
-    public override Envelope GetEnvelope()
-    {
-        return null;
-    }
+    public override Envelope Envelope => null;
 
     public override string ToString()
     {
@@ -158,17 +165,17 @@ public class ShapeFileSource : VectorSourceBase
         return dbaseFile.ReadEntry(index);
     }
 
-    private int GetSrid(string path)
+    private CoordinateSystem GetCoordinateSystem(string path)
     {
         var projPath = path.Replace(".shp", ".prj");
         if (!System.IO.File.Exists(projPath))
         {
-            return -1;
+            return null;
         }
 
         var coordinateSystem =
             CoordinateSystemFactory.CreateFromWkt(System.IO.File.ReadAllText(Path.Combine(projPath)));
-        return (int)coordinateSystem.AuthorityCode;
+        return coordinateSystem;
     }
 
     private List<SpatialIndexItem> GetObjectIDsInView(ISpatialIndex<SpatialIndexItem> tree, Envelope bbox)

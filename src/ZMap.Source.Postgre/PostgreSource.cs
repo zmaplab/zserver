@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using FreeSql.Internal.Model;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
@@ -27,7 +25,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .UseConnectionFactory(DataType.PostgreSQL, () =>
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    "User ID=postgres;Password=11111;Host=127.0.0.1;Port=8888;Database=zserver_dev;Pooling=true;");
+                    "User ID=postgres;Password=11111;Host=127.0.0.1;Port=5432;Database=db;Pooling=true;");
                 dataSourceBuilder.UseNetTopologySuite();
                 var dataSource = dataSourceBuilder.Build();
                 return dataSource.CreateConnection();
@@ -35,9 +33,9 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .Build();
     });
 
-    private static ConcurrentDictionary<string, string> BaseSql = new ConcurrentDictionary<string, string>();
+    private static readonly ConcurrentDictionary<string, string> BaseSql = new();
 
-    public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
+    public override async Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope bbox, string filter)
     {
         if (string.IsNullOrEmpty(Geometry))
         {
@@ -93,10 +91,10 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
         });
 
         string sql;
-        if (!string.IsNullOrEmpty(Filter))
+        if (!string.IsNullOrEmpty(filter))
         {
             var select = FreeSql.Value.Select<object>().WithSql(baseSql);
-            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(Filter);
+            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(filter);
             select = select.WhereDynamicFilter(filterInfo);
             sql = select.ToSql();
         }
@@ -111,7 +109,11 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 bbox.MinY, bbox.MaxY, Srid);
         }
 
-        await using var conn = CreateDbConnection();
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(ConnectionString);
+        dataSourceBuilder.UseNetTopologySuite();
+        // DataSource 一定要释放， 不然会连接池泄露
+        await using var dataSource = dataSourceBuilder.Build();
+        await using var conn = dataSource.CreateConnection();
 
         return (await conn.QueryAsync(sql, new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid }, null, 30)).Select(
             x =>
@@ -138,10 +140,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             });
     }
 
-    public override Envelope GetEnvelope()
-    {
-        return null;
-    }
+    public override Envelope Envelope => null;
 
     public override ISource Clone()
     {
@@ -160,20 +159,5 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
     public override void Dispose()
     {
-    }
-
-    private DbConnection CreateDbConnection()
-    {
-        var dataSource = Cache.GetOrCreate(Name, entry =>
-        {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(ConnectionString);
-            dataSourceBuilder.UseNetTopologySuite();
-            var dataSource = dataSourceBuilder.Build();
-            entry.SetValue(dataSource);
-            entry.SetSlidingExpiration(TimeSpan.FromMinutes(15));
-            return dataSource;
-        });
-
-        return dataSource.CreateConnection();
     }
 }

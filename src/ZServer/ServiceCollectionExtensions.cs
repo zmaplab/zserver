@@ -37,6 +37,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.TryAddScoped<ISldStore, SldStore>();
         serviceCollection.TryAddSingleton(_ => new JsonStoreProvider(layersConfiguration));
         serviceCollection.AddHostedService<StoreRefreshService>();
+        serviceCollection.TryAddSingleton<StoreRefreshService>();
 
         serviceCollection.AddHostedService<PreloadService>();
         serviceCollection.TryAddScoped<ILayerQueryService, LayerQueryService>();

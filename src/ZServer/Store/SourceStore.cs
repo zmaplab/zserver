@@ -42,7 +42,7 @@ public class SourceStore : ISourceStore
         return new ValueTask<List<ISource>>(items);
     }
 
-    public Task Refresh(List<JObject> configurations)
+    public Task RefreshAsync(List<JObject> configurations)
     {
         var existKeys = Cache.Keys.ToList();
         var keys = new List<string>();
@@ -191,11 +191,11 @@ public class SourceStore : ISourceStore
 
         var parameterInfos = StorageTypeCache.GetOrAdd(type, x =>
         {
-            if (!typeof(IVectorSource).IsAssignableFrom(x))
-            {
-                Logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", sourceName, provider);
-                return null;
-            }
+            // if (!typeof(IVectorSource).IsAssignableFrom(x))
+            // {
+            //     Logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", sourceName, provider);
+            //     return null;
+            // }
 
             var result = x.GetConstructors()[0].GetParameters();
 

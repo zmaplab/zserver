@@ -20,17 +20,19 @@ public interface IGraphicsService : IDisposable
     /// <summary>
     /// 获取渲染的图像
     /// </summary>
-    /// <param name="imageFormat"></param>
+    /// <param name="format"></param>
     /// <param name="bordered"></param>
     /// <returns></returns>
-    Stream GetImage(string imageFormat, bool bordered = false);
+    Stream GetImage(string format, bool bordered = false);
 
     /// <summary>
     /// 渲染影像数据
     /// </summary>
+    /// <param name="extent"></param>
+    /// <param name="geometry"></param>
     /// <param name="image"></param>
     /// <param name="style"></param>
-    void Render(byte[] image, RasterStyle style);
+    void Render(Envelope extent, Envelope geometry, byte[] image, RasterStyle style);
 
     /// <summary>
     /// 渲染矢量数据

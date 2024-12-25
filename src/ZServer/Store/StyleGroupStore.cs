@@ -13,7 +13,7 @@ public class StyleGroupStore : IStyleGroupStore
 {
     private static Dictionary<string, StyleGroup> _cache = new();
 
-    public Task Refresh(List<JObject> configurations)
+    public Task RefreshAsync(List<JObject> configurations)
     {
         var dict = new Dictionary<string, StyleGroup>();
         foreach (var configuration in configurations)

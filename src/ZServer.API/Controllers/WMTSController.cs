@@ -31,7 +31,10 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
     /// <param name="filter"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task GetAsync([Required] [FromQuery(Name = "layer"), StringLength(100)] string layers,
+    public async Task GetAsync([Required]
+        [FromQuery(Name = "layer"),
+         StringLength(100)]
+        string layers,
         [StringLength(100)] string style,
         [Required, StringLength(50)] string tileMatrix, [Required] int tileRow, [Required] int tileCol,
         string format = "image/png",
@@ -39,11 +42,9 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
         [FromQuery(Name = "Z_FILTER"), StringLength(2048)]
         string filter = null)
     {
+        var tuple = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
 #if !DEBUG
-        // 使用相同的缓存路径
-        var path = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
-
-        if (System.IO.File.Exists(path))
+        if (System.IO.File.Exists(tuple.FullPath))
         {
             if (ZMap.EnvironmentVariables.EnableSensitiveDataLogging)
             {
@@ -53,7 +54,7 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
                     displayUrl);
             }
 
-            await using var stream = System.IO.File.OpenRead(path);
+            await using var stream = System.IO.File.OpenRead(tuple.FullPath);
             HttpContext.Response.ContentType = format;
             HttpContext.Response.ContentLength = stream.Length;
             await stream.CopyToAsync(HttpContext.Response.Body, (int)stream.Length);
@@ -62,12 +63,10 @@ public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController
 #endif
 
         // 同一个 Grid 使用同一个对象进行管理， 保证缓存文件在同一个 Silo 目录下
-        var key = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
-        var friend = clusterClient.GetGrain<IWMTSGrain>(key);
+        var grain = clusterClient.GetGrain<IWMTSGrain>(tuple.IntervalPath);
         var result =
-            await friend.GetTileAsync(layers, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
-                filter
-                ,
+            await grain.GetTileAsync(layers, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
+                filter,
                 new Dictionary<string, object>
                 {
                     { "TraceIdentifier", HttpContext.TraceIdentifier }

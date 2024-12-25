@@ -1,10 +1,11 @@
-﻿
+﻿using System.Net.Http;
 
 namespace ZMap.Ogc.Wms;
 
 public class WmsService(
     IPermissionService permissionService,
     IGraphicsServiceProvider graphicsServiceProvider,
+    IHttpClientFactory httpClientFactory,
     ILayerQueryService layerQueryService)
 {
     private static readonly ILogger Logger = Log.CreateLogger<WmsService>();
@@ -20,7 +21,8 @@ public class WmsService(
         try
         {
             var validateResult =
-                ArgumentsValidator.VerifyAndBuildWmsGetMapArguments(layers, srs, bbox, width, height, format);
+                ParameterValidator.VerifyAndBuildWmsGetMapArguments(layers, srs, bbox, width, height, format, styles,
+                    zFilter);
             if (!string.IsNullOrEmpty(validateResult.Code))
             {
                 displayUrl = GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
@@ -30,42 +32,33 @@ public class WmsService(
                 return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
 
-            var requestArguments = validateResult.Arguments;
-
             var dpi = Utility.GetDpi(formatOptions);
+            var layerQueries = new List<LayerQuery>();
+            var requestParameters = validateResult.Parameters;
 
-            var filterList = string.IsNullOrWhiteSpace(zFilter)
-                ? []
-                : zFilter.Split(';', StringSplitOptions.RemoveEmptyEntries);
-
-            var styleList = string.IsNullOrWhiteSpace(styles)
-                ? []
-                : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
-
-            var layerQueries =
-                new List<LayerQuery>();
-
-            for (var i = 0; i < requestArguments.Layers.Count; ++i)
+            for (var i = 0; i < requestParameters.Layers.Count; ++i)
             {
-                var layer = validateResult.Arguments.Layers.ElementAt(i);
-                layerQueries.Add(new LayerQuery(layer.ResourceGroup,
-                    layer.Layer, styleList.ElementAtOrDefault(i),
-                    new Dictionary<string, object>
-                    {
-                        { Defaults.AdditionalFilter, filterList.ElementAtOrDefault(i) }
-                    }));
+                var layer = requestParameters.Layers.ElementAt(i);
+                layerQueries.Add(new LayerQuery(layer.ResourceGroup, layer.Layer,
+                    requestParameters.Styles.ElementAtOrDefault(i)));
             }
 
-            var layerList = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
-            if (layerList.Count == 0)
+            var tuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = tuple.Layers;
+            if (tuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerQueries.Count)
             {
-                return new MapResult(Stream.Null, null, null);
+                Logger.LogError("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
+                return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
-            foreach (var layer in layerList)
+            for (var i = 0; i < requestParameters.Layers.Count; ++i)
             {
+                var layer = layerList[i];
+                layer.HttpClientFactory = httpClientFactory;
+                layer.Filter = requestParameters.Filters.ElementAtOrDefault(i);
+
                 var permission =
-                    await permissionService.EnforceAsync("read", layer.GetResourceId(), PolicyEffect.Allow);
+                    await permissionService.EnforceAsync("read", layer.ResourceId, PolicyEffect.Allow);
                 if (permission)
                 {
                     continue;
@@ -74,25 +67,26 @@ public class WmsService(
                 return new MapResult(Stream.Null, "403", "Forbidden");
             }
 
-            var viewPort = new Viewport
+            var viewport = new Viewport
             {
-                Extent = validateResult.Arguments.Envelope,
+                Extent = validateResult.Parameters.Envelope,
                 Width = width,
                 Height = height,
                 Transparent = transparent,
+                BackgroundColor = bgColor,
                 Bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b
             };
 
-            var scale = GeographicUtility.CalculateOGCScale(validateResult.Arguments.Envelope,
-                validateResult.Arguments.SRID,
+            var scale = GeographicUtility.CalculateOGCScale(validateResult.Parameters.Envelope,
+                validateResult.Parameters.SRID,
                 width, dpi);
             var map = new Map();
-            map.SetId(traceIdentifier)
-                .SetSrid(validateResult.Arguments.SRID)
+            await map.SetId(traceIdentifier)
+                .SetSrid(validateResult.Parameters.SRID)
                 .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                 .SetGraphicsContextFactory(graphicsServiceProvider)
                 .AddLayers(layerList);
-            var image = await map.GetImageAsync(viewPort, format);
+            var image = await map.GetImageAsync(viewport, format);
             return new MapResult(image, null, null);
         }
         catch (Exception e)
@@ -114,7 +108,7 @@ public class WmsService(
         try
         {
             var validateResult =
-                ArgumentsValidator.VerifyAndBuildWmsGetFeatureInfoArguments(layers, srs, bbox, width, height, x, y,
+                ParameterValidator.VerifyAndBuildWmsGetFeatureInfoArguments(layers, srs, bbox, width, height, x, y,
                     featureCount);
             if (!string.IsNullOrEmpty(validateResult.Code))
             {
@@ -126,19 +120,17 @@ public class WmsService(
             var layerQueries =
                 new List<LayerQuery>();
 
-            for (var i = 0; i < validateResult.Arguments.Layers.Count; ++i)
+            for (var i = 0; i < validateResult.Parameters.Layers.Count; ++i)
             {
-                var layer = validateResult.Arguments.Layers.ElementAt(i);
-                layerQueries.Add(new LayerQuery(layer.ResourceGroup,
-                    layer.Layer, null,
-                    new Dictionary<string, object>()));
+                var layer = validateResult.Parameters.Layers.ElementAt(i);
+                layerQueries.Add(new LayerQuery(layer.ResourceGroup, layer.Layer, null));
             }
 
-            var layerList = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
-
-            var featureCollection = await
-                GetFeatureInfoAsync(layerList, featureCount, srs, validateResult.Arguments.Envelope, width, height, x,
-                    y);
+            var tuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = tuple.Layers;
+            var featureCollection = await GetFeatureInfoAsync(layerList, featureCount, srs,
+                validateResult.Parameters.Envelope,
+                width, height, x, y);
 
             if (!EnvironmentVariables.EnableSensitiveDataLogging)
             {
@@ -201,7 +193,7 @@ public class WmsService(
             var envelope = new Envelope(minX, maxX, minY, maxY);
             var targetEnvelope = envelope.Transform(srid, spatialDatabaseSource.Srid);
             var features = await spatialDatabaseSource
-                .GetFeaturesInExtentAsync(targetEnvelope);
+                .GetFeaturesAsync(targetEnvelope, null);
 
             foreach (var feature in features)
             {
