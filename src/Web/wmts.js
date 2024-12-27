@@ -30,7 +30,7 @@ const projection2 = getProjection('EPSG:3857')
 const projectionExtent2 = projection2.getExtent()
 const c = resolutionsFromExtent(projectionExtent2)
 
-let centerXY = [103.994382, 30.702905]
+let centerXY = [121.340165, 29.2364651]
 let img_w_url1 =
   'http://t0.tianditu.gov.cn/img_w/wmts?' + 'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk='
 let img_w_url2 = 'http://localhost:8200/wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=tianditu_w&tileMatrixSet=EPSG:3857&format=image/png' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
