@@ -4,8 +4,9 @@ public static class CoordinateReferenceSystem
 {
     // ReSharper disable once InconsistentNaming
     // TODO: int 转成 string 更好？可能存在大量装箱拆箱
-    private static readonly Dictionary<int, CoordinateSystem> SRIDCache;
-    private static readonly Dictionary<string, CoordinateSystem> NameCache;
+    public static readonly Dictionary<int, CoordinateSystem> SRIDCache;
+    public static readonly Dictionary<string, CoordinateSystem> NameCache;
+    public static readonly Dictionary<string, CoordinateSystem> EsriNameCache;
 
     private static readonly GeometryFactory GeometryFactory =
         NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory();
@@ -20,6 +21,8 @@ public static class CoordinateReferenceSystem
     {
         SRIDCache = new Dictionary<int, CoordinateSystem>();
         NameCache = new Dictionary<string, CoordinateSystem>();
+        EsriNameCache = new Dictionary<string, CoordinateSystem>();
+
         typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
         using var stream =
             typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Infrastructure.proj.xml");
@@ -35,6 +38,38 @@ public static class CoordinateReferenceSystem
         if (nodes == null)
         {
             return;
+        }
+
+        using var esriProjStream =
+            typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Infrastructure.esri_proj.csv");
+        var esriNames = new List<(int Srid, string Name)>();
+        if (esriProjStream != null)
+        {
+            using var reader = new StreamReader(esriProjStream);
+            var lines = reader.ReadToEnd().Split('\n');
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                var data = line.Split(',');
+                var name = data[0].Trim();
+                try
+                {
+                    if (!int.TryParse(data[1].Trim(), out var srid))
+                    {
+                        continue;
+                    }
+
+                    esriNames.Add((srid, name));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         foreach (XmlNode referenceNode in nodes)
@@ -55,6 +90,12 @@ public static class CoordinateReferenceSystem
             var coordinateSystem = coordinateSystemFactory.CreateFromWkt(wkt);
             SRIDCache.TryAdd(srid, coordinateSystem);
             NameCache.TryAdd(coordinateSystem.Name, coordinateSystem);
+
+            var names = esriNames.Where(x => x.Srid == srid).ToList();
+            foreach (var tuple in names)
+            {
+                EsriNameCache.TryAdd(tuple.Name, coordinateSystem);
+            }
         }
     }
 
@@ -74,7 +115,7 @@ public static class CoordinateReferenceSystem
         {
             "WGS 84" => GeographicCoordinateSystem.WGS84,
             "WGS 84 / Pseudo-Mercator" => ProjectedCoordinateSystem.WebMercator,
-            _ => NameCache.GetValueOrDefault(name)
+            _ => NameCache.GetValueOrDefault(name) ?? EsriNameCache.GetValueOrDefault(name)
         };
     }
 

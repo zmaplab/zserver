@@ -14,15 +14,15 @@
     },
     "cd": {
       "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
-      "file": "/Users/lewis/Downloads/cd_common_cog.tif"
+      "file": "/Users/lewis/Downloads/tiled_cog_chengdu.tif"
     },
     "tianditu_c": {
       "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
-      "url": "https://t3.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk=7b5d52dbf12be8c8b626d68241708e08"
+      "url": "https://t3.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk="
     },
     "tianditu_w": {
       "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
-      "url": "https://t3.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk=7b5d52dbf12be8c8b626d68241708e08"
+      "url": "https://t3.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk="
     }
   },
   "styleGroups": {

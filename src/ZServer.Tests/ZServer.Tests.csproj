@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="EPPlus" Version="4.5.3.3" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
         <PackageReference Include="DotNetCore.Compile.Environment" Version="3.2.0" />
 <!--        <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.10" />-->
@@ -127,6 +128,9 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="images\tianditu_w.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="ESRI_CS.xlsx">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

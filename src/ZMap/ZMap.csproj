@@ -27,6 +27,8 @@
         <EmbeddedResource Include="Infrastructure\proj.xml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Remove="Infrastructure\esri_proj.csv" />
+        <EmbeddedResource Include="Infrastructure\esri_proj.csv" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ZMap.TileGrid\ZMap.TileGrid.csproj"/>
