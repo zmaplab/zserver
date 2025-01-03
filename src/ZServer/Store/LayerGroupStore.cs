@@ -15,7 +15,7 @@ public class LayerGroupStore(
     : ILayerGroupStore
 {
     private static Dictionary<string, LayerGroup> _cache = new();
-    private static readonly ILogger Logger = Log.CreateLogger<LayerGroupStore>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<LayerGroupStore>());
 
     public async Task RefreshAsync(List<JObject> configurations)
     {
@@ -163,7 +163,7 @@ public class LayerGroupStore(
                         layer = await layerStore.FindAsync(parts[0], parts[1]);
                         break;
                     default:
-                        Logger.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
+                        Logger.Value.LogError("图层组 {LayerGroupName} 中的图层 {LayerName} 不存在", layerGroup.Name, layerName);
                         break;
                 }
 

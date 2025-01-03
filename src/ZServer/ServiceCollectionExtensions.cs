@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
     public static ZServerBuilder AddZServer(this IServiceCollection serviceCollection,
         IConfiguration configuration, string layersConfiguration)
     {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
         serviceCollection.Configure<ServerOptions>(configuration);

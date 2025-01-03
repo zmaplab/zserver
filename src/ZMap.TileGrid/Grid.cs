@@ -2,10 +2,10 @@
 
 namespace ZMap.TileGrid;
 
-public class Grid
+public class Grid(int index)
 {
     // ReSharper disable once PropertyCanBeMadeInitOnly.Global
-    public int Index { get; private set; }
+    public int Index { get; private set; } = index;
 
     /// <summary>
     /// 名称
@@ -34,11 +34,8 @@ public class Grid
 
     public int Height { get; set; }
     public int Width { get; set; }
-
-    public Grid(int index)
-    {
-        Index = index;
-    }
+    public int TileHeight { get; set; }
+    public int TileWidth { get; set; }
 
     public override string ToString()
     {

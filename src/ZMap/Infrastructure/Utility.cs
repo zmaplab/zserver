@@ -52,6 +52,18 @@ public static partial class Utility
         return (fullPath, intervalPath);
     }
 
+    public static (string FullPath, string IntervalPath) GetTiffPath(string file, string tileMatrix, int tileRow,
+        int tileCol)
+    {
+        // group1:layer1,layer2 -> group1_layer1.group2_layer2
+        var fileKey = CryptographyUtility.ComputeHash(Encoding.UTF8.GetBytes(file));
+        var fileName = Path.GetFileNameWithoutExtension(file);
+        var intervalPath =
+            $"geotif{Path.DirectorySeparatorChar}{fileName}{Path.DirectorySeparatorChar}{fileKey}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}.dat";
+        var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", intervalPath);
+        return (fullPath, intervalPath);
+    }
+
     // public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,
     //     int tileCol)
     // {

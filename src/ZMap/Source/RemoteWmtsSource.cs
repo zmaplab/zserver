@@ -160,24 +160,25 @@ public partial class RemoteWmtsSource(string url) : ITiledSource, IRemoteHttpSou
         Envelope = tuple.Extent;
     }
 
-    public async Task<byte[]> GetImageAsync(string matrix, int row, int col)
+    public async Task<ImageData> GetImageAsync(string matrix, int row, int col)
     {
         var path = $"{_cacheFolder}/{matrix}_{row}_{col}.png";
         if (File.Exists(path))
         {
-            return await File.ReadAllBytesAsync(path);
+            var fileBytes = await File.ReadAllBytesAsync(path);
+            return new ImageData(fileBytes, ImageDataType.Image);
         }
 
         var requestUrl = string.Format(url, matrix, row, col);
         var response = await SendAsync(requestUrl);
         if (!response.IsSuccessStatusCode)
         {
-            return [];
+            return null;
         }
 
         var bytes = await response.Content.ReadAsByteArrayAsync();
         await File.WriteAllBytesAsync(path, bytes);
-        return bytes;
+        return new ImageData(bytes, ImageDataType.Image);
     }
 
     private async Task<HttpResponseMessage> SendAsync(string requestUrl)

@@ -1,8 +1,9 @@
 using System;
-using System.IO;
+using System.Runtime.InteropServices;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
 using ZMap.Renderer.SkiaSharp.Utilities;
+using ZMap.Source;
 using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
@@ -14,7 +15,7 @@ public class RasterRender(RasterStyle style) : SkiaRenderer, IRasterRender<SKCan
         return new SKPaint();
     }
 
-    public void Render(SKCanvas graphics, Envelope geometry, Envelope extent, int width, int height, byte[] image)
+    public void Render(SKCanvas graphics, Envelope geometry, Envelope extent, int width, int height, ImageData image)
     {
         // var origin = YBaseToggle
         //     ? [Extent.MinX, Extent.MinY]
@@ -35,17 +36,55 @@ public class RasterRender(RasterStyle style) : SkiaRenderer, IRasterRender<SKCan
         var destRect = SKRect.Create((int)min.X, (int)min.Y, (int)(max.X - min.X), (int)(max.Y - min.Y));
         using var paint = CreatePaint();
 
-        // var skiaImage = SKImage.FromEncodedData(image);
-        var skiaImage = SKBitmap.Decode(image);
-        if (skiaImage.Width != width || skiaImage.Height != height)
+        switch (image.Type)
         {
-            using var bitmap = new SKBitmap(width, height);
-            using var canvas = new SKCanvas(bitmap);
-            canvas.Scale((float)width / skiaImage.Width, (float)height / skiaImage.Height);
-            canvas.DrawBitmap(skiaImage, 0, 0);
-            canvas.Flush();
-            skiaImage = bitmap;
+            case ImageDataType.Image:
+            {
+                var skiaImage = SKImage.FromEncodedData((byte[])image.Data);
+                graphics.DrawImage(skiaImage, SKRect.Create(0, 0, width, height), destRect, paint);
+                break;
+            }
+            case ImageDataType.Pixels:
+            {
+                //保存当前画布状态
+                // graphics.Save();
+
+                var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
+
+                try
+                {
+                    using var skiaImage =
+                        SKImage.FromPixels(
+                            new SKImageInfo(image.Width, image.Height, SKColorType.Rgba8888, SKAlphaType.Premul),
+                            handle.AddrOfPinnedObject());
+                    graphics.DrawImage(skiaImage, SKRect.Create(0, 0, width, height), destRect, paint);
+                }
+                finally
+                {
+                    handle.Free();
+                }
+
+                //恢复画布之前的状态
+                graphics.Restore();
+
+                break;
+            }
+            default:
+            {
+                throw new NotSupportedException($"不支持的影像数据类型：{image.Type}");
+            }
         }
+
+        //var skiaImage = SKBitmap.Decode(image);
+        // if (skiaImage.Width != width || skiaImage.Height != height)
+        // {
+        //     using var bitmap = new SKBitmap(width, height);
+        //     using var canvas = new SKCanvas(bitmap);
+        //     canvas.Scale((float)width / skiaImage.Width, (float)height / skiaImage.Height);
+        //     canvas.DrawBitmap(skiaImage, 0, 0);
+        //     canvas.Flush();
+        //     skiaImage = bitmap;
+        // }
 
         // SKBitmap newBitmap = new SKBitmap(skiaImage.Width, skiaImage.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
         // // 遍历每个像素
@@ -68,8 +107,10 @@ public class RasterRender(RasterStyle style) : SkiaRenderer, IRasterRender<SKCan
         //     }
         // }
 
-        using var skiaImage2 = SKImage.FromBitmap(skiaImage);
-        graphics.DrawImage(skiaImage2, SKRect.Create(0, 0, width, height), destRect, paint);
+        // using var skiaImage2 = SKImage.FromBitmap(skiaImage);
+        // graphics.RotateDegrees(180);
+        // graphics.DrawImage(skiaImage, SKRect.Create(0, 0, width, height), destRect, paint);
+        //  graphics.RotateDegrees(-180);
     }
 
     public override string ToString()

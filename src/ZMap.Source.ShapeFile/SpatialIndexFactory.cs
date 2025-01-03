@@ -20,7 +20,7 @@ public class SpatialIndexFactory
     private static readonly MessagePackSerializerOptions SerializerOptions =
         MessagePackSerializer.Typeless.DefaultOptions.WithCompression(MessagePackCompression.Lz4Block);
 
-    private static readonly ILogger Logger = Log.CreateLogger<SpatialIndexFactory>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<SpatialIndexFactory>());
 
     public static ISpatialIndex<SpatialIndexItem> Create(string shapeFile, BinaryReader reader,
         SpatialIndexType type)
@@ -38,7 +38,7 @@ public class SpatialIndexFactory
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "加载空间索引失败， 矢量文件： {ShapeFile}", shapeFile);
+                Logger.Value.LogError(e, "加载空间索引失败， 矢量文件： {ShapeFile}", shapeFile);
                 entries = new List<SpatialIndexItem>();
             }
 
@@ -89,7 +89,7 @@ public class SpatialIndexFactory
             if (shapeFileStream.Position >= shapeFileStream.Length ||
                 shapeFileStream.Length - shapeFileStream.Position < 24)
             {
-                Logger.LogInformation("Read end stream at: {Position}, stream length: {Length}",
+                Logger.Value.LogInformation("Read end stream at: {Position}, stream length: {Length}",
                     shapeFileStream.Position, shapeFileStream.Length);
                 break;
             }

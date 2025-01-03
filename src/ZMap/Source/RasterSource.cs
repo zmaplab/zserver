@@ -21,7 +21,7 @@ public abstract class RasterSource : IRasterSource
     /// </summary>
     /// <param name="extent"></param>
     /// <returns></returns>
-    public abstract Task<byte[]> GetImageAsync(Envelope extent);
+    public abstract Task<ImageData> GetImageAsync(Envelope extent);
 
     public abstract Envelope Envelope { get; }
     public abstract Task LoadAsync();

@@ -14,7 +14,11 @@
     },
     "cd": {
       "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
-      "file": "/Users/lewis/Downloads/tiled_cog_chengdu.tif"
+      "file": "/Users/lewis/Downloads/cd_common_cog.tif"
+    },
+    "qtz": {
+      "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
+      "file": "/Users/lewis/Downloads/前童镇_DOM_webmerc_cog.tif"
     },
     "tianditu_c": {
       "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
@@ -182,6 +186,12 @@
       "services": [],
       "extent": [],
       "source": "cd"
+    },
+    "qtz": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "qtz"
     }
   }
 }

@@ -8,7 +8,7 @@ namespace ZMap;
 public partial class Layer : IVisibleLimit
 {
     public static readonly IZMapStyleVisitor StyleVisitor = new ZMapStyleVisitor();
-    private static readonly ILogger Logger = Log.CreateLogger<Layer>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<Layer>());
 
     /// <summary>
     /// 图层名称

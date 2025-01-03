@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Source;
 using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
@@ -46,9 +47,10 @@ public class SkiaGraphicsService : IGraphicsService
         return _bitmap.Encode(GetImageFormat(imageFormat), 90).AsStream();
     }
 
-    public void Render(Envelope extent, Envelope geometry, byte[] image, RasterStyle style)
+
+    public void Render(Envelope extent, Envelope geometry, ImageData image, RasterStyle style)
     {
-        if (image == null || image.Length == 0)
+        if (image == null || image.IsEmpty)
         {
             return;
         }

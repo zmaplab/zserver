@@ -8,7 +8,7 @@ public class WmsService(
     IHttpClientFactory httpClientFactory,
     ILayerQueryService layerQueryService)
 {
-    private static readonly ILogger Logger = Log.CreateLogger<WmsService>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<WmsService>());
 
     public async ValueTask<MapResult> GetMapAsync(string layers, string styles,
         string srs, string bbox, int width,
@@ -27,7 +27,7 @@ public class WmsService(
             {
                 displayUrl = GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
                     zFilter);
-                Logger.LogError("{Url}, arguments error: {Code}, message: {Message}", displayUrl, validateResult.Code,
+                Logger.Value.LogError("{Url}, arguments error: {Code}, message: {Message}", displayUrl, validateResult.Code,
                     validateResult.Message);
                 return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
@@ -47,7 +47,7 @@ public class WmsService(
             var layerList = tuple.Layers;
             if (tuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerQueries.Count)
             {
-                Logger.LogError("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
+                Logger.Value.LogError("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
                 return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
@@ -93,7 +93,7 @@ public class WmsService(
         {
             displayUrl ??= GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
                 zFilter);
-            Logger.LogError(e, "请求 {Url} 失败", displayUrl);
+            Logger.Value.LogError(e, "请求 {Url} 失败", displayUrl);
             return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }
@@ -113,7 +113,7 @@ public class WmsService(
             if (!string.IsNullOrEmpty(validateResult.Code))
             {
                 displayUrl = GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
-                Logger.LogError("{Url}, arguments error", displayUrl);
+                Logger.Value.LogError("{Url}, arguments error", displayUrl);
                 return new GetFeatureInfoResult(null, validateResult.Code, validateResult.Message);
             }
 
@@ -138,7 +138,7 @@ public class WmsService(
             }
 
             displayUrl = GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
-            Logger.LogInformation("GetFeatureInfo {Url}, hit layers: {Layers}, count: {Count}", displayUrl,
+            Logger.Value.LogInformation("GetFeatureInfo {Url}, hit layers: {Layers}, count: {Count}", displayUrl,
                 string.Join(", ", layerList.Select(z => z.Name)), featureCollection.Count);
 
             return new GetFeatureInfoResult(featureCollection, null, null);
@@ -146,7 +146,7 @@ public class WmsService(
         catch (Exception e)
         {
             displayUrl ??= GetFeatureInfoDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, infoFormat);
-            Logger.LogError(e, "请求 {Url} 失败", displayUrl);
+            Logger.Value.LogError(e, "请求 {Url} 失败", displayUrl);
             return new GetFeatureInfoResult(null, "InternalError", e.Message);
         }
     }

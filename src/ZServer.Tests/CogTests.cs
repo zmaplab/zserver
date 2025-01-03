@@ -71,14 +71,14 @@ public class CogTests(WebApplicationFactoryFixture fixture)
         var str = Encoding.UTF8.GetString(image2);
         await File.WriteAllBytesAsync("images/cd_2.png", image2);
     }
-    
-    [Fact(DisplayName = "Get cd tile 1")]
+
+    [Fact(DisplayName = "Get cd tile cd")]
     public async Task GetWmts1Tile()
     {
         var service = fixture.Instance.Services.GetRequiredService<StoreRefreshService>();
         await service.StartAsync(default);
         var httpClient = fixture.Instance.CreateClient();
- 
+
         var result2 =
             await httpClient.GetAsync(
                 "wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=cd&tileMatrixSet=EPSG:4326&format=image/png&TILEMATRIX=17&TILEROW=21590&TILECOL=103398");
@@ -88,10 +88,38 @@ public class CogTests(WebApplicationFactoryFixture fixture)
         await File.WriteAllBytesAsync("images/cd_2.png", image2);
     }
 
+    [Fact(DisplayName = "Get cd tile qtz")]
+    public async Task GetWmtsQtzTile()
+    {
+        var service = fixture.Instance.Services.GetRequiredService<StoreRefreshService>();
+        await service.StartAsync(default);
+        var httpClient = fixture.Instance.CreateClient();
+
+        var result1 =
+            await httpClient.GetAsync(
+                "wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=qtz&tileMatrixSet=EPSG:4326&format=image/png&TILEMATRIX=13&TILEROW=1382&TILECOL=6858&CQL_FILTER=");
+        var image1 = await result1.Content.ReadAsByteArrayAsync();
+        result1.EnsureSuccessStatusCode();
+
+        await File.WriteAllBytesAsync("images/qtz_1.png", image1);
+
+        var result2 =
+            await httpClient.GetAsync(
+                "wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=qtz&tileMatrixSet=EPSG:3857&format=image/png&TILEMATRIX=13&TILEROW=1382&TILECOL=6858&CQL_FILTER=");
+        var image2 = await result2.Content.ReadAsByteArrayAsync();
+        result2.EnsureSuccessStatusCode();
+
+        await File.WriteAllBytesAsync("images/qtz_2.png", image2);
+    }
+
     private async Task AssertAllTiles(COGGeoTiffSource cogGeoTiffSource, string zoom, int x, int y)
     {
         var image = await cogGeoTiffSource.GetImageAsync(zoom, x, y);
-        await File.WriteAllBytesAsync("images/cd_" + zoom + "_" + x + "_" + y + ".png", image);
-        Assert.True(image.Length > 0);
+        if (image.Data is byte[] b)
+        {
+            await File.WriteAllBytesAsync("images/cd_" + zoom + "_" + x + "_" + y + ".png", b);
+        }
+
+        Assert.False(image.IsEmpty);
     }
 }
