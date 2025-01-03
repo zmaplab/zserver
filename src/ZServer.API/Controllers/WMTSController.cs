@@ -13,7 +13,13 @@ namespace ZServer.API.Controllers;
 [Route("[controller]")]
 [ZServerAuthorize]
 // ReSharper disable once InconsistentNaming
-public class WMTSController(IClusterClient clusterClient, ILogger<WMTSController> logger)
+public class WMTSController(
+    IClusterClient clusterClient
+#if !DEBUG
+    ,
+    ILogger<WMTSController> logger
+#endif
+)
     : ControllerBase
 {
     /// <summary>

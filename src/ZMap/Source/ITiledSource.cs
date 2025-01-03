@@ -5,5 +5,5 @@ namespace ZMap.Source;
 public interface ITiledSource : ISource
 {
     GridSet GridSet { get; set; }
-    Task<byte[]> GetImageAsync(string matrix, int row, int col);
+    Task<ImageData> GetImageAsync(string matrix, int row, int col);
 }

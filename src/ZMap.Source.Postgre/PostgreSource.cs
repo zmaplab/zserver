@@ -17,7 +17,7 @@ namespace ZMap.Source.Postgre;
 
 public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
-    private static readonly ILogger Logger = Log.CreateLogger<PostgreSource>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<PostgreSource>());
 
     private static readonly Lazy<IFreeSql> FreeSql = new(() =>
     {
@@ -105,7 +105,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            Logger.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
+            Logger.Value.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
                 bbox.MinY, bbox.MaxY, Srid);
         }
 

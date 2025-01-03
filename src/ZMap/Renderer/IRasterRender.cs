@@ -6,5 +6,5 @@ namespace ZMap.Renderer;
 /// <typeparam name="TGraphics"></typeparam>
 public interface IRasterRender<in TGraphics> : IRenderer
 {
-    void Render(TGraphics graphics, Envelope content, Envelope extent, int width, int height, byte[] image);
+    void Render(TGraphics graphics, Envelope content, Envelope extent, int width, int height, ImageData image);
 }

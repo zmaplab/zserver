@@ -24,7 +24,8 @@ public class LayerStore(
     private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> PropertyCache =
         new();
 
-    private static readonly ILogger Logger = Log.CreateLogger<LayerStore>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<LayerStore>());
+
     private static readonly ConcurrentDictionary<string, Layer> Cache = new();
 
     public async Task RefreshAsync(List<JObject> configurations)
@@ -316,14 +317,14 @@ public class LayerStore(
         var sourceName = section["source"]?.ToObject<string>();
         if (string.IsNullOrEmpty(sourceName))
         {
-            Logger.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
+            Logger.Value.LogError("图层 {ResourceGroup}:{Name} 未配置数据源", resourceGroup, name);
             return null;
         }
 
         var source = await sourceStore.FindAsync(sourceName);
         if (source == null)
         {
-            Logger.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
+            Logger.Value.LogError("图层 {ResourceGroup}:{Name} 的数据源 {SourceName} 不存在", resourceGroup, name, sourceName);
             return null;
         }
 

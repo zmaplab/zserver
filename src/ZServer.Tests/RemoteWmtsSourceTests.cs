@@ -29,6 +29,6 @@ public class RemoteWmtsSourceTests(WebApplicationFactoryFixture fixture)
 
         await source.LoadAsync();
         var image = await source.GetImageAsync("9", 80, 423);
-        await File.WriteAllBytesAsync("images/remote_wmts.png", image);
+        await File.WriteAllBytesAsync("images/remote_wmts.png", (byte[])image.Data);
     }
 }

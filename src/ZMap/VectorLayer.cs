@@ -125,7 +125,7 @@ public partial class Layer
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            Logger.LogInformation(
+            Logger.Value.LogInformation(
                 "[{Identifier}] layer: {Name}, bbox: {MinX},{MinY},{MaxX},{MaxY}, srid: {srid} width: {Width}, height: {Height}, filter: {Filter}, feature count: {Count}, rendering: {ElapsedMilliseconds}",
                 graphicsService.TraceIdentifier, Name, renderEnvelope.MinX, renderEnvelope.MinY, renderEnvelope.MaxX,
                 renderEnvelope.MaxY, viewportSrid, graphicsService.Width, graphicsService.Height, Filter, count,

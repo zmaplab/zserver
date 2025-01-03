@@ -32,7 +32,7 @@ public interface IGraphicsService : IDisposable
     /// <param name="geometry"></param>
     /// <param name="image"></param>
     /// <param name="style"></param>
-    void Render(Envelope extent, Envelope geometry, byte[] image, RasterStyle style);
+    void Render(Envelope extent, Envelope geometry, ImageData image, RasterStyle style);
 
     /// <summary>
     /// 渲染矢量数据

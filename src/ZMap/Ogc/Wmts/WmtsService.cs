@@ -9,8 +9,8 @@ public class WmtsService(
     IHttpClientFactory httpClientFactory,
     IGridSetStore gridSetStore)
 {
-    private static readonly ILogger Logger = Log.CreateLogger<WmtsService>();
-
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<WmtsService>());
+    
     public async ValueTask<MapResult> GetTileAsync(string layers, string styles,
         string format,
         string tileMatrixSet, string tileMatrix, int tileRow,
@@ -25,7 +25,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, zFilter);
-                Logger.LogError("{Url}, no layers have been requested", displayUrl);
+                Logger.Value.LogError("{Url}, no layers have been requested", displayUrl);
                 return new MapResult(Stream.Null, "LayerNotDefined", "No layers have been requested");
             }
 
@@ -33,7 +33,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, zFilter);
-                Logger.LogError("{Url}, no tile matrix set requested", displayUrl);
+                Logger.Value.LogError("{Url}, no tile matrix set requested", displayUrl);
                 return new MapResult(Stream.Null, "InvalidTileMatrixSet", "No tile matrix set requested");
             }
 
@@ -43,7 +43,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, zFilter);
-                Logger.LogError("{Url}, could not find tile matrix set", displayUrl);
+                Logger.Value.LogError("{Url}, could not find tile matrix set", displayUrl);
                 return new MapResult(Stream.Null, "TileMatrixSetNotDefined",
                     $"Could not find tile matrix set {tileMatrixSet}");
             }
@@ -53,7 +53,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, zFilter);
-                Logger.LogError("{Url}, wmts key is empty", displayUrl);
+                Logger.Value.LogError("{Url}, wmts key is empty", displayUrl);
                 return new MapResult(Stream.Null, "WMTSKeyIsEmpty",
                     "wmts key is empty");
             }
@@ -65,7 +65,7 @@ public class WmtsService(
                 {
                     displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                         tileRow, tileCol, zFilter);
-                    Logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
+                    Logger.Value.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
                 }
 
                 return new MapResult(File.OpenRead(tuple.FullPath), null, null);
@@ -84,7 +84,7 @@ public class WmtsService(
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, zFilter);
-                Logger.LogError("{Url}, could not get envelope from grid set", displayUrl);
+                Logger.Value.LogError("{Url}, could not get envelope from grid set", displayUrl);
                 return new MapResult(Stream.Null, null, null);
             }
 
@@ -127,7 +127,7 @@ public class WmtsService(
                         displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet,
                             tileMatrix,
                             tileRow, tileCol, zFilter);
-                        Logger.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
+                        Logger.Value.LogError("{Url}, layer format is incorrect {Layer}", displayUrl, layerName);
                         return new MapResult(Stream.Null, "LayerFormatIncorrect",
                             $"layer format is incorrect {layerName}");
                     }
@@ -138,7 +138,7 @@ public class WmtsService(
             var layerList = layerTuple.Layers;
             if (layerTuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerQueries.Count)
             {
-                Logger.LogError("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
+                Logger.Value.LogError("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
                 return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
@@ -179,13 +179,15 @@ public class WmtsService(
             await using var fileStream = new FileStream(tuple.FullPath, FileMode.Create, FileAccess.Write);
             await image.CopyToAsync(fileStream);
             image.Seek(0, SeekOrigin.Begin);
+
+
             return new MapResult(image, null, null);
         }
         catch (Exception e)
         {
             displayUrl ??= GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                 tileRow, tileCol, zFilter);
-            Logger.LogError(e, "请求 {Url} 失败", displayUrl);
+            Logger.Value.LogError(e, "请求 {Url} 失败", displayUrl);
             return new MapResult(Stream.Null, "InternalError", e.Message);
         }
     }

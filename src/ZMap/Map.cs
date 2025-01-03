@@ -9,7 +9,7 @@ namespace ZMap;
 /// </summary>
 public class Map : IDisposable
 {
-    private static readonly ILogger Logger = Log.CreateLogger<Map>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<Map>());
     private readonly List<Layer> _layers = new();
     private IGraphicsServiceProvider _graphicsServiceProvider;
     private Zoom _zoom;
@@ -69,7 +69,7 @@ public class Map : IDisposable
             _graphicsServiceProvider.Create(viewport.Width, viewport.Height);
         if (graphicsService == null)
         {
-            Logger.LogWarning("创建图形服务失败");
+            Logger.Value.LogWarning("创建图形服务失败");
             return Stream.Null;
         }
 

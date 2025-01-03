@@ -7,5 +7,5 @@ public interface IRasterSource : ISource
     /// </summary>
     /// <param name="extent"></param>
     /// <returns></returns>
-    Task<byte[]> GetImageAsync(Envelope extent);
+    Task<ImageData> GetImageAsync(Envelope extent);
 }

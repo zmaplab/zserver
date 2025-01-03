@@ -28,7 +28,7 @@ public partial class Layer
                     continue;
                 }
 
-                byte[] image = null;
+                ImageData image = null;
                 var tileEnvelope = tiledSource.GridSet.GetEnvelope(level, x, y);
                 var area = tileEnvelope.Extent.Transform(tiledSource.CoordinateSystem,
                     CoordinateReferenceSystem.Get(viewportSrid));
@@ -49,7 +49,10 @@ public partial class Layer
                             }
 
                             image ??= await tiledSource.GetImageAsync(level, x, y);
-                            graphicsService.Render(viewportExtent, area, image, rasterStyle);
+                            if (image != null)
+                            {
+                                graphicsService.Render(viewportExtent, area, image, rasterStyle);
+                            }
                         }
                     }
                 }
@@ -57,9 +60,17 @@ public partial class Layer
                 {
                     image = await tiledSource.GetImageAsync(level, x, y);
 
-                    // await File.WriteAllBytesAsync($"images/t_{level}_{y}_{x}.png", image);
+                    // await File.WriteAllBytesAsync($"images/t_{x:D3}_{y:D3}_{level}.png", image);
                     // Logger.LogInformation("Combine render image: {level}, {y}, {x}", level, y, x);
+
+                    // var stopwatch = Stopwatch.StartNew();
+                    // stopwatch.Start();
                     graphicsService.Render(viewportExtent, area, image, new RasterStyle());
+                    // stopwatch.Stop();
+                    // Logger.LogDebug(
+                    //     "Render tile {TileRow} {TileCol} {TileMatrix}: {ElapsedMilliseconds}ms", x,
+                    //     y,
+                    //     level, stopwatch.ElapsedMilliseconds);
                 }
             }
         }

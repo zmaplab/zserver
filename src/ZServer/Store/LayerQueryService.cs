@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ public class LayerQueryService(
     IStyleGroupStore styleStore)
     : ILayerQueryService
 {
-    private static readonly ILogger Logger = Log.CreateLogger<LayerQueryService>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<LayerQueryService>());
 
     /// <summary>
     /// 传入错误图层名称时，返回的图层列表为空
@@ -41,7 +42,7 @@ public class LayerQueryService(
                     continue;
                 }
 
-                Logger.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
+                Logger.Value.LogError("[{TraceIdentifier}] 图层 {Layer} 不存在", traceIdentifier, layerQuery.Layer);
                 break;
             }
 
@@ -68,7 +69,7 @@ public class LayerQueryService(
                 }
                 else
                 {
-                    Logger.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
+                    Logger.Value.LogError("[{TraceIdentifier}] 图层 {ResourceGroup}:{Layer} 不存在", traceIdentifier,
                         layerQuery.ResourceGroup, layerQuery.Layer);
                     break;
                 }

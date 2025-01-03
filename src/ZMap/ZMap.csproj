@@ -3,7 +3,7 @@
     <Import Project="../../package.props"/>
     <Import Project="../../version.props"/>
     <ItemGroup>
-        <PackageReference Include="MessagePack.Annotations" Version="2.5.192" />
+        <PackageReference Include="MessagePack" Version="3.1.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1"/>
         <PackageReference Include="NetTopologySuite" Version="2.5.0"/>
@@ -16,7 +16,7 @@
         <PackageReference Include="Dapper" Version="2.1.35"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
-        <PackageReference Include="MongoDB.Bson" Version="2.28.0"/>
+        <PackageReference Include="MongoDB.Bson" Version="3.1.0" />
     </ItemGroup>
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">

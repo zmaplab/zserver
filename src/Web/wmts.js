@@ -32,7 +32,9 @@ const c = resolutionsFromExtent(projectionExtent2)
 
 let centerXY = [121.340165, 29.2364651]
 let img_w_url1 =
-  'http://t0.tianditu.gov.cn/img_w/wmts?' + 'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk='
+  'http://t0.tianditu.gov.cn/img_w/wmts?' +
+  'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles' +
+  '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk='
 let img_w_url2 = 'http://localhost:8200/wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=tianditu_w&tileMatrixSet=EPSG:3857&format=image/png' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
 let img_w_url3 = 'http://localhost:8200/wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=cd&tileMatrixSet=EPSG:3857&format=image/png' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
 const map = new Map({
@@ -84,42 +86,43 @@ const map = new Map({
     //     url: img_w_url1,
     //   }),
     // }),
-    new TileLayer({
-      source: new WMTS({
-        url: 'https://t0.tianditu.gov.cn/img_c/wmts?&tk=',
-        layer: 'img',
-        style: 'default',
-        matrixSet: 'c',
-        version: '1.0.0',
-        format: 'tiles',
-        tileGrid: new WMTSTileGrid({
-          origin: getTopLeft(projectionExtent),
-          resolutions: resolutions,
-          matrixIds: matrixIds,
-        }),
-        wrapX: true,
-      }),
-    }),
-    new TileLayer({
-      source: new WMTS({
-        url: 'https://t0.tianditu.gov.cn/cia_c/wmts?tk=',
-        layer: 'cia',
-        style: 'default',
-        matrixSet: 'c',
-        tileGrid: new WMTSTileGrid({
-          origin: getTopLeft(projectionExtent),
-          resolutions: resolutions,
-          matrixIds: matrixIds,
-        }),
-        wrapX: true,
-      }),
-    }),
+    // new TileLayer({
+    //   source: new WMTS({
+    //     url: 'https://t0.tianditu.gov.cn/img_c/wmts?&tk=7b5d52dbf12be8c8b626d68241708e08',
+    //     layer: 'img',
+    //     style: 'default',
+    //     matrixSet: 'c',
+    //     version: '1.0.0',
+    //     format: 'tiles',
+    //     tileGrid: new WMTSTileGrid({
+    //       origin: getTopLeft(projectionExtent),
+    //       resolutions: resolutions,
+    //       matrixIds: matrixIds,
+    //     }),
+    //     wrapX: true,
+    //   }),
+    // }),
+
     new TileLayer({
       source: new WMTS({
         url: 'http://localhost:8200/wmts',
-        layer: 'cd',
+        layer: 'qtz',
         matrixSet: 'EPSG:4326',
         format: 'image/png',
+        tileGrid: new WMTSTileGrid({
+          origin: getTopLeft(projectionExtent),
+          resolutions: resolutions,
+          matrixIds: matrixIds,
+        }),
+        wrapX: true,
+      }),
+    }),
+    new TileLayer({
+      source: new WMTS({
+        url: 'https://t0.tianditu.gov.cn/cia_c/wmts?tk=7b5d52dbf12be8c8b626d68241708e08',
+        layer: 'cia',
+        style: 'default',
+        matrixSet: 'c',
         tileGrid: new WMTSTileGrid({
           origin: getTopLeft(projectionExtent),
           resolutions: resolutions,
@@ -132,7 +135,7 @@ const map = new Map({
   view: new View({
     projection: projection,
     center: centerXY,
-    zoom: 17,
+    zoom: 15,
   }),
 })
 
