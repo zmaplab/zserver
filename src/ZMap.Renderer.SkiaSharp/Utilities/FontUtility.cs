@@ -13,7 +13,8 @@ public static class FontUtility
     private static readonly ConcurrentDictionary<string, SKTypeface>
         SkTypefaceCache = new();
 
-    private static readonly SKTypeface Default = SKTypeface.FromFamilyName("宋体");
+    public static readonly SKTypeface Default = SKTypeface.FromFamilyName("宋体");
+    public static readonly SKFont DefaultFont = SKTypeface.FromFamilyName("宋体").ToFont();
 
     public static void Load()
     {

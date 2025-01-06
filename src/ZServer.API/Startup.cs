@@ -12,7 +12,6 @@ using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
 using Serilog.Context;
 using ZMap.Permission;
-using ZMap.Source.CloudOptimizedGeoTIFF;
 using ZServer.API.Filters;
 using Log = ZMap.Infrastructure.Log;
 

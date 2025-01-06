@@ -63,6 +63,12 @@ public partial class Layer
 
         var count = 0;
 
+        // comments: 此处是按 feature 顺序进行渲染， 优势是 features 是按 Reader 方式读取， 一次只有一条数据在内存中
+        // 缺点是， 不同 feature 之间的空间关系可能导致 style 顺序渲染效果不达预期
+        // 举个例子： 两个相邻的多边型 A、B， 都渲染了填充 + 文字， 其中 A 文字较长， 侵入了 B 的范围
+        // 由于先把 A 的所有 style 渲染完， 再渲染 B， 导致 A 的文字被 B 的填充覆盖
+        // 建议是， 文字类等独立图层， 再合并到图层组中来保证渲染效果
+        // 我们还是内存控制优先， 一个 bbox 覆盖的矢量数据量太大， 内存直接炸掉
         foreach (var feature in features)
         {
             if (feature == null || feature.IsEmpty)
