@@ -11,6 +11,11 @@ public abstract class SkiaRenderer
 {
     protected abstract SKPaint CreatePaint();
 
+    protected virtual SKFont CreateFont()
+    {
+        return FontUtility.DefaultFont;
+    }
+
     protected Lazy<ILogger> Logger { get; }
 
     protected SkiaRenderer()
@@ -21,13 +26,14 @@ public abstract class SkiaRenderer
 
     protected virtual SKPaint CreateDefaultPaint()
     {
-        return new SKPaint
+        var paint = new SKPaint
         {
             Style = SKPaintStyle.Stroke,
             StrokeWidth = 1,
             IsAntialias = true,
             Color = SKColors.Black
         };
+        return paint;
     }
 
     public virtual void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
@@ -39,9 +45,9 @@ public abstract class SkiaRenderer
         }
     }
 
-    public virtual void Render(SKCanvas graphics, byte[] image, Envelope extent, int width, int height)
-    {
-    }
+    // public virtual void Render(SKCanvas graphics, byte[] image, Envelope extent, int width, int height)
+    // {
+    // }
 
     private void DrawPoint(SKCanvas canvas, SKPaint paint, Point point, Envelope extent,
         int width, int height)

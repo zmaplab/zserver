@@ -1,11 +1,8 @@
-using System;
 using System.IO;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using ZMap.Infrastructure;
 using ZMap.Source.CloudOptimizedGeoTIFF;
 
 namespace ZServer.Tests;

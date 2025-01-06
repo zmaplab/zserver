@@ -73,14 +73,13 @@ public class TextRenderer(TextStyle style) : SkiaRenderer, ITextRenderer<SKCanva
         }
 
         using var paint = CreatePaint();
-
+        using var font = CreateFont();
         var backgroundColor = style.BackgroundColor.Value;
         if (!string.IsNullOrWhiteSpace(backgroundColor))
         {
-            var rect = new SKRect();
-            paint.MeasureText(text, ref rect);
-
-            using var textPath = paint.GetTextPath(text, offsetX - rect.Width / 2, offsetY);
+            font.MeasureText(text, out var rect, paint);
+            var point = new SKPoint(offsetX - rect.Width / 2, offsetY);
+            using var textPath = font.GetTextPath(text, point);
             // Create a new path for the outlines of the path
             using var outlinePath = new SKPath();
             using var backgroundPaint = CreateBackgroundPaint(backgroundColor);
@@ -88,7 +87,10 @@ public class TextRenderer(TextStyle style) : SkiaRenderer, ITextRenderer<SKCanva
             graphics.DrawPath(outlinePath, backgroundPaint);
         }
 
-        graphics.DrawText(text, offsetX, offsetY, paint);
+        var align = Enum.TryParse<SKTextAlign>(style.Align?.Value, out var a)
+            ? a
+            : SKTextAlign.Center;
+        graphics.DrawText(text, offsetX, offsetY, align, font, paint);
     }
 
     private SKPaint CreateBackgroundPaint(string color)
@@ -111,23 +113,28 @@ public class TextRenderer(TextStyle style) : SkiaRenderer, ITextRenderer<SKCanva
     protected override SKPaint CreatePaint()
     {
         // TODO: 暂时只取第一个字体
-        var fontFamily = style.Font.Value.ElementAtOrDefault(0);
-        var size = style.Size.Value ?? 14;
-        var rotate = style.Rotate.Value ?? 0;
-        var color = style.Color?.Value;
-        var align = Enum.TryParse<SKTextAlign>(style.Align?.Value, out var a)
-            ? a
-            : SKTextAlign.Center;
 
-        return new SKPaint
+        var color = style.Color?.Value;
+
+        var paint = new SKPaint
         {
             Style = SKPaintStyle.Fill,
             IsAntialias = true,
             Color = ColorUtility.GetColor(color),
-            TextSize = size,
-            TextSkewX = rotate,
-            TextAlign = align,
-            Typeface = FontUtility.Get(fontFamily)
         };
+
+        return paint;
+    }
+
+    protected override SKFont CreateFont()
+    {
+        var fontFamily = style.Font.Value.ElementAtOrDefault(0);
+        var size = style.Size.Value ?? 14;
+        var rotate = style.Rotate.Value ?? 0;
+
+        var font = FontUtility.Get(fontFamily).ToFont();
+        font.Size = size;
+        font.SkewX = rotate;
+        return font;
     }
 }

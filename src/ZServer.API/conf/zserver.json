@@ -56,6 +56,7 @@
           "label": "{{ feature[\"name\"] }}",
           "minZoom": 100,
           "type": "text",
+          "rotate": 0.6,
           "font": [
             "SimSun"
           ]
