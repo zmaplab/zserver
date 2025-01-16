@@ -1,8 +1,10 @@
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using ZMap.Infrastructure;
 using ZMap.Source.CloudOptimizedGeoTIFF;
 
 namespace ZServer.Tests;
@@ -10,6 +12,29 @@ namespace ZServer.Tests;
 [Collection("WebApplication collection")]
 public class CogTests(WebApplicationFactoryFixture fixture)
 {
+    [Fact]
+    public async Task GetHeader()
+    {
+        var url = "http://share-lhc.oss-cn-shanghai.aliyuncs.com/北仑区_webmerc_cog.tif";
+        var httpClient = fixture.Instance.Services.GetRequiredService<IHttpClientFactory>().CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Range = new(0, 1024 * 64);
+        var response = await httpClient.SendAsync(request);
+        var bytes = await response.Content.ReadAsByteArrayAsync();
+        await File.WriteAllBytesAsync("北仑区_webmerc_cog_header.tif", bytes);
+        //
+        // var crs = CoordinateReferenceSystem.Get(4549);
+
+        var cog1 = new COGGeoTiffSource("北仑区_webmerc_cog_header.tif");
+        await cog1.LoadAsync();
+
+        // var cog2 = new COGGeoTiffSource("/Users/lewis/Downloads/北仑区_4549_cog.tif");
+        // await cog2.LoadAsync();
+
+        // var cog3 = new COGGeoTiffSource("/Users/lewis/Downloads/北仑区.tif");
+        // await cog3.LoadAsync();
+    }
+
     [Fact]
     public async Task GetCogImage()
     {
