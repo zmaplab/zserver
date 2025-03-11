@@ -21,6 +21,11 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
     private static readonly ILogger Logger = Log.CreateLogger<PostgreSource>();
     private static readonly ConcurrentDictionary<string, string> BaseSql = new();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public string ExtendedVersion { get; set; }
+
     private static readonly Lazy<IFreeSql> FreeSql = new(() =>
     {
         return new FreeSql.FreeSqlBuilder()
@@ -81,7 +86,15 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
             }
 
-            sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+            if ("KingbaseES".Equals(ExtendedVersion, StringComparison.OrdinalIgnoreCase))
+            {
+                sqlBuilder.Append("ST_Intersects(").Append(Geometry)
+                    .Append(", ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid))");
+            }
+            else
+            {
+                sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+            }
 
             if (!string.IsNullOrEmpty(Where))
             {
