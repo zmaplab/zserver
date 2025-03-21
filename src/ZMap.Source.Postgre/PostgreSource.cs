@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using FreeSql.Internal.Model;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
@@ -17,7 +18,13 @@ namespace ZMap.Source.Postgre;
 
 public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
-    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<PostgreSource>());
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<PostgreSource>);
+    private static readonly ConcurrentDictionary<string, string> BaseSql = new();
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string ExtendedVersion { get; set; }
 
     private static readonly Lazy<IFreeSql> FreeSql = new(() =>
     {
@@ -33,9 +40,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .Build();
     });
 
-    private static readonly ConcurrentDictionary<string, string> BaseSql = new();
-
-    public override async Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope bbox, string filter)
+    public override async Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope bbox, string fitler)
     {
         if (string.IsNullOrEmpty(Geometry))
         {
@@ -80,7 +85,15 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
             }
 
-            sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+            if ("KingbaseES".Equals(ExtendedVersion, StringComparison.OrdinalIgnoreCase))
+            {
+                sqlBuilder.Append("ST_Intersects(").Append(Geometry)
+                    .Append(", ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid))");
+            }
+            else
+            {
+                sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+            }
 
             if (!string.IsNullOrEmpty(Where))
             {
@@ -91,10 +104,10 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
         });
 
         string sql;
-        if (!string.IsNullOrEmpty(filter))
+        if (!string.IsNullOrEmpty(fitler))
         {
             var select = FreeSql.Value.Select<object>().WithSql(baseSql);
-            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(filter);
+            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(fitler);
             select = select.WhereDynamicFilter(filterInfo);
             sql = select.ToSql();
         }
@@ -109,10 +122,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 bbox.MinY, bbox.MaxY, Srid);
         }
 
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(ConnectionString);
-        dataSourceBuilder.UseNetTopologySuite();
-        // DataSource 一定要释放， 不然会连接池泄露
-        await using var dataSource = dataSourceBuilder.Build();
+        await using var dataSource = GetNpgSqlDataSource();
         await using var conn = dataSource.CreateConnection();
 
         return (await conn.QueryAsync(sql, new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid }, null, 30)).Select(
@@ -159,5 +169,19 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
     public override void Dispose()
     {
+    }
+
+    private NpgsqlDataSource GetNpgSqlDataSource()
+    {
+        var dataSourceBuilder = Cache.GetOrCreate(ConnectionString, entry =>
+        {
+            var builder = new NpgsqlDataSourceBuilder(ConnectionString);
+            builder.UseNetTopologySuite();
+
+            entry.SetValue(builder);
+            entry.SetSlidingExpiration(TimeSpan.FromMinutes(5));
+            return builder;
+        });
+        return dataSourceBuilder.Build();
     }
 }
