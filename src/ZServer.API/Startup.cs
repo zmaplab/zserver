@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
 using Serilog.Context;
@@ -70,7 +69,7 @@ public class Startup(IConfiguration configuration)
         //     }
         // });
 
-        services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZServer.API", Version = "v1" }); });
+        // services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZServer.API", Version = "v1" }); });
 
         services.AddCors(option =>
         {
@@ -131,18 +130,19 @@ public class Startup(IConfiguration configuration)
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        Log.SetLoggerFactory(app.ApplicationServices.GetRequiredService<ILoggerFactory>());
+        var loggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
+        Log.SetLoggerFactory(loggerFactory);
 
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
         }
 
-        if (configuration["Swagger"]?.ToLower() == "true")
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZServer API v1"));
-        }
+        // if (configuration["Swagger"]?.ToLower() == "true")
+        // {
+        //     app.UseSwagger();
+        //     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZServer API v1"));
+        // }
 
         app.UseHealthChecks("/healthz");
         // app.UseResponseCompression();
@@ -150,7 +150,9 @@ public class Startup(IConfiguration configuration)
 
         app.UseRouting();
 
-        if ("true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase))
+        var enableAuthorization =
+            "true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase);
+        if (enableAuthorization)
         {
             app.UseAuthorization();
             app.UseAuthentication();
@@ -165,7 +167,7 @@ public class Startup(IConfiguration configuration)
         app.UseEndpoints(endpoints =>
         {
             var endpointConventionBuilder = endpoints.MapControllers();
-            if ("true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase))
+            if (enableAuthorization)
             {
                 endpointConventionBuilder.RequireAuthorization("JWT");
             }

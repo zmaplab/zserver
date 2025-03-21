@@ -17,6 +17,7 @@ using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
+using ZMap.Source.CloudOptimizedGeoTIFF;
 using ZServer.Silo;
 using Log = Serilog.Log;
 
@@ -29,6 +30,12 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        // var binaryReader = new BinaryReader(new FileStream("/Users/lewis/Downloads/BigTIFFLong8Tiles.tif",
+        //     FileMode.Open, FileAccess.Read));
+        // var tiff = new TIFF.NET.TIFF(binaryReader);
+        //
+
+
         Utility.PrintInfo();
 
         // FixOrleansPublishSingleFileIssue();

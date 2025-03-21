@@ -1,8 +1,9 @@
-﻿
+﻿namespace ZMap.Store;
 
-namespace ZMap.Store;
-
+/// <summary>
+/// 刷新器
+/// </summary>
 public interface IRefresher
 {
-    Task Refresh(List<JObject> configurations);
+    Task RefreshAsync(List<JObject> configurations);
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Source;
 using ZMap.Style;
 
 namespace ZMap.Renderer.SkiaSharp;
@@ -22,13 +23,14 @@ public class SkiaGraphicsService : IGraphicsService
         };
     }
 
-    public string TraceIdentifier { get;   set; }
+    public string TraceIdentifier { get; set; }
     public int Width { get; }
     public int Height { get; }
 
     public SkiaGraphicsService(int width, int height)
     {
         _bitmap = new SKBitmap(width, height);
+        // _bitmap.Erase(SKColors.Transparent);
         _canvas = new SKCanvas(_bitmap);
         Width = width;
         Height = height;
@@ -45,9 +47,18 @@ public class SkiaGraphicsService : IGraphicsService
         return _bitmap.Encode(GetImageFormat(imageFormat), 90).AsStream();
     }
 
-    public void Render(byte[] image, RasterStyle style)
+
+    public void Render(Envelope extent, Envelope geometry, ImageData image, RasterStyle style)
     {
-        throw new NotImplementedException();
+        if (image == null || image.IsEmpty)
+        {
+            return;
+        }
+
+        if (Create(style) is IRasterRender<SKCanvas> renderer)
+        {
+            renderer.Render(_canvas, geometry, extent, Width, Height, image);
+        }
     }
 
     public void Render(Envelope extent, Geometry geometry, VectorStyle style)

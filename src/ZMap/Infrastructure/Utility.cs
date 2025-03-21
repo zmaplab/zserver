@@ -3,7 +3,7 @@ namespace ZMap.Infrastructure;
 /// <summary>
 /// 常用的方法
 /// </summary>
-public static class Utility
+public static partial class Utility
 {
     public static void PrintInfo()
     {
@@ -31,7 +31,8 @@ public static class Utility
     /// <param name="tileRow"></param>
     /// <param name="tileCol"></param>
     /// <returns></returns>
-    public static string GetWmtsPath(string layers, string filter, string format, string tileMatrixSet,
+    public static PathInfo GetWmtsPath(string layers, string filter, string format,
+        string tileMatrixSet,
         string tileMatrix, int tileRow,
         int tileCol)
     {
@@ -39,14 +40,28 @@ public static class Utility
         var layerKey = layers.Replace(',', '.').Replace(':', '_');
         var cqlFilterKey = string.IsNullOrWhiteSpace(filter)
             ? string.Empty
-            : MurmurHashAlgorithmUtility.ComputeHash(Encoding.UTF8.GetBytes(filter));
+            : CryptographyUtility.ComputeHash(Encoding.UTF8.GetBytes(filter));
 
         var imageExtension = GetImageExtension(format);
 
-        return Path.Combine(AppContext.BaseDirectory, "cache", "wmts",
-            string.IsNullOrEmpty(cqlFilterKey)
-                ? $"{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSet}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}{imageExtension}"
-                : $"{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSet}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}_{cqlFilterKey}{imageExtension}");
+        var tileMatrixSetPath = tileMatrixSet.Replace(":", "").Replace("/", "_");
+        var intervalPath = string.IsNullOrEmpty(cqlFilterKey)
+            ? $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}{imageExtension}"
+            : $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}_{cqlFilterKey}{imageExtension}";
+        var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", intervalPath);
+        return new PathInfo(fullPath, intervalPath);
+    }
+
+    public static (string FullPath, string IntervalPath) GetTiffPath(string file, string tileMatrix, int tileRow,
+        int tileCol)
+    {
+        // group1:layer1,layer2 -> group1_layer1.group2_layer2
+        var fileKey = CryptographyUtility.ComputeHash(Encoding.UTF8.GetBytes(file));
+        var fileName = Path.GetFileNameWithoutExtension(file);
+        var intervalPath =
+            $"geotif{Path.DirectorySeparatorChar}{fileName}_{fileKey}{Path.DirectorySeparatorChar}{tileMatrix}_{tileRow}_{tileCol}.dat";
+        var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", intervalPath);
+        return (fullPath, intervalPath);
     }
 
     // public static string GetWmtsKey(string layers, string tileMatrix, int tileRow,
@@ -64,16 +79,14 @@ public static class Utility
             return dpi;
         }
 
-        var match = Regex.Match(formatOptions, "dpi:\\d+");
+        var match = DpiRegex().Match(formatOptions);
         if (!match.Success)
         {
             return dpi;
         }
 
         var value = match.Value.Substring(4, match.Value.Length - 4);
-        int.TryParse(value, out dpi);
-
-        return dpi;
+        return int.TryParse(value, out dpi) ? dpi : 96;
     }
 
     /// <summary>
@@ -101,4 +114,7 @@ public static class Utility
             _ => ".png"
         };
     }
+
+    [GeneratedRegex("dpi:\\d+")]
+    private static partial Regex DpiRegex();
 }

@@ -23,7 +23,7 @@ public class ResourceGroupStore : IResourceGroupStore
         return new ValueTask<List<ResourceGroup>>(items);
     }
 
-    public Task Refresh(List<JObject> configurations)
+    public Task RefreshAsync(List<JObject> configurations)
     {
         var dict = new Dictionary<string, ResourceGroup>();
 

@@ -1,21 +1,28 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace ZMap.TileGrid;
 
-public class Grid
+public class Grid(int index)
 {
+    private GridSet _gridSet;
+
+    // ReSharper disable once PropertyCanBeMadeInitOnly.Global
+    public int Index { get; private set; } = index;
+
     /// <summary>
     /// 名称
     /// </summary>
     public string Name { get; set; }
-        
+
     /// <summary>
     /// 横向瓦片数量
     /// </summary>
-    public long NumTilesWide { get; set; }
-        
+    public int NumTilesWidth { get; set; }
+
     /// <summary>
     /// 纵向瓦片数量
     /// </summary>
-    public long NumTilesHigh { get; set; }
+    public int NumTilesHeight { get; set; }
 
     /// <summary>
     /// 分辩率
@@ -26,6 +33,16 @@ public class Grid
     /// 比例尺分母
     /// </summary>
     public double ScaleDenominator { get; set; }
+
+    public int Height { get; set; }
+    public int Width { get; set; }
+    public int TileHeight => _gridSet?.TileHeight ?? 0;
+    public int TileWidth => _gridSet?.TileWidth ?? 0;
+
+    internal void SetGridSet(GridSet gridSet)
+    {
+        _gridSet = gridSet;
+    }
 
     public override string ToString()
     {

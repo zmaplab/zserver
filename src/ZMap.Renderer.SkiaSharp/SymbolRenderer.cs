@@ -98,7 +98,7 @@ public class SymbolRenderer(SymbolStyle style) : SkiaRenderer, ISymbolRenderer<S
                 {
                     case "file":
                     {
-                        var path = u.ToPath();
+                        var path = u.GetPath();
                         if (File.Exists(path))
                         {
                             Logger.Value.LogDebug("Load image from file: {Path}", path);

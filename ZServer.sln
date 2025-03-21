@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.DynamicCompiler", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZServer.Silo", "src\ZServer.Silo\ZServer.Silo.csproj", "{E335B71B-A78D-4A23-A7D1-14933963424E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMap.Source.CloudOptimizedGeoTIFF", "src\ZMap.Source.CloudOptimizedGeoTIFF\ZMap.Source.CloudOptimizedGeoTIFF.csproj", "{5C8280BB-CECD-4F0B-9C6C-F8FD9A07C6FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{E335B71B-A78D-4A23-A7D1-14933963424E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E335B71B-A78D-4A23-A7D1-14933963424E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E335B71B-A78D-4A23-A7D1-14933963424E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C8280BB-CECD-4F0B-9C6C-F8FD9A07C6FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C8280BB-CECD-4F0B-9C6C-F8FD9A07C6FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C8280BB-CECD-4F0B-9C6C-F8FD9A07C6FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C8280BB-CECD-4F0B-9C6C-F8FD9A07C6FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

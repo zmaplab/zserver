@@ -16,6 +16,7 @@ public class WMTSGrain(WmtsService wmtsService) : Grain, IWMTSGrain
         string tileMatrix, int tileRow,
         int tileCol, string cqlFilter, IDictionary<string, object> arguments)
     {
+
         var result = await wmtsService.GetTileAsync(layers, styles, format, tileMatrixSet, tileMatrix, tileRow,
             tileCol, cqlFilter,
             arguments);
@@ -26,6 +27,7 @@ public class WMTSGrain(WmtsService wmtsService) : Grain, IWMTSGrain
 
         await using var stream = result.Stream;
         var bytes = await result.Stream.ToArrayAsync();
+
         return ZServerResponseFactory.Ok(bytes, format);
     }
 }

@@ -1,11 +1,11 @@
 ﻿namespace ZMap.Ogc.Wms;
 
-public static class ArgumentsValidator
+public static class ParameterValidator
 {
     public static ValidateResult VerifyAndBuildWmsGetMapArguments(
         string layers,
         string srs, string bbox,
-        int width, int height, string format)
+        int width, int height, string format, string styles, string filter)
     {
         if (string.IsNullOrWhiteSpace(layers))
         {
@@ -54,7 +54,8 @@ public static class ArgumentsValidator
         }
 
         var list = new List<(string Group, string Layer)>();
-        foreach (var layer in layers.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        var layerNames = layers.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var layer in layerNames)
         {
             var layerQuery = layer.Split(':', StringSplitOptions.RemoveEmptyEntries);
 
@@ -68,8 +69,7 @@ public static class ArgumentsValidator
                     break;
                 default:
                 {
-                    // todo: 重新描述错误
-                    return new ValidateResult(null, "LayerNotDefined", $"can not find layer {layer}");
+                    return new ValidateResult(null, "LayerDefinedError", $"layer defined error {layers}");
                 }
             }
         }
@@ -79,20 +79,38 @@ public static class ArgumentsValidator
             return new ValidateResult(null, "LayerNotDefined", $"can not find layer {layers}");
         }
 
+        var filterList = string.IsNullOrEmpty(filter)
+            ? []
+            : filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        if (filterList.Length > 0 && filterList.Length != layerNames.Length)
+        {
+            return new ValidateResult(null, "FilterDefinedError", "filter count not match layer count");
+        }
+
+        var styleList = string.IsNullOrEmpty(styles)
+            ? []
+            : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        if (styleList.Length > 0 && styleList.Length != layerNames.Length)
+        {
+            return new ValidateResult(null, "StyleDefinedError", "style count not match layer count");
+        }
+
         var envelope = new Envelope(x1, x2, y1, y2);
-        return new ValidateResult(new RequestArguments(envelope, srid, list), null, null);
+        return new ValidateResult(new RequestParameters(envelope, srid, list, styleList, filterList), null, null);
     }
 
     public static ValidateResult VerifyAndBuildWmsGetFeatureInfoArguments(
         string layers, string srs, string bbox,
         int width, int height, double x, double y, int featureCount)
     {
-        if (string.IsNullOrWhiteSpace(layers))
+        if (string.IsNullOrEmpty(layers))
         {
             return new ValidateResult(null, "LayerNotDefined", "No layers have been requested");
         }
 
-        if (string.IsNullOrWhiteSpace(srs))
+        if (string.IsNullOrEmpty(srs))
         {
             return new ValidateResult(null, "InvalidSRS", "No srs requested");
         }
@@ -102,7 +120,7 @@ public static class ArgumentsValidator
             return new ValidateResult(null, "InvalidSRS", "SRS is not valid");
         }
 
-        if (string.IsNullOrWhiteSpace(bbox))
+        if (string.IsNullOrEmpty(bbox))
         {
             return new ValidateResult(null, "MissingBBox", "GetFeatureInfo requests must include a BBOX parameter");
         }
@@ -134,7 +152,7 @@ public static class ArgumentsValidator
 
         if (featureCount <= 0)
         {
-            return new ValidateResult(null, "InvalidFeatureCount", $"featureCount is invalid");
+            return new ValidateResult(null, "InvalidFeatureCount", "featureCount is invalid");
         }
 
         var list = new List<(string Group, string Layer)>();
@@ -165,6 +183,6 @@ public static class ArgumentsValidator
         }
 
         var envelope = new Envelope(x1, x2, y1, y2);
-        return new ValidateResult(new RequestArguments(envelope, srid, list), null, null);
+        return new ValidateResult(new RequestParameters(envelope, srid, list, null, null), null, null);
     }
 }

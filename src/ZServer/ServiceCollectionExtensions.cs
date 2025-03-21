@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +21,6 @@ public static class ServiceCollectionExtensions
     public static ZServerBuilder AddZServer(this IServiceCollection serviceCollection,
         IConfiguration configuration, string layersConfiguration)
     {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
         serviceCollection.Configure<ServerOptions>(configuration);
@@ -37,6 +35,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.TryAddScoped<ISldStore, SldStore>();
         serviceCollection.TryAddSingleton(_ => new JsonStoreProvider(layersConfiguration));
         serviceCollection.AddHostedService<StoreRefreshService>();
+        serviceCollection.TryAddSingleton<StoreRefreshService>();
 
         serviceCollection.AddHostedService<PreloadService>();
         serviceCollection.TryAddScoped<ILayerQueryService, LayerQueryService>();

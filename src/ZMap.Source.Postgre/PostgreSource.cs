@@ -18,7 +18,7 @@ namespace ZMap.Source.Postgre;
 
 public sealed class PostgreSource(string connectionString) : SpatialDatabaseSource(connectionString)
 {
-    private static readonly ILogger Logger = Log.CreateLogger<PostgreSource>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<PostgreSource>);
     private static readonly ConcurrentDictionary<string, string> BaseSql = new();
 
     /// <summary>
@@ -32,7 +32,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .UseConnectionFactory(DataType.PostgreSQL, () =>
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    "User ID=postgres;Password=postgres;Host=127.0.0.1;Port=5432;Database=postgres;Pooling=true;");
+                    "User ID=nobody;Password=jv9@4cLh#cMuEgSSUc2b;Host=127.0.0.1;Port=55432;Database=__db;Pooling=true;");
                 dataSourceBuilder.UseNetTopologySuite();
                 var dataSource = dataSourceBuilder.Build();
                 return dataSource.CreateConnection();
@@ -40,8 +40,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .Build();
     });
 
-
-    public override async Task<IEnumerable<Feature>> GetFeaturesInExtentAsync(Envelope bbox)
+    public override async Task<IEnumerable<Feature>> GetFeaturesAsync(Envelope bbox, string fitler)
     {
         if (string.IsNullOrEmpty(Geometry))
         {
@@ -105,10 +104,10 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
         });
 
         string sql;
-        if (!string.IsNullOrEmpty(Filter))
+        if (!string.IsNullOrEmpty(fitler))
         {
             var select = FreeSql.Value.Select<object>().WithSql(baseSql);
-            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(Filter);
+            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(fitler);
             select = select.WhereDynamicFilter(filterInfo);
             sql = select.ToSql();
         }
@@ -119,7 +118,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            Logger.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
+            Logger.Value.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
                 bbox.MinY, bbox.MaxY, Srid);
         }
 
@@ -151,10 +150,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             });
     }
 
-    public override Envelope GetEnvelope()
-    {
-        return null;
-    }
+    public override Envelope Envelope => null;
 
     public override ISource Clone()
     {

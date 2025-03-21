@@ -11,6 +11,22 @@
     "zserver_3857_shp": {
       "provider": "ZMap.Source.ShapeFile.ShapeFileSource, ZMap.Source.ShapeFile",
       "file": "shapes/polygon_3857.shp"
+    },
+    "cd": {
+      "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
+      "file": "/Users/lewis/Downloads/cd_common_cog.tif"
+    },
+    "qtz": {
+      "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
+      "file": "/Users/lewis/Downloads/前童镇_DOM_webmerc_cog.tif"
+    },
+    "tianditu_c": {
+      "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
+      "url": "https://t3.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk="
+    },
+    "tianditu_w": {
+      "provider": "ZMap.Source.RemoteWmtsSource, ZMap",
+      "url": "https://t3.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={2}&TILEROW={1}&TILEMATRIX={0}&tk="
     }
   },
   "styleGroups": {
@@ -40,6 +56,7 @@
           "label": "{{ feature[\"name\"] }}",
           "minZoom": 100,
           "type": "text",
+          "rotate": 0.6,
           "font": [
             "SimSun"
           ]
@@ -152,6 +169,30 @@
       "styleGroups": [
         "polygon"
       ]
+    },
+    "tianditu_c": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "tianditu_c"
+    },
+    "tianditu_w": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "tianditu_w"
+    },
+    "cd": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "cd"
+    },
+    "qtz": {
+      "resourceGroup": "zserver",
+      "services": [],
+      "extent": [],
+      "source": "qtz"
     }
   }
 }

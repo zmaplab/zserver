@@ -1,21 +1,11 @@
 using System.Collections.Concurrent;
-using NetTopologySuite.Geometries;
+using System.Collections.Generic;
 
 namespace ZMap.TileGrid;
 
 public static class DefaultGridSets
 {
     private static readonly ConcurrentDictionary<string, GridSet> Instances;
-    public static readonly Envelope World4326 = new(-180.0, 180.0, -90.0, 90.0);
-    public static readonly Envelope World3857 = new(-20037508.34, 20037508.34, -20037508.34, 20037508.34);
-    public static readonly Envelope World4490 = new(73.62, 134.77, 16.7, 53.56);
-
-    /// <summary>
-    /// Default pixel size in meters, producing a default of 90.7 DPI
-    /// </summary>
-    public const double DefaultPixelSizeMeter = 0.00028;
-
-    public const int DefaultLevels = 22;
 
     static DefaultGridSets()
     {
@@ -23,24 +13,25 @@ public static class DefaultGridSets
 
         var epsg4326 = GridSetFactory.CreateGridSet(
             "EPSG:4326",
-            4326, World4326,
+            4326, GridSetFactory.GeographicWorld,
             false,
-            DefaultLevels,
-            null,
-            DefaultPixelSizeMeter,
+            GridSetFactory.DefaultLevels,
+            GridSetFactory.Epsg4326ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             256,
             256,
             true);
+
         Instances.TryAdd(epsg4326.Name, epsg4326);
 
         var epsg4326X2 = GridSetFactory.CreateGridSet(
             "EPSG:4326x2",
             4326,
-            World4326,
+            GridSetFactory.GeographicWorld,
             false,
-            DefaultLevels,
-            null,
-            DefaultPixelSizeMeter,
+            GridSetFactory.DefaultLevels,
+            GridSetFactory.Epsg4326ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             512,
             512,
             true);
@@ -49,12 +40,12 @@ public static class DefaultGridSets
         var epsg3857 = GridSetFactory.CreateGridSet(
             "EPSG:3857",
             3857,
-            World3857,
+            GridSetFactory.ProjectedWorld,
             false,
             GetCommonPractice900913Resolutions(),
             null,
-            1.0D,
-            DefaultPixelSizeMeter,
+            GridSetFactory.Epsg3857ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             null,
             256,
             256,
@@ -64,12 +55,12 @@ public static class DefaultGridSets
         var epsg3857X2 = GridSetFactory.CreateGridSet(
             "EPSG:3857x2",
             3857,
-            World3857,
+            GridSetFactory.ProjectedWorld,
             false,
             GetCommonPractice900913Resolutions(),
             null,
-            1.0D,
-            DefaultPixelSizeMeter,
+            GridSetFactory.Epsg3857ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             null,
             512,
             512,
@@ -79,12 +70,12 @@ public static class DefaultGridSets
         var globalCrs84Pixel = GridSetFactory.CreateGridSet(
             "GlobalCRS84Pixel",
             4326,
-            World4326,
+            GridSetFactory.GeographicWorld,
             true,
             GetScalesCRS84PixelResolutions(),
             null,
-            null,
-            DefaultPixelSizeMeter,
+            GridSetFactory.Epsg4326ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             null,
             256,
             256,
@@ -94,12 +85,12 @@ public static class DefaultGridSets
         var globalCrs84Scale = GridSetFactory.CreateGridSet(
             "GlobalCRS84Scale",
             4326,
-            World4326,
+            GridSetFactory.GeographicWorld,
             true,
             null,
             GetScalesCRS84ScaleDenominators(),
-            null,
-            DefaultPixelSizeMeter,
+            GridSetFactory.Epsg4326ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             null,
             256,
             256,
@@ -109,12 +100,12 @@ public static class DefaultGridSets
         var googleCrs84Quad = GridSetFactory.CreateGridSet(
             "GoogleCRS84Quad",
             4326,
-            World4326,
+            GridSetFactory.GeographicWorld,
             true,
             null,
             GetScalesCRS84QuadScaleDenominators(),
-            null,
-            DefaultPixelSizeMeter,
+            GridSetFactory.Epsg4326ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             null,
             256,
             256,
@@ -123,11 +114,11 @@ public static class DefaultGridSets
 
         var epsg4490 = GridSetFactory.CreateGridSet(
             "EPSG:4490",
-            4490, World4490,
+            4490, GridSetFactory.GeographicWorld,
             false,
-            DefaultLevels,
-            null,
-            DefaultPixelSizeMeter,
+            GridSetFactory.DefaultLevels,
+            GridSetFactory.Epsg4326ToMeters,
+            GridSetFactory.DefaultPixelSizeMeter,
             256,
             256,
             true);
@@ -136,14 +127,19 @@ public static class DefaultGridSets
 
     public static GridSet TryGet(string name)
     {
-        return Instances.TryGetValue(name, out var v) ? v : null;
+        return Instances.GetValueOrDefault(name);
+    }
+
+    public static void Add(string name, GridSet gridSet)
+    {
+        Instances.TryAdd(name, gridSet);
     }
 
     // ReSharper disable once InconsistentNaming
     private static double[] GetScalesCRS84QuadScaleDenominators()
     {
-        return new[]
-        {
+        return
+        [
             559082264.0287178,
             279541132.0143589,
             139770566.0071794,
@@ -163,7 +159,7 @@ public static class DefaultGridSets
             8530.918335399136,
             4265.459167699568,
             2132.729583849784
-        };
+        ];
     }
 
     // ReSharper disable once InconsistentNaming
@@ -177,11 +173,11 @@ public static class DefaultGridSets
         // 6.28820698883665E-7, 2.51528279553466E-7 };
         //
         // return scalesCRS84Pixel;
-        return new[]
-        {
+        return
+        [
             500E6, 250E6, 100E6, 50E6, 25E6, 10E6, 5E6, 2.5E6, 1E6, 500E3, 250E3, 100E3, 50E3, 25E3,
             10E3, 5E3, 2.5E3, 1000, 500, 250, 100
-        };
+        ];
     }
 
     // ReSharper disable once InconsistentNaming
@@ -212,8 +208,8 @@ public static class DefaultGridSets
 
     private static double[] GetCommonPractice900913Resolutions()
     {
-        return new[]
-        {
+        return
+        [
             156543.03390625,
             78271.516953125,
             39135.7584765625,
@@ -245,6 +241,6 @@ public static class DefaultGridSets
             5.831682455027476E-4,
             2.915841227513738E-4,
             1.457920613756869E-4
-        };
+        ];
     }
 }
