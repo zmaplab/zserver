@@ -65,6 +65,7 @@ public class GridSet
 
     public void AppendGrid(Grid grid)
     {
+        grid.SetGridSet(this);
         ScaleDenominators.Add(grid.ScaleDenominator, grid);
         // GridIndexes.Add(grid.Index, grid.Name);
         GridLevels.Add(grid.Name, grid);

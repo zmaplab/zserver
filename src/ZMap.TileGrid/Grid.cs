@@ -4,6 +4,8 @@ namespace ZMap.TileGrid;
 
 public class Grid(int index)
 {
+    private GridSet _gridSet;
+
     // ReSharper disable once PropertyCanBeMadeInitOnly.Global
     public int Index { get; private set; } = index;
 
@@ -34,8 +36,13 @@ public class Grid(int index)
 
     public int Height { get; set; }
     public int Width { get; set; }
-    public int TileHeight { get; set; }
-    public int TileWidth { get; set; }
+    public int TileHeight => _gridSet?.TileHeight ?? 0;
+    public int TileWidth => _gridSet?.TileWidth ?? 0;
+
+    internal void SetGridSet(GridSet gridSet)
+    {
+        _gridSet = gridSet;
+    }
 
     public override string ToString()
     {

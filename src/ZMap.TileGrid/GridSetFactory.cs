@@ -50,15 +50,15 @@ public static class GridSetFactory
         //Assert.notNull(extent, "extent is null");
         //Assert.isTrue(!extent.isNull() && extent.isSane(), "Extent is invalid: " + extent);
         // Assert.isTrue(
-        //     resolutions != null || scaleDenoms != null,
-        //     "The gridset definition must have either resolutions or scale denominators");
+        //     resolutions != null || scaleDenominators != null,
+        //     "The gridSet definition must have either resolutions or scale denominators");
         // Assert.isTrue(
-        //     resolutions == null || scaleDenoms == null,
-        //     "Only one of resolutions or scaleDenoms should be provided, not both");
+        //     resolutions == null || scaleDenominators == null,
+        //     "Only one of resolutions or scaleDenominators should be provided, not both");
 
         if (scaleDenominators == null && resolutions == null)
         {
-            throw new ArgumentException("Only one of resolutions or scaleDenoms should be provided, not both");
+            throw new ArgumentException("Only one of resolutions or scaleDenominators should be provided, not both");
         }
 
         for (var i = 1; resolutions != null && i < resolutions.Length; i++)
@@ -268,9 +268,11 @@ public static class GridSetFactory
     {
         var resolutions = new double[levels];
         var size = extent.Width / tileWidth;
-        for (var i = 0; i < levels; i++)
+        // 常规栅格第 0 级分辨率为 0.703125
+        // 注意天地图栅格第 1 级分辨率为 0.703125
+        for (var i = 1; i < levels; i++)
         {
-            resolutions[i] = size / Math.Pow(2, i);
+            resolutions[i - 1] = size / Math.Pow(2, i);
         }
 
         return CreateGridSet(

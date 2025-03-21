@@ -1,8 +1,12 @@
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using SkiaSharp;
+using TagImageFileFormat;
 using Xunit;
 using ZMap.Infrastructure;
 using ZMap.Source.CloudOptimizedGeoTIFF;
@@ -21,6 +25,7 @@ public class CogTests(WebApplicationFactoryFixture fixture)
         request.Headers.Range = new(0, 1024 * 64);
         var response = await httpClient.SendAsync(request);
         var bytes = await response.Content.ReadAsByteArrayAsync();
+        var j = Encoding.UTF8.GetString(bytes);
         await File.WriteAllBytesAsync("北仑区_webmerc_cog_header.tif", bytes);
         //
         // var crs = CoordinateReferenceSystem.Get(4549);
@@ -38,34 +43,58 @@ public class CogTests(WebApplicationFactoryFixture fixture)
     [Fact]
     public async Task GetCogImage()
     {
+        // CogTileReader.ReadTile2("/Users/lewis/Downloads/tiled_cog_chengdu.tif");
+        //     
         var cog = new COGGeoTiffSource("/Users/lewis/Downloads/tiled_cog_chengdu.tif");
-        var name = cog.GetType().FullName;
         await cog.LoadAsync();
 
-        // for (var i = 0; i < 8; ++i)
-        // {
-        //     for (var j = 0; j < 9; ++j)
-        //     {
-        //         await AssertAllTiles(cog, "5", i, j);
-        //     }
-        // }
-
+        // 3: 2X2
+        await AssertAllTiles(cog, "3", 0, 0);
+        await AssertAllTiles(cog, "3", 0, 1);
         await AssertAllTiles(cog, "3", 1, 0);
-        await AssertAllTiles(cog, "3", 2, 0);
         await AssertAllTiles(cog, "3", 1, 1);
-        await AssertAllTiles(cog, "3", 2, 0);
+        // 4: 1X1
+        await AssertAllTiles(cog, "4", 0, 0);
+        // 5: 1X1
+        await AssertAllTiles(cog, "5", 0, 0);
 
+        using var reader = new BinaryReader(File.OpenRead("/Users/lewis/Downloads/tiled_cog_chengdu.tif"));
+        var tiff = TIFF.Load(reader);
+        await SaveImage(reader, tiff, 3, 0, 0);
+        await SaveImage(reader, tiff, 3, 0, 1);
+        await SaveImage(reader, tiff, 3, 1, 0);
+        await SaveImage(reader, tiff, 3, 1, 1);
+        await SaveImage(reader, tiff, 4, 0, 0);
+        await SaveImage(reader, tiff, 5, 0, 0);
+    }
 
-        // await AssertAllTiles(cog, "0", 0, 0);
-        // await AssertAllTiles(cog, "1", 0, 0);
-        // await AssertAllTiles(cog, "2", 0, 0);
-        // await AssertAllTiles(cog, "2", 0, 1);
+    private async Task SaveImage(BinaryReader reader, TIFF tiff, int level, int col, int row)
+    {
+        var data = await tiff.GetTileAsync(reader, level, col, row);
+        SaveImage($"images/tiff_{level}_{col}_{row}.png", data);
+    }
 
-        // await AssertAllTiles(cog, "2", 1, 0);
-        // await AssertAllTiles(cog, "2", 1, 1);
-        // await AssertAllTiles(cog, "3", 2, 2);
-        // await AssertAllTiles(cog, "4", 0, 0);
-        // await AssertAllTiles(cog, "4", 4, 3);
+    private void SaveImage(string path, int[] data)
+    {
+        var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+
+        try
+        {
+            // int: 4 bytes, 32 bits
+            // rgba8888: 4 bytes, 32 bits
+            using var skiaImage =
+                SKImage.FromPixels(
+                    new SKImageInfo(512, 512, SKColorType.Rgba8888, SKAlphaType.Premul),
+                    handle.AddrOfPinnedObject());
+            using var bitmap = SKBitmap.FromImage(skiaImage);
+            using var stream = new MemoryStream();
+            bitmap.Encode(stream, SKEncodedImageFormat.Png, 100);
+            File.WriteAllBytes(path, stream.ToArray());
+        }
+        finally
+        {
+            handle.Free();
+        }
     }
 
     [Fact(DisplayName = "Get cd tile")]
@@ -134,14 +163,24 @@ public class CogTests(WebApplicationFactoryFixture fixture)
         await File.WriteAllBytesAsync("images/qtz_2.png", image2);
     }
 
-    private async Task AssertAllTiles(COGGeoTiffSource cogGeoTiffSource, string zoom, int x, int y)
+    private async Task AssertAllTiles(COGGeoTiffSource cogGeoTiffSourceSource, string zoom, int x, int y)
     {
-        var image = await cogGeoTiffSource.GetImageAsync(zoom, x, y);
-        if (image.Data is byte[] b)
+        var image = await cogGeoTiffSourceSource.GetImageAsync(zoom, x, y);
+        if (image is { IsEmpty: false })
         {
-            await File.WriteAllBytesAsync("images/cd_" + zoom + "_" + x + "_" + y + ".png", b);
+            var i = (int[])image.Data;
+            var bitmap = new SKBitmap(image.Width, image.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+            var handle = GCHandle.Alloc(i, GCHandleType.Pinned);
+            bitmap.SetPixels(handle.AddrOfPinnedObject());
+            using var ms = new MemoryStream();
+            using var skStream = new SKManagedWStream(ms);
+            bitmap.Encode(skStream, SKEncodedImageFormat.Jpeg, 80);
+            var resultArray = ms.ToArray();
+
+            await File.WriteAllBytesAsync("images/cd_" + zoom + "_" + x + "_" + y + ".jpg", resultArray);
         }
 
+        Assert.NotNull(image);
         Assert.False(image.IsEmpty);
     }
 }
