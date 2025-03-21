@@ -130,20 +130,20 @@ const map = new Map({
     //   }),
     // }),
 
-    new TileLayer({
-      source: new WMTS({
-        url: 'https://t0.tianditu.gov.cn/cia_c/wmts?tk=',
-        layer: 'cia',
-        style: 'default',
-        matrixSet: 'c',
-        tileGrid: new WMTSTileGrid({
-          origin: getTopLeft(projectionExtent),
-          resolutions: resolutions,
-          matrixIds: matrixIds,
-        }),
-        wrapX: true,
-      }),
-    }),
+    // new TileLayer({
+    //   source: new WMTS({
+    //     url: 'https://t0.tianditu.gov.cn/cia_c/wmts?tk=',
+    //     layer: 'cia',
+    //     style: 'default',
+    //     matrixSet: 'c',
+    //     tileGrid: new WMTSTileGrid({
+    //       origin: getTopLeft(projectionExtent),
+    //       resolutions: resolutions,
+    //       matrixIds: matrixIds,
+    //     }),
+    //     wrapX: true,
+    //   }),
+    // }),
   ],
   view: new View({
     projection: projection,
