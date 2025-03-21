@@ -9,7 +9,7 @@ namespace ZMap.Renderer.SkiaSharp.Utilities;
 public class ColorUtility
 {
     private static readonly SKColor DefaultColor = SKColors.Black;
-    private static readonly ILogger Logger = Log.CreateLogger<ColorUtility>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<ColorUtility>());
 
     public static SKColor GetColor(string hexString, float opacity = 1)
     {
@@ -20,7 +20,7 @@ public class ColorUtility
 
         if (!SKColor.TryParse(hexString, out var color))
         {
-            Logger.LogWarning("RGB {IncorrectColorHexString} 不是一个合法的颜色", color);
+            Logger.Value.LogWarning("RGB {IncorrectColorHexString} 不是一个合法的颜色", color);
             return DefaultColor;
         }
 

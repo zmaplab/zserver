@@ -66,19 +66,19 @@ public class StoreRefreshService(
             var configurations = new List<JObject> { configuration };
             using var scope = serviceProvider.CreateScope();
             var gridSetStore = scope.ServiceProvider.GetRequiredService<IGridSetStore>();
-            await gridSetStore.Refresh(configurations);
+            await gridSetStore.RefreshAsync(configurations);
             var sourceStore = scope.ServiceProvider.GetRequiredService<ISourceStore>();
-            await sourceStore.Refresh(configurations);
+            await sourceStore.RefreshAsync(configurations);
             var styleGroupStore = scope.ServiceProvider.GetRequiredService<IStyleGroupStore>();
-            await styleGroupStore.Refresh(configurations);
+            await styleGroupStore.RefreshAsync(configurations);
             var sldStore = scope.ServiceProvider.GetRequiredService<ISldStore>();
-            await sldStore.Refresh(configurations);
+            await sldStore.RefreshAsync(configurations);
             var resourceGroupStore = scope.ServiceProvider.GetRequiredService<IResourceGroupStore>();
-            await resourceGroupStore.Refresh(configurations);
+            await resourceGroupStore.RefreshAsync(configurations);
             var layerStore = scope.ServiceProvider.GetRequiredService<ILayerStore>();
-            await layerStore.Refresh(configurations);
+            await layerStore.RefreshAsync(configurations);
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
-            await layerGroupStore.Refresh(configurations);
+            await layerGroupStore.RefreshAsync(configurations);
         }
     }
 

@@ -1,11 +1,12 @@
-
-
 namespace ZMap.Infrastructure;
 
 public static class CoordinateReferenceSystem
 {
     // ReSharper disable once InconsistentNaming
-    private static readonly ConcurrentDictionary<int, CoordinateSystem> SRIDCache;
+    // TODO: int 转成 string 更好？可能存在大量装箱拆箱
+    public static readonly Dictionary<int, CoordinateSystem> SRIDCache;
+    public static readonly Dictionary<string, CoordinateSystem> NameCache;
+    public static readonly Dictionary<string, CoordinateSystem> EsriNameCache;
 
     private static readonly GeometryFactory GeometryFactory =
         NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory();
@@ -18,7 +19,10 @@ public static class CoordinateReferenceSystem
 
     static CoordinateReferenceSystem()
     {
-        SRIDCache = new ConcurrentDictionary<int, CoordinateSystem>();
+        SRIDCache = new Dictionary<int, CoordinateSystem>();
+        NameCache = new Dictionary<string, CoordinateSystem>();
+        EsriNameCache = new Dictionary<string, CoordinateSystem>();
+
         typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceNames();
         using var stream =
             typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Infrastructure.proj.xml");
@@ -34,6 +38,38 @@ public static class CoordinateReferenceSystem
         if (nodes == null)
         {
             return;
+        }
+
+        using var esriProjStream =
+            typeof(CoordinateReferenceSystem).Assembly.GetManifestResourceStream("ZMap.Infrastructure.esri_proj.csv");
+        var esriNames = new List<(int Srid, string Name)>();
+        if (esriProjStream != null)
+        {
+            using var reader = new StreamReader(esriProjStream);
+            var lines = reader.ReadToEnd().Split('\n');
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                var data = line.Split(',');
+                var name = data[0].Trim();
+                try
+                {
+                    if (!int.TryParse(data[1].Trim(), out var srid))
+                    {
+                        continue;
+                    }
+
+                    esriNames.Add((srid, name));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         foreach (XmlNode referenceNode in nodes)
@@ -53,6 +89,13 @@ public static class CoordinateReferenceSystem
 
             var coordinateSystem = coordinateSystemFactory.CreateFromWkt(wkt);
             SRIDCache.TryAdd(srid, coordinateSystem);
+            NameCache.TryAdd(coordinateSystem.Name, coordinateSystem);
+
+            var names = esriNames.Where(x => x.Srid == srid).ToList();
+            foreach (var tuple in names)
+            {
+                EsriNameCache.TryAdd(tuple.Name, coordinateSystem);
+            }
         }
     }
 
@@ -63,6 +106,16 @@ public static class CoordinateReferenceSystem
             4326 => GeographicCoordinateSystem.WGS84,
             3857 => ProjectedCoordinateSystem.WebMercator,
             _ => SRIDCache.GetValueOrDefault(srid)
+        };
+    }
+
+    public static CoordinateSystem Get(string name)
+    {
+        return name switch
+        {
+            "WGS 84" => GeographicCoordinateSystem.WGS84,
+            "WGS 84 / Pseudo-Mercator" => ProjectedCoordinateSystem.WebMercator,
+            _ => NameCache.GetValueOrDefault(name) ?? EsriNameCache.GetValueOrDefault(name)
         };
     }
 
@@ -83,6 +136,23 @@ public static class CoordinateReferenceSystem
         });
     }
 
+    public static ICoordinateTransformation CreateTransformation(CoordinateSystem source, CoordinateSystem target)
+    {
+        if (source == null)
+        {
+            return null;
+        }
+
+        if (target == null)
+        {
+            return null;
+        }
+
+        var key = $"{source.Name}:{target.Name}";
+        return CoordinateTransformations.GetOrAdd(key,
+            _ => CoordinateTransformationFactory.CreateFromCoordinateSystems(source, target));
+    }
+
     public static Envelope Transform(this Envelope extent, int sourceSrid, int targetSrid)
     {
         if (extent == null)
@@ -101,6 +171,42 @@ public static class CoordinateReferenceSystem
         }
 
         var transformation = CreateTransformation(sourceSrid, targetSrid);
+        if (transformation == null)
+        {
+            throw new ArgumentException("创建投影转换失败");
+        }
+
+        var corners = new[]
+        {
+            Transform(new Coordinate(extent.MinX, extent.MinY), transformation),
+            Transform(new Coordinate(extent.MinX, extent.MaxY), transformation),
+            Transform(new Coordinate(extent.MaxX, extent.MinY), transformation),
+            Transform(new Coordinate(extent.MaxX, extent.MaxY), transformation)
+        };
+
+        var result = new Envelope(corners[0]);
+        for (var i = 1; i < 4; i++)
+        {
+            result.ExpandToInclude(corners[i]);
+        }
+
+        return result;
+    }
+
+    public static Envelope Transform(this Envelope extent, CoordinateSystem sourceCoordinateSystem,
+        CoordinateSystem targetCoordinateSystem)
+    {
+        if (extent == null)
+        {
+            return null;
+        }
+
+        if (extent.IsNull)
+        {
+            return extent;
+        }
+
+        var transformation = CreateTransformation(sourceCoordinateSystem, targetCoordinateSystem);
         if (transformation == null)
         {
             throw new ArgumentException("创建投影转换失败");

@@ -19,12 +19,12 @@ public class UriTests
         Assert.False(Uri.TryCreate("file://images/108.png", UriKind.Relative, out _));
         var uri6 = new Uri("file://images/108.png", UriKind.RelativeOrAbsolute);
  
-        Assert.Equal("108.png", uri1.ToPath()); 
-        Assert.Equal("108.png", uri3.ToPath()); 
-        Assert.Equal("images/108.png", uri4.ToPath()); 
-        Assert.Equal("images/108.png", uri6.ToPath()); 
+        Assert.Equal("108.png", uri1.GetPath()); 
+        Assert.Equal("108.png", uri3.GetPath()); 
+        Assert.Equal("images/108.png", uri4.GetPath()); 
+        Assert.Equal("images/108.png", uri6.GetPath()); 
             
-        Assert.True(File.Exists(uri1.ToPath()));
-        Assert.True(File.Exists(uri6.ToPath()));
+        Assert.True(File.Exists(uri1.GetPath()));
+        Assert.True(File.Exists(uri6.GetPath()));
     }
 }

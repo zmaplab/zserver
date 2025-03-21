@@ -1,5 +1,3 @@
-
-
 namespace ZMap.Infrastructure;
 
 public static class Log
@@ -19,11 +17,17 @@ public static class Log
 
     public static ILogger CreateLogger<T>()
     {
-        return _loggerFactory.CreateLogger<T>();
+        var logger = _loggerFactory.CreateLogger<T>();
+        return logger;
     }
 
     public static ILogger CreateLogger(string name)
     {
         return _loggerFactory.CreateLogger(name);
+    }
+
+    public static ILogger CreateLogger(Type type)
+    {
+        return _loggerFactory.CreateLogger(type);
     }
 }

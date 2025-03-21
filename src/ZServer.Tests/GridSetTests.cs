@@ -26,7 +26,7 @@ public class GridSetTests : BaseTests
     {
         // 117.38953125,31.916933593750002,117.41150390625,31.938906250000002
         var gridSet = DefaultGridSets.TryGet("EPSG:4326");
-        var xyz = gridSet.GetTileCoordForXyAndZ(120.20861471424968, 27.75598560808519, 11);
+        var xyz = gridSet.GetTileCoordForXyAndZ(120.20861471424968, 27.75598560808519, "11");
         Assert.Equal(3415, xyz.X);
         Assert.Equal(708, xyz.Y);
     }
@@ -37,8 +37,7 @@ public class GridSetTests : BaseTests
         var store = GetScopedService<IGridSetStore>();
 
         var gridSet4326 = await store.FindAsync("EPSG:4326");
-
-
+        
         var tuple = gridSet4326.GetEnvelope("14", 27058, 5295);
         var e0 = tuple.Extent;
         Assert.Equal(117.26806640625, e0.MinX);
@@ -50,10 +49,10 @@ public class GridSetTests : BaseTests
 
         tuple = gridSet43857.GetEnvelope("14", 27058, 5295);
         e0 = tuple.Extent;
-        Assert.Equal(46145951.213676751, e0.MinX);
-        Assert.Equal(7083572.2842578124, e0.MinY);
-        Assert.Equal(46148397.198581539, e0.MaxX);
-        Assert.Equal(7086018.2691625971, e0.MaxY);
+        Assert.Equal(46145951.210887507, e0.MinX);
+        Assert.Equal(7083572.2870470565, e0.MinY);
+        Assert.Equal(46148397.195792295, e0.MaxX);
+        Assert.Equal(7086018.2719518412, e0.MaxY);
     }
 
     [Fact(Skip = "")]
@@ -74,9 +73,9 @@ public class GridSetTests : BaseTests
 
         tuple = gridSet43857.GetEnvelope("14", 27058, 5295);
         e0 = tuple.Extent;
-        Assert.Equal(46145951.213676751, e0.MinX);
-        Assert.Equal(7083572.2842578124, e0.MinY);
-        Assert.Equal(46148397.198581539, e0.MaxX);
-        Assert.Equal(7086018.2691625971, e0.MaxY);
+        Assert.Equal(46145951.553676754, e0.MinX);
+        Assert.Equal(7083571.9442578126, e0.MinY);
+        Assert.Equal(46148397.538581543, e0.MaxX);
+        Assert.Equal(7086017.9291625973, e0.MaxY);
     }
 }

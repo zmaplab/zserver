@@ -48,7 +48,7 @@ public class WmsGrain(WmsService wmsService) : Grain, IWMSGrain
         int width, int height, string format, bool transparent, string bgColor, int time,
         string formatOptions, string cqlFilter, IDictionary<string, object> arguments)
     {
-        var result = await wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
+        using var result = await wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
             transparent, bgColor, time,
             formatOptions, cqlFilter, arguments);
 
@@ -57,8 +57,8 @@ public class WmsGrain(WmsService wmsService) : Grain, IWMSGrain
             return ZServerResponseFactory.Failed(result.Message, result.Code, result.Locator);
         }
 
-        await using var stream = result.Stream;
-        var bytes = await result.Stream.ToArrayAsync();
+        var stream = result.Stream;
+        var bytes = await stream.ToArrayAsync();
         return ZServerResponseFactory.Ok(bytes, format);
     }
 

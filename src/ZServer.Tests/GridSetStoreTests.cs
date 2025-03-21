@@ -15,6 +15,6 @@ public class GridSetStoreTests
     {
         var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
         var gridSetStore = new GridSetStore();
-        await gridSetStore.Refresh(new List<JObject> { json });
+        await gridSetStore.RefreshAsync(new List<JObject> { json });
     }
 }

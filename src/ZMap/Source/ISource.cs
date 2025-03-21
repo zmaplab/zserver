@@ -18,10 +18,21 @@ public interface ISource : IDisposable
     int Srid { get; }
 
     /// <summary>
+    /// 投影
+    /// </summary>
+    CoordinateSystem CoordinateSystem { get; }
+
+    /// <summary>
     /// 数据源覆盖范围
     /// </summary>
     /// <returns></returns>
-    Envelope GetEnvelope();
+    Envelope Envelope { get; }
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <returns></returns>
+    Task LoadAsync();
 
     /// <summary>
     /// 复制数据源对象

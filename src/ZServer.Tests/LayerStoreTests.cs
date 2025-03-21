@@ -22,16 +22,16 @@ public class LayerStoreTests : BaseTests
     {
         var json = JsonConvert.DeserializeObject(await File.ReadAllTextAsync("layers.json")) as JObject;
         var styleGroupStore = new StyleGroupStore();
-        await styleGroupStore.Refresh(new List<JObject> { json });
+        await styleGroupStore.RefreshAsync(new List<JObject> { json });
         var resourceGroupStore = new ResourceGroupStore();
-        await resourceGroupStore.Refresh(new List<JObject> { json });
+        await resourceGroupStore.RefreshAsync(new List<JObject> { json });
         var sourceStore = new SourceStore();
-        await sourceStore.Refresh(new List<JObject> { json });
+        await sourceStore.RefreshAsync(new List<JObject> { json });
         var sldStore = new SldStore();
-        await sldStore.Refresh(new List<JObject> { json });
+        await sldStore.RefreshAsync(new List<JObject> { json });
 
         var store = new LayerStore(styleGroupStore, resourceGroupStore, sourceStore, sldStore);
-        await store.Refresh(new List<JObject> { json });
+        await store.RefreshAsync(new List<JObject> { json });
 
         var layer = await store.FindAsync("resourceGroup1", "berlin_db");
         var source = layer.Source as PostgreSource;

@@ -16,7 +16,7 @@ namespace ZServer.Store;
 /// </summary>
 public class SourceStore : ISourceStore
 {
-    private static readonly ILogger Logger = Log.CreateLogger<SourceStore>();
+    private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<SourceStore>());
     private static readonly ConcurrentDictionary<string, ISource> Cache = new();
 
     private static readonly ConcurrentDictionary<Type, ParameterInfo[]>
@@ -42,7 +42,7 @@ public class SourceStore : ISourceStore
         return new ValueTask<List<ISource>>(items);
     }
 
-    public Task Refresh(List<JObject> configurations)
+    public Task RefreshAsync(List<JObject> configurations)
     {
         var existKeys = Cache.Keys.ToList();
         var keys = new List<string>();
@@ -178,24 +178,24 @@ public class SourceStore : ISourceStore
         var provider = section.Value<string>("provider");
         if (string.IsNullOrWhiteSpace(provider))
         {
-            Logger.LogError("数据源 {Name} 不存在或驱动为空", sourceName);
+            Logger.Value.LogError("数据源 {Name} 不存在或驱动为空", sourceName);
             return null;
         }
 
         var type = Type.GetType(provider);
         if (type == null)
         {
-            Logger.LogError("数据源 {Name} 的驱动 {Provider} 不存在", sourceName, provider);
+            Logger.Value.LogError("数据源 {Name} 的驱动 {Provider} 不存在", sourceName, provider);
             return null;
         }
 
         var parameterInfos = StorageTypeCache.GetOrAdd(type, x =>
         {
-            if (!typeof(IVectorSource).IsAssignableFrom(x))
-            {
-                Logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", sourceName, provider);
-                return null;
-            }
+            // if (!typeof(IVectorSource).IsAssignableFrom(x))
+            // {
+            //     Logger.LogError("数据源 {Name} 的驱动 {Provider} 不是有效的驱动", sourceName, provider);
+            //     return null;
+            // }
 
             var result = x.GetConstructors()[0].GetParameters();
 
@@ -228,7 +228,7 @@ public class SourceStore : ISourceStore
             }
             catch (Exception e)
             {
-                Logger.LogError("创建数据源 {Name} 的驱动 {Provider} 失败: {Exception}", sourceName, provider,
+                Logger.Value.LogError("创建数据源 {Name} 的驱动 {Provider} 失败: {Exception}", sourceName, provider,
                     e.ToString());
                 return null;
             }
