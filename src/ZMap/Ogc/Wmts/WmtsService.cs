@@ -10,7 +10,7 @@ public class WmtsService(
     IGridSetStore gridSetStore)
 {
     private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<WmtsService>());
-    
+
     public async ValueTask<MapResult> GetTileAsync(string layers, string styles,
         string format,
         string tileMatrixSet, string tileMatrix, int tileRow,
@@ -80,7 +80,7 @@ public class WmtsService(
             }
 
             var gridSetEnvelope = gridSet.GetEnvelope(tileMatrix, tileCol, tileRow);
-            if (gridSetEnvelope == default)
+            if (gridSetEnvelope == null)
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, zFilter);
@@ -160,8 +160,9 @@ public class WmtsService(
 
             var scale = gridSetEnvelope.ScaleDenominator;
             var bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b;
-            var viewPort = new Viewport
+            var viewport = new Viewport
             {
+                Tile = new Tile(tileMatrix, tileCol, tileRow),
                 Extent = gridSetEnvelope.Extent,
                 Width = gridSet.TileWidth,
                 Height = gridSet.TileHeight,
@@ -175,11 +176,10 @@ public class WmtsService(
                 .SetZoom(new Zoom(scale, ZoomUnits.Scale))
                 .SetGraphicsContextFactory(graphicsServiceProvider)
                 .AddLayers(layerList);
-            var image = await map.GetImageAsync(viewPort, format);
+            var image = await map.GetImageAsync(viewport, format);
             await using var fileStream = new FileStream(tuple.FullPath, FileMode.Create, FileAccess.Write);
             await image.CopyToAsync(fileStream);
             image.Seek(0, SeekOrigin.Begin);
-
 
             return new MapResult(image, null, null);
         }

@@ -54,6 +54,7 @@ public class Map : IDisposable
 
     /// <summary>
     /// 获取指定区域的图片
+    /// 只传渲染区域，而不使用 tile 的原因是，即便 matrixSet 名称一样，并不能保证是一致的。
     /// </summary>
     /// <param name="viewport"></param>
     /// <param name="imageFormat"></param>

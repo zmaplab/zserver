@@ -20,7 +20,7 @@ public partial class RemoteWmtsSource(string url) : ITiledSource, IRemoteHttpSou
 
     /// <summary>
     /// 
-    /// </summary>
+    /// </summary> 
     public string MatrixSet { get; set; }
 
     public GridSet GridSet { get; set; }
@@ -34,9 +34,10 @@ public partial class RemoteWmtsSource(string url) : ITiledSource, IRemoteHttpSou
             return;
         }
 
+        _cacheFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"cache/wmts/remote/{Name}");
+
         var tuple = await Cache.GetOrCreateAsync($"{url}_Capabilities", async entry =>
         {
-            _cacheFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"cache/wmts/remote/{Name}");
             if (!Directory.Exists(_cacheFolder))
             {
                 Directory.CreateDirectory(_cacheFolder);
@@ -125,12 +126,11 @@ public partial class RemoteWmtsSource(string url) : ITiledSource, IRemoteHttpSou
                     throw new ArgumentException("无法识别的坐标系");
             }
 
-            var index = 0;
             foreach (var tileMatrix in capabilities.Contents.TileMatrixSet.TileMatrices)
             {
                 var scaleDenominator = tileMatrix.ScaleDenominator;
                 var resolution = gridSet.PixelSize * (scaleDenominator / gridSet.MetersPerUnit);
-                var grid = new Grid(index)
+                var grid = new Grid(int.Parse(tileMatrix.Identifier))
                 {
                     Name = tileMatrix.Identifier,
                     NumTilesWidth = tileMatrix.MatrixWidth,
@@ -139,7 +139,6 @@ public partial class RemoteWmtsSource(string url) : ITiledSource, IRemoteHttpSou
                     Resolution = resolution
                 };
                 gridSet.AppendGrid(grid);
-                index++;
             }
 
             (GridSet GridSet, CoordinateSystem CoordinateSystem, Envelope Extent ) tuple = (gridSet, crs, extent);
@@ -160,7 +159,7 @@ public partial class RemoteWmtsSource(string url) : ITiledSource, IRemoteHttpSou
         Envelope = tuple.Extent;
     }
 
-    public async Task<ImageData> GetImageAsync(string matrix, int row, int col)
+    public async Task<ImageData> GetImageAsync(string matrix, int col, int row)
     {
         var path = $"{_cacheFolder}/{matrix}_{row}_{col}.png";
         if (File.Exists(path))

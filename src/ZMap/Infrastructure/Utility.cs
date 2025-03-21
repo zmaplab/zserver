@@ -31,7 +31,7 @@ public static partial class Utility
     /// <param name="tileRow"></param>
     /// <param name="tileCol"></param>
     /// <returns></returns>
-    public static (string FullPath, string IntervalPath) GetWmtsPath(string layers, string filter, string format,
+    public static PathInfo GetWmtsPath(string layers, string filter, string format,
         string tileMatrixSet,
         string tileMatrix, int tileRow,
         int tileCol)
@@ -49,7 +49,7 @@ public static partial class Utility
             ? $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}{imageExtension}"
             : $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}_{cqlFilterKey}{imageExtension}";
         var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", intervalPath);
-        return (fullPath, intervalPath);
+        return new PathInfo(fullPath, intervalPath);
     }
 
     public static (string FullPath, string IntervalPath) GetTiffPath(string file, string tileMatrix, int tileRow,
@@ -59,7 +59,7 @@ public static partial class Utility
         var fileKey = CryptographyUtility.ComputeHash(Encoding.UTF8.GetBytes(file));
         var fileName = Path.GetFileNameWithoutExtension(file);
         var intervalPath =
-            $"geotif{Path.DirectorySeparatorChar}{fileName}{Path.DirectorySeparatorChar}{fileKey}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}.dat";
+            $"geotif{Path.DirectorySeparatorChar}{fileName}_{fileKey}{Path.DirectorySeparatorChar}{tileMatrix}_{tileRow}_{tileCol}.dat";
         var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", intervalPath);
         return (fullPath, intervalPath);
     }

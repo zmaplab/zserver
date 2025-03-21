@@ -25,7 +25,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             .UseConnectionFactory(DataType.PostgreSQL, () =>
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    "User ID=postgres;Password=11111;Host=127.0.0.1;Port=5432;Database=db;Pooling=true;");
+                    "User ID=nobody;Password=jv9@4cLh#cMuEgSSUc2b;Host=127.0.0.1;Port=55432;Database=__db;Pooling=true;");
                 dataSourceBuilder.UseNetTopologySuite();
                 var dataSource = dataSourceBuilder.Build();
                 return dataSource.CreateConnection();

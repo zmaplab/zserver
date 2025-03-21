@@ -52,6 +52,7 @@ public class PostgreSourceTests
                        ]
                      }
                      """;
+        source.Key = "XXX";
 
         var list =
             (await source.GetFeaturesAsync(new Envelope(52.31301, 52.41318, 13.12318, 13.22347), filter))

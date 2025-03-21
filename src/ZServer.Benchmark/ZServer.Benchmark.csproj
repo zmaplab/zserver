@@ -31,8 +31,8 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.3" />
         <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
     </ItemGroup>
 

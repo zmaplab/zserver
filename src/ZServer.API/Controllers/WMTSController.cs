@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using ZMap.Infrastructure;
 using ZServer.Interfaces.WMTS;
@@ -13,11 +14,8 @@ namespace ZServer.API.Controllers;
 [ZServerAuthorize]
 // ReSharper disable once InconsistentNaming
 public class WMTSController(
-    IClusterClient clusterClient
-#if !DEBUG
-    ,
+    IClusterClient clusterClient,
     ILogger<WMTSController> logger
-#endif
 )
     : ControllerBase
 {
@@ -48,6 +46,10 @@ public class WMTSController(
         string filter = null)
     {
         var tuple = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
+
+        logger.LogDebug("[{TraceIdentifier}] Request wmts service {TileMatrix} {TileMatrixSet}  {TileCol}  {TileRow}",
+            HttpContext.TraceIdentifier, tileMatrix, tileMatrixSet, tileCol, tileRow);
+
 #if !DEBUG
         if (System.IO.File.Exists(tuple.FullPath))
         {
@@ -55,8 +57,8 @@ public class WMTSController(
             {
                 var displayUrl =
                     $"[{HttpContext.TraceIdentifier}] LAYERS={layers}&STYLES={style}&FORMAT={format}&TILEMATRIXSET={tileMatrixSet}&TILEMATRIX={tileMatrix}&TILEROW={tileRow}&TILECOL={tileCol}";
-                logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", HttpContext.TraceIdentifier,
-                    displayUrl);
+                logger.LogDebug("[{TraceIdentifier}] {Url}", HttpContext.TraceIdentifier, displayUrl);
+                logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", HttpContext.TraceIdentifier, displayUrl);
             }
 
             await using var stream = System.IO.File.OpenRead(tuple.FullPath);

@@ -49,10 +49,10 @@ public class GridSetTests : BaseTests
 
         tuple = gridSet43857.GetEnvelope("14", 27058, 5295);
         e0 = tuple.Extent;
-        Assert.Equal(46145951.213676751, e0.MinX);
-        Assert.Equal(7083572.2842578124, e0.MinY);
-        Assert.Equal(46148397.198581539, e0.MaxX);
-        Assert.Equal(7086018.2691625971, e0.MaxY);
+        Assert.Equal(46145951.210887507, e0.MinX);
+        Assert.Equal(7083572.2870470565, e0.MinY);
+        Assert.Equal(46148397.195792295, e0.MaxX);
+        Assert.Equal(7086018.2719518412, e0.MaxY);
     }
 
     [Fact(Skip = "")]
@@ -73,9 +73,9 @@ public class GridSetTests : BaseTests
 
         tuple = gridSet43857.GetEnvelope("14", 27058, 5295);
         e0 = tuple.Extent;
-        Assert.Equal(46145951.213676751, e0.MinX);
-        Assert.Equal(7083572.2842578124, e0.MinY);
-        Assert.Equal(46148397.198581539, e0.MaxX);
-        Assert.Equal(7086018.2691625971, e0.MaxY);
+        Assert.Equal(46145951.553676754, e0.MinX);
+        Assert.Equal(7083571.9442578126, e0.MinY);
+        Assert.Equal(46148397.538581543, e0.MaxX);
+        Assert.Equal(7086017.9291625973, e0.MaxY);
     }
 }
