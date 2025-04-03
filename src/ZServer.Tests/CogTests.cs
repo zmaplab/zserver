@@ -41,35 +41,45 @@ public class CogTests(WebApplicationFactoryFixture fixture)
     [Fact]
     public async Task GetCogImage()
     {
-        // CogTileReader.ReadTile2("/Users/lewis/Downloads/tiled_cog_chengdu.tif");
-        //     
-        var cog = new COGGeoTiffSource("/Users/lewis/Downloads/tiled_cog_chengdu.tif");
+        var cog = new COGGeoTiffSource("images/hengshan.tif");
         await cog.LoadAsync();
 
-        // 3: 2X2
-        await AssertAllTiles(cog, "3", 0, 0);
-        await AssertAllTiles(cog, "3", 0, 1);
-        await AssertAllTiles(cog, "3", 1, 0);
-        await AssertAllTiles(cog, "3", 1, 1);
-        // 4: 1X1
+        // 4 1 * 1
         await AssertAllTiles(cog, "4", 0, 0);
-        // 5: 1X1
-        await AssertAllTiles(cog, "5", 0, 0);
 
-        using var reader = new BinaryReader(File.OpenRead("/Users/lewis/Downloads/tiled_cog_chengdu.tif"));
-        var tiff = TIFF.Load(reader);
-        await SaveImage(reader, tiff, 3, 0, 0);
-        await SaveImage(reader, tiff, 3, 0, 1);
-        await SaveImage(reader, tiff, 3, 1, 0);
-        await SaveImage(reader, tiff, 3, 1, 1);
-        await SaveImage(reader, tiff, 4, 0, 0);
-        await SaveImage(reader, tiff, 5, 0, 0);
+        // 3 2 * 1
+        await AssertAllTiles(cog, "3", 0, 0);
+        await AssertAllTiles(cog, "3", 1, 0);
+
+        // 2 3 * 2
+        await AssertAllTiles(cog, "2", 0, 0);
+        await AssertAllTiles(cog, "2", 2, 1);
+
+        // 1 5 * 4
+        await AssertAllTiles(cog, "1", 0, 0);
+        await AssertAllTiles(cog, "1", 4, 3);
+
+        // 0 10 * 8
+        await AssertAllTiles(cog, "0", 0, 0);
+        await AssertAllTiles(cog, "0", 9, 7);
+
+        // using var reader = new BinaryReader(File.OpenRead("images/hengshan.tif"));
+        // var tiff = TIFF.Load(reader);
+        // await SaveImage(reader, tiff, 4, 0, 0);
+        // await SaveImage(reader, tiff, 3, 0, 0);
+        // await SaveImage(reader, tiff, 3, 1, 0);
+        // await SaveImage(reader, tiff, 2, 0, 0);
+        // await SaveImage(reader, tiff, 2, 2, 1);
+        // await SaveImage(reader, tiff, 1, 0, 0);
+        // await SaveImage(reader, tiff, 1, 4, 3);
+        // await SaveImage(reader, tiff, 0, 0, 0);
+        // await SaveImage(reader, tiff, 0, 9, 7);
     }
 
     private async Task SaveImage(BinaryReader reader, TIFF tiff, int level, int col, int row)
     {
         var data = await tiff.GetTileAsync(reader, level, col, row);
-        SaveImage($"images/tiff_{level}_{col}_{row}.png", data);
+        SaveImage($"images/expected/tiff_{level}_{col}_{row}.png", data);
     }
 
     private void SaveImage(string path, int[] data)
@@ -164,6 +174,8 @@ public class CogTests(WebApplicationFactoryFixture fixture)
     private async Task AssertAllTiles(COGGeoTiffSource cogGeoTiffSourceSource, string zoom, int x, int y)
     {
         var image = await cogGeoTiffSourceSource.GetImageAsync(zoom, x, y);
+        var expectedBytes = await File.ReadAllBytesAsync($"images/expected/cd_{zoom}_{x}_{y}.jpg");
+        byte[] actualBytes = null;
         if (image is { IsEmpty: false })
         {
             var i = (int[])image.Data;
@@ -173,12 +185,12 @@ public class CogTests(WebApplicationFactoryFixture fixture)
             using var ms = new MemoryStream();
             using var skStream = new SKManagedWStream(ms);
             bitmap.Encode(skStream, SKEncodedImageFormat.Jpeg, 80);
-            var resultArray = ms.ToArray();
-
-            await File.WriteAllBytesAsync("images/cd_" + zoom + "_" + x + "_" + y + ".jpg", resultArray);
+            actualBytes = ms.ToArray();
         }
 
         Assert.NotNull(image);
         Assert.False(image.IsEmpty);
+
+        Assert.Equal(expectedBytes, actualBytes);
     }
 }
