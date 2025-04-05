@@ -35,6 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install gdal
+        run: |
+          sudo apt-get update && sudo apt-get install -y gdal-bin
+      - name: Import test data(osmbuildings.shp) to PostGIS
+        run: |
+          ogr2ogr -f "PostgreSQL" \
+            PG:"host=localhost port=${{ job.services.postgres.ports['5432'] }} dbname=zserver_dev user=postgres password=postgres" \
+            /home/runner/work/zserver/zserver/src/ZServer.Tests/shapes/osmbuildings.shp
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
