@@ -8,6 +8,30 @@ on:
 
 jobs:
   test:
+    env:
+      PGDATABASE: zserver_dev
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        ports:
+          - 5432/tcp
+        options: >-
+          -e POSTGRES_DB=zserver_dev
+          -e POSTGRES_USER=postgres
+          -e POSTGRES_PASSWORD=postgres
+          -e PGDATABASE=zserver_dev
+          -e PGUSER=postgres
+          -e PGPASSWORD=postgres
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --entrypoint sh
+          postgis/postgis:16-3.5
+          -c "exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem -c ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
