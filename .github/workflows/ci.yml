@@ -35,6 +35,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set PostgreSQL Connection String
+        run: |
+          echo "ConnStr=User ID=postgres;Password=postgres;Host=localhost;Port=${{ job.services.postgres.ports['5432'] }};Database=zserver_dev;Pooling=true;" >> $GITHUB_ENV
       - name: Install gdal
         run: |
           sudo apt-get update && sudo apt-get install -y gdal-bin
