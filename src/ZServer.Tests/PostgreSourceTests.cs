@@ -17,8 +17,12 @@ public class PostgreSourceTests
         var freeSql = new FreeSqlBuilder()
             .UseConnectionFactory(DataType.PostgreSQL, () =>
             {
-                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;");
+                var connStr = Environment.GetEnvironmentVariable("ConnStr");
+                if (string.IsNullOrEmpty(connStr))
+                {
+                    connStr = "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;";
+                }
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connStr);
                 dataSourceBuilder.UseNetTopologySuite();
                 var dataSource = dataSourceBuilder.Build();
                 return dataSource.CreateConnection();
@@ -31,15 +35,21 @@ public class PostgreSourceTests
     public async Task GetFeaturesInExtentAsync()
     {
         Environment.SetEnvironmentVariable("EnableSensitiveDataLogging", "true");
-
+        var connStr = Environment.GetEnvironmentVariable("ConnStr");
+        if (string.IsNullOrEmpty(connStr))
+        {
+            connStr = "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;";
+        }
         var source =
             new PostgreSource(
-                "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;");
-        source.Table = "osmbuildings";
-        source.Geometry = "geom";
-        source.Srid = 4326;
-        source.Where = "id > 0";
-        source.Name = "osmbuildings";
+                connStr)
+            {
+                Table = "osmbuildings",
+                Geometry = "geom",
+                Srid = 4326,
+                Where = "id > 0",
+                Name = "osmbuildings"
+            };
         var filter = """
                      {
                        "Logic": "And",
