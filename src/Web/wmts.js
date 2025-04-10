@@ -17,7 +17,7 @@ const projection = getProjection('EPSG:4326')
 const projectionExtent = projection.getExtent()
 var size = getWidth(projectionExtent) / 256
 //分辨率
-const length = 19
+const length = 22
 const resolutions = new Array(length)
 const matrixIds = new Array(length)
 for (let i = 0; i < length; i += 1) {
@@ -30,7 +30,9 @@ const projection2 = getProjection('EPSG:3857')
 const projectionExtent2 = projection2.getExtent()
 const c = resolutionsFromExtent(projectionExtent2)
 // cd: 103.994126, 30.704402
-let centerXY = [103.994126, 30.704402]
+// 31.782366,118.592880
+// 31.7903704,118.5997978
+let centerXY = [118.59288, 31.782366]
 let img_w_url1 =
   'http://t0.tianditu.gov.cn/img_w/wmts?' + 'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk='
 let img_w_url2 = 'http://localhost:8200/wmts?SERVICE=WMTS&REQUEST=GetTile&version=1.0.0&layer=tianditu_w&tileMatrixSet=EPSG:3857&format=image/png' + '&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
@@ -148,7 +150,7 @@ const map = new Map({
   view: new View({
     projection: projection,
     center: centerXY,
-    zoom: 16,
+    zoom: 19,
   }),
 })
 

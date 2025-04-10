@@ -34,8 +34,6 @@ public class Program
         //     FileMode.Open, FileAccess.Read));
         // var tiff = new TIFF.NET.TIFF(binaryReader);
         //
-
-
         Utility.PrintInfo();
 
         // FixOrleansPublishSingleFileIssue();

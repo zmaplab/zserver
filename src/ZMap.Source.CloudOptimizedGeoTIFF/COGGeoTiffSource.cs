@@ -1,13 +1,19 @@
 ﻿using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
+using System.Text;
+using BitMiracle.LibTiff.Classic;
+using ICSharpCode.SharpZipLib.Lzw;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using MessagePack;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using TagImageFileFormat;
+using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.TileGrid;
+using ZstdSharp;
 using ArgumentException = System.ArgumentException;
 
 namespace ZMap.Source.CloudOptimizedGeoTIFF;
@@ -131,7 +137,7 @@ public class COGGeoTiffSource : ITiledSource
 
         var tuple = Utility.GetTiffPath(_file, matrix, row, col);
 
-#if !DEBUG
+
         if (File.Exists(tuple.FullPath))
         {
             stopwatch.Stop();
@@ -143,9 +149,35 @@ public class COGGeoTiffSource : ITiledSource
             var array = MessagePackSerializer.Deserialize<int[]>(cachedBytes);
             return new ImageData(array, ImageDataType.Pixels, GridSet.TileWidth, GridSet.TileHeight);
         }
-#endif
 
         var tileNumber = (short)grid.Index;
+
+        // using var tiff2 = Tiff.Open(_file, "r");
+        //
+        // try
+        // {
+        //     tiff2.SetDirectory(tileNumber);
+        // }
+        // catch (Exception e)
+        // {
+        //     Logger.Value.LogError(e, "SetDirectory {TileRow} {TileCol} {TileMatrix}", row, col, matrix);
+        //     return null;
+        // }
+        //
+        // //
+        // var pixelX = col * GridSet.TileWidth;
+        // var pixelY = row * GridSet.TileHeight;
+        //
+        // var tileBuffer1 = new int[GridSet.TileWidth * GridSet.TileHeight];
+        // if (!tiff2.ReadRGBATile(pixelX, pixelY, tileBuffer1))
+        // {
+        //     return null;
+        // }
+        //
+        // if (GridSet.YCoordinateFirst)
+        // {
+        //     LibTiffUtility.FlipImageVertically(tileBuffer1, GridSet.TileWidth, GridSet.TileHeight);
+        // }
 
         using var accessor = OpenViewAccessor();
         var byteAccessor = new MemoryMappedViewByteAccessor(accessor);
@@ -154,38 +186,26 @@ public class COGGeoTiffSource : ITiledSource
             Cache.Get<(TIFF Tiff, GridSet GridSet, CoordinateSystem CoordinateSystem, int MaxZoom )>(
                 $"{_file}_COGGeoTiffSource");
         var tiff = metadata.Tiff;
-        // using var tiff = Tiff.Open(_file, "r");
-        //
-        // try
-        // {
-        //     tiff.SetDirectory(tileNumber);
-        // }
-        // catch (Exception e)
-        // {
-        //     Logger.Value.LogError(e, "SetDirectory {TileRow} {TileCol} {TileMatrix}", row, col, matrix);
-        //     return null;
-        // }
-        //
-        // var pixelX = col * GridSet.TileWidth;
-        // var pixelY = row * GridSet.TileHeight;
-        //
-        // var tileBuffer = new int[GridSet.TileWidth * GridSet.TileHeight];
-        //
-        // if (!tiff.ReadRGBATile(pixelX, pixelY, tileBuffer))
-        // {
-        //     return null;
-        // }
-        //
-        // if (GridSet.YCoordinateFirst)
-        // {
-        //     LibTiffUtility.FlipImageVertically(tileBuffer, GridSet.TileWidth, GridSet.TileHeight);
-        // }
+        var ifd = tiff.ImageFileDirectories.ElementAt(tileNumber);
+        var bytes = await tiff.GetBytesAsync(byteAccessor, tileNumber, col, row);
+        int[] tileBuffer;
+        if (tiff.ImageFileDirectories.ElementAt(0).Compression == 5)
+        {
+            var m = new MemoryStream();
+            LzwCompressionAlgorithm.Instance.Decompress(bytes.AsSpan(), m);
+            var bytes1 = m.ToArray();
+            tileBuffer = GetImage(bytes1, ifd);
+            // LibTiffUtility.FlipImageVertically(tileBuffer, GridSet.TileWidth, GridSet.TileHeight);
+        }
+        else
+        {
+            tileBuffer = await tiff.GetTileAsync(byteAccessor, tileNumber, col, row);
+        }
 
-        var tileBuffer = await tiff.GetTileAsync(byteAccessor, tileNumber, col, row);
 
         stopwatch.Stop();
-        Logger.Value.LogInformation("ReadRGBATile {TileRow} {TileCol} {TileMatrix}: {ElapsedMilliseconds}ms", row, col,
-            matrix, stopwatch.ElapsedMilliseconds);
+        // Logger.Value.LogDebug("ReadRGBATile {TileRow} {TileCol} {TileMatrix}: {ElapsedMilliseconds}ms", row, col,
+        //     matrix, stopwatch.ElapsedMilliseconds);
 
         if (string.IsNullOrEmpty(tuple.FullPath) || File.Exists(tuple.FullPath))
         {
@@ -196,6 +216,27 @@ public class COGGeoTiffSource : ITiledSource
         await File.WriteAllBytesAsync(tuple.FullPath, data);
 
         return new ImageData(tileBuffer, ImageDataType.Pixels, GridSet.TileWidth, GridSet.TileHeight);
+    }
+
+
+    public int[] GetImage(byte[] bytes, ImageFileDirectory ifd)
+    {
+        var data = new int[ifd.TileWidth * ifd.TileLength];
+        var samplesPerPixel = ifd.SamplesPerPixel;
+        var numbers = bytes.Length / samplesPerPixel;
+        for (var i = 0; i < numbers; i++)
+        {
+            var start = i * samplesPerPixel;
+            var rgba = new byte[] { 0, 0, 0, 0 };
+            for (var j = 0; j < samplesPerPixel; ++j)
+            {
+                rgba[j] = bytes[start + j];
+            }
+
+            data[i] = BitConverter.ToInt32(rgba, 0);
+        }
+
+        return data;
     }
 
     private Stream OpenStream()

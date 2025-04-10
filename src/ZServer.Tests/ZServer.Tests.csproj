@@ -85,7 +85,7 @@
         <None Update="polygons.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Fonts\宋体.ttc">
+        <None Update="Fonts\2宋体.ttc">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="108.png">

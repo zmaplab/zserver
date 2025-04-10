@@ -14,7 +14,7 @@
     },
     "cd": {
       "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",
-      "file": "/Users/lewis/Downloads/cd_common_cog.tif"
+      "file": "/Users/lewis/Downloads/jiangning_01_20241031_05.tif"
     },
     "qtz": {
       "provider": "ZMap.Source.CloudOptimizedGeoTIFF.COGGeoTiffSource, ZMap.Source.CloudOptimizedGeoTIFF",

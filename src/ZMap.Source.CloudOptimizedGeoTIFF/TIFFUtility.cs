@@ -1036,7 +1036,8 @@ internal static class TIFFUtility
         GeoTiffIIOMetadataDecoder metadata)
     {
         GeographicCoordinateSystem gcs;
-        var tempCode = metadata.GetGeoKey(GeoTiffGCSCodes.GeographicTypeGeoKey) as ushort?;
+        var geographicTypeValue = metadata.GetGeoKey(GeoTiffGCSCodes.GeographicTypeGeoKey);
+        int? tempCode = geographicTypeValue == null ? null : Convert.ToInt32(geographicTypeValue);
         // TODO: 异常处理
         var angularUnit = CreateAngularUnit(metadata) ?? AngularUnit.Degrees;
         var linearUnit = CreateLinearUnit(metadata) ?? LinearUnit.Metre;
@@ -1095,10 +1096,19 @@ internal static class TIFFUtility
 
     private static HorizontalDatum CreateGeodeticDatum(LinearUnit unit, GeoTiffIIOMetadataDecoder metadata)
     {
-        var datumCode = metadata.GetGeoKey(GeoTiffGCSCodes.GeogGeodeticDatumGeoKey) as ushort?;
+        var datumCodeValue = metadata.GetGeoKey(GeoTiffGCSCodes.GeogGeodeticDatumGeoKey);
+        var datumCode = datumCodeValue as ushort?;
         if (datumCode == null)
         {
-            throw new ArgumentException("A user defined Geographic Coordinate system must include a predefined datum!");
+            if (datumCodeValue is int datumCode1)
+            {
+                datumCode = (ushort)datumCode1;
+            }
+            else
+            {
+                throw new ArgumentException(
+                    "A user defined Geographic Coordinate system must include a predefined datum!");
+            }
         }
 
         HorizontalDatum datum;

@@ -6,7 +6,8 @@ public partial class Layer
         ITiledSource tiledSource, Envelope viewportExtent, int viewportSrid,
         Zoom zoom, Envelope dataSourceExtent)
     {
-        var nearestGrid = tiledSource.GridSet.GetNearestLevel(zoom.Value);
+        // var nearestGrid = tiledSource.GridSet.GetNearestLevel(zoom.Value);
+        var nearestGrid = tiledSource.GridSet.GridLevels.First().Value;
         var gridArea = tiledSource.GridSet.GetGridArea(dataSourceExtent, nearestGrid);
         if (gridArea.IsEmpty)
         {

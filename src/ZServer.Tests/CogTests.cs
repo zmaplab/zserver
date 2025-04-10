@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -16,6 +17,37 @@ namespace ZServer.Tests;
 [Collection("WebApplication collection")]
 public class CogTests(WebApplicationFactoryFixture fixture)
 {
+    [Fact]
+    public async Task A()
+    {
+        var cog = new COGGeoTiffSource("/Users/lewis/Downloads/jiangning_01_20241031_05.tif");
+        await cog.LoadAsync();
+
+        int x = 220, y = 220;
+        for (int i = 214; i < x; i++)
+        {
+            for (int j = 214; j < y; j++)
+            {
+                var image = await cog.GetImageAsync("0", i, j);
+                if (image is { IsEmpty: false })
+                {
+                    var i1 = (int[])image.Data;
+                    var bitmap = new SKBitmap(image.Width, image.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+                    var handle = GCHandle.Alloc(i1, GCHandleType.Pinned);
+                    bitmap.SetPixels(handle.AddrOfPinnedObject());
+                    using var ms = new MemoryStream();
+                    using var skStream = new SKManagedWStream(ms);
+                    bitmap.Encode(skStream, SKEncodedImageFormat.Jpeg, 80);
+                    var resultArray = ms.ToArray();
+
+                    await File.WriteAllBytesAsync(
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images/jn_" + i + "_" + j + ".jpg"),
+                        resultArray);
+                }
+            }
+        }
+    }
+
     [Fact]
     public async Task GetHeader()
     {

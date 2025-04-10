@@ -50,7 +50,6 @@ public class WMTSController(
         logger.LogDebug("[{TraceIdentifier}] Request wmts service {TileMatrix} {TileMatrixSet}  {TileCol}  {TileRow}",
             HttpContext.TraceIdentifier, tileMatrix, tileMatrixSet, tileCol, tileRow);
 
-#if !DEBUG
         if (System.IO.File.Exists(tuple.FullPath))
         {
             if (ZMap.EnvironmentVariables.EnableSensitiveDataLogging)
@@ -67,7 +66,7 @@ public class WMTSController(
             await stream.CopyToAsync(HttpContext.Response.Body, (int)stream.Length);
             return;
         }
-#endif
+
 
         // 同一个 Grid 使用同一个对象进行管理， 保证缓存文件在同一个 Silo 目录下
         var grain = clusterClient.GetGrain<IWMTSGrain>(tuple.IntervalPath);

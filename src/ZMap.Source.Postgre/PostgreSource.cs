@@ -103,18 +103,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
             return sqlBuilder.ToString();
         });
 
-        string sql;
-        if (!string.IsNullOrEmpty(fitler))
-        {
-            var select = FreeSql.Value.Select<object>().WithSql(baseSql);
-            var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(fitler);
-            select = select.WhereDynamicFilter(filterInfo);
-            sql = select.ToSql();
-        }
-        else
-        {
-            sql = baseSql;
-        }
+        var sql = !string.IsNullOrEmpty(fitler) ? CombineFilter(baseSql, fitler) : baseSql;
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
@@ -148,6 +137,14 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
                 return f;
             });
+    }
+
+    internal string CombineFilter(string baseSql, string filter)
+    {
+        var select = FreeSql.Value.Select<object>().WithSql(baseSql);
+        var filterInfo = JsonConvert.DeserializeObject<DynamicFilterInfo>(filter);
+        select = select.WhereDynamicFilter(filterInfo);
+        return select.ToSql();
     }
 
     public override Envelope Envelope => null;
