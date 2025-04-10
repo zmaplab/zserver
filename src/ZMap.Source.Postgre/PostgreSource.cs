@@ -173,15 +173,15 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
     private NpgsqlDataSource GetNpgSqlDataSource()
     {
-        var dataSourceBuilder = Cache.GetOrCreate(ConnectionString, entry =>
+        var dataSource = Cache.GetOrCreate(ConnectionString, entry =>
         {
             var builder = new NpgsqlDataSourceBuilder(ConnectionString);
             builder.UseNetTopologySuite();
 
-            entry.SetValue(builder);
+            entry.SetValue(builder.Build());
             entry.SetSlidingExpiration(TimeSpan.FromMinutes(5));
             return builder;
         });
-        return dataSourceBuilder.Build();
+        return dataSource;
     }
 }
