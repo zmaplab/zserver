@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using MongoDB.Bson;
 using Newtonsoft.Json;
@@ -13,7 +14,8 @@ using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
-public class SocoStoreProvider(string url, IHttpClientFactory factory) : IJsonStoreProvider
+public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<SocoStoreProvider> logger)
+    : IJsonStoreProvider
 {
     private string _lastHash;
     private static readonly string AppId;
@@ -28,7 +30,7 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory) : IJsonSt
         AppSecret = Environment.GetEnvironmentVariable("ZSERVER_SOCODB_APPSECRET");
     }
 
-    public async Task<JObject> GetConfiguration()
+    public async Task<JObject> GetConfigurationAsync()
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -46,6 +48,13 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory) : IJsonSt
         requestMessage.Headers.TryAddWithoutValidation("Sign", sign);
 
         var response = await factory.CreateClient("HttpJsonStoreProvider").SendAsync(requestMessage);
+        if (!response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            logger.LogError("Read zserver config error: {Message}", result);
+            return null;
+        }
+
         var bytes = await response.Content.ReadAsByteArrayAsync();
         var hash = CryptographyUtility.ComputeHash(bytes);
         if (hash == _lastHash)

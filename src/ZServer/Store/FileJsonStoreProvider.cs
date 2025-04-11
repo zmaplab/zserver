@@ -16,7 +16,7 @@ public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : 
 
     public string Path => path;
 
-    public Task<JObject> GetConfiguration()
+    public Task<JObject> GetConfigurationAsync()
     {
         if (!File.Exists(path))
         {
