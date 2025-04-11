@@ -37,7 +37,7 @@ public class LayerQueryService(
                 if (layer != null)
                 {
                     await SetStyle(layer, layerQuery.Style);
-                    TryAdd(hashSet, list, layerQuery, layer);
+                    TryAdd(hashSet, list, layer);
                     count++;
                     continue;
                 }
@@ -53,10 +53,9 @@ public class LayerQueryService(
                 foreach (var layer in layerGroup.Layers)
                 {
                     await SetStyle(layer, layerQuery.Style);
-                    TryAdd(hashSet, list, layerQuery, layer);
+                    TryAdd(hashSet, list, layer);
+                    count++;
                 }
-
-                count++;
             }
             else
             {
@@ -64,7 +63,7 @@ public class LayerQueryService(
                 if (layer != null)
                 {
                     await SetStyle(layer, layerQuery.Style);
-                    TryAdd(hashSet, list, layerQuery, layer);
+                    TryAdd(hashSet, list, layer);
                     count++;
                 }
                 else
@@ -91,14 +90,15 @@ public class LayerQueryService(
         }
     }
 
-    private void TryAdd(ISet<string> hashSet, ICollection<Layer> list, LayerQuery layerQuery, Layer layer)
+    private bool TryAdd(ISet<string> hashSet, ICollection<Layer> list, Layer layer)
     {
         if (!hashSet.Add(layer.Name))
         {
-            return;
+            return true;
         }
 
         list.Add(layer);
+        return false;
 
         // if (layer.Source is not IVectorSource vectorSource)
         // {
