@@ -136,10 +136,10 @@ public class WmtsService(
 
             var layerTuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
             var layerList = layerTuple.Layers;
-            if (layerTuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerQueries.Count)
+            if (layerList.Count != layerQueries.Count)
             {
-                Logger.Value.LogError("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
-                return new MapResult(Stream.Null, "QueryLayerError", null);
+                Logger.Value.LogWarning("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
+                // return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
             for (var i = 0; i < layerList.Count; ++i)
