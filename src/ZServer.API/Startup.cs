@@ -44,15 +44,15 @@ public class Startup(IConfiguration configuration)
         services.AddRouting(x => { x.LowercaseUrls = true; });
 
         var configProvider = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_PROVIDER");
-        configProvider = string.IsNullOrEmpty(configProvider) ? "File" : "Http";
+        configProvider = string.IsNullOrEmpty(configProvider) ? "File" : "SocoDB";
         var configAddr = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_ADDR");
         configAddr = string.IsNullOrEmpty(configAddr) ? "conf/zserver.json" : configAddr;
-        switch (configProvider)
+        switch (configProvider.ToLower())
         {
-            case "File":
+            case "file":
                 services.AddZServer(configuration, configAddr).AddSkiaSharpRenderer();
                 break;
-            case "Http":
+            case "socodb":
                 services.AddZServer(configuration).AddSkiaSharpRenderer();
                 services.AddSingleton<IJsonStoreProvider>(provider =>
                     new SocoStoreProvider(configAddr, provider.GetRequiredService<IHttpClientFactory>()));
