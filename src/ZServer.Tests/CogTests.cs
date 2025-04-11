@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
 using TagImageFileFormat;
 using Xunit;
-using ZMap.Infrastructure;
 using ZMap.Source.CloudOptimizedGeoTIFF;
 
 namespace ZServer.Tests;

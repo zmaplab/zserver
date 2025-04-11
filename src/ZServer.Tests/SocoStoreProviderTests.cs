@@ -28,16 +28,22 @@ public class SocoStoreProviderTests(WebApplicationFactoryFixture fixture)
     [Fact]
     public void JsonFormate()
     {
-        var j1 = SocoStoreProvider.Read("""
+        var j1 = SocoStoreProvider.Read(""""
                                         {
                                             "success": true,
                                             "code": 0,
                                             "msg": "",
                                             "data": [
+                                                {
+                                                    "id": "67f8b2bfe84e12c3a3dd8708",
+                                                    "name": "Zserver",
+                                                    "description": "Zserver的配置",
+                                                    "config": "{\"layers\": \"2\"}"
+                                                }
                                             ]
                                         }
-                                        """);
-        Assert.Null(j1);
+                                        """");
+        Assert.NotNull(j1);
         var j2 = SocoStoreProvider.Read("""
                                         {
                                             "success": true,
