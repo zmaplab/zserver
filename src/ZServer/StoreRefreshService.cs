@@ -21,16 +21,8 @@ public class StoreRefreshService(
         return Task.Factory.StartNew(async () =>
         {
             var logger = serviceProvider.GetRequiredService<ILogger<StoreRefreshService>>();
-            var configurationProvider = serviceProvider.GetRequiredService<JsonStoreProvider>();
-            if (File.Exists(configurationProvider.Path))
-            {
-                logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
-                    configurationProvider.Path);
-            }
-            else
-            {
-                logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", configurationProvider.Path);
-            }
+            var configurationProvider = serviceProvider.GetRequiredService<IJsonStoreProvider>();
+            configurationProvider.Check();
 
             var logged = false;
             while (!cancellationToken.IsCancellationRequested)
@@ -58,9 +50,9 @@ public class StoreRefreshService(
         }, cancellationToken);
     }
 
-    public async Task RefreshAsync(JsonStoreProvider jsonStoreProvider)
+    public async Task RefreshAsync(IJsonStoreProvider fileJsonStoreProvider)
     {
-        var configuration = jsonStoreProvider.GetConfiguration();
+        var configuration = await fileJsonStoreProvider.GetConfiguration();
         if (configuration != null)
         {
             var configurations = new List<JObject> { configuration };

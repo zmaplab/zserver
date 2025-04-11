@@ -4,6 +4,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using ZMap;
 using ZMap.Ogc.Wms;
 using ZMap.Ogc.Wmts;
@@ -33,7 +34,34 @@ public static class ServiceCollectionExtensions
         serviceCollection.TryAddScoped<IStyleGroupStore, StyleGroupStore>();
         serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
         serviceCollection.TryAddScoped<ISldStore, SldStore>();
-        serviceCollection.TryAddSingleton(_ => new JsonStoreProvider(layersConfiguration));
+        serviceCollection.TryAddSingleton<IJsonStoreProvider>(provider =>
+            new FileJsonStoreProvider(layersConfiguration, provider.GetRequiredService<ILoggerFactory>()));
+        serviceCollection.AddHostedService<StoreRefreshService>();
+        serviceCollection.TryAddSingleton<StoreRefreshService>();
+
+        serviceCollection.AddHostedService<PreloadService>();
+        serviceCollection.TryAddScoped<ILayerQueryService, LayerQueryService>();
+        serviceCollection.TryAddScoped<WmsService>();
+        serviceCollection.TryAddScoped<WmtsService>();
+        serviceCollection.AddMemoryCache();
+        return new ZServerBuilder(serviceCollection);
+    }
+
+    public static ZServerBuilder AddZServer(this IServiceCollection serviceCollection,
+        IConfiguration configuration)
+    {
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+        serviceCollection.Configure<ServerOptions>(configuration);
+
+        // 配置的存储
+        serviceCollection.TryAddScoped<ILayerStore, LayerStore>();
+        serviceCollection.TryAddScoped<IResourceGroupStore, ResourceGroupStore>();
+        serviceCollection.TryAddScoped<ISourceStore, SourceStore>();
+        serviceCollection.TryAddScoped<IGridSetStore, GridSetStore>();
+        serviceCollection.TryAddScoped<IStyleGroupStore, StyleGroupStore>();
+        serviceCollection.TryAddScoped<ILayerGroupStore, LayerGroupStore>();
+        serviceCollection.TryAddScoped<ISldStore, SldStore>();
         serviceCollection.AddHostedService<StoreRefreshService>();
         serviceCollection.TryAddSingleton<StoreRefreshService>();
 
