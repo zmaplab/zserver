@@ -18,9 +18,9 @@ public class SocoStoreProviderTests(WebApplicationFactoryFixture fixture)
         var httpClientFactory = fixture.Instance.Services.GetRequiredService<IHttpClientFactory>();
         Environment.SetEnvironmentVariable("ZSERVER_SOCODB_APPID", "66457c75702a1e87e2f4b4ac");
         Environment.SetEnvironmentVariable("ZSERVER_SOCODB_APPSECRET", "OveFGUp8VdZa47rLElD1yEBtDig=");
-
+        var address = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_ADDR");
         var provider =
-            new SocoStoreProvider("https://jsyhswfz-api.zyjinke.cn/socodb/v1.0/tables/67f8adafe84e12c3a3dd862c/data",
+            new SocoStoreProvider(address,
                 httpClientFactory, fixture.Instance.Services.GetRequiredService<ILogger<SocoStoreProvider>>());
         var b = await provider.GetConfigurationAsync();
     }
