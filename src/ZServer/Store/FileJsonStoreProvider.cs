@@ -16,7 +16,7 @@ public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : 
 
     public string Path => path;
 
-    public Task<JObject> GetConfigurationAsync()
+    public async Task<JObject> GetConfigurationAsync()
     {
         if (!File.Exists(path))
         {
@@ -31,7 +31,7 @@ public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : 
 
         _lastWriteTime = file.LastWriteTime;
 
-        var bytes = File.ReadAllBytes(path);
+        var bytes = await File.ReadAllBytesAsync(path);
         var hash = CryptographyUtility.ComputeHash(bytes);
         if (hash == _lastHash)
         {
@@ -42,7 +42,8 @@ public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : 
         var json = Encoding.UTF8.GetString(bytes).Replace("\uFEFF", "").Replace("\u200B", "");
 
         var result = JsonConvert.DeserializeObject(json) as JObject;
-        return Task.FromResult(result);
+        await Task.CompletedTask;
+        return result;
     }
 
     public void Check()

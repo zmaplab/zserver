@@ -27,7 +27,8 @@ public class WmsService(
             {
                 displayUrl = GetMapDisplayUrl(traceIdentifier, layers, srs, bbox, width, height, format, formatOptions,
                     zFilter);
-                Logger.Value.LogError("{Url}, arguments error: {Code}, message: {Message}", displayUrl, validateResult.Code,
+                Logger.Value.LogError("{Url}, arguments error: {Code}, message: {Message}", displayUrl,
+                    validateResult.Code,
                     validateResult.Message);
                 return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
@@ -43,12 +44,12 @@ public class WmsService(
                     requestParameters.Styles.ElementAtOrDefault(i)));
             }
 
-            var tuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
-            var layerList = tuple.Layers;
-            if (layerList.Count != layerQueries.Count)
+            var layerTuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = layerTuple.Layers;
+            if (layerTuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerTuple.FetchCount)
             {
                 Logger.Value.LogWarning("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
-                // return new MapResult(Stream.Null, "QueryLayerError", null);
+                return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
             for (var i = 0; i < requestParameters.Layers.Count; ++i)

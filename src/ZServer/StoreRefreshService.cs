@@ -31,27 +31,27 @@ public class StoreRefreshService(
                     await RefreshAsync(configurationProvider);
                     if (!logged)
                     {
-                        logger.LogInformation("刷新配置文件成功");
+                        logger.LogInformation("刷新配置成功");
                         logged = true;
                     }
                     else
                     {
-                        logger.LogDebug("刷新配置文件成功");
+                        logger.LogDebug("刷新配置成功");
                     }
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "加载配置文件失败");
+                    logger.LogError(e, "加载配置失败");
                 }
 
-                await Task.Delay(15000, cancellationToken);
+                await Task.Delay(10000, cancellationToken);
             }
         }, cancellationToken);
     }
 
-    public async Task RefreshAsync(IJsonStoreProvider fileJsonStoreProvider)
+    public async Task RefreshAsync(IJsonStoreProvider jsonStoreProvider)
     {
-        var configuration = await fileJsonStoreProvider.GetConfigurationAsync();
+        var configuration = await jsonStoreProvider.GetConfigurationAsync();
         if (configuration != null)
         {
             var configurations = new List<JObject> { configuration };
