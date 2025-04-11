@@ -118,18 +118,43 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
             return null;
         }
 
-        var resultObject = JsonConvert.DeserializeObject(json) as JObject;
-        if (resultObject == null)
+        if (JsonConvert.DeserializeObject(json) is not JObject resultObject)
         {
             return null;
         }
 
         if (resultObject["data"] is JArray array)
         {
-            return array.Count == 0 ? null : array[0] as JObject;
+            if (array.Count == 0)
+            {
+                return null;
+            }
+
+            if (array[0] is not JObject first)
+            {
+                return null;
+            }
+
+            var config = first["config"]?.ToString();
+            if (string.IsNullOrEmpty(config))
+            {
+                return null;
+            }
+
+            return JsonConvert.DeserializeObject(config) as JObject;
         }
 
-        var jObject = resultObject["data"] as JObject;
-        return jObject;
+        if (resultObject["data"] is not JObject jObject)
+        {
+            return null;
+        }
+
+        var config1 = jObject["config"]?.ToString();
+        if (string.IsNullOrEmpty(config1))
+        {
+            return null;
+        }
+
+        return JsonConvert.DeserializeObject(config1) as JObject;
     }
 }

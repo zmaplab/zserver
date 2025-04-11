@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using FreeSql.Internal.Model;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;

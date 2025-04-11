@@ -17,7 +17,6 @@ using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZMap.Source.CloudOptimizedGeoTIFF;
 using ZServer.Silo;
 using Log = Serilog.Log;
 
