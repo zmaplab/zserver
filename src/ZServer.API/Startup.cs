@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +14,7 @@ using Orleans.Configuration;
 using Serilog.Context;
 using ZMap.Permission;
 using ZServer.API.Filters;
+using ZServer.Store;
 using Log = ZMap.Infrastructure.Log;
 
 namespace ZServer.API;
@@ -41,7 +43,24 @@ public class Startup(IConfiguration configuration)
         services.AddResponseCaching();
         services.AddRouting(x => { x.LowercaseUrls = true; });
 
-        services.AddZServer(configuration, "conf/zserver.json").AddSkiaSharpRenderer();
+        var configProvider = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_PROVIDER");
+        configProvider = string.IsNullOrEmpty(configProvider) ? "File" : "Http";
+        var configAddr = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_ADDR");
+        configAddr = string.IsNullOrEmpty(configAddr) ? "conf/zserver.json" : configAddr;
+        switch (configProvider)
+        {
+            case "File":
+                services.AddZServer(configuration, configAddr).AddSkiaSharpRenderer();
+                break;
+            case "Http":
+                services.AddZServer(configuration).AddSkiaSharpRenderer();
+                services.AddSingleton<IJsonStoreProvider>(provider =>
+                    new SocoStoreProvider(configAddr, provider.GetRequiredService<IHttpClientFactory>()));
+                break;
+            default:
+                throw new NotSupportedException($"不支持的配置提供者 {configProvider}");
+        }
+
         services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
         services.Configure<ServerOptions>(configuration);
         services.Configure<ClusterOptions>("Orleans", configuration);

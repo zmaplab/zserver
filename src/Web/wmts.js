@@ -13,18 +13,59 @@ import { register } from 'ol/proj/proj4'
 import { createXYZ } from 'ol/tilegrid'
 import { getHeight } from 'ol/extent'
 
+const getWMTSMatrixIds = (level, interval) => {
+  level = level == null || level == undefined ? 20 : level
+  interval = interval == null || interval == undefined ? 0 : interval
+  debugger
+  const matrixIds = new Array(level)
+  for (let z = 0; z < level; ++z) {
+    matrixIds[z] = z - 1 + interval
+  }
+  // W-TMS
+  // TMS: zoom 0 0.703
+  // Google Maps/XYZ: zoom 0 1.40625
+  // 天地图: zoom 0 1.40625
+
+  // 序号       0   1   2 3 4
+  // R          1.4 0.7 0.35
+  // TMS            0
+  // XYZ        0
+  // TMS Matrix -1  0
+  // XYZ Matrix 0
+  //
+  return matrixIds
+}
+const getWMTSResolutions = (projection, level, tileGridSize) => {
+  level = level == null || level == undefined ? 20 : level
+  tileGridSize = tileGridSize == null || tileGridSize == undefined ? 256 : tileGridSize
+  const projectionExtent = projection.getExtent()
+  const size = getWidth(projectionExtent) / tileGridSize
+  const resolutions = new Array(level)
+  for (let z = 0; z < level; ++z) {
+    resolutions[z] = size / Math.pow(2, z)
+  }
+  return resolutions
+}
 const projection = getProjection('EPSG:4326')
 const projectionExtent = projection.getExtent()
-var size = getWidth(projectionExtent) / 256
-//分辨率
-const length = 19
-const resolutions = new Array(length)
-const matrixIds = new Array(length)
-for (let i = 0; i < length; i += 1) {
-  const pow = Math.pow(2, i)
-  resolutions[i] = size / pow
-  matrixIds[i] = i
+const size = getWidth(projectionExtent) / 256
+const resolutions = getWMTSResolutions(projection, 19)
+const matrixIds = getWMTSMatrixIds()
+// xyz
+for (let z = 0; z < 19; ++z) {
+  // generate resolutions and matrixIds arrays for this WMTS
+  resolutions[z] = size / Math.pow(2, z)
+  matrixIds[z] = z
 }
+// XYZ
+// R 1.4 0.7 0.3
+// M 0    1   2
+
+// WMTS/TMS
+// R  1.4  0.7 0.3
+// M  -1   0    1
+
+debugger
 const b = createXYZ()
 const projection2 = getProjection('EPSG:3857')
 const projectionExtent2 = projection2.getExtent()

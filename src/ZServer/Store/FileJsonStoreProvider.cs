@@ -1,20 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
-public class JsonStoreProvider(string path)
+public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : IJsonStoreProvider
 {
     private DateTime _lastWriteTime;
     private string _lastHash;
 
     public string Path => path;
 
-    public JObject GetConfiguration()
+    public Task<JObject> GetConfiguration()
     {
         if (!File.Exists(path))
         {
@@ -39,6 +41,21 @@ public class JsonStoreProvider(string path)
         _lastHash = hash;
         var json = Encoding.UTF8.GetString(bytes).Replace("\uFEFF", "").Replace("\u200B", "");
 
-        return JsonConvert.DeserializeObject(json) as JObject;
+        var result = JsonConvert.DeserializeObject(json) as JObject;
+        return Task.FromResult(result);
+    }
+
+    public void Check()
+    {
+        var logger = loggerFactory.CreateLogger("FileJsonStoreProvider");
+        if (File.Exists(Path))
+        {
+            logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",
+                Path);
+        }
+        else
+        {
+            logger.LogError("ZServer 未发现配置文件 {ConfigurationPath}", Path);
+        }
     }
 }

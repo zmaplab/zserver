@@ -47,7 +47,7 @@ public class LayerStoreTests : BaseTests
     public async Task ParallelTest()
     {
         var syncService = GetService<StoreRefreshService>();
-        var configurationProvider = GetService<JsonStoreProvider>();
+        var configurationProvider = GetService<FileJsonStoreProvider>();
         await syncService.RefreshAsync(configurationProvider);
 
         var list = Enumerable.Range(0, 10000).ToList();
