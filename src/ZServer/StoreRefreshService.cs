@@ -52,7 +52,7 @@ public class StoreRefreshService(
 
     public async Task RefreshAsync(IJsonStoreProvider fileJsonStoreProvider)
     {
-        var configuration = await fileJsonStoreProvider.GetConfiguration();
+        var configuration = await fileJsonStoreProvider.GetConfigurationAsync();
         if (configuration != null)
         {
             var configurations = new List<JObject> { configuration };

@@ -55,7 +55,8 @@ public class Startup(IConfiguration configuration)
             case "socodb":
                 services.AddZServer(configuration).AddSkiaSharpRenderer();
                 services.AddSingleton<IJsonStoreProvider>(provider =>
-                    new SocoStoreProvider(configAddr, provider.GetRequiredService<IHttpClientFactory>()));
+                    new SocoStoreProvider(configAddr, provider.GetRequiredService<IHttpClientFactory>(),
+                        provider.GetRequiredService<ILogger<SocoStoreProvider>>()));
                 break;
             default:
                 throw new NotSupportedException($"不支持的配置提供者 {configProvider}");

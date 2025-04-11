@@ -5,6 +5,6 @@ namespace ZServer.Store;
 
 public interface IJsonStoreProvider
 {
-    Task<JObject> GetConfiguration();
+    Task<JObject> GetConfigurationAsync();
     void Check();
 }
