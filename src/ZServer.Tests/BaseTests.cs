@@ -33,7 +33,7 @@ public abstract class BaseTests
         serviceCollection.TryAddSingleton<StoreRefreshService>();
         Service = serviceCollection.BuildServiceProvider();
         var syncService = Service.GetRequiredService<StoreRefreshService>();
-        var configurationProvider = Service.GetRequiredService<FileJsonStoreProvider>();
+        var configurationProvider = Service.GetRequiredService<IJsonStoreProvider>();
 
         syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
     }
