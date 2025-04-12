@@ -95,6 +95,20 @@ public abstract class BaseTests
     {
         var builder = new ConfigurationBuilder();
         builder.AddJsonFile("appsettings.json");
+          var connStr = Environment.GetEnvironmentVariable("ConnStr");
+
+                if (!string.IsNullOrEmpty(connStr))
+                {
+                    // 创建包含Orleans连接字符串的配置字典
+                    var configDict = new Dictionary<string, string>
+                    {
+                        {"orleans:connectionString", connStr},
+                        {"sources:berlin_db:connectionString", connStr}
+                    };
+
+                    // 将配置添加到配置构建器中，这将覆盖任何现有的配置
+                    builder.AddInMemoryCollection(configDict);
+                }
         return builder.Build();
     }
 
