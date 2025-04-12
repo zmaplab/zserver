@@ -45,7 +45,8 @@ jobs:
         run: |
           ogr2ogr -f "PostgreSQL" \
             PG:"host=localhost port=${{ job.services.postgres.ports['5432'] }} dbname=zserver_dev user=postgres password=postgres" \
-            /home/runner/work/zserver/zserver/src/ZServer.Tests/shapes/osmbuildings.shp
+            /home/runner/work/zserver/zserver/src/ZServer.Tests/shapes/osmbuildings.shp \
+            -lco GEOMETRY_NAME=geom
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
