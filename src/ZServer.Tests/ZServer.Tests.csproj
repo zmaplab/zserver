@@ -154,7 +154,7 @@
         <None Update="秋季普查-上城区-20230902163239.db">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="multiLine.json">
+        <None Update="multiline.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="images\tianditu_c.png">
