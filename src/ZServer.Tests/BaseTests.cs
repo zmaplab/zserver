@@ -103,7 +103,8 @@ public abstract class BaseTests
                     var configDict = new Dictionary<string, string>
                     {
                         {"orleans:connectionString", connStr},
-                        {"sources:berlin_db:connectionString", connStr}
+                        {"sources:berlin_db:connectionString", connStr},
+                        {"sources:zserver:connectionString", connStr},
                     };
 
                     // 将配置添加到配置构建器中，这将覆盖任何现有的配置
