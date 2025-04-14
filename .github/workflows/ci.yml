@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     env:
-      PGDATABASE: zserver_dev
+      PGDATABASE: berlin
       PGHOST: localhost
       PGUSER: postgres
       PGPASSWORD: postgres
@@ -19,10 +19,10 @@ jobs:
         ports:
           - 5432/tcp
         options: >-
-          -e POSTGRES_DB=zserver_dev
+          -e POSTGRES_DB=berlin
           -e POSTGRES_USER=postgres
           -e POSTGRES_PASSWORD=postgres
-          -e PGDATABASE=zserver_dev
+          -e PGDATABASE=berlin
           -e PGUSER=postgres
           -e PGPASSWORD=postgres
           --health-cmd pg_isready
@@ -37,17 +37,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set PostgreSQL Connection String
         run: |
-          echo "ConnStr=User ID=postgres;Password=postgres;Host=localhost;Port=${{ job.services.postgres.ports['5432'] }};Database=zserver_dev;Pooling=true;" >> $GITHUB_ENV
+          echo "ConnStr=User ID=postgres;Password=postgres;Host=localhost;Port=${{ job.services.postgres.ports['5432'] }};Database=berlin;Pooling=true;" >> $GITHUB_ENV
       - name: Install gdal
         run: |
           sudo apt-get update && sudo apt-get install -y gdal-bin
       - name: Import test data(osmbuildings.shp) to PostGIS
         run: |
           ogr2ogr -f "PostgreSQL" \
-            PG:"host=localhost port=${{ job.services.postgres.ports['5432'] }} dbname=zserver_dev user=postgres password=postgres" \
+            PG:"host=localhost port=${{ job.services.postgres.ports['5432'] }} dbname=berlin user=postgres password=postgres" \
             /home/runner/work/zserver/zserver/src/ZServer.Tests/shapes/osmbuildings.shp \
             -lco GEOMETRY_NAME=geom \
-            -nln berlin_db
+            -nln osmbuildings
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
