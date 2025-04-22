@@ -1,19 +1,13 @@
 ﻿using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
-using System.Text;
-using BitMiracle.LibTiff.Classic;
-using ICSharpCode.SharpZipLib.Lzw;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using MessagePack;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using TagImageFileFormat;
-using ZMap.Extensions;
 using ZMap.Infrastructure;
 using ZMap.TileGrid;
-using ZstdSharp;
 using ArgumentException = System.ArgumentException;
 
 namespace ZMap.Source.CloudOptimizedGeoTIFF;
@@ -137,7 +131,7 @@ public class COGGeoTiffSource : ITiledSource
 
         var tuple = Utility.GetTiffPath(_file, matrix, row, col);
 
-
+#if !DEBUG
         if (File.Exists(tuple.FullPath))
         {
             stopwatch.Stop();
@@ -149,6 +143,7 @@ public class COGGeoTiffSource : ITiledSource
             var array = MessagePackSerializer.Deserialize<int[]>(cachedBytes);
             return new ImageData(array, ImageDataType.Pixels, GridSet.TileWidth, GridSet.TileHeight);
         }
+#endif
 
         var tileNumber = (short)grid.Index;
 

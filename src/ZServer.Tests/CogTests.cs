@@ -23,6 +23,23 @@ public class CogTests(WebApplicationFactoryFixture fixture)
         var cog = new COGGeoTiffSource("/Users/lewis/Downloads/jiangning_01_20241031_05.tif");
         await cog.LoadAsync();
 
+        var image1 = await cog.GetImageAsync("9", 0, 0);
+        if (image1 is { IsEmpty: false })
+        {
+            var i1 = (int[])image1.Data;
+            var bitmap = new SKBitmap(image1.Width, image1.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+            var handle = GCHandle.Alloc(i1, GCHandleType.Pinned);
+            bitmap.SetPixels(handle.AddrOfPinnedObject());
+            using var ms = new MemoryStream();
+            using var skStream = new SKManagedWStream(ms);
+            bitmap.Encode(skStream, SKEncodedImageFormat.Jpeg, 80);
+            var resultArray = ms.ToArray();
+
+            await File.WriteAllBytesAsync(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images/jn_9_0_0.jpg"),
+                resultArray);
+        }
+        
         int x = 220, y = 220;
         for (int i = 214; i < x; i++)
         {
@@ -41,7 +58,7 @@ public class CogTests(WebApplicationFactoryFixture fixture)
                     var resultArray = ms.ToArray();
 
                     await File.WriteAllBytesAsync(
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images/jn_" + i + "_" + j + ".jpg"),
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images/jn_9_" + i + "_" + j + ".jpg"),
                         resultArray);
                 }
             }

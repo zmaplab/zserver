@@ -6,8 +6,9 @@ public partial class Layer
         ITiledSource tiledSource, Envelope viewportExtent, int viewportSrid,
         Zoom zoom, Envelope dataSourceExtent)
     {
-        // var nearestGrid = tiledSource.GridSet.GetNearestLevel(zoom.Value);
-        var nearestGrid = tiledSource.GridSet.GridLevels.First().Value;
+        // TODO: 若数据源 tile 的分辨率远小于当前图层最小分辨率，则应该把当前图层最小层级的瓦片渲染出来
+        var nearestGrid = tiledSource.GridSet.GetNearestLevel(zoom.Value);
+        // var nearestGrid = tiledSource.GridSet.GridLevels.First().Value;
         var gridArea = tiledSource.GridSet.GetGridArea(dataSourceExtent, nearestGrid);
         if (gridArea.IsEmpty)
         {

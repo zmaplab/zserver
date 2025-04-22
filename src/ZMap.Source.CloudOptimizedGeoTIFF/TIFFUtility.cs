@@ -42,7 +42,7 @@ internal static class TIFFUtility
 
         var measurePerUnit = unit is LinearUnit linearUnit
             ? linearUnit.MetersPerUnit
-            : (unit as AngularUnit)!.RadiansPerUnit * 180 / Math.PI;
+            : (unit as AngularUnit)!.RadiansPerUnit * 6378137.0;
 
         var directories = tiff.ImageFileDirectories.Count;
         List<int> levels = [];
@@ -93,6 +93,10 @@ internal static class TIFFUtility
             var extent = new Envelope(topExtent[0], topExtent[2], topExtent[1], topExtent[3]);
             gridSet.Extent = extent;
 
+            // var meterEnvelope = extent.Transform(coordinateSystem, CoordinateReferenceSystem.Get(3857));
+            // var pixelSize = meterEnvelope.Width / topWidthHeight.Width;
+            // gridSet.PixelSize = pixelSize;
+
             foreach (var zoomLevel in levels)
             {
                 var ifd = tiff.ImageFileDirectories.ElementAt(zoomLevel);
@@ -110,11 +114,13 @@ internal static class TIFFUtility
                     gridSet.TileHeight = (int)ifd.TileLength;
                 }
 
+                var res = resolution[0];
+                var scaleDenominator = res * gridSet.MetersPerUnit / gridSet.PixelSize;
                 var grid = new Grid(zoomLevel)
                 {
                     Name = zoomLevel.ToString(),
-                    Resolution = resolution[0],
-                    ScaleDenominator = resolution[0] / gridSet.PixelSize * gridSet.MetersPerUnit,
+                    Resolution = res,
+                    ScaleDenominator = scaleDenominator,
                     NumTilesWidth = (int)ifd.NumOfTileWidth,
                     NumTilesHeight = (int)ifd.NumOfTileLength,
                     Width = (int)ifd.ImageWidth,
@@ -145,7 +151,7 @@ internal static class TIFFUtility
                     .Append("    ")
                     .Append(grid.NumTilesWidth).Append("x").Append(grid.NumTilesHeight).Append("(")
                     .Append(grid.NumTilesWidth * grid.NumTilesHeight).Append(")").Append("    ")
-                    .Append(Math.Round(grid.Resolution, 4))
+                    .Append(Math.Round(grid.Resolution, 8))
                     .AppendLine();
             }
 
@@ -160,7 +166,7 @@ internal static class TIFFUtility
                         Images
                             Compression     {compression}
                             Origin          {Math.Round(topOrigin[0], 4)}, {Math.Round(topOrigin[1], 4)}, {Math.Round(topOrigin[2], 4)}
-                            Resolution      {Math.Round(topResolution[0], 4)}, {Math.Round(topResolution[1], 4)}, {Math.Round(topResolution[2], 4)}
+                            Resolution      {Math.Round(topResolution[0], 8)}, {Math.Round(topResolution[1], 8)}, {Math.Round(topResolution[2], 8)}
                             BoundingBox     {Math.Round(topExtent[0], 4)}, {Math.Round(topExtent[1], 4)}, {Math.Round(topExtent[2], 4)}, {Math.Round(topExtent[3], 4)}
                             EPSG            EPSG:{gridSet.SRID} {coordinateSystem.Name} https://epsg.io/{gridSet.SRID}
                             Images
