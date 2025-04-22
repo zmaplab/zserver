@@ -19,7 +19,7 @@ public class SkiaGraphicsService : IGraphicsService
         {
             Style = SKPaintStyle.Stroke,
             StrokeWidth = 1,
-            Color = SKColors.Gray.WithAlpha(byte.MaxValue)
+            Color = SKColors.Brown.WithAlpha(byte.MaxValue)
         };
     }
 

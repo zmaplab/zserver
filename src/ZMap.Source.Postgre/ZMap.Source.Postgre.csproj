@@ -10,4 +10,9 @@
         <PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.5.202" />
         <PackageReference Include="Npgsql.NetTopologySuite" Version="9.0.3" />
     </ItemGroup>
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>ZServer.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>

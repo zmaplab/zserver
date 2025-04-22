@@ -32,6 +32,7 @@ public class WMTSController(
     /// <param name="format"></param>
     /// <param name="tileMatrixSet"></param>
     /// <param name="filter"></param>
+    /// <param name="bordered"></param>
     /// <returns></returns>
     [HttpGet]
     public async Task GetAsync([Required]
@@ -43,7 +44,7 @@ public class WMTSController(
         string format = "image/png",
         [Required, StringLength(50)] string tileMatrixSet = "EPSG:4326",
         [FromQuery(Name = "Z_FILTER"), StringLength(2048)]
-        string filter = null)
+        string filter = null, bool bordered = false)
     {
         var tuple = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
 
@@ -71,12 +72,14 @@ public class WMTSController(
 
         // 同一个 Grid 使用同一个对象进行管理， 保证缓存文件在同一个 Silo 目录下
         var grain = clusterClient.GetGrain<IWMTSGrain>(tuple.IntervalPath);
+
         var result =
             await grain.GetTileAsync(layers, style, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
                 filter,
                 new Dictionary<string, object>
                 {
-                    { "TraceIdentifier", HttpContext.TraceIdentifier }
+                    { "TraceIdentifier", HttpContext.TraceIdentifier },
+                    { "Bordered", bordered }
                 });
 
         await HttpContext.WriteZServerResponseAsync(result);

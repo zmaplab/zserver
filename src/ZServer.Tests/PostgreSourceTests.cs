@@ -28,6 +28,33 @@ public class PostgreSourceTests
     }
 
     [Fact]
+    public void FreeSqlFilter()
+    {
+        var source =
+            new PostgreSource(
+                "User ID=postgres;Password=oVkr7GiT29CAkw;Host=10.0.10.190;Port=5432;Database=zserver_dev;Pooling=true;");
+        source.Table = "osmbuildings";
+        source.Geometry = "geom";
+        source.Srid = 4326;
+        source.Where = "id > 0";
+        source.Name = "osmbuildings";
+        var sql = source.CombineFilter("select * from table ",
+            """
+            {
+              "Logic": "And",
+              "Filters": [
+                {
+                  "Field": "risk_level",
+                  "Operator": "Any",
+                  "Value": "1,2"
+                }
+              ]
+            }
+            """
+        );
+    }
+
+    [Fact]
     public async Task GetFeaturesInExtentAsync()
     {
         Environment.SetEnvironmentVariable("EnableSensitiveDataLogging", "true");

@@ -338,3 +338,4 @@ ASALocalRun/
 .mfractor/
 
 /src/Web/.cache/
+/src/Web/pnpm-lock.yaml
