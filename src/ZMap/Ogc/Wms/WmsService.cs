@@ -168,7 +168,7 @@ public class WmsService(
         var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
 
 
-        x = width - x;
+       //  x = width - x;
         y = height - y;
 
         var latLon = GeographicUtility.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
