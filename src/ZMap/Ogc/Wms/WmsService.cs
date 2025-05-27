@@ -167,10 +167,16 @@ public class WmsService(
         var pixelHeight = (bbox.MaxY - bbox.MinY) / height;
         var pixelWidth = (bbox.MaxX - bbox.MinX) / width;
 
-        var minX = x - pixelSensitivity * pixelWidth;
-        var maxX = x + pixelSensitivity * pixelWidth;
-        var minY = y - pixelSensitivity * pixelHeight;
-        var maxY = y + pixelSensitivity * pixelHeight;
+
+        x = width - x;
+        y = height - y;
+
+        var latLon = GeographicUtility.CalculateLatLongFromGrid(bbox, pixelWidth, pixelHeight, (int)x, (int)y);
+
+        var minX = latLon.Lon - pixelSensitivity * pixelWidth;
+        var maxX = latLon.Lon + pixelSensitivity * pixelWidth;
+        var minY = latLon.Lat - pixelSensitivity * pixelHeight;
+        var maxY = latLon.Lat + pixelSensitivity * pixelHeight;
 
         var featureCollection = new FeatureCollection();
         var totalCount = 0;
