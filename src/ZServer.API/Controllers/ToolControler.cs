@@ -19,8 +19,8 @@ namespace ZServer.API.Controllers;
 [ZServerAuthorize]
 public class ToolController(ILogger<ToolController> logger, IMemoryCache memoryCache) : ControllerBase
 {
-    [HttpPost("findAuthority")]
-    public async Task FindAuthority()
+    [HttpPost("GetAuthority")]
+    public async Task GetAuthority()
     {
         using var streamReader = new StreamReader(HttpContext.Request.Body);
         var wkt = await streamReader.ReadToEndAsync();
