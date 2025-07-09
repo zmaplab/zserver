@@ -125,11 +125,15 @@ public class Startup(IConfiguration configuration)
                             return Task.CompletedTask;
                         }
                     };
-                    options.Authority = configuration["Authority"];
-                    options.RequireHttpsMetadata = configuration["RequireHttpsMetadata"] == "true";
+                    options.Authority = configuration["jwtBearer:authority"];
+                    options.RequireHttpsMetadata = configuration["jwtBearer:requireHttpsMetadata"] == "true";
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateAudience = false, ValidateIssuer = false
+                        ValidateAudience =
+                            "true".Equals(configuration["jwtBearer:validateAudience"],
+                                StringComparison.OrdinalIgnoreCase),
+                        ValidateIssuer = "true".Equals(configuration["jwtBearer:validateIssuer"],
+                            StringComparison.OrdinalIgnoreCase)
                     };
                 });
             // 授权
