@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -35,7 +36,7 @@ public abstract class BaseTests
         var syncService = Service.GetRequiredService<StoreRefreshService>();
         var configurationProvider = Service.GetRequiredService<FileJsonStoreProvider>();
 
-        syncService.RefreshAsync(configurationProvider).GetAwaiter().GetResult();
+        syncService.RefreshAsync(configurationProvider, NullLogger.Instance).GetAwaiter().GetResult();
     }
 
     // protected IRendererFactory GetRendererFactory()

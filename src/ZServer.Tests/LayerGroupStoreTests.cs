@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using ZServer.Store;
 using Xunit;
 using ZMap.Source.Postgre;
@@ -13,7 +14,7 @@ public class LayerGroupStoreTests : BaseTests
     {
         var syncService = GetService<StoreRefreshService>();
         var configurationProvider = GetService<FileJsonStoreProvider>();
-        await syncService.RefreshAsync(configurationProvider);
+        await syncService.RefreshAsync(configurationProvider, NullLogger.Instance);
 
         var list = Enumerable.Range(0, 10000).ToList();
 

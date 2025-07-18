@@ -7,6 +7,7 @@ using ZMap.Source;
 using ZMap.Style;
 using ZMap.Source.ShapeFile;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -48,7 +49,7 @@ public class LayerStoreTests : BaseTests
     {
         var syncService = GetService<StoreRefreshService>();
         var configurationProvider = GetService<FileJsonStoreProvider>();
-        await syncService.RefreshAsync(configurationProvider);
+        await syncService.RefreshAsync(configurationProvider, NullLogger.Instance);
 
         var list = Enumerable.Range(0, 10000).ToList();
 

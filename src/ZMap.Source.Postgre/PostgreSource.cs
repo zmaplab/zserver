@@ -20,10 +20,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
     private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<PostgreSource>);
     private static readonly ConcurrentDictionary<string, string> BaseSql = new();
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public string ExtendedVersion { get; set; }
+    public string OverlapOperator { get; set; } = "&&";
 
     private static readonly Lazy<IFreeSql> FreeSql = new(() =>
     {
@@ -84,14 +81,14 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
             }
 
-            if ("KingbaseES".Equals(ExtendedVersion, StringComparison.OrdinalIgnoreCase))
+            if (OverlapOperator == "&&")
             {
-                sqlBuilder.Append("ST_Intersects(").Append(Geometry)
-                    .Append(", ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid))");
+                sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
             }
             else
             {
-                sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
+                sqlBuilder.Append("ST_Intersects(").Append(Geometry)
+                    .Append(", ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid))");
             }
 
             if (!string.IsNullOrEmpty(Where))
@@ -113,8 +110,8 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
         await using var dataSource = GetNpgSqlDataSource();
         await using var conn = dataSource.CreateConnection();
 
-        return (await conn.QueryAsync(sql, new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid }, null, 30)).Select(
-            x =>
+        return (await conn.QueryAsync(sql, new { bbox.MinX, bbox.MaxX, bbox.MinY, bbox.MaxY, Srid }, null, 30))
+            .Select(x =>
             {
                 var f = new Feature(Geometry, x);
                 if (f.Geometry.SRID != -1)

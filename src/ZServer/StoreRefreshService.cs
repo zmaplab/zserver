@@ -28,15 +28,15 @@ public class StoreRefreshService(
             {
                 try
                 {
-                    await RefreshAsync(configurationProvider);
+                    await RefreshAsync(configurationProvider, logger);
                     if (!logged)
                     {
-                        logger.LogInformation("刷新配置成功");
+                        logger.LogInformation("刷新配置完成");
                         logged = true;
                     }
                     else
                     {
-                        logger.LogDebug("刷新配置成功");
+                        logger.LogDebug("刷新配置完成");
                     }
                 }
                 catch (Exception e)
@@ -49,7 +49,7 @@ public class StoreRefreshService(
         }, cancellationToken);
     }
 
-    public async Task RefreshAsync(IJsonStoreProvider jsonStoreProvider)
+    public async Task RefreshAsync(IJsonStoreProvider jsonStoreProvider, ILogger logger)
     {
         var configuration = await jsonStoreProvider.GetConfigurationAsync();
         if (configuration != null)
@@ -60,10 +60,26 @@ public class StoreRefreshService(
             await gridSetStore.RefreshAsync(configurations);
             var sourceStore = scope.ServiceProvider.GetRequiredService<ISourceStore>();
             await sourceStore.RefreshAsync(configurations);
-            var styleGroupStore = scope.ServiceProvider.GetRequiredService<IStyleGroupStore>();
-            await styleGroupStore.RefreshAsync(configurations);
-            var sldStore = scope.ServiceProvider.GetRequiredService<ISldStore>();
-            await sldStore.RefreshAsync(configurations);
+            try
+            {
+                var styleGroupStore = scope.ServiceProvider.GetRequiredService<IStyleGroupStore>();
+                await styleGroupStore.RefreshAsync(configurations);
+            }
+            catch (Exception e)
+            {
+                logger.LogError("加载样式失败: {Exception}", e);
+            }
+
+            try
+            {
+                var sldStore = scope.ServiceProvider.GetRequiredService<ISldStore>();
+                await sldStore.RefreshAsync(configurations);
+            }
+            catch (Exception e)
+            {
+                logger.LogError("加载 SLD 样式失败: {Exception}", e);
+            }
+
             var resourceGroupStore = scope.ServiceProvider.GetRequiredService<IResourceGroupStore>();
             await resourceGroupStore.RefreshAsync(configurations);
             var layerStore = scope.ServiceProvider.GetRequiredService<ILayerStore>();

@@ -63,7 +63,8 @@ public static class ConfigurationSectionExtensions
             null => CSharpExpressionV2.Create<T>("{{ default }}"),
             JValue v => CSharpExpressionV2.Create<T>(v.ToObject<string>() ?? "{{ default }}"),
             JArray array => CreateArrayExpression<T>(array),
-            _ => throw new ArgumentException("Invalid expression value")
+            _ => throw new ArgumentException(
+                "Invalid expression name: " + name + ", value: " + targetSection)
         };
 
         // var expressionValue = targetSection["value"] == null ? default : targetSection["value"].ToObject<T>();
