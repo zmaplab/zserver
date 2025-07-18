@@ -81,7 +81,7 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
                 sqlBuilder.Append(' ').Append(Geometry).Append(" WHERE ");
             }
 
-            if (OverlapOperator == "&&")
+            if (!"ST_Intersects".Equals(OverlapOperator, StringComparison.OrdinalIgnoreCase))
             {
                 sqlBuilder.Append(Geometry).Append(" && ST_MakeEnvelope(@MinX, @MinY, @MaxX, @MaxY, @Srid)");
             }
