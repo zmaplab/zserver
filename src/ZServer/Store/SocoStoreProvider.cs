@@ -43,7 +43,8 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
         requestMessage.Headers.TryAddWithoutValidation("Nonce", nonce);
         var ts = DateTimeOffset.Now.ToLocalTime().ToUnixTimeSeconds().ToString();
         requestMessage.Headers.TryAddWithoutValidation("Timestamp", ts);
-        var signData = GetSignData(AppId, null, null, nonce, ts);
+        var path = new Uri(url).AbsolutePath;
+        var signData = GetSignData(AppId, path, null, null, nonce, ts);
         var sign = Sign(AppSecret, signData);
         requestMessage.Headers.TryAddWithoutValidation("Sign", sign);
 
@@ -51,7 +52,7 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
         if (!response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadAsStringAsync();
-            logger.LogError("Read zserver config error: {Message}", result);
+            logger.LogError("Read zserver config error: {Message}, {Status}", result, response.StatusCode);
             return null;
         }
 
@@ -81,7 +82,7 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
         return signature;
     }
 
-    private static byte[] GetSignData(string appId, IEnumerable<KeyValuePair<string, StringValues>> query,
+    private static byte[] GetSignData(string appId, string path, IEnumerable<KeyValuePair<string, StringValues>> query,
         string body, string nonce, string timestamp)
     {
         var data = new StringBuilder();
@@ -89,7 +90,7 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
 
         data.AppendLine(nonce);
         data.AppendLine(timestamp);
-
+        data.AppendLine(path);
         if (query != null)
         {
             foreach (var kv in query)
