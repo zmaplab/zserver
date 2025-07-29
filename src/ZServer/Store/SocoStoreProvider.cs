@@ -43,7 +43,9 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
         requestMessage.Headers.TryAddWithoutValidation("Nonce", nonce);
         var ts = DateTimeOffset.Now.ToLocalTime().ToUnixTimeSeconds().ToString();
         requestMessage.Headers.TryAddWithoutValidation("Timestamp", ts);
-        var path = new Uri(url).AbsolutePath;
+        var absolutePath = new Uri(url).AbsolutePath;
+        var index = absolutePath.IndexOf("/v1.", StringComparison.Ordinal);
+        var path = absolutePath.Substring(index);
         var signData = GetSignData(AppId, path, null, null, nonce, ts);
         var sign = Sign(AppSecret, signData);
         requestMessage.Headers.TryAddWithoutValidation("Sign", sign);
