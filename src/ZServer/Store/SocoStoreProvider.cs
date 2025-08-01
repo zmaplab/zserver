@@ -26,8 +26,8 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
 
     static SocoStoreProvider()
     {
-        AppId = Environment.GetEnvironmentVariable("ZSERVER_SOCODB_APPID");
-        AppSecret = Environment.GetEnvironmentVariable("ZSERVER_SOCODB_APPSECRET");
+        AppId = "66457c75702a1e87e2f4b4ac";
+        AppSecret = "OveFGUp8VdZa47rLElD1yEBtDig=";
     }
 
     public async Task<JObject> GetConfigurationAsync()
@@ -46,7 +46,8 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
         var absolutePath = new Uri(url).AbsolutePath;
         var index = absolutePath.IndexOf("/v1.", StringComparison.Ordinal);
         var path = absolutePath.Substring(index);
-        var signData = GetSignData(AppId, path, null, null, nonce, ts);
+        // /api/v1.0/tables/67f8adafe84e12c3a3dd862c/data
+        var signData = GetSignData(AppId, $"/api{path}", null, null, nonce, ts);
         var sign = Sign(AppSecret, signData);
         requestMessage.Headers.TryAddWithoutValidation("Sign", sign);
 
@@ -89,7 +90,6 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
     {
         var data = new StringBuilder();
         data.AppendLine(appId);
-
         data.AppendLine(nonce);
         data.AppendLine(timestamp);
         data.AppendLine(path);
@@ -109,6 +109,7 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
             }
         }
 
+        data.AppendLine();
         data.AppendLine(body ?? string.Empty);
         var str = data.ToString();
         return Encoding.UTF8.GetBytes(str);
