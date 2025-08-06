@@ -1,10 +1,14 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
@@ -27,7 +31,7 @@ namespace ZServer.API;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         // var binaryReader = new BinaryReader(new FileStream("/Users/lewis/Downloads/BigTIFFLong8Tiles.tif",
         //     FileMode.Open, FileAccess.Read));
@@ -43,8 +47,6 @@ public class Program
             PrecisionModel.Floating.Value,
             4326, GeometryOverlay.Legacy, new CoordinateEqualityComparer());
 
-        FontUtility.Load();
-
         CSharpDynamicCompiler.Load<NatashaDynamicCompiler>();
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
@@ -53,8 +55,43 @@ public class Program
             Directory.CreateDirectory("cache");
         }
 
-        CreateHostBuilder(args).Build().Run();
+        var app = CreateHostBuilder(args).Build();
+        var configuration = app.Services.GetRequiredService<IConfiguration>();
+        await DownloadResource(configuration, "FontResource", "fonts");
+        FontUtility.Load();
+        await DownloadResource(configuration, "SymbolResource", "symbols");
+        await app.RunAsync();
     }
+
+    private static async Task DownloadResource(IConfiguration configuration, string name, string folder)
+    {
+        var url = configuration[name];
+        var httpClient = new HttpClient();
+        if (!string.IsNullOrEmpty(url))
+        {
+            var bytes = await httpClient.GetByteArrayAsync(url);
+            if (bytes.Length > 0)
+            {
+                var fontFile = Path.Combine("/tmp", $"{Guid.NewGuid():N}.zip");
+                if (!Directory.Exists(Path.GetDirectoryName(fontFile)))
+                {
+                    Directory.CreateDirectory("/tmp");
+                }
+
+                await File.WriteAllBytesAsync(fontFile, bytes);
+                // 解压文件
+                using var zipArchive = ZipFile.OpenRead(fontFile);
+                foreach (var entry in zipArchive.Entries)
+                {
+                    // 构建目标文件路径
+                    var destinationPath = Path.Combine($"/app/{folder}", entry.FullName);
+                    // 解压文件
+                    entry.ExtractToFile(destinationPath, false);
+                }
+            }
+        }
+    }
+
 
     // private static void FixOrleansPublishSingleFileIssue()
     // {
@@ -138,7 +175,8 @@ public class Program
                 builder.AddCommandLine(args);
 
                 var finalConfiguration = builder.Build();
-                EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(finalConfiguration, "HOST_IP", "HostIP");
+                EnvironmentVariables.OrleansHostIP =
+                    EnvironmentVariables.GetValue(finalConfiguration, "HOST_IP", "HostIP");
 
                 var serilogSection = finalConfiguration.GetSection("Serilog");
                 if (serilogSection.GetChildren().Any())

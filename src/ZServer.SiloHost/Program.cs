@@ -78,7 +78,7 @@ public static class Program
 
                 _configuration = builder.Build();
 
-                EnvironmentVariables.HostIP = EnvironmentVariables.GetValue(_configuration, "HOST_IP", "HostIP");
+                EnvironmentVariables.OrleansHostIP = EnvironmentVariables.GetValue(_configuration, "ORLEANS_HOST_IP");
                 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Build()).CreateLogger();
             })
             .ConfigureSilo()

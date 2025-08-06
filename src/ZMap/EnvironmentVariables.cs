@@ -5,7 +5,7 @@ namespace ZMap;
 public static class EnvironmentVariables
 {
     public static readonly bool EnableSensitiveDataLogging;
-    public static string HostIP;
+    public static string OrleansHostIP;
     public static string Port = "8200";
 
     static EnvironmentVariables()
