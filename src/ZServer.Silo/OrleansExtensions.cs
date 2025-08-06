@@ -129,7 +129,7 @@ public static class OrleansExtensions
                 options.SiloPort = siloPort;
                 options.GatewayPort = gatewayPort;
 
-                var hostIp = EnvironmentVariables.HostIP;
+                var hostIp = EnvironmentVariables.OrleansHostIP;
                 IPAddress ipAddress;
                 if (string.IsNullOrWhiteSpace(hostIp))
                 {
