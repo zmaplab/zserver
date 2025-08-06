@@ -82,12 +82,20 @@ public class Program
                 }
 
                 await File.WriteAllBytesAsync(fontFile, bytes);
+
+                var baseFolder = $"/app/{folder}";
+                if (!Directory.Exists(baseFolder))
+                {
+                    Directory.CreateDirectory(baseFolder);
+                }
+
                 // 解压文件
                 using var zipArchive = ZipFile.OpenRead(fontFile);
                 foreach (var entry in zipArchive.Entries)
                 {
                     // 构建目标文件路径
-                    var destinationPath = Path.Combine($"/app/{folder}", entry.FullName);
+                    var destinationPath = Path.Combine(baseFolder, entry.FullName);
+
                     // 解压文件
                     entry.ExtractToFile(destinationPath, false);
                 }
