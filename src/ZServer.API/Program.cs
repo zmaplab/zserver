@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
@@ -22,6 +23,7 @@ using ZMap.Infrastructure;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
 using ZServer.Silo;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Log = Serilog.Log;
 
 #if !DEBUG
@@ -57,13 +59,14 @@ public class Program
 
         var app = CreateHostBuilder(args).Build();
         var configuration = app.Services.GetRequiredService<IConfiguration>();
-        await DownloadResource(configuration, "FontResource", "fonts");
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        await DownloadResource(configuration, logger, "FontResource", "fonts");
         FontUtility.Load();
-        await DownloadResource(configuration, "SymbolResource", "symbols");
+        await DownloadResource(configuration, logger, "SymbolResource", "symbols");
         await app.RunAsync();
     }
 
-    private static async Task DownloadResource(IConfiguration configuration, string name, string folder)
+    private static async Task DownloadResource(IConfiguration configuration, ILogger logger, string name, string folder)
     {
         var url = configuration[name];
         var httpClient = new HttpClient();
@@ -88,6 +91,8 @@ public class Program
                     // 解压文件
                     entry.ExtractToFile(destinationPath, false);
                 }
+
+                logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
             }
         }
     }
