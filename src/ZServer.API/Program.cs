@@ -75,33 +75,42 @@ public class Program
             var bytes = await httpClient.GetByteArrayAsync(url);
             if (bytes.Length > 0)
             {
-                var fontFile = Path.Combine("/tmp", $"{Guid.NewGuid():N}.zip");
-                if (!Directory.Exists(Path.GetDirectoryName(fontFile)))
+                var file = Path.Combine("/tmp", $"{Guid.NewGuid():N}.zip");
+                if (!Directory.Exists(Path.GetDirectoryName(file)))
                 {
                     Directory.CreateDirectory("/tmp");
                 }
 
-                await File.WriteAllBytesAsync(fontFile, bytes);
+                await File.WriteAllBytesAsync(file, bytes);
 
                 var baseFolder = $"/app/{folder}";
-                if (!Directory.Exists(baseFolder))
-                {
-                    Directory.CreateDirectory(baseFolder);
-                }
-
-                // 解压文件
-                using var zipArchive = ZipFile.OpenRead(fontFile);
-                foreach (var entry in zipArchive.Entries)
-                {
-                    // 构建目标文件路径
-                    var destinationPath = Path.Combine(baseFolder, entry.FullName);
-
-                    // 解压文件
-                    entry.ExtractToFile(destinationPath, false);
-                }
-
+                Unzip(baseFolder, file);
                 logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
             }
+        }
+    }
+
+    private static void Unzip(string baseFolder, string file)
+    {
+        if (string.IsNullOrEmpty(baseFolder))
+        {
+            return;
+        }
+
+        if (!Directory.Exists(baseFolder))
+        {
+            Directory.CreateDirectory(baseFolder);
+        }
+
+        // 解压文件
+        using var zipArchive = ZipFile.OpenRead(file);
+        foreach (var entry in zipArchive.Entries)
+        {
+            // 构建目标文件路径
+            var destinationPath = Path.Combine(baseFolder, entry.FullName);
+
+            // 解压文件
+            entry.ExtractToFile(destinationPath, true);
         }
     }
 

@@ -17,7 +17,16 @@ public class SymbolRenderer(SymbolStyle style) : SkiaRenderer, ISymbolRenderer<S
 
     static SymbolRenderer()
     {
-        DefaultImage = SKBitmap.Decode("108.png");
+        // 创建32×23大小的SKBitmap，使用32位RGBA格式
+        DefaultImage = new SKBitmap(32, 32, SKColorType.Rgba8888, SKAlphaType.Premul);
+
+        // 填充白色（ARGB均为最大值）
+        using var canvas = new SKCanvas(DefaultImage);
+        // 设置白色画笔
+        using SKPaint paint = new SKPaint();
+        paint.Color = SKColors.White;
+        // 绘制填充整个位图的矩形
+        canvas.DrawRect(0, 0, DefaultImage.Width, DefaultImage.Height, paint);
     }
 
     public override void Render(SKCanvas graphics, Geometry geometry, Envelope extent, int width, int height)
