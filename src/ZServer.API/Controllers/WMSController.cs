@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -12,7 +13,7 @@ namespace ZServer.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[ZServerAuthorize]
+[Authorize]
 // ReSharper disable once InconsistentNaming
 public class WMSController(
     IClusterClient clusterClient,

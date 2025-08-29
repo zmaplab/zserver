@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ namespace ZServer.API.Controllers;
 
 [ApiController]
 [Route("api/v1.0/tools")]
-[ZServerAuthorize]
+[Authorize]
 public class ToolController(ILogger<ToolController> logger, IMemoryCache memoryCache) : ControllerBase
 {
     [HttpPost("GetAuthority")]

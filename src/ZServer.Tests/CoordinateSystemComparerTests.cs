@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using ProjNet.CoordinateSystems;
 using ProjNet.IO.CoordinateSystems;
 using Xunit;

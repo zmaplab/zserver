@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -11,7 +12,7 @@ namespace ZServer.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[ZServerAuthorize]
+[Authorize]
 // ReSharper disable once InconsistentNaming
 public class WMTSController(
     IClusterClient clusterClient,

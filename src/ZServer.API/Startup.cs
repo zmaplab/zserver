@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +15,7 @@ using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
 using Serilog.Context;
 using ZMap.Permission;
+using ZServer.API.Authentication;
 using ZServer.API.Filters;
 using ZServer.Store;
 using Log = ZMap.Infrastructure.Log;
@@ -21,24 +24,21 @@ namespace ZServer.API;
 
 public class Startup(IConfiguration configuration)
 {
+    private bool _enableAuthorization;
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers(x => x.Filters.Add<GlobalExceptionFilter>())
+        _enableAuthorization = configuration.GetValue<bool>("EnableAuthorization");
+
+        services.AddControllers(x =>
+            {
+                x.Filters.Add<GlobalExceptionFilter>();
+            })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
             });
-
-        // 网关层处理
-        // services.AddResponseCompression(options =>
-        // {
-        //     options.Providers.Add<BrotliCompressionProvider>();
-        //     options.Providers.Add<GzipCompressionProvider>();
-        //     options.MimeTypes =
-        //         ResponseCompressionDefaults.MimeTypes.Concat(
-        //             new[] { "image/svg+xml", "db" });
-        // });
 
         services.AddResponseCaching();
         services.AddRouting(x => { x.LowercaseUrls = true; });
@@ -107,10 +107,16 @@ public class Startup(IConfiguration configuration)
         services.Configure<PermissionOptions>(configuration);
         services.AddSingleton<IPermissionService, PermissionService>();
 
-        if ("true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase))
+        if (_enableAuthorization)
         {
+            var apiName = configuration["ApiName"];
+            if (string.IsNullOrWhiteSpace(apiName))
+            {
+                apiName = "zserver-api";
+            }
+
             // 认证
-            services.AddAuthentication(x =>
+            var authenticationBuilder = services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -136,18 +142,32 @@ public class Startup(IConfiguration configuration)
                             StringComparison.OrdinalIgnoreCase)
                     };
                 });
+            var tokens = configuration
+                .GetSection("tokens").Get<HashSet<string>>();
+            authenticationBuilder.AddScheme<TokenAuthOptions, TokenAuthHandler>("Token",
+                opts =>
+                {
+                    opts.Tokens = tokens;
+                    opts.ApiName = apiName;
+                });
             // 授权
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("JWT", policy =>
+                options.AddPolicy("default", policy =>
                 {
-                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "Token");
                     policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", configuration["ApiName"] ?? "zserver-api");
+                    policy.RequireClaim("scope", apiName);
                 });
             });
         }
-
+        else
+        {
+            // 当授权被禁用时，添加一个“空”的授权服务或什么都不做。
+            // 为了确保 MVC 能正常运行，我们可以添加一个允许所有请求的授权策略到全局过滤器。
+            // 但更优雅的方式是通过自定义过滤器处理（见下一步）。
+            services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
+        }
         services.AddHealthChecks();
     }
 
@@ -174,13 +194,8 @@ public class Startup(IConfiguration configuration)
 
         app.UseRouting();
 
-        var enableAuthorization =
-            "true".Equals(configuration["EnableAuthorization"], StringComparison.OrdinalIgnoreCase);
-        if (enableAuthorization)
-        {
-            app.UseAuthorization();
-            app.UseAuthentication();
-        }
+        app.UseAuthorization();
+        app.UseAuthentication();
 
         app.UseCors("cors");
         app.Use((context, next) =>
@@ -191,9 +206,9 @@ public class Startup(IConfiguration configuration)
         app.UseEndpoints(endpoints =>
         {
             var endpointConventionBuilder = endpoints.MapControllers();
-            if (enableAuthorization)
+            if (_enableAuthorization)
             {
-                endpointConventionBuilder.RequireAuthorization("JWT");
+                endpointConventionBuilder.RequireAuthorization("default");
             }
         });
     }
