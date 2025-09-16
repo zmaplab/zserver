@@ -11,7 +11,7 @@ class Program
 // #if !DEBUG
 //             BenchmarkDotNet.Running.BenchmarkRunner.Run<RendererTest>();
 // #endif
-        BenchmarkDotNet.Running.BenchmarkRunner.Run<StreamToArray>();
+        BenchmarkDotNet.Running.BenchmarkRunner.Run<GpuVsCpuTest>();
         Console.WriteLine("Bye!");
     }
 }

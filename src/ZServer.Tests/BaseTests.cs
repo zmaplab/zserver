@@ -12,6 +12,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
+using ZMap.Renderer.SkiaSharp.GlContexts;
 using ZServer.Store;
 using Feature = ZMap.Feature;
 
@@ -32,9 +33,10 @@ public abstract class BaseTests
         serviceCollection.AddZServer(configuration, "layers.json");
         serviceCollection.TryAddSingleton(configuration);
         serviceCollection.TryAddSingleton<StoreRefreshService>();
+
         Service = serviceCollection.BuildServiceProvider();
         var syncService = Service.GetRequiredService<StoreRefreshService>();
-        var configurationProvider = Service.GetRequiredService<FileJsonStoreProvider>();
+        var configurationProvider = Service.GetRequiredService<IJsonStoreProvider>();
 
         syncService.RefreshAsync(configurationProvider, NullLogger.Instance).GetAwaiter().GetResult();
     }
@@ -74,6 +76,8 @@ public abstract class BaseTests
         {
             Directory.CreateDirectory("images");
         }
+
+        Service.GetRequiredService<IConfiguration>();
     }
 
     private FeatureCollection GetGeometries(string path)

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using NetTopologySuite.Geometries;
 using SkiaSharp;
+using ZMap.Renderer.SkiaSharp.GlContexts;
 using ZMap.Source;
 using ZMap.Style;
 
@@ -9,9 +10,12 @@ namespace ZMap.Renderer.SkiaSharp;
 
 public class SkiaGraphicsService : IGraphicsService
 {
+    private static readonly SKPaint BorderPaint;
     private readonly SKBitmap _bitmap;
     private readonly SKCanvas _canvas;
-    private static readonly SKPaint BorderPaint;
+    private readonly GRContext _grContext;
+    private readonly SKSurface _gpuSurface;
+    private readonly GlContext _glContext;
 
     static SkiaGraphicsService()
     {
@@ -27,11 +31,30 @@ public class SkiaGraphicsService : IGraphicsService
     public int Width { get; }
     public int Height { get; }
 
-    public SkiaGraphicsService(int width, int height)
+    public SkiaGraphicsService(int width, int height, bool useGpu = true)
     {
-        _bitmap = new SKBitmap(width, height);
         // _bitmap.Erase(SKColors.Transparent);
-        _canvas = new SKCanvas(_bitmap);
+
+        _glContext = useGpu ? GlContextHelper.Create() : null;
+
+        if (useGpu && _glContext == null)
+        {
+            throw new InvalidOperationException("Gpu graphics service is not initialized.");
+        }
+
+        if (_glContext != null)
+        {
+            _glContext.MakeCurrent();
+            _grContext = GRContext.CreateGl();
+            _gpuSurface = SKSurface.Create(_grContext, false, new SKImageInfo(width, height));
+            _canvas = _gpuSurface.Canvas;
+        }
+        else
+        {
+            _bitmap = new SKBitmap(width, height);
+            _canvas = new SKCanvas(_bitmap);
+        }
+
         Width = width;
         Height = height;
     }
@@ -44,9 +67,18 @@ public class SkiaGraphicsService : IGraphicsService
         }
 
         _canvas.Flush();
-        return _bitmap.Encode(GetImageFormat(imageFormat), 90).AsStream();
-    }
 
+        if (_bitmap != null)
+        {
+            return _bitmap.Encode(GetImageFormat(imageFormat), 90).AsStream();
+        }
+
+        _grContext.Flush();
+        using var skImage = _gpuSurface.Snapshot();
+        var format = GetImageFormat(imageFormat);
+        var skData = skImage.Encode(format, 80);
+        return skData.AsStream();
+    }
 
     public void Render(Envelope extent, Envelope geometry, ImageData image, RasterStyle style)
     {
@@ -71,8 +103,11 @@ public class SkiaGraphicsService : IGraphicsService
 
     public void Dispose()
     {
-        _bitmap.Dispose();
         _canvas.Dispose();
+        _bitmap?.Dispose();
+        _gpuSurface?.Dispose();
+        _grContext?.Dispose();
+        ((IDisposable)_glContext)?.Dispose();
     }
 
     private IRenderer Create<TStyle>(TStyle style) where TStyle : Style.Style

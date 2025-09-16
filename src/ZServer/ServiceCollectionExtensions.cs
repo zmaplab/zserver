@@ -9,6 +9,7 @@ using ZMap;
 using ZMap.Ogc.Wms;
 using ZMap.Ogc.Wmts;
 using ZMap.Renderer.SkiaSharp;
+using ZMap.Renderer.SkiaSharp.GlContexts;
 using ZMap.Store;
 using ZServer.Store;
 
@@ -44,6 +45,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.TryAddScoped<WmsService>();
         serviceCollection.TryAddScoped<WmtsService>();
         serviceCollection.AddMemoryCache();
+
+        GlContextHelper.Initialize();
         return new ZServerBuilder(serviceCollection);
     }
 
