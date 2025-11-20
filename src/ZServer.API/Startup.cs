@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,10 +33,18 @@ public class Startup(IConfiguration configuration)
     {
         _enableAuthorization = configuration.GetValue<bool>("EnableAuthorization");
 
-        services.AddControllers(x =>
-            {
-                x.Filters.Add<GlobalExceptionFilter>();
-            })
+        // 替换默认的 IHttpRequestIdentifierFeature
+        services.AddTransient<IHttpRequestIdentifierFeature>(sp =>
+        {
+            // 获取原始 Feature（框架默认实现）
+            var originalFeature = sp.GetRequiredService<HttpRequestIdentifierFeature>();
+            // 注入依赖项
+            var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+            // 返回自定义 Feature
+            return new CustomTraceIdentifierFeature(originalFeature, httpContextAccessor);
+        });
+
+        services.AddControllers(x => { x.Filters.Add<GlobalExceptionFilter>(); })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
@@ -168,6 +178,7 @@ public class Startup(IConfiguration configuration)
             // 但更优雅的方式是通过自定义过滤器处理（见下一步）。
             services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
         }
+
         services.AddHealthChecks();
     }
 
