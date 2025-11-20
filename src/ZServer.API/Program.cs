@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Dapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +17,6 @@ using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
 using Serilog.Events;
-using SkiaSharp;
 using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
@@ -37,10 +35,6 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        // var binaryReader = new BinaryReader(new FileStream("/Users/lewis/Downloads/BigTIFFLong8Tiles.tif",
-        //     FileMode.Open, FileAccess.Read));
-        // var tiff = new TIFF.NET.TIFF(binaryReader);
-        //
         Utility.PrintInfo();
 
         // FixOrleansPublishSingleFileIssue();
@@ -115,7 +109,6 @@ public class Program
             entry.ExtractToFile(destinationPath, true);
         }
     }
-
 
     // private static void FixOrleansPublishSingleFileIssue()
     // {

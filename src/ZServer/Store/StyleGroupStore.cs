@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMap;
+using ZMap.Infrastructure;
 using ZMap.Style;
 using ZServer.Extensions;
 
@@ -12,6 +14,7 @@ namespace ZServer.Store;
 public class StyleGroupStore : IStyleGroupStore
 {
     private static Dictionary<string, StyleGroup> _cache = new();
+    private readonly ILogger _logger = Log.CreateLogger<StyleGroupStore>();
 
     public Task RefreshAsync(List<JObject> configurations)
     {
@@ -32,25 +35,32 @@ public class StyleGroupStore : IStyleGroupStore
                     continue;
                 }
 
-                var descriptionToken = obj["description"];
-                var minZoomToken = obj["minZoom"];
-                var maxZoomToken = obj["maxZoom"];
-                var zoomUnitValue = obj["zoomUnit"]?.ToString();
-                var filter = obj.GetFilterExpressionV2();
-                var zoomUnit = Enum.TryParse(zoomUnitValue, out ZoomUnits v) ? v : ZoomUnits.Scale;
-                var stylesToken = obj.SelectToken("styles") as JArray;
-                var styleGroup = new StyleGroup
+                try
                 {
-                    Name = section.Name,
-                    Filter = filter,
-                    Description = descriptionToken?.Value<string>(),
-                    MinZoom = minZoomToken?.Value<float>() ?? 0,
-                    MaxZoom = maxZoomToken?.Value<float>() ?? 20,
-                    ZoomUnit = zoomUnit,
-                    Styles = GetStyles(stylesToken)
-                };
+                    var descriptionToken = obj["description"];
+                    var minZoomToken = obj["minZoom"];
+                    var maxZoomToken = obj["maxZoom"];
+                    var zoomUnitValue = obj["zoomUnit"]?.ToString();
+                    var filter = obj.GetFilterExpressionV2();
+                    var zoomUnit = Enum.TryParse(zoomUnitValue, out ZoomUnits v) ? v : ZoomUnits.Scale;
+                    var stylesToken = obj.SelectToken("styles") as JArray;
+                    var styleGroup = new StyleGroup
+                    {
+                        Name = section.Name,
+                        Filter = filter,
+                        Description = descriptionToken?.Value<string>(),
+                        MinZoom = minZoomToken?.Value<float>() ?? 0,
+                        MaxZoom = maxZoomToken?.Value<float>() ?? 20,
+                        ZoomUnit = zoomUnit,
+                        Styles = GetStyles(stylesToken)
+                    };
 
-                dict.TryAdd(section.Name, styleGroup);
+                    dict.TryAdd(section.Name, styleGroup);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "StyleGroup {StyleGroup} 配置不正确", section.Name);
+                }
             }
         }
 
