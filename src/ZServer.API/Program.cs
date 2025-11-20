@@ -17,6 +17,7 @@ using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.ClickHouse;
 using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
@@ -229,6 +230,7 @@ public class Program
                         // Serilog.Enrichers.Environment
                         .Enrich.WithMachineName()
                         .WriteTo.Console()
+                        // .WriteTo.ClickHouse()
                         .WriteTo.Async(x => x.File(logFile, rollingInterval: RollingInterval.Day))
                         .CreateLogger();
                 }

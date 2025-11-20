@@ -5,7 +5,8 @@
       "Serilog.Sinks.Console",
       "Serilog.Expressions",
       "Serilog.Enrichers.Environment",
-      "Serilog.Enrichers.Thread"
+      "Serilog.Enrichers.Thread",
+      "Serilog.Sinks.ClickHouse"
     ],
     "MinimumLevel": {
       "Default": "Information",
@@ -26,6 +27,17 @@
         "Name": "Console",
         "Args": {
           "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
+        }
+      },   
+      {
+        "Name": "ClickHouse",
+        "Args": {
+          "endpointAddr": "http://10.0.10.190:8123",
+          "database": "logs",
+          "table": "application_log",
+          "application": "zserver-api",
+          "user": "default",
+          "key": ""
         }
       }
     ],
