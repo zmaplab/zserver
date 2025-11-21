@@ -155,6 +155,9 @@ public class Program
             })
             .ConfigureAppConfiguration((_, builder) =>
             {
+                var sb = new StringBuilder();
+                var sb2 = new StringBuilder();
+                sb.Append(sb2);
                 builder.AddEnvironmentVariables();
 
                 if (File.Exists("conf/serilog.json"))
