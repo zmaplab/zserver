@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,6 @@ using NetTopologySuite.Geometries.Implementation;
 using RemoteConfiguration.Json.Aliyun;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.ClickHouse;
 using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
@@ -63,84 +63,6 @@ public class Program
         await app.RunAsync();
     }
 
-    private static async Task DownloadResource(IConfiguration configuration, ILogger logger, string name, string folder)
-    {
-        var url = configuration[name];
-        var httpClient = new HttpClient();
-        if (!string.IsNullOrEmpty(url))
-        {
-            var bytes = await httpClient.GetByteArrayAsync(url);
-            if (bytes.Length > 0)
-            {
-                var file = Path.Combine("/tmp", $"{Guid.NewGuid():N}.zip");
-                if (!Directory.Exists(Path.GetDirectoryName(file)))
-                {
-                    Directory.CreateDirectory("/tmp");
-                }
-
-                await File.WriteAllBytesAsync(file, bytes);
-
-                var baseFolder = $"/app/{folder}";
-                Unzip(baseFolder, file);
-                logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
-            }
-        }
-    }
-
-    private static void Unzip(string baseFolder, string file)
-    {
-        if (string.IsNullOrEmpty(baseFolder))
-        {
-            return;
-        }
-
-        if (!Directory.Exists(baseFolder))
-        {
-            Directory.CreateDirectory(baseFolder);
-        }
-
-        // 解压文件
-        using var zipArchive = ZipFile.OpenRead(file);
-        foreach (var entry in zipArchive.Entries)
-        {
-            // 构建目标文件路径
-            var destinationPath = Path.Combine(baseFolder, entry.FullName);
-
-            // 解压文件
-            entry.ExtractToFile(destinationPath, true);
-        }
-    }
-
-    // private static void FixOrleansPublishSingleFileIssue()
-    // {
-    //     var assembly = typeof(Orleans.Runtime.SiloStatus).Assembly;
-    //
-    //     if (!string.IsNullOrWhiteSpace(assembly.Location))
-    //     {
-    //         return;
-    //     }
-    //
-    //     var type = typeof(Orleans.Runtime.SiloStatus).Assembly.GetTypes()
-    //         .First(
-    //             x => x.FullName == "Orleans.Runtime.RuntimeVersion");
-    //     var method = type.GetProperty("Current")?.GetMethod;
-    //     if (method == null)
-    //     {
-    //         return;
-    //     }
-    //
-    //     var harmony = new Harmony("orleans.publishSingleFile");
-    //     var prefix = typeof(Program).GetMethod("Prefix");
-    //     harmony.Patch(method, new HarmonyMethod(prefix));
-    //     Console.WriteLine("Patch Orleans completed");
-    // }
-
-    // public static bool Prefix(ref string __result)
-    // {
-    //     __result = "3.6.5";
-    //     return false; // make sure you only skip if really necessary
-    // }
-
     /// <summary>
     /// 配置响应顺序，按从低到高：环境 -> 配置 -> command parameters
     /// </summary>
@@ -155,9 +77,6 @@ public class Program
             })
             .ConfigureAppConfiguration((_, builder) =>
             {
-                var sb = new StringBuilder();
-                var sb2 = new StringBuilder();
-                sb.Append(sb2);
                 builder.AddEnvironmentVariables();
 
                 if (File.Exists("conf/serilog.json"))
@@ -244,4 +163,52 @@ public class Program
                 webBuilder.UseStartup<Startup>();
             }).ConfigureSilo()
             .UseSerilog();
+
+    private static async Task DownloadResource(IConfiguration configuration, ILogger logger, string name, string folder)
+    {
+        var url = configuration[name];
+        var httpClient = new HttpClient();
+        if (!string.IsNullOrEmpty(url))
+        {
+            var bytes = await httpClient.GetByteArrayAsync(url);
+            if (bytes.Length > 0)
+            {
+                var file = Path.Combine("/tmp", $"{Guid.NewGuid():N}.zip");
+                if (!Directory.Exists(Path.GetDirectoryName(file)))
+                {
+                    Directory.CreateDirectory("/tmp");
+                }
+
+                await File.WriteAllBytesAsync(file, bytes);
+
+                var baseFolder = $"/app/{folder}";
+                Unzip(baseFolder, file);
+                logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
+            }
+        }
+    }
+
+    private static void Unzip(string baseFolder, string file)
+    {
+        if (string.IsNullOrEmpty(baseFolder))
+        {
+            return;
+        }
+
+        if (!Directory.Exists(baseFolder))
+        {
+            Directory.CreateDirectory(baseFolder);
+        }
+
+        // 解压文件
+        using var zipArchive = ZipFile.OpenRead(file);
+        foreach (var entry in zipArchive.Entries)
+        {
+            // 构建目标文件路径
+            var destinationPath = Path.Combine(baseFolder, entry.FullName);
+
+            // 解压文件
+            entry.ExtractToFile(destinationPath, true);
+        }
+    }
 }

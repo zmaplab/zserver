@@ -147,7 +147,7 @@ public class CogTests(WebApplicationFactoryFixture fixture)
     [Fact(DisplayName = "Get cd tile")]
     public async Task GetRemoteWmts1Tile()
     {
-        var service = fixture.Instance.Services.GetRequiredService<StoreRefreshService>();
+        var service = fixture.Instance.Services.GetRequiredService<RefreshConfigService>();
         await service.StartAsync(default);
         var httpClient = fixture.Instance.CreateClient();
 // TileMatrix=16&TileCol=54894&TileRow=10944
@@ -173,7 +173,7 @@ public class CogTests(WebApplicationFactoryFixture fixture)
     [Fact(DisplayName = "Get cd tile cd")]
     public async Task GetWmts1Tile()
     {
-        var service = fixture.Instance.Services.GetRequiredService<StoreRefreshService>();
+        var service = fixture.Instance.Services.GetRequiredService<RefreshConfigService>();
         await service.StartAsync(default);
         var httpClient = fixture.Instance.CreateClient();
 
@@ -189,7 +189,7 @@ public class CogTests(WebApplicationFactoryFixture fixture)
     [Fact(DisplayName = "Get cd tile qtz")]
     public async Task GetWmtsQtzTile()
     {
-        var service = fixture.Instance.Services.GetRequiredService<StoreRefreshService>();
+        var service = fixture.Instance.Services.GetRequiredService<RefreshConfigService>();
         await service.StartAsync(default);
         var httpClient = fixture.Instance.CreateClient();
 

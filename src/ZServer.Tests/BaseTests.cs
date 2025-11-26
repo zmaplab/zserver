@@ -29,11 +29,11 @@ public abstract class BaseTests
         var configuration = GetConfiguration();
         serviceCollection.AddMemoryCache();
         serviceCollection.AddLogging(x => x.AddConsole());
-        serviceCollection.AddZServer(configuration, "layers.json");
+        serviceCollection.AddZServer(configuration);
         serviceCollection.TryAddSingleton(configuration);
-        serviceCollection.TryAddSingleton<StoreRefreshService>();
+        serviceCollection.TryAddSingleton<RefreshConfigService>();
         Service = serviceCollection.BuildServiceProvider();
-        var syncService = Service.GetRequiredService<StoreRefreshService>();
+        var syncService = Service.GetRequiredService<RefreshConfigService>();
         var configurationProvider = Service.GetRequiredService<FileJsonStoreProvider>();
 
         syncService.RefreshAsync(configurationProvider, NullLogger.Instance).GetAwaiter().GetResult();

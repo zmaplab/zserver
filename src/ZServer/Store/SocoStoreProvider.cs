@@ -14,41 +14,35 @@ using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
-public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<SocoStoreProvider> logger)
+public class SocoStoreProvider(
+    string url,
+    StoreConfigOptions configOptions,
+    IHttpClientFactory factory,
+    ILogger<SocoStoreProvider> logger)
     : IJsonStoreProvider
 {
     private string _lastHash;
-    private static readonly string AppId;
-    private static readonly string AppSecret;
 
     private static readonly List<string> ExcludeParams =
         ["appId", "nonce", "timestamp", "sign"];
 
     static SocoStoreProvider()
     {
-        AppId = "66457c75702a1e87e2f4b4ac";
-        AppSecret = "OveFGUp8VdZa47rLElD1yEBtDig=";
     }
 
-    public async Task<JObject> GetConfigurationAsync()
+    public async Task<List<JObject>> GetConfigurationAsync()
     {
-        if (string.IsNullOrEmpty(url))
-        {
-            return null;
-        }
-
         var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
         var nonce = ObjectId.GenerateNewId().ToString();
-        requestMessage.Headers.TryAddWithoutValidation("AppId", AppId);
+        requestMessage.Headers.TryAddWithoutValidation("AppId", configOptions.AppId);
         requestMessage.Headers.TryAddWithoutValidation("Nonce", nonce);
         var ts = DateTimeOffset.Now.ToLocalTime().ToUnixTimeSeconds().ToString();
         requestMessage.Headers.TryAddWithoutValidation("Timestamp", ts);
         var absolutePath = new Uri(url).AbsolutePath;
         var index = absolutePath.IndexOf("/v1.", StringComparison.Ordinal);
         var path = absolutePath.Substring(index);
-        // /api/v1.0/tables/67f8adafe84e12c3a3dd862c/data
-        var signData = GetSignData(AppId, $"/api{path}", null, null, nonce, ts);
-        var sign = Sign(AppSecret, signData);
+        var signData = GetSignData(configOptions.AppId, $"/api{path}", null, null, nonce, ts);
+        var sign = Sign(configOptions.AppSecret, signData);
         requestMessage.Headers.TryAddWithoutValidation("Sign", sign);
 
         var response = await factory.CreateClient("HttpJsonStoreProvider").SendAsync(requestMessage);
@@ -115,50 +109,44 @@ public class SocoStoreProvider(string url, IHttpClientFactory factory, ILogger<S
         return Encoding.UTF8.GetBytes(str);
     }
 
-    public static JObject Read(string json)
+    public static List<JObject> Read(string json)
     {
         if (string.IsNullOrEmpty(json))
         {
             return null;
         }
 
-        if (JsonConvert.DeserializeObject(json) is not JObject resultObject)
+        var result = JsonConvert.DeserializeObject<ApiResult>(json);
+        if (result.Data == null || result.Data.Count == 0)
         {
             return null;
         }
 
-        if (resultObject["data"] is JArray array)
+        var list = new List<JObject>();
+        foreach (var item in result.Data)
         {
-            if (array.Count == 0)
+            var value = item.Config;
+            if (string.IsNullOrEmpty(value))
             {
-                return null;
+                continue;
             }
 
-            if (array[0] is not JObject first)
-            {
-                return null;
-            }
-
-            var config = first["config"]?.ToString();
-            if (string.IsNullOrEmpty(config))
-            {
-                return null;
-            }
-
-            return JsonConvert.DeserializeObject(config) as JObject;
+            var obj = JsonConvert.DeserializeObject<JObject>(value);
+            list.Add(obj);
         }
 
-        if (resultObject["data"] is not JObject jObject)
-        {
-            return null;
-        }
+        return list;
+    }
 
-        var config1 = jObject["config"]?.ToString();
-        if (string.IsNullOrEmpty(config1))
-        {
-            return null;
-        }
-
-        return JsonConvert.DeserializeObject(config1) as JObject;
+    private class ApiResult
+    {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public List<DataItem> Data { get; set; }
+    }
+    
+    private class DataItem
+    {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public string Config { get; set; }
     }
 }

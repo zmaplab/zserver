@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using ZMap.Store;
 using ZServer.Store;
 
 namespace ZServer;
 
-public class StoreRefreshService(
+public class RefreshConfigService(
     IServiceProvider serviceProvider)
     : IHostedService
 {
@@ -19,7 +17,7 @@ public class StoreRefreshService(
     {
         return Task.Factory.StartNew(async () =>
         {
-            var logger = serviceProvider.GetRequiredService<ILogger<StoreRefreshService>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<RefreshConfigService>>();
             var configurationProvider = serviceProvider.GetRequiredService<IJsonStoreProvider>();
             configurationProvider.Check();
 
@@ -51,10 +49,9 @@ public class StoreRefreshService(
 
     public async Task RefreshAsync(IJsonStoreProvider jsonStoreProvider, ILogger logger)
     {
-        var configuration = await jsonStoreProvider.GetConfigurationAsync();
-        if (configuration != null)
+        var configurations = await jsonStoreProvider.GetConfigurationAsync();
+        if (configurations != null)
         {
-            var configurations = new List<JObject> { configuration };
             using var scope = serviceProvider.CreateScope();
             var gridSetStore = scope.ServiceProvider.GetRequiredService<IGridSetStore>();
             await gridSetStore.RefreshAsync(configurations);

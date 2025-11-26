@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,14 +10,14 @@ using ZMap.Infrastructure;
 
 namespace ZServer.Store;
 
-public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : IJsonStoreProvider
+public class FileJsonStoreProvider(string path, ILogger<FileJsonStoreProvider> logger) : IJsonStoreProvider
 {
     private DateTime _lastWriteTime;
     private string _lastHash;
 
     public string Path => path;
 
-    public async Task<JObject> GetConfigurationAsync()
+    public async Task<List<JObject>> GetConfigurationAsync()
     {
         if (!File.Exists(path))
         {
@@ -42,13 +43,11 @@ public class FileJsonStoreProvider(string path, ILoggerFactory loggerFactory) : 
         var json = Encoding.UTF8.GetString(bytes).Replace("\uFEFF", "").Replace("\u200B", "");
 
         var result = JsonConvert.DeserializeObject(json) as JObject;
-        await Task.CompletedTask;
-        return result;
+        return [result];
     }
 
     public void Check()
     {
-        var logger = loggerFactory.CreateLogger("FileJsonStoreProvider");
         if (File.Exists(Path))
         {
             logger.LogInformation("ZServer 发现配置文件 {ConfigurationPath} ",

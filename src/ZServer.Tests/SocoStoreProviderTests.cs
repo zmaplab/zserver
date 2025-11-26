@@ -20,7 +20,7 @@ public class SocoStoreProviderTests(WebApplicationFactoryFixture fixture)
         Environment.SetEnvironmentVariable("ZSERVER_SOCODB_APPSECRET", "OveFGUp8VdZa47rLElD1yEBtDig=");
         var address = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_ADDR");
         var provider =
-            new SocoStoreProvider(address,
+            new SocoStoreProvider(address, new StoreConfigOptions(),
                 httpClientFactory, fixture.Instance.Services.GetRequiredService<ILogger<SocoStoreProvider>>());
         var b = await provider.GetConfigurationAsync();
     }

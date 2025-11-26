@@ -52,26 +52,9 @@ public class Startup(IConfiguration configuration)
 
         services.AddResponseCaching();
         services.AddRouting(x => { x.LowercaseUrls = true; });
+        services.AddZServer(configuration).AddSkiaSharpRenderer();
 
-        var configProvider = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_PROVIDER");
-        configProvider = string.IsNullOrEmpty(configProvider) ? "File" : "SocoDB";
-        var configAddr = Environment.GetEnvironmentVariable("ZSERVER_CONFIG_ADDR");
-        configAddr = string.IsNullOrEmpty(configAddr) ? "conf/zserver.json" : configAddr;
-        switch (configProvider.ToLower())
-        {
-            case "file":
-                services.AddZServer(configuration, configAddr).AddSkiaSharpRenderer();
-                break;
-            case "socodb":
-                services.AddZServer(configuration).AddSkiaSharpRenderer();
-                services.AddSingleton<IJsonStoreProvider>(provider =>
-                    new SocoStoreProvider(configAddr, provider.GetRequiredService<IHttpClientFactory>(),
-                        provider.GetRequiredService<ILogger<SocoStoreProvider>>()));
-                break;
-            default:
-                throw new NotSupportedException($"不支持的配置提供者 {configProvider}");
-        }
-
+     
         services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
         services.Configure<ServerOptions>(configuration);
         services.Configure<ClusterOptions>("Orleans", configuration);
