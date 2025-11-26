@@ -1,14 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Http;
-
-namespace ZServer.API;
-
 using Microsoft.AspNetCore.Http.Features;
+
+namespace ZServer.API.Features;
 
 /// <summary>
 /// 自定义请求标识 Feature，优先从 Header 读取 TraceIdentifier
 /// </summary>
-public class CustomTraceIdentifierFeature(
+public class TraceIdentifierFeature(
     IHttpRequestIdentifierFeature originalFeature,
     IHttpContextAccessor httpContextAccessor)
     : IHttpRequestIdentifierFeature

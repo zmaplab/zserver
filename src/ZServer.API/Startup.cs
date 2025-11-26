@@ -18,7 +18,10 @@ using Orleans.Configuration;
 using Serilog.Context;
 using ZMap.Permission;
 using ZServer.API.Authentication;
+using ZServer.API.Features;
 using ZServer.API.Filters;
+using ZServer.API.Permission;
+using ZServer.API.Serilog;
 using ZServer.Store;
 using Log = ZMap.Infrastructure.Log;
 
@@ -41,7 +44,7 @@ public class Startup(IConfiguration configuration)
             // 注入依赖项
             var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
             // 返回自定义 Feature
-            return new CustomTraceIdentifierFeature(originalFeature, httpContextAccessor);
+            return new TraceIdentifierFeature(originalFeature, httpContextAccessor);
         });
 
         services.AddControllers(x => { x.Filters.Add<GlobalExceptionFilter>(); })

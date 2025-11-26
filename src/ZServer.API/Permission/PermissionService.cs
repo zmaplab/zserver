@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZMap.Permission;
 
-namespace ZServer.API;
+namespace ZServer.API.Permission;
 
 public class PermissionService(
     IOptionsMonitor<PermissionOptions> optionsMonitor,

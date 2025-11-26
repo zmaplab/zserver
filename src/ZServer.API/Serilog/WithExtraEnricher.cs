@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace ZServer.API;
+namespace ZServer.API.Serilog;
 
 public class WithExtraEnricher : ILogEventEnricher
 {

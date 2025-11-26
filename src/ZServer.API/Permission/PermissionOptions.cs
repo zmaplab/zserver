@@ -1,4 +1,4 @@
-namespace ZServer.API;
+namespace ZServer.API.Permission;
 
 public class PermissionOptions
 {
