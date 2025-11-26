@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +21,6 @@ using ZServer.API.Features;
 using ZServer.API.Filters;
 using ZServer.API.Permission;
 using ZServer.API.Serilog;
-using ZServer.Store;
 using Log = ZMap.Infrastructure.Log;
 
 namespace ZServer.API;

@@ -15,6 +15,7 @@ RUN rm -rf src/ZServer.SiloHost/out/runtimes/win-x64
 RUN rm -rf src/ZServer.SiloHost/out/runtimes/win-x86
 RUN rm -rf src/ZServer.API/out/shapes
 RUN rm -rf src/ZServer.API/out/Fonts
+RUN rm -rf src/ZServer.API/out/conf/appsettings.json
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS zserver
 ENV LANG C.UTF-8
