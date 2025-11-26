@@ -26,36 +26,45 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.Configure<ServerOptions>(configuration);
         var configSection = configuration.GetSection("config");
-        serviceCollection.Configure<StoreConfigOptions>(configSection);
         var configOptions = configSection.Get<StoreConfigOptions>();
-
-        var configProvider = string.IsNullOrEmpty(configOptions.Provider) ? "file" : configOptions.Provider;
-
-        switch (configProvider.ToLower())
+        if (configOptions == null)
         {
-            case "file":
-                var configAddr = string.IsNullOrEmpty(configOptions.Address)
-                    ? "conf/zserver.json"
-                    : configOptions.Address;
-                serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
-                    new FileJsonStoreProvider(configAddr,
-                        provider.GetRequiredService<ILogger<FileJsonStoreProvider>>()));
-                break;
-            case "socodb":
-                if (string.IsNullOrEmpty(configOptions.Address))
-                {
-                    throw new ArgumentNullException(nameof(configOptions.Address));
-                }
-
-                serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
-                    new SocoStoreProvider(configOptions.Address, configOptions,
-                        provider.GetRequiredService<IHttpClientFactory>(),
-                        provider.GetRequiredService<ILogger<SocoStoreProvider>>()));
-                break;
-            default:
-                throw new NotSupportedException($"不支持的配置提供者 {configProvider}");
+            serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
+                new FileJsonStoreProvider("conf/zserver.json",
+                    provider.GetRequiredService<ILogger<FileJsonStoreProvider>>()));
         }
+        else
+        {
+            serviceCollection.Configure<StoreConfigOptions>(configSection);
+            var configProvider = "socodb".Equals(configOptions.Provider, StringComparison.OrdinalIgnoreCase)
+                ? "socodb"
+                : "file";
 
+            switch (configProvider.ToLower())
+            {
+                case "file":
+                    var configAddr = string.IsNullOrEmpty(configOptions.Address)
+                        ? "conf/zserver.json"
+                        : configOptions.Address;
+                    serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
+                        new FileJsonStoreProvider(configAddr,
+                            provider.GetRequiredService<ILogger<FileJsonStoreProvider>>()));
+                    break;
+                case "socodb":
+                    if (string.IsNullOrEmpty(configOptions.Address))
+                    {
+                        throw new ArgumentNullException(nameof(configOptions.Address));
+                    }
+
+                    serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
+                        new SocoStoreProvider(configOptions.Address, configOptions,
+                            provider.GetRequiredService<IHttpClientFactory>(),
+                            provider.GetRequiredService<ILogger<SocoStoreProvider>>()));
+                    break;
+                default:
+                    throw new NotSupportedException($"不支持的配置提供者 {configProvider}");
+            }
+        }
 
         // 配置的存储
         serviceCollection.TryAddScoped<ILayerStore, LayerStore>();
