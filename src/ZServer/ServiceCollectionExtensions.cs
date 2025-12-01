@@ -40,16 +40,8 @@ public static class ServiceCollectionExtensions
                 ? "socodb"
                 : "file";
 
-            switch (configProvider.ToLower())
+            switch (configProvider)
             {
-                case "file":
-                    var configAddr = string.IsNullOrEmpty(configOptions.Address)
-                        ? "conf/zserver.json"
-                        : configOptions.Address;
-                    serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
-                        new FileJsonStoreProvider(configAddr,
-                            provider.GetRequiredService<ILogger<FileJsonStoreProvider>>()));
-                    break;
                 case "socodb":
                     if (string.IsNullOrEmpty(configOptions.Address))
                     {
@@ -62,7 +54,13 @@ public static class ServiceCollectionExtensions
                             provider.GetRequiredService<ILogger<SocoStoreProvider>>()));
                     break;
                 default:
-                    throw new NotSupportedException($"不支持的配置提供者 {configProvider}");
+                    var configAddr = string.IsNullOrEmpty(configOptions.Address)
+                        ? "conf/zserver.json"
+                        : configOptions.Address;
+                    serviceCollection.AddSingleton<IJsonStoreProvider>(provider =>
+                        new FileJsonStoreProvider(configAddr,
+                            provider.GetRequiredService<ILogger<FileJsonStoreProvider>>()));
+                    break;
             }
         }
 

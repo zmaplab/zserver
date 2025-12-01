@@ -2,11 +2,12 @@
   "Serilog": {
     "Using": [
       "Serilog.Sinks.Async",
+      "Serilog.Sinks.ClickHouse",
       "Serilog.Sinks.Console",
       "Serilog.Expressions",
+      "Serilog.Sinks.Grafana.Loki",
       "Serilog.Enrichers.Environment",
-      "Serilog.Enrichers.Thread",
-      "Serilog.Sinks.ClickHouse"
+      "Serilog.Enrichers.HttpHeader"
     ],
     "MinimumLevel": {
       "Default": "Information",
@@ -19,7 +20,7 @@
         "Microsoft.AspNetCore.Cors.Infrastructure.CorsService": "Warning",
         "Microsoft.AspNetCore.Mvc": "Warning",
         "Microsoft.AspNetCore.Hosting": "Information",
-        "Orleans": "Error"
+        "Orleans": "Warning"
       }
     },
     "WriteTo": [
@@ -28,14 +29,14 @@
         "Args": {
           "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
         }
-      },   
+      },
       {
         "Name": "ClickHouse",
         "Args": {
           "endpointAddr": "http://10.0.10.190:8123",
           "database": "logs",
           "table": "application_log",
-          "application": "zserver-api",
+          "application": "bch-zserver-api",
           "user": "default",
           "key": ""
         }
@@ -43,13 +44,74 @@
     ],
     "Enrich": [
       "FromLogContext",
-      "WithMachineName",
       "WithThreadId",
-      "WithProcessId"
+      {
+        "Name": "WithEnvironmentVariable",
+        "Args": {
+          "environmentVariableName": "MachineName",
+          "propertyName": "machine_name"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "user_id",
+          "propertyName": "user_id"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "user_name",
+          "propertyName": "user_name"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "x-trace-id",
+          "propertyName": "trace_id"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "x-frontend-version",
+          "propertyName": "frontend_version"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "x-page-open-time",
+          "propertyName": "page_open_time"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "session",
+          "propertyName": "session"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "SecurityToken",
+          "propertyName": "security_token"
+        }
+      },
+      {
+        "Name": "WithHttpHeader",
+        "Args": {
+          "headerKey": "client",
+          "propertyName": "client"
+        }
+      }
     ],
     "Properties": {
-      "Application": "ZServer.API",
-      "MachineName": "%COMPUTERNAME%"
+      "MachineName": "${MachineName}",
+      "source": "backend"
     }
   }
 }

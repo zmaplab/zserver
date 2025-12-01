@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ZServer.API.Controllers;
 #if DEBUG
+/// <summary>
+/// 
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class TestController : ControllerBase

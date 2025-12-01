@@ -7,9 +7,7 @@
         "HOST_IP": "192.168.31.111",
         "EnableAuthorization": "false",
         "EnableSensitiveDataLogging": "true",
-        "standalone": "true",
-        "ZSERVER_CONFIG_PROVIDER": "",
-        "ZSERVER_CONFIG_ADDR": ""
+        "standalone": "true"
       }
     }
   }

@@ -9,18 +9,9 @@ using Microsoft.Extensions.Options;
 
 namespace ZServer.API.Authentication;
 
-public class TokenAuthHandler : AuthenticationHandler<TokenAuthOptions>
+public class TokenAuthHandler(IOptionsMonitor<TokenAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+    : AuthenticationHandler<TokenAuthOptions>(options, logger, encoder)
 {
-    public TokenAuthHandler(IOptionsMonitor<TokenAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder,
-        ISystemClock clock) : base(options, logger, encoder, clock)
-    {
-    }
-
-    public TokenAuthHandler(IOptionsMonitor<TokenAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder) :
-        base(options, logger, encoder)
-    {
-    }
-
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (Context.User.Identity is { IsAuthenticated: true })

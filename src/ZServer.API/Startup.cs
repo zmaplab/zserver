@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -34,6 +35,11 @@ public class Startup(IConfiguration configuration)
     {
         _enableAuthorization = configuration.GetValue<bool>("EnableAuthorization");
 
+        services.AddOpenApi("zserver-api", options =>
+        {
+            // Specify the OpenAPI version to use
+            options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
+        });
         // 替换默认的 IHttpRequestIdentifierFeature
         services.AddTransient<IHttpRequestIdentifierFeature>(sp =>
         {
@@ -54,34 +60,9 @@ public class Startup(IConfiguration configuration)
         services.AddResponseCaching();
         services.AddRouting(x => { x.LowercaseUrls = true; });
         services.AddZServer(configuration).AddSkiaSharpRenderer();
-
-     
         services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
         services.Configure<ServerOptions>(configuration);
         services.Configure<ClusterOptions>("Orleans", configuration);
-
-        // services.AddOrleansClient(builder =>
-        // {
-        //     if ("true".Equals(Configuration["standalone"]))
-        //     {
-        //         builder
-        //             .UseLocalhostClustering(30000, "zserver", "zserver");
-        //     }
-        //     else
-        //     {
-        //         builder.Configure<ClusterOptions>(options =>
-        //         {
-        //             options.ClusterId = Configuration["Orleans:ClusterId"];
-        //             options.ServiceId = Configuration["Orleans:ServiceId"];
-        //         });
-        //
-        //         builder.UseAdoNetClustering(options =>
-        //         {
-        //             options.ConnectionString = Configuration["Orleans:ConnectionString"];
-        //             options.Invariant = Configuration["Orleans:Invariant"];
-        //         });
-        //     }
-        // });
 
         // services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZServer.API", Version = "v1" }); });
 
@@ -99,7 +80,7 @@ public class Startup(IConfiguration configuration)
         services.AddHttpContextAccessor();
         services.AddHttpClient();
         services.Configure<PermissionOptions>(configuration);
-        services.AddSingleton<IPermissionService, PermissionService>();
+        services.TryAddSingleton<IPermissionService, PermissionService>();
 
         if (_enableAuthorization)
         {
@@ -153,6 +134,12 @@ public class Startup(IConfiguration configuration)
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("scope", apiName);
                 });
+                options.AddPolicy("api-document", policy =>
+                {
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "Token");
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("zserver-api-document");
+                });
             });
         }
         else
@@ -177,12 +164,6 @@ public class Startup(IConfiguration configuration)
             app.UseDeveloperExceptionPage();
         }
 
-        // if (configuration["Swagger"]?.ToLower() == "true")
-        // {
-        //     app.UseSwagger();
-        //     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZServer API v1"));
-        // }
-
         app.UseHealthChecks("/healthz");
         // app.UseResponseCompression();
         app.UseResponseCaching();
@@ -200,6 +181,13 @@ public class Startup(IConfiguration configuration)
         });
         app.UseEndpoints(endpoints =>
         {
+#if DEBUG
+            endpoints.MapOpenApi();
+#else
+            endpoints.MapOpenApi()
+                .RequireAuthorization("api-document");
+#endif
+
             var endpointConventionBuilder = endpoints.MapControllers();
             if (_enableAuthorization)
             {

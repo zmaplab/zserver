@@ -5,11 +5,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Orleans;
+using ZMap;
 using ZMap.Infrastructure;
 using ZServer.Interfaces.WMTS;
 
 namespace ZServer.API.Controllers;
 
+/// <summary>
+/// WMS 服务
+/// </summary>
+/// <param name="clusterClient"></param>
+/// <param name="logger"></param>
 [ApiController]
 [Route("[controller]")]
 [Authorize]
@@ -25,8 +31,8 @@ public class WMTSController(
     /// workspace1:layer1,workspace2:layer2
     /// 缓存路径： workspace1.layer1_workspace2.layer2
     /// </summary>
-    /// <param name="layers"></param>
-    /// <param name="style"></param>
+    /// <param name="layers">需渲染的图层名称列表（用逗号分隔，名称需与服务元数据一致）</param>
+    /// <param name="style">图层渲染样式名称列表（用逗号分隔，与 LAYERS 顺序对应，默认用默认样式）</param>
     /// <param name="tileMatrix"></param>
     /// <param name="tileRow"></param>
     /// <param name="tileCol"></param>
@@ -36,12 +42,10 @@ public class WMTSController(
     /// <param name="bordered"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task GetAsync([Required]
-        [FromQuery(Name = "layer"),
-         StringLength(100)]
-        string layers,
-        [StringLength(100)] string style,
-        [Required, StringLength(50)] string tileMatrix, [Required] int tileRow, [Required] int tileCol,
+    public async Task GetAsync([Required] [FromQuery(Name = "layer"), StringLength(100)] string layers,
+        [StringLength(255)] string style,
+        [Required, StringLength(100)] string tileMatrix, [Required] int tileRow, [Required] int tileCol,
+        [StringLength(25)]
         string format = "image/png",
         [Required, StringLength(50)] string tileMatrixSet = "EPSG:4326",
         [FromQuery(Name = "Z_FILTER"), StringLength(2048)]
@@ -55,11 +59,10 @@ public class WMTSController(
 #if !DEBUG
         if (System.IO.File.Exists(tuple.FullPath))
         {
-            if (ZMap.EnvironmentVariables.EnableSensitiveDataLogging)
+            if (EnvironmentVariables.EnableSensitiveDataLogging)
             {
                 var displayUrl =
                     $"[{HttpContext.TraceIdentifier}] LAYERS={layers}&STYLES={style}&FORMAT={format}&TILEMATRIXSET={tileMatrixSet}&TILEMATRIX={tileMatrix}&TILEROW={tileRow}&TILECOL={tileCol}";
-                logger.LogDebug("[{TraceIdentifier}] {Url}", HttpContext.TraceIdentifier, displayUrl);
                 logger.LogInformation("[{TraceIdentifier}] {Url}, CACHED", HttpContext.TraceIdentifier, displayUrl);
             }
 
@@ -79,7 +82,7 @@ public class WMTSController(
                 filter,
                 new Dictionary<string, object>
                 {
-                    { "TraceIdentifier", HttpContext.TraceIdentifier },
+                    { Defaults.TraceIdentifier, HttpContext.TraceIdentifier },
                     { "Bordered", bordered }
                 });
 

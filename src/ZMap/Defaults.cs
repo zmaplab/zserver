@@ -26,5 +26,4 @@ public static class Defaults
     public const string WmsScaleKey = "wms_scale_denominator";
     
     public const string TraceIdentifier = "TraceIdentifier";
-    public const string AdditionalFilter = "AdditionalFilter";
 }

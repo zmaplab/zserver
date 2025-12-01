@@ -1,16 +1,23 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Orleans;
+using ZMap;
 using ZMap.Ogc.Wms;
 using ZServer.Interfaces;
 using ZServer.Interfaces.WMS;
 
 namespace ZServer.API.Controllers;
 
+/// <summary>
+/// WMTS 服务
+/// </summary>
+/// <param name="clusterClient"></param>
+/// <param name="options"></param>
 [ApiController]
 [Route("[controller]")]
 [Authorize]
@@ -30,16 +37,16 @@ public class WMSController(
     /// 2. 直接访问图层: layer
     /// 通过 , 号分隔可以同时请求多个图层 resourceGroup1:layer1,resourceGroup1:layer2
     /// </param>
-    /// <param name="styles">前端传入样式，暂不支持</param>
-    /// <param name="srs">前端投影标识</param>
-    /// <param name="bbox">渲染区域</param>
-    /// <param name="width">渲染图片的宽度</param>
-    /// <param name="height">渲染图片的高度</param>
-    /// <param name="format">返回图片的格式，一般使用 PNG</param>
+    /// <param name="styles">图层渲染样式名称列表（用逗号分隔，与 LAYERS 顺序对应，默认用默认样式）</param>
+    /// <param name="srs">前端空间参考系统, EPSG:900913</param>
+    /// <param name="bbox">地图地理范围（minX,minY,maxX,maxY）: 123.3984375,27.7734375,126.9140625,31.2890625</param>
+    /// <param name="width">输出地图图像的宽度</param>
+    /// <param name="height">输出地图图像的高度</param>
+    /// <param name="format">输出图像格式，一般使用 PNG</param>
     /// <param name="transparent"></param>
     /// <param name="bgColor">图片背景色</param>
     /// <param name="time">请求的时间搓</param>
-    /// <param name="filter">CQL_FILTER，编写 SQL 后面的 WHERE 限制条件</param>
+    /// <param name="filter">Z_FILTER，编写 SQL 后面的 WHERE 限制条件</param>
     /// <param name="formatOptions">格式化参数，参考 WMS 标准</param>
     /// <param name="featureCount"></param>
     /// <param name="exceptions">异常格式：XML 或者 JSON</param>
@@ -49,19 +56,22 @@ public class WMSController(
     /// <param name="bordered"></param>
     [HttpGet]
     public async Task GetAsync(
-        string request,
-        string layers, string styles,
-        string srs,
-        string bbox,
+        [StringLength(25), Required] string request,
+        [StringLength(255), Required] string layers,
+        [StringLength(255)] string styles,
+        [StringLength(15), Required] string srs,
+        [StringLength(100), Required] string bbox,
         int width,
         int height,
-        string format,
+        [StringLength(25)] string format,
         bool transparent,
-        string bgColor,
+        [StringLength(25)] string bgColor,
         int time,
-        [FromQuery(Name = "Z_FILTER")] string filter,
-        [FromQuery(Name = "FORMAT_OPTIONS")] string formatOptions,
-        string exceptions,
+        [FromQuery(Name = "Z_FILTER"), StringLength(2048)]
+        string filter,
+        [FromQuery(Name = "FORMAT_OPTIONS"), StringLength(100)]
+        string formatOptions,
+        [StringLength(255)] string exceptions,
         float x, float y, int featureCount = 1, int buffer = 0, bool bordered = false)
     {
         // var layerList = layers.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -92,7 +102,7 @@ public class WMSController(
                             formatOptions, filter,
                             new Dictionary<string, object>
                             {
-                                { "TraceIdentifier", HttpContext.TraceIdentifier },
+                                { Defaults.TraceIdentifier, HttpContext.TraceIdentifier },
                                 { "Bordered", bordered },
                                 { "Buffer", buffer }
                             });
@@ -105,7 +115,7 @@ public class WMSController(
                         transparent, bgColor, time,
                         formatOptions, filter, new Dictionary<string, object>
                         {
-                            { "TraceIdentifier", HttpContext.TraceIdentifier },
+                            { Defaults.TraceIdentifier, HttpContext.TraceIdentifier },
                             { "Bordered", bordered },
                             { "Buffer", buffer }
                         });
@@ -135,7 +145,7 @@ public class WMSController(
                         await friend.GetFeatureInfoAsync(layers, srs, bbox, width, height, null, featureCount, x, y,
                             new Dictionary<string, object>
                             {
-                                { "TraceIdentifier", HttpContext.TraceIdentifier }
+                                { Defaults.TraceIdentifier, HttpContext.TraceIdentifier }
                             });
                     await HttpContext.WriteAsync(result);
                 }
@@ -146,7 +156,7 @@ public class WMSController(
                         featureCount, x, y,
                         new Dictionary<string, object>
                         {
-                            { "TraceIdentifier", HttpContext.TraceIdentifier }
+                            { Defaults.TraceIdentifier, HttpContext.TraceIdentifier }
                         });
 
                     if (!string.IsNullOrEmpty(result.Code))

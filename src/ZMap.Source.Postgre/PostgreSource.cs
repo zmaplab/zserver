@@ -103,8 +103,8 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
         if (EnvironmentVariables.EnableSensitiveDataLogging)
         {
-            Logger.Value.LogInformation("{Sql} {MinX}, {MaxX}, {MinY}, {MaxY}, {SRID}", sql, bbox.MinX, bbox.MaxX,
-                bbox.MinY, bbox.MaxY, Srid);
+            Logger.Value.LogInformation("{Sql} {MinX}, {MinY}, {MaxX}, {MaxY}, {SRID}", sql, bbox.MinX,
+                bbox.MinY, bbox.MaxX, bbox.MaxY, Srid);
         }
 
         await using var dataSource = GetNpgSqlDataSource();

@@ -53,8 +53,8 @@ public class PermissionService(
         var key = $"{userId}:{action}:{resource}:{policyEffect.Name}";
         var value = await memoryCache.GetOrCreateAsync(key, async entry =>
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, api);
-            var content = new StringContent(JsonSerializer.Serialize(new[]
+            using var request = new HttpRequestMessage(HttpMethod.Post, api);
+            using var content = new StringContent(JsonSerializer.Serialize(new[]
             {
                 new
                 {
@@ -67,7 +67,7 @@ public class PermissionService(
             request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
             request.Content = content;
             var client = clientFactory.CreateClient("PermissionService");
-            var response = await client.SendAsync(request);
+            using var response = await client.SendAsync(request);
             // var json = await response.Content.ReadAsStringAsync();
 
             var result = await JsonSerializer.DeserializeAsync<bool[]>(await response.Content.ReadAsStreamAsync());

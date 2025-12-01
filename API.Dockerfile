@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS api-builder
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api-builder
 WORKDIR /app
 COPY . .
 RUN cd src/ZServer.API && dotnet publish -c Release -o out
@@ -13,9 +13,9 @@ RUN rm -rf src/ZServer.API/out/runtimes/win-arm64
 RUN rm -rf src/ZServer.API/out/runtimes/win-x64
 RUN rm -rf src/ZServer.API/out/runtimes/win-x86
 RUN rm -rf src/ZServer.API/out/shapes
-RUN rm -rf src/ZServer.API/out/Fonts
+RUN rm -rf src/ZServer.API/out/fonts
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS zserver-api
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS zserver-api
 WORKDIR /app
 EXPOSE 8200
 ENV LANG zh_CN.UTF-8

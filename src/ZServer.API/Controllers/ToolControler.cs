@@ -18,7 +18,7 @@ namespace ZServer.API.Controllers;
 [Authorize]
 public class ToolController(ILogger<ToolController> logger, IMemoryCache memoryCache) : ControllerBase
 {
-    [HttpPost("GetAuthority")]
+    [HttpPost("crs_authority")]
     public async Task GetAuthority()
     {
         using var streamReader = new StreamReader(HttpContext.Request.Body);

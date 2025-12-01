@@ -104,7 +104,6 @@ public static class OrleansExtensions
         {
             options.ConnectionString = connectString;
             options.Invariant = invariant;
-             
         });
         siloBuilder.UseAdoNetReminderService(options =>
         {
