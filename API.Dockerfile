@@ -20,10 +20,10 @@ WORKDIR /app
 EXPOSE 8200
 ENV LANG zh_CN.UTF-8
 RUN mkdir /app/shapes && mkdir /app/Fonts
-RUN echo "deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib" > /etc/apt/sources.list && \
-    echo "deb-src https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib" >> /etc/apt/sources.list && \
-    echo "deb https://mirrors.aliyun.com/debian-security/ bookworm-security main" >> /etc/apt/sources.list && \
-    echo "deb-src https://mirrors.aliyun.com/debian-security/ bookworm-security main" >> /etc/apt/sources.list
+RUN echo "deb https://mirrors.aliyun.com/debian/ noble main non-free non-free-firmware contrib" > /etc/apt/sources.list && \
+    echo "deb-src https://mirrors.aliyun.com/debian/ noble main non-free non-free-firmware contrib" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian-security/ noble-security main" >> /etc/apt/sources.list && \
+    echo "deb-src https://mirrors.aliyun.com/debian-security/ noble-security main" >> /etc/apt/sources.list
 RUN apt-get update &&\
     apt-get install -y fontconfig && apt-get clean
 COPY docker-entrypoint.sh /usr/local/bin/
