@@ -10,6 +10,9 @@ namespace ZServer.API.Controllers;
 [Route("[controller]")]
 public class TestController : ControllerBase
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [HttpGet]
     public async Task GetAsync()
     {

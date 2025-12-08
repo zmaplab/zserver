@@ -14,6 +14,14 @@ using ZMap.Permission;
 
 namespace ZServer.API.Permission;
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="optionsMonitor"></param>
+/// <param name="httpContextAccessor"></param>
+/// <param name="logger"></param>
+/// <param name="clientFactory"></param>
+/// <param name="memoryCache"></param>
 public class PermissionService(
     IOptionsMonitor<PermissionOptions> optionsMonitor,
     IHttpContextAccessor httpContextAccessor,
@@ -21,6 +29,13 @@ public class PermissionService(
     IHttpClientFactory clientFactory,
     IMemoryCache memoryCache) : IPermissionService
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="resource"></param>
+    /// <param name="policyEffect"></param>
+    /// <returns></returns>
     public async ValueTask<bool> EnforceAsync(string action, string resource,
         PolicyEffect policyEffect)
     {

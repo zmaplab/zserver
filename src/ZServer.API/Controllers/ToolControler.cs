@@ -13,11 +13,19 @@ using ZMap.Infrastructure;
 
 namespace ZServer.API.Controllers;
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="logger"></param>
+/// <param name="memoryCache"></param>
 [ApiController]
 [Route("api/v1.0/tools")]
 [Authorize]
 public class ToolController(ILogger<ToolController> logger, IMemoryCache memoryCache) : ControllerBase
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [HttpPost("crs_authority")]
     public async Task GetAuthority()
     {

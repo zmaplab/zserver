@@ -31,8 +31,15 @@ using Log = Serilog.Log;
 
 namespace ZServer.API;
 
+/// <summary>
+/// 
+/// </summary>
 public class Program
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="args"></param>
     public static async Task Main(string[] args)
     {
         Utility.PrintInfo();

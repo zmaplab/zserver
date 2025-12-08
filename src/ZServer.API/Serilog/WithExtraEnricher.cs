@@ -5,6 +5,9 @@ using Serilog.Events;
 
 namespace ZServer.API.Serilog;
 
+/// <summary>
+/// 
+/// </summary>
 public class WithExtraEnricher : ILogEventEnricher
 {
     private readonly HttpContext _httpContext;

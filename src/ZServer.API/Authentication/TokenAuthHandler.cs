@@ -9,9 +9,19 @@ using Microsoft.Extensions.Options;
 
 namespace ZServer.API.Authentication;
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="options"></param>
+/// <param name="logger"></param>
+/// <param name="encoder"></param>
 public class TokenAuthHandler(IOptionsMonitor<TokenAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : AuthenticationHandler<TokenAuthOptions>(options, logger, encoder)
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (Context.User.Identity is { IsAuthenticated: true })

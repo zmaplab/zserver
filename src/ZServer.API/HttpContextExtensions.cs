@@ -9,8 +9,17 @@ using ZServer.Interfaces;
 
 namespace ZServer.API;
 
+/// <summary>
+/// 
+/// </summary>
 public static class HttpContextExtensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="httpContext"></param>
+    /// <param name="result"></param>
+    /// <param name="infoFormat"></param>
     public static async Task WriteZServerResponseAsync(this HttpContext httpContext, ZServerResponse result,
         string infoFormat = "text/xml")
     {
@@ -44,6 +53,11 @@ public static class HttpContextExtensions
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="httpContext"></param>
+    /// <param name="result"></param>
     public static async Task WriteAsync(this HttpContext httpContext, object result)
     {
         var options = httpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value;

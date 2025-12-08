@@ -4,8 +4,16 @@ using Microsoft.Extensions.Logging;
 
 namespace ZServer.API.Filters;
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="logger"></param>
 public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExceptionFilter
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context"></param>
     public void OnException(ExceptionContext context)
     {
         context.HttpContext.Response.StatusCode = 500;
