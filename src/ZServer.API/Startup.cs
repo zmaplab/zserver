@@ -101,81 +101,8 @@ public class Startup(IConfiguration configuration)
             }
 
             // 认证
-            var authenticationBuilder = services.AddAuthentication(x =>
-                {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                {
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnAuthenticationFailed = context =>
-                        {
-                            context.Response.StatusCode = 401;
-                            return Task.CompletedTask;
-                        }
-                    };
+            var authenticationBuilder = services.AddJwtBearerAuthentication(configuration);
 
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience =
-                            "true".Equals(configuration["JwtBearer:ValidateAudience"],
-                                StringComparison.OrdinalIgnoreCase),
-                        ValidateIssuer = "true".Equals(configuration["JwtBearer:ValidateIssuer"],
-                            StringComparison.OrdinalIgnoreCase),
-                        ValidIssuer = configuration["JwtBearer:ValidIssuer"],
-                        ValidAudience = configuration["JwtBearer:ValidAudience"],
-                        ValidateLifetime = "true".Equals(configuration["JwtBearer:ValidateLifetime"],
-                            StringComparison.OrdinalIgnoreCase)
-                    };
-
-                    var keyType = configuration["JwtBearer:Key:kty"];
-                    if (!string.IsNullOrEmpty(keyType))
-                    {
-                        var webKey = configuration.GetSection("JwtBearer:Key").Get<JsonWebKey>();
-                        var rsaParameters = new RSAParameters
-                        {
-                            Modulus = Base64UrlEncoder.DecodeBytes(webKey.N),
-                            Exponent = Base64UrlEncoder.DecodeBytes(webKey.E),
-                            D = string.IsNullOrEmpty(webKey.D) ? null : Base64UrlEncoder.DecodeBytes(webKey.D),
-                            P = string.IsNullOrEmpty(webKey.P) ? null : Base64UrlEncoder.DecodeBytes(webKey.P),
-                            Q = string.IsNullOrEmpty(webKey.Q) ? null : Base64UrlEncoder.DecodeBytes(webKey.Q),
-                            DP = string.IsNullOrEmpty(webKey.DP) ? null : Base64UrlEncoder.DecodeBytes(webKey.DP),
-                            DQ = string.IsNullOrEmpty(webKey.DQ) ? null : Base64UrlEncoder.DecodeBytes(webKey.DQ),
-                            InverseQ = string.IsNullOrEmpty(webKey.QI) ? null : Base64UrlEncoder.DecodeBytes(webKey.QI)
-                        };
-
-                        // 可选：禁用自动发现配置的额外校验
-                        options.ConfigurationManager = null;
-                        options.Authority = null;
-                        options.RequireHttpsMetadata = false;
-                        options.TokenValidationParameters.IssuerSigningKey = new RsaSecurityKey(rsaParameters);
-                    }
-                    else
-                    {
-                        options.Authority = configuration["JwtBearer:Authority"] ??
-                                            throw new ApplicationException("JwtBearer:Authority is null or empty. ");
-
-                        options.RequireHttpsMetadata = "true".Equals(configuration["JwtBearer:RequireHttpsMetadata"],
-                            StringComparison.OrdinalIgnoreCase);
-                        options.MetadataAddress = configuration["JwtBearer:MetadataAddress"] ?? string.Empty;
-
-                        // 试验性代码，authority 不设计 https/requireHttpsMetadata
-                        if (!options.RequireHttpsMetadata && string.IsNullOrEmpty(options.MetadataAddress) &&
-                            !string.IsNullOrEmpty(options.Authority))
-                        {
-                            var metadataAddress =
-                                options.Authority.Replace("https://", "http://", StringComparison.OrdinalIgnoreCase);
-                            if (!metadataAddress.EndsWith("/", StringComparison.Ordinal))
-                            {
-                                metadataAddress += "/";
-                            }
-
-                            options.MetadataAddress = metadataAddress + ".well-known/openid-configuration";
-                        }
-                    }
-                });
             var tokens = configuration
                 .GetSection("tokens").Get<HashSet<string>>();
             authenticationBuilder.AddScheme<TokenAuthOptions, TokenAuthHandler>("Token",
