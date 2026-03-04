@@ -24,10 +24,9 @@ public static class JwtBearerAuthenticationExtensions
         IConfiguration configuration)
     {
         var jwtBearerOptions = configuration.GetSection("JwtBearer").Get<JwtBearerSettings>();
-        RsaSecurityKey rsaSecurityKey = null;
-        if (jwtBearerOptions.Key != null)
+        var rsaSecurityKey = jwtBearerOptions.GetRsaSecurityKey();
+        if (rsaSecurityKey != null)
         {
-            rsaSecurityKey = jwtBearerOptions.Key.GetRsaSecurityKey();
             services.AddKeyedSingleton(JwtBearerSettings.JwtBearerRsaSecurityKey, rsaSecurityKey);
         }
 
@@ -66,25 +65,10 @@ public static class JwtBearerAuthenticationExtensions
                 }
                 else
                 {
-                    options.Authority = jwtBearerOptions.Authority ??
-                                        throw new ApplicationException("JwtBearer:Authority is null or empty. ");
-
+                    options.Authority = jwtBearerOptions.Authority ?? throw new ApplicationException(
+                        "JwtBearer:Authority is null or empty. Please check your configuration. https://qcn6sgdfwyfj.feishu.cn/wiki/O4QEwz6idiwHFsk8V3EcLE7Unpf?fromScene=spaceOverview#share-VPlFdJAwSo2Oyyxs7XPcWHy4nQd");
                     options.RequireHttpsMetadata = jwtBearerOptions.RequireHttpsMetadata;
-                    options.MetadataAddress = jwtBearerOptions.MetadataAddress ?? string.Empty;
-
-                    // 试验性代码，authority 不设计 https/requireHttpsMetadata
-                    if (!options.RequireHttpsMetadata && string.IsNullOrEmpty(options.MetadataAddress) &&
-                        !string.IsNullOrEmpty(options.Authority))
-                    {
-                        var metadataAddress =
-                            options.Authority.Replace("https://", "http://", StringComparison.OrdinalIgnoreCase);
-                        if (!metadataAddress.EndsWith("/", StringComparison.Ordinal))
-                        {
-                            metadataAddress += "/";
-                        }
-
-                        options.MetadataAddress = metadataAddress + ".well-known/openid-configuration";
-                    }
+                    options.MetadataAddress = jwtBearerOptions.GetMetadataAddress();
                 }
             });
 
