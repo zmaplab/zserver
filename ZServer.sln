@@ -39,6 +39,8 @@ ProjectSection(SolutionItems) = preProject
 	docker-entrypoint.sh = docker-entrypoint.sh
 	ci.yml = .github/workflows/docker-image.yml
 	design.md = design.md
+	AGENTS.md = AGENTS.md
+	docs\ZServer使用文档.md = docs\ZServer使用文档.md
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZServer.API", "src\ZServer.API\ZServer.API.csproj", "{C2B0CB75-1C1B-4541-BCCA-E7071342C2C8}"

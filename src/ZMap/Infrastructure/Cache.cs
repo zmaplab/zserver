@@ -1,8 +1,17 @@
+using Microsoft.Extensions.Internal;
+
 namespace ZMap.Infrastructure;
 
 public static class Cache
 {
-    private static readonly IMemoryCache MemoryCache = new MemoryCache(new MemoryCacheOptions());
+    private static readonly IMemoryCache MemoryCache = new MemoryCache(new MemoryCacheOptions
+    {
+        SizeLimit = null, // 不限制条目数
+        ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+        CompactionPercentage = 0.05 ,
+        TrackLinkedCacheEntries =  false,
+    
+    });
 
     public static TItem GetOrCreate<TItem>(string key, Func<ICacheEntry, TItem> valueFactory)
     {

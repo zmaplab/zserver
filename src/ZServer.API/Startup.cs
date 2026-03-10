@@ -158,11 +158,13 @@ public class Startup(IConfiguration configuration)
         app.UseHealthChecks("/healthz");
         // app.UseResponseCompression();
         app.UseResponseCaching();
-
+        
         app.UseRouting();
 
-        app.UseAuthorization();
+// 先认证
         app.UseAuthentication();
+// 后授权
+        app.UseAuthorization();
 
         app.UseCors("cors");
         app.Use((context, next) =>

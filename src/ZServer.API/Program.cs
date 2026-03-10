@@ -63,9 +63,10 @@ public class Program
         var app = CreateHostBuilder(args).Build();
         var configuration = app.Services.GetRequiredService<IConfiguration>();
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
-        await DownloadResource(configuration, logger, "FontResource", "fonts");
+        var httpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient();
+        await DownloadResource(configuration, logger, httpClient, "FontResource", "fonts");
         FontUtility.Load();
-        await DownloadResource(configuration, logger, "SymbolResource", "symbols");
+        await DownloadResource(configuration, logger, httpClient, "SymbolResource", "symbols");
         await app.RunAsync();
     }
 
@@ -170,10 +171,10 @@ public class Program
             }).ConfigureSilo()
             .UseSerilog();
 
-    private static async Task DownloadResource(IConfiguration configuration, ILogger logger, string name, string folder)
+    private static async Task DownloadResource(IConfiguration configuration, ILogger logger, HttpClient httpClient,
+        string name, string folder)
     {
         var url = configuration[name];
-        var httpClient = new HttpClient();
         if (!string.IsNullOrEmpty(url))
         {
             var bytes = await httpClient.GetByteArrayAsync(url);
@@ -185,11 +186,21 @@ public class Program
                     Directory.CreateDirectory("/tmp");
                 }
 
-                await File.WriteAllBytesAsync(file, bytes);
+                try
+                {
+                    await File.WriteAllBytesAsync(file, bytes);
 
-                var baseFolder = $"/app/{folder}";
-                Unzip(baseFolder, file);
-                logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
+                    var baseFolder = $"/app/{folder}";
+                    Unzip(baseFolder, file);
+                    logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
+                }
+                finally
+                {
+                    if (File.Exists(file))
+                    {
+                        File.Delete(file);
+                    }
+                }
             }
         }
     }

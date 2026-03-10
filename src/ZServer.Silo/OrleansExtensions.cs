@@ -79,7 +79,7 @@ public static class OrleansExtensions
         var scriptPath = $"{invariant}.sql";
         if (!File.Exists(scriptPath))
         {
-            throw new Exception("Invariant sql is missing");
+            throw new FileNotFoundException("Invariant sql is missing");
         }
 
         var sql = File.ReadAllText(scriptPath);
@@ -88,7 +88,7 @@ public static class OrleansExtensions
             assembly.GetTypes().FirstOrDefault(x => x.IsAssignableTo(typeof(IDbConnection)));
         if (connectionType == null)
         {
-            throw new Exception("Invariant driver's connection type is missing");
+            throw new ArgumentException("Invariant driver's connection type is missing");
         }
 
         using var conn =
@@ -132,7 +132,7 @@ public static class OrleansExtensions
                 IPAddress ipAddress;
                 if (string.IsNullOrWhiteSpace(hostIp))
                 {
-                    var ips = Dns.GetHostAddressesAsync(Dns.GetHostName()).Result;
+                    var ips = Dns.GetHostAddresses(Dns.GetHostName());
                     ipAddress = ips.FirstOrDefault(x =>
                         x.AddressFamily == AddressFamily.InterNetwork
                         && !Equals(x, IPAddress.Loopback)

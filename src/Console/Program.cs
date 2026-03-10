@@ -64,7 +64,7 @@ class Program
 
         await using var conn =
             new NpgsqlConnection(
-                "User ID=postgres;Password=1qazZAQ!;Host=localhost;Port=5432;Database=hdy;Pooling=true;");
+                "User ID=postgres;Password=;Host=localhost;Port=5432;Database=hdy;Pooling=true;");
 
         // var extent = await conn.QuerySingleOrDefaultAsync<Extent>(
         //     $"select min(st_xmin(geom)) xmin, min(st_ymin(geom)) ymin, max(st_xmax(geom)) xmax, max(st_ymax(geom)) ymax from sldc_2019");
