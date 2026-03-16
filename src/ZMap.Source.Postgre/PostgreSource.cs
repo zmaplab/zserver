@@ -93,7 +93,8 @@ public sealed class PostgreSource(string connectionString) : SpatialDatabaseSour
 
             if (!string.IsNullOrEmpty(Where))
             {
-                sqlBuilder.Append(" AND ").Append(Where);
+                var sanitized = SanitizeWhereClause(Where);
+                sqlBuilder.Append(" AND ").Append(sanitized);
             }
 
             return sqlBuilder.ToString();

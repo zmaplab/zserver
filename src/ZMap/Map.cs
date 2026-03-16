@@ -7,7 +7,7 @@ namespace ZMap;
 /// 如果图层数据是矢量数据，则可以直接获取对应区域的矢量后进行样式渲染
 /// 如果图层是栅格、瓦片数据，则需要根据区域重新算出相交的瓦片、然后获取瓦片数据进行渲染
 /// </summary>
-public class Map : IDisposable
+public class Map
 {
     private static readonly Lazy<ILogger> Logger = new(Log.CreateLogger<Map>());
     private readonly List<Layer> _layers = new();
@@ -84,9 +84,5 @@ public class Map : IDisposable
         }
 
         return graphicsService.GetImage(imageFormat, viewport.Bordered);
-    }
-
-    public void Dispose()
-    {
     }
 }

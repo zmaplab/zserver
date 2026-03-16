@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
 using Serilog.Context;
@@ -66,26 +63,38 @@ public class Startup(IConfiguration configuration)
             {
                 options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
             });
-
         services.AddResponseCaching();
         services.AddRouting(x => { x.LowercaseUrls = true; });
         services.AddZServer(configuration).AddSkiaSharpRenderer();
         services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
         services.Configure<ServerOptions>(configuration);
         services.Configure<ClusterOptions>("Orleans", configuration);
-
-        // services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZServer.API", Version = "v1" }); });
-
         services.AddCors(option =>
         {
-            option
-                .AddPolicy("cors", policy =>
-                    policy.AllowAnyMethod()
-                        .SetIsOriginAllowed(_ => true)
-                        .AllowAnyHeader()
-                        .WithExposedHeaders("Content-Disposition", "X-Suggested-Filename")
-                        .AllowCredentials().SetPreflightMaxAge(TimeSpan.FromDays(30))
-                );
+            var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+            if (allowedOrigins is { Length: > 0 })
+            {
+                option
+                    .AddPolicy("cors", policy =>
+                        policy.WithOrigins(allowedOrigins).AllowAnyMethod()
+                            .SetIsOriginAllowed(_ => true)
+                            .AllowAnyHeader()
+                            .WithExposedHeaders("Content-Disposition", "X-Suggested-Filename")
+                            .AllowCredentials().SetPreflightMaxAge(TimeSpan.FromDays(30))
+                    );
+            }
+            else
+            {
+                option
+                    .AddPolicy("cors", policy =>
+                        policy.AllowAnyMethod()
+                            .SetIsOriginAllowed(_ => true)
+                            .AllowAnyHeader()
+                            .WithExposedHeaders("Content-Disposition", "X-Suggested-Filename")
+                            .AllowCredentials().SetPreflightMaxAge(TimeSpan.FromDays(30))
+                    );
+            }
         });
         services.AddHttpContextAccessor();
         services.AddHttpClient();

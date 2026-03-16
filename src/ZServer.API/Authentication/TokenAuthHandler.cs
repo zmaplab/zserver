@@ -43,17 +43,17 @@ public class TokenAuthHandler(IOptionsMonitor<TokenAuthOptions> options, ILogger
 
         if (token.Length != 24)
         {
-            Logger.LogError("traceId {TraceId}: token {Token} 长度必须小于等于 24", Context.TraceIdentifier, token);
+            Logger.LogError("traceId {TraceId}: token 长度必须小于等于 24", Context.TraceIdentifier);
             return AuthenticateResult.Fail("401");
         }
 
         if (!Options.Tokens.Contains(token))
         {
-            Logger.LogError("traceId {TraceId}: token {Token} 不合法", Context.TraceIdentifier, token);
+            Logger.LogError("traceId {TraceId}: token 不合法", Context.TraceIdentifier);
             return AuthenticateResult.Fail("401");
         }
 
-        Logger.LogDebug("验签成功 traceId {TraceId} token {Token}", Context.TraceIdentifier, token);
+        Logger.LogDebug("验签成功 traceId {TraceId}", Context.TraceIdentifier);
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, token),

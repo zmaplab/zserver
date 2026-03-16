@@ -1,5 +1,8 @@
+using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace ZServer.API.Filters;
@@ -8,7 +11,8 @@ namespace ZServer.API.Filters;
 /// 
 /// </summary>
 /// <param name="logger"></param>
-public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExceptionFilter
+public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger, IWebHostEnvironment hostEnvironment)
+    : IExceptionFilter
 {
     /// <summary>
     /// 
@@ -16,7 +20,6 @@ public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExc
     /// <param name="context"></param>
     public void OnException(ExceptionContext context)
     {
-        context.HttpContext.Response.StatusCode = 500;
         context.Result = new JsonResult(new
         {
             success = false,
@@ -25,5 +28,24 @@ public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExc
         });
         context.ExceptionHandled = true;
         logger.LogError(context.Exception, "请求异常");
+
+        var statusCode = context.Exception switch
+        {
+            ArgumentException => 400,
+            UnauthorizedAccessException => 401,
+            _ => 500
+        };
+
+        context.HttpContext.Response.StatusCode = statusCode;
+        context.Result = new JsonResult(new
+        {
+            success = false,
+            msg = hostEnvironment.IsDevelopment() ? context.Exception.Message : "请求处理失败",
+            code = statusCode,
+            traceId = context.HttpContext.TraceIdentifier
+        });
+
+        logger.LogError(context.Exception, "请求异常 TraceId: {TraceId}",
+            context.HttpContext.TraceIdentifier);
     }
 }

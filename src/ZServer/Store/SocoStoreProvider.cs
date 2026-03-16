@@ -26,6 +26,14 @@ public class SocoStoreProvider(
     private static readonly List<string> ExcludeParams =
         ["appId", "nonce", "timestamp", "sign"];
 
+    private static readonly JsonSerializerSettings SafeSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.None,
+        MaxDepth = 32,
+        DateParseHandling = DateParseHandling.None,
+        MetadataPropertyHandling = MetadataPropertyHandling.Ignore
+    };
+
     static SocoStoreProvider()
     {
     }
@@ -116,7 +124,7 @@ public class SocoStoreProvider(
             return null;
         }
 
-        var result = JsonConvert.DeserializeObject<ApiResult>(json);
+        var result = JsonConvert.DeserializeObject<ApiResult>(json, SafeSettings);
         if (result.Data == null || result.Data.Count == 0)
         {
             return null;
@@ -131,7 +139,7 @@ public class SocoStoreProvider(
                 continue;
             }
 
-            var obj = JsonConvert.DeserializeObject<JObject>(value);
+            var obj = JsonConvert.DeserializeObject<JObject>(value, SafeSettings);
             list.Add(obj);
         }
 
@@ -143,7 +151,7 @@ public class SocoStoreProvider(
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         public List<DataItem> Data { get; set; }
     }
-    
+
     private class DataItem
     {
         // ReSharper disable once UnusedAutoPropertyAccessor.Local

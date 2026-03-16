@@ -11,40 +11,37 @@ namespace ZServer;
 
 public class RefreshConfigService(
     IServiceProvider serviceProvider)
-    : IHostedService
+    : BackgroundService
 {
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return Task.Factory.StartNew(async () =>
+        var logger = serviceProvider.GetRequiredService<ILogger<RefreshConfigService>>();
+        var configurationProvider = serviceProvider.GetRequiredService<IJsonStoreProvider>();
+        configurationProvider.Check();
+
+        var logged = false;
+        while (!stoppingToken.IsCancellationRequested)
         {
-            var logger = serviceProvider.GetRequiredService<ILogger<RefreshConfigService>>();
-            var configurationProvider = serviceProvider.GetRequiredService<IJsonStoreProvider>();
-            configurationProvider.Check();
-
-            var logged = false;
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                try
+                await RefreshAsync(configurationProvider, logger);
+                if (!logged)
                 {
-                    await RefreshAsync(configurationProvider, logger);
-                    if (!logged)
-                    {
-                        logger.LogInformation("刷新配置完成");
-                        logged = true;
-                    }
-                    else
-                    {
-                        logger.LogDebug("刷新配置完成");
-                    }
+                    logger.LogInformation("刷新配置完成");
+                    logged = true;
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.LogError(e, "加载配置失败");
+                    logger.LogDebug("刷新配置完成");
                 }
-
-                await Task.Delay(10000, cancellationToken);
             }
-        }, cancellationToken);
+            catch (Exception e)
+            {
+                logger.LogError(e, "加载配置失败");
+            }
+
+            await Task.Delay(10000, stoppingToken);
+        }
     }
 
     public async Task RefreshAsync(IJsonStoreProvider jsonStoreProvider, ILogger logger)
@@ -84,10 +81,5 @@ public class RefreshConfigService(
             var layerGroupStore = scope.ServiceProvider.GetRequiredService<ILayerGroupStore>();
             await layerGroupStore.RefreshAsync(configurations);
         }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 }

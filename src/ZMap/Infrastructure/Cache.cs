@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Internal;
-
 namespace ZMap.Infrastructure;
 
 public static class Cache
@@ -8,9 +6,8 @@ public static class Cache
     {
         SizeLimit = null, // 不限制条目数
         ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-        CompactionPercentage = 0.05 ,
-        TrackLinkedCacheEntries =  false,
-    
+        CompactionPercentage = 0.05,
+        TrackLinkedCacheEntries = false,
     });
 
     public static TItem GetOrCreate<TItem>(string key, Func<ICacheEntry, TItem> valueFactory)

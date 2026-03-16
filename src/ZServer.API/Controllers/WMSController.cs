@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Orleans;
 using ZMap;
@@ -24,7 +23,8 @@ namespace ZServer.API.Controllers;
 // ReSharper disable once InconsistentNaming
 public class WMSController(
     IClusterClient clusterClient,
-    IOptions<ServerOptions> options) : ControllerBase
+    IOptions<ServerOptions> options,
+    WmsService wmsService) : ControllerBase
 {
     // private static readonly Random Rnd = new();
 
@@ -110,7 +110,6 @@ public class WMSController(
                 }
                 else
                 {
-                    var wmsService = HttpContext.RequestServices.GetRequiredService<WmsService>();
                     using var result = await wmsService.GetMapAsync(layers, styles, srs, bbox, width, height, format,
                         transparent, bgColor, time,
                         formatOptions, filter, new Dictionary<string, object>
@@ -151,7 +150,6 @@ public class WMSController(
                 }
                 else
                 {
-                    var wmsService = HttpContext.RequestServices.GetRequiredService<WmsService>();
                     var result = await wmsService.GetFeatureInfoAsync(layers, srs, bbox, width, height, null,
                         featureCount, x, y,
                         new Dictionary<string, object>

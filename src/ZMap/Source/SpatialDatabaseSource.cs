@@ -51,4 +51,15 @@ public abstract class SpatialDatabaseSource(string connectionString) : VectorSou
         return
             $"ConnectionString: {ConnectionString}, Table: {Table}, SRID: {Srid}, Geometry: {Geometry}";
     }
+    
+    protected static string SanitizeWhereClause(string where)
+    {
+        // 白名單驗證：只允許特定字段和操作符
+        var allowedPattern = @"^[\w\s=<>!''"",\.\(\)]+$";
+        if (!Regex.IsMatch(where, allowedPattern))
+        {
+            throw new ArgumentException("Invalid WHERE clause");
+        }
+        return where;
+    }
 }
