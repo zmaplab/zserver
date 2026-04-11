@@ -2,7 +2,6 @@
   "Serilog": {
     "Using": [
       "Serilog.Sinks.Async",
-      "Serilog.Sinks.ClickHouse",
       "Serilog.Sinks.Console",
       "Serilog.Expressions",
       "Serilog.Sinks.Grafana.Loki",
@@ -29,89 +28,11 @@
         "Args": {
           "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
         }
-      },
-      {
-        "Name": "ClickHouse",
-        "Args": {
-          "endpointAddr": "http://10.0.10.190:8123",
-          "database": "logs",
-          "table": "application_log",
-          "application": "bch-zserver-api",
-          "user": "default",
-          "key": ""
-        }
       }
     ],
     "Enrich": [
       "FromLogContext",
-      "WithThreadId",
-      {
-        "Name": "WithEnvironmentVariable",
-        "Args": {
-          "environmentVariableName": "MachineName",
-          "propertyName": "machine_name"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "user_id",
-          "propertyName": "user_id"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "user_name",
-          "propertyName": "user_name"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "x-trace-id",
-          "propertyName": "trace_id"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "x-frontend-version",
-          "propertyName": "frontend_version"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "x-page-open-time",
-          "propertyName": "page_open_time"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "session",
-          "propertyName": "session"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "SecurityToken",
-          "propertyName": "security_token"
-        }
-      },
-      {
-        "Name": "WithHttpHeader",
-        "Args": {
-          "headerKey": "client",
-          "propertyName": "client"
-        }
-      }
-    ],
-    "Properties": {
-      "MachineName": "${MachineName}",
-      "source": "backend"
-    }
+      "WithThreadId" 
+    ]
   }
 }

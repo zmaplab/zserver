@@ -1,30 +1,40 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
-using RemoteConfiguration.Json.Aliyun;
+using NetTopologySuite.IO.Converters;
+using Orleans.Configuration;
+using Prometheus;
 using Serilog;
-using Serilog.Events;
-using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
+using ZMap.Permission;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZServer.Silo;
+using ZServer.API.Authentication;
+using ZServer.API.Features;
+using ZServer.API.Filters;
+using ZServer.API.Middlewares;
+using ZServer.API.Permission;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Log = Serilog.Log;
 
 #if !DEBUG
 #endif
@@ -36,6 +46,9 @@ namespace ZServer.API;
 /// </summary>
 public class Program
 {
+    private static bool _enableAuthorization;
+    private static readonly string CrosPoliy = "___my_cors";
+
     /// <summary>
     /// 
     /// </summary>
@@ -60,172 +73,233 @@ public class Program
             Directory.CreateDirectory("cache");
         }
 
-        var app = CreateHostBuilder(args).Build();
-        var configuration = app.Services.GetRequiredService<IConfiguration>();
-        var logger = app.Services.GetRequiredService<ILogger<Program>>();
-        var httpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient();
-        await DownloadResource(configuration, logger, httpClient, "FontResource", "fonts");
+        var app = CreateApp(args);
+
+        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+        ZMap.Infrastructure.Log.SetLoggerFactory(loggerFactory);
         FontUtility.Load();
-        await DownloadResource(configuration, logger, httpClient, "SymbolResource", "symbols");
+
+        app.UseHealthChecks("/healthz");
+        // app.UseResponseCompression();
+        app.UseResponseCaching();
+
+        app.UseRouting();
+        app.UseCors(CrosPoliy);
+
+        var healthCheckPath = Environment.GetEnvironmentVariable("HEALTH_CHECK_PATH") ?? "/healthz";
+        app.UseHealthChecks(healthCheckPath, HealthCheckUtils.CreateHealthCheckOptions());
+
+// 先认证
+        app.UseAuthentication();
+// 后授权
+        app.UseAuthorization();
+        app.UseCloudEvents();
+        app.MapSubscribeHandler();
+        app.MapControllers()
+            .RequireCors(CrosPoliy);
+        app.MapMetrics();
         await app.RunAsync();
     }
 
-    /// <summary>
-    /// 配置响应顺序，按从低到高：环境 -> 配置 -> command parameters
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureHostConfiguration(x =>
-            {
-                x.AddEnvironmentVariables();
-                x.AddCommandLine(args);
-            })
-            .ConfigureAppConfiguration((_, builder) =>
-            {
-                builder.AddEnvironmentVariables();
-
-                if (File.Exists("conf/serilog.json"))
-                {
-                    builder.AddJsonFile("conf/serilog.json", optional: true, reloadOnChange: true);
-                }
-
-                if (File.Exists("conf/appsettings.json"))
-                {
-                    builder.AddJsonFile("conf/appsettings.json", optional: true, reloadOnChange: true);
-                }
-
-                var configuration = builder.Build();
-
-                // nacos 漏洞太多
-                // // 1. 加载 nacos 配置
-                // var section = configuration.GetSection("Nacos");
-                // if (section.GetChildren().Any())
-                // {
-                //     builder.AddNacosV2Configuration(section);
-                // }
-
-                // 2. 加载 remote configuration 配置
-                if (!string.IsNullOrEmpty(configuration["RemoteConfiguration:Endpoint"]))
-                {
-                    builder.AddAliyunJsonFile(source =>
-                    {
-                        source.Endpoint = configuration["RemoteConfiguration:Endpoint"];
-                        source.BucketName = configuration["RemoteConfiguration:BucketName"];
-                        source.AccessKeyId = configuration["RemoteConfiguration:AccessKeyId"];
-                        source.AccessKeySecret = configuration["RemoteConfiguration:AccessKeySecret"];
-                        source.Key = configuration["RemoteConfiguration:Key"];
-                    });
-                }
-
-                builder.AddCommandLine(args);
-
-                var finalConfiguration = builder.Build();
-                EnvironmentVariables.OrleansHostIP =
-                    EnvironmentVariables.GetValue(finalConfiguration, "HOST_IP", "HostIP");
-
-                var serilogSection = finalConfiguration.GetSection("Serilog");
-                if (serilogSection.GetChildren().Any())
-                {
-                    Log.Logger = new LoggerConfiguration().ReadFrom
-                        .Configuration(finalConfiguration)
-                        .CreateLogger();
-                }
-                else
-                {
-                    var logFile = Environment.GetEnvironmentVariable("LOG_PATH");
-                    if (string.IsNullOrEmpty(logFile))
-                    {
-                        logFile = Environment.GetEnvironmentVariable("LOG");
-                    }
-
-                    if (string.IsNullOrEmpty(logFile))
-                    {
-                        logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                            "logs/log.txt".ToLowerInvariant());
-                    }
-
-                    Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Information()
-                        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-                        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                        .MinimumLevel.Override("System", LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
-                        .Enrich.FromLogContext()
-                        // Serilog.Enrichers.Thread
-                        .Enrich.WithThreadId()
-                        // Serilog.Enrichers.Environment
-                        .Enrich.WithMachineName()
-                        .WriteTo.Console()
-                        // .WriteTo.ClickHouse()
-                        .WriteTo.Async(x => x.File(logFile, rollingInterval: RollingInterval.Day))
-                        .CreateLogger();
-                }
-            })
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseUrls("http://+:8200");
-                webBuilder.UseStartup<Startup>();
-            }).ConfigureSilo()
-            .UseSerilog();
-
-    private static async Task DownloadResource(IConfiguration configuration, ILogger logger, HttpClient httpClient,
-        string name, string folder)
+    private static WebApplication CreateApp(string[] args)
     {
-        var url = configuration[name];
-        if (!string.IsNullOrEmpty(url))
+        var builder = WebApplication.CreateBuilder(args);
+        builder.WebHost.ConfigureKestrel((_, options) =>
         {
-            var bytes = await httpClient.GetByteArrayAsync(url);
-            if (bytes.Length > 0)
-            {
-                var file = Path.Combine("/tmp", $"{Guid.NewGuid():N}.zip");
-                if (!Directory.Exists(Path.GetDirectoryName(file)))
-                {
-                    Directory.CreateDirectory("/tmp");
-                }
+            // Handle requests up to 500 MB
+            options.Limits.MaxRequestBodySize = 1024288000;
+            options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+            options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(20);
+        });
 
-                try
-                {
-                    await File.WriteAllBytesAsync(file, bytes);
+        builder.Configuration.AddEnvironmentVariables("ZSERVER_");
 
-                    var baseFolder = $"/app/{folder}";
-                    Unzip(baseFolder, file);
-                    logger.LogInformation("Download {Name} from {Url} completed", name.Replace("Resource", ""), url);
-                }
-                finally
-                {
-                    if (File.Exists(file))
-                    {
-                        File.Delete(file);
-                    }
-                }
-            }
+        builder.AddSerilog();
+        builder.Host.UseSerilog();
+
+        // Add services to the container.
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddOpenApi();
         }
+
+        _enableAuthorization = builder.Configuration.GetValue<bool>("EnableAuthorization");
+
+        var services = builder.Services;
+        // 可选：启用OpenTelemetry追踪（如需可视化/导出TraceId）
+        // 替换默认的 IHttpContextFactory, 创建后立即修改 启用OpenTelemetry 相关 Header 才能启作用
+        services.AddSingleton<IHttpContextFactory, HttpContextFactory>();
+
+        // 替换默认的 IHttpRequestIdentifierFeature
+        services.AddTransient<IHttpRequestIdentifierFeature>(sp =>
+        {
+            // 获取原始 Feature（框架默认实现）
+            var originalFeature = sp.GetRequiredService<HttpRequestIdentifierFeature>();
+            // 注入依赖项
+            var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+            // 返回自定义 Feature
+            return new TraceIdentifierFeature(originalFeature, httpContextAccessor);
+        });
+
+        services.AddControllers(x => { x.Filters.Add<GlobalExceptionFilter>(); })
+            .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory()); })
+            .AddDapr();
+        services.AddResponseCaching();
+        services.AddRouting(x => { x.LowercaseUrls = true; });
+        services.AddZServer(builder.Configuration).AddSkiaSharpRenderer();
+        services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
+        services.Configure<ServerOptions>(builder.Configuration);
+        services.Configure<ClusterOptions>("Orleans", builder.Configuration);
+        services.AddCors(option =>
+        {
+            option.AddPolicy(CrosPoliy, policy =>
+                policy.AllowAnyMethod()
+                    .SetIsOriginAllowed(_ => true)
+                    .AllowAnyHeader()
+                    .WithExposedHeaders("x-suggested-filename")
+                    .AllowCredentials().SetPreflightMaxAge(TimeSpan.FromDays(30))
+            );
+        });
+        services.AddHttpContextAccessor();
+        services.AddHttpClient();
+        services.AddHealthChecks();
+        services.Configure<PermissionOptions>(builder.Configuration);
+        services.TryAddSingleton<IPermissionService, PermissionService>();
+
+        var apiName = builder.Configuration["ApiName"];
+        if (string.IsNullOrWhiteSpace(apiName))
+        {
+            apiName = "zserver-api";
+        }
+
+        builder.AddOtel(apiName);
+
+        if (_enableAuthorization)
+        {
+            // 认证
+            services.AddAuthentication(builder.Configuration, apiName);
+
+            // 注册授权策略
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("default", policy =>
+                {
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "Token");
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", apiName);
+                });
+            });
+        }
+        else
+        {
+            // 当授权被禁用时，添加一个“空”的授权服务或什么都不做。
+            // 为了确保 MVC 能正常运行，我们可以添加一个允许所有请求的授权策略到全局过滤器。
+            // 但更优雅的方式是通过自定义过滤器处理（见下一步）。
+            services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
+        }
+
+        return builder.Build();
     }
 
-    private static void Unzip(string baseFolder, string file)
-    {
-        if (string.IsNullOrEmpty(baseFolder))
-        {
-            return;
-        }
-
-        if (!Directory.Exists(baseFolder))
-        {
-            Directory.CreateDirectory(baseFolder);
-        }
-
-        // 解压文件
-        using var zipArchive = ZipFile.OpenRead(file);
-        foreach (var entry in zipArchive.Entries)
-        {
-            // 构建目标文件路径
-            var destinationPath = Path.Combine(baseFolder, entry.FullName);
-
-            // 解压文件
-            entry.ExtractToFile(destinationPath, true);
-        }
-    }
+    // /// <summary>
+    // /// 配置响应顺序，按从低到高：环境 -> 配置 -> command parameters
+    // /// </summary>
+    // /// <param name="args"></param>
+    // /// <returns></returns>
+    // private static IHostBuilder CreateHostBuilder(string[] args) =>
+    //     Host.CreateDefaultBuilder(args)
+    //         .ConfigureHostConfiguration(x =>
+    //         {
+    //             x.AddEnvironmentVariables();
+    //             x.AddCommandLine(args);
+    //         })
+    //         .ConfigureAppConfiguration((_, builder) =>
+    //         {
+    //             builder.AddEnvironmentVariables();
+    //
+    //             if (File.Exists("conf/serilog.json"))
+    //             {
+    //                 builder.AddJsonFile("conf/serilog.json", optional: true, reloadOnChange: true);
+    //             }
+    //
+    //             if (File.Exists("conf/appsettings.json"))
+    //             {
+    //                 builder.AddJsonFile("conf/appsettings.json", optional: true, reloadOnChange: true);
+    //             }
+    //
+    //             var configuration = builder.Build();
+    //
+    //             // nacos 漏洞太多
+    //             // // 1. 加载 nacos 配置
+    //             // var section = configuration.GetSection("Nacos");
+    //             // if (section.GetChildren().Any())
+    //             // {
+    //             //     builder.AddNacosV2Configuration(section);
+    //             // }
+    //
+    //             // 2. 加载 remote configuration 配置
+    //             if (!string.IsNullOrEmpty(configuration["RemoteConfiguration:Endpoint"]))
+    //             {
+    //                 builder.AddAliyunJsonFile(source =>
+    //                 {
+    //                     source.Endpoint = configuration["RemoteConfiguration:Endpoint"];
+    //                     source.BucketName = configuration["RemoteConfiguration:BucketName"];
+    //                     source.AccessKeyId = configuration["RemoteConfiguration:AccessKeyId"];
+    //                     source.AccessKeySecret = configuration["RemoteConfiguration:AccessKeySecret"];
+    //                     source.Key = configuration["RemoteConfiguration:Key"];
+    //                 });
+    //             }
+    //
+    //             builder.AddCommandLine(args);
+    //
+    //             var finalConfiguration = builder.Build();
+    //             EnvironmentVariables.OrleansHostIP =
+    //                 EnvironmentVariables.GetValue(finalConfiguration, "HOST_IP", "HostIP");
+    //
+    //             var serilogSection = finalConfiguration.GetSection("Serilog");
+    //             if (serilogSection.GetChildren().Any())
+    //             {
+    //                 Log.Logger = new LoggerConfiguration().ReadFrom
+    //                     .Configuration(finalConfiguration)
+    //                     .CreateLogger();
+    //             }
+    //             else
+    //             {
+    //                 var logFile = Environment.GetEnvironmentVariable("LOG_PATH");
+    //                 if (string.IsNullOrEmpty(logFile))
+    //                 {
+    //                     logFile = Environment.GetEnvironmentVariable("LOG");
+    //                 }
+    //
+    //                 if (string.IsNullOrEmpty(logFile))
+    //                 {
+    //                     logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+    //                         "logs/log.txt".ToLowerInvariant());
+    //                 }
+    //
+    //                 Log.Logger = new LoggerConfiguration()
+    //                     .MinimumLevel.Information()
+    //                     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    //                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
+    //                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    //                     .MinimumLevel.Override("System", LogEventLevel.Warning)
+    //                     .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
+    //                     .Enrich.FromLogContext()
+    //                     // Serilog.Enrichers.Thread
+    //                     .Enrich.WithThreadId()
+    //                     // Serilog.Enrichers.Environment
+    //                     .Enrich.WithMachineName()
+    //                     .WriteTo.Console()
+    //                     // .WriteTo.ClickHouse()
+    //                     .WriteTo.Async(x => x.File(logFile, rollingInterval: RollingInterval.Day))
+    //                     .CreateLogger();
+    //             }
+    //         })
+    //         .ConfigureWebHostDefaults(webBuilder =>
+    //         {
+    //             webBuilder.UseUrls("http://+:8200");
+    //             webBuilder.UseStartup<Startup>();
+    //         }).ConfigureSilo()
+    //         .UseSerilog();
 }

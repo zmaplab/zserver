@@ -19,7 +19,7 @@ namespace ZServer.API.Controllers;
 /// <param name="options"></param>
 [ApiController]
 [Route("[controller]")]
-[Authorize]
+[Authorize(Policy = "default")]
 // ReSharper disable once InconsistentNaming
 public class WMSController(
     IClusterClient clusterClient,

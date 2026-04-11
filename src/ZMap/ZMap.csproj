@@ -12,10 +12,10 @@
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.3" />
 <!--        <PackageReference Include="System.Net.Http" Version="4.3.4" />-->
 <!--        <PackageReference Include="System.Text.Json" Version="9.0.10" />-->
-        <PackageReference Include="Dapper" Version="2.1.66" />
+        <PackageReference Include="Dapper" Version="2.1.72" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.3" />
-        <PackageReference Include="MongoDB.Bson" Version="3.5.2" />
+        <PackageReference Include="MongoDB.Bson" Version="3.7.1" />
     </ItemGroup>
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">

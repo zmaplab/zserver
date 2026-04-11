@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using ZServer.API.Authentication;
 
 namespace ZServer.API;
 
@@ -18,10 +20,11 @@ public static class JwtBearerAuthenticationExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <param name="configuration"></param>
+    /// <param name="apiName"></param>
     /// <returns></returns>
     /// <exception cref="ApplicationException"></exception>
-    public static AuthenticationBuilder AddJwtBearerAuthentication(this IServiceCollection services,
-        IConfiguration configuration)
+    public static AuthenticationBuilder AddAuthentication(this IServiceCollection services,
+        IConfiguration configuration, string apiName)
     {
         var jwtBearerOptions = configuration.GetSection("JwtBearer").Get<JwtBearerSettings>();
         var rsaSecurityKey = jwtBearerOptions.GetRsaSecurityKey();
@@ -30,12 +33,8 @@ public static class JwtBearerAuthenticationExtensions
             services.AddKeyedSingleton(JwtBearerSettings.JwtBearerRsaSecurityKey, rsaSecurityKey);
         }
 
-        var builder = services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
+        var builder = services.AddAuthentication();
+        builder.AddJwtBearer(options =>
             {
                 options.Events = new JwtBearerEvents
                 {
@@ -66,10 +65,18 @@ public static class JwtBearerAuthenticationExtensions
                 else
                 {
                     options.Authority = jwtBearerOptions.Authority ?? throw new ApplicationException(
-                        "JwtBearer:Authority is null or empty. Please check your configuration. https://qcn6sgdfwyfj.feishu.cn/wiki/O4QEwz6idiwHFsk8V3EcLE7Unpf?fromScene=spaceOverview#share-VPlFdJAwSo2Oyyxs7XPcWHy4nQd");
+                        "JwtBearer:Authority is null or empty. Please check your configuration.");
                     options.RequireHttpsMetadata = jwtBearerOptions.RequireHttpsMetadata;
                     options.MetadataAddress = jwtBearerOptions.GetMetadataAddress();
                 }
+            });
+
+        var tokens = configuration.GetSection("tokens").Get<HashSet<string>>();
+        builder.AddScheme<TokenAuthOptions, TokenAuthHandler>("Token",
+            opts =>
+            {
+                opts.Tokens = tokens;
+                opts.ApiName = apiName;
             });
 
         return builder;

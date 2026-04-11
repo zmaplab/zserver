@@ -20,7 +20,7 @@ namespace ZServer.API.Controllers;
 /// <param name="memoryCache"></param>
 [ApiController]
 [Route("api/v1.0/tools")]
-[Authorize]
+[Authorize(Policy = "default")]
 public class ToolController(ILogger<ToolController> logger, IMemoryCache memoryCache) : ControllerBase
 {
     /// <summary>
