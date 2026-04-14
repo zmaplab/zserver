@@ -34,6 +34,7 @@ using ZServer.API.Features;
 using ZServer.API.Filters;
 using ZServer.API.Middlewares;
 using ZServer.API.Permission;
+using ZServer.Silo;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 #if !DEBUG
@@ -116,6 +117,7 @@ public class Program
 
         builder.AddSerilog();
         builder.Host.UseSerilog();
+        builder.Host.ConfigureSilo();
 
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -178,14 +180,14 @@ public class Program
         if (_enableAuthorization)
         {
             // 认证
-            services.AddAuthentication(builder.Configuration, apiName);
+            var schemas = services.AddAuthentication(builder.Configuration, apiName);
 
             // 注册授权策略
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("default", policy =>
                 {
-                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "Token");
+                    policy.AddAuthenticationSchemes(schemas.ToArray());
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("scope", apiName);
                 });
@@ -196,9 +198,12 @@ public class Program
             // 当授权被禁用时，添加一个“空”的授权服务或什么都不做。
             // 为了确保 MVC 能正常运行，我们可以添加一个允许所有请求的授权策略到全局过滤器。
             // 但更优雅的方式是通过自定义过滤器处理（见下一步）。
-            services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
+            // services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
             // 注册授权策略
-            services.AddAuthorization(options => { options.AddPolicy("default", policy => { }); });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("default", policy => { policy.RequireAssertion(_ => true); });
+            });
         }
 
         return builder.Build();

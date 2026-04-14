@@ -23,11 +23,12 @@ public static class JwtBearerAuthenticationExtensions
     /// <param name="apiName"></param>
     /// <returns></returns>
     /// <exception cref="ApplicationException"></exception>
-    public static AuthenticationBuilder AddAuthentication(this IServiceCollection services,
+    public static List<string> AddAuthentication(this IServiceCollection services,
         IConfiguration configuration, string apiName)
     {
         var builder = services.AddAuthentication();
 
+        var schemas = new List<string>();
         var jwtBearerOptions = configuration.GetSection("JwtBearer").Get<JwtBearerSettings>();
         if (jwtBearerOptions != null)
         {
@@ -73,6 +74,7 @@ public static class JwtBearerAuthenticationExtensions
                     options.MetadataAddress = jwtBearerOptions.GetMetadataAddress();
                 }
             });
+            schemas.Add(JwtBearerDefaults.AuthenticationScheme);
         }
 
         var tokens = configuration.GetSection("tokens").Get<HashSet<string>>();
@@ -82,7 +84,7 @@ public static class JwtBearerAuthenticationExtensions
                 opts.Tokens = tokens;
                 opts.ApiName = apiName;
             });
-
-        return builder;
+        schemas.Add("Token");
+        return schemas;
     }
 }
