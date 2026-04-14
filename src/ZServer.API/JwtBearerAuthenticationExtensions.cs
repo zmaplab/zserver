@@ -26,15 +26,18 @@ public static class JwtBearerAuthenticationExtensions
     public static AuthenticationBuilder AddAuthentication(this IServiceCollection services,
         IConfiguration configuration, string apiName)
     {
-        var jwtBearerOptions = configuration.GetSection("JwtBearer").Get<JwtBearerSettings>();
-        var rsaSecurityKey = jwtBearerOptions.GetRsaSecurityKey();
-        if (rsaSecurityKey != null)
-        {
-            services.AddKeyedSingleton(JwtBearerSettings.JwtBearerRsaSecurityKey, rsaSecurityKey);
-        }
-
         var builder = services.AddAuthentication();
-        builder.AddJwtBearer(options =>
+
+        var jwtBearerOptions = configuration.GetSection("JwtBearer").Get<JwtBearerSettings>();
+        if (jwtBearerOptions != null)
+        {
+            var rsaSecurityKey = jwtBearerOptions.GetRsaSecurityKey();
+            if (rsaSecurityKey != null)
+            {
+                services.AddKeyedSingleton(JwtBearerSettings.JwtBearerRsaSecurityKey, rsaSecurityKey);
+            }
+
+            builder.AddJwtBearer(options =>
             {
                 options.Events = new JwtBearerEvents
                 {
@@ -70,6 +73,7 @@ public static class JwtBearerAuthenticationExtensions
                     options.MetadataAddress = jwtBearerOptions.GetMetadataAddress();
                 }
             });
+        }
 
         var tokens = configuration.GetSection("tokens").Get<HashSet<string>>();
         builder.AddScheme<TokenAuthOptions, TokenAuthHandler>("Token",
