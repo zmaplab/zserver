@@ -197,6 +197,8 @@ public class Program
             // 为了确保 MVC 能正常运行，我们可以添加一个允许所有请求的授权策略到全局过滤器。
             // 但更优雅的方式是通过自定义过滤器处理（见下一步）。
             services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
+            // 注册授权策略
+            services.AddAuthorization(options => { options.AddPolicy("default", policy => { }); });
         }
 
         return builder.Build();
