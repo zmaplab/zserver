@@ -202,7 +202,10 @@ public class Program
             // 注册授权策略
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("default", policy => { policy.RequireAssertion(_ => true); });
+                options.AddPolicy("default", policy =>
+                {
+                    policy.RequireAssertion(_ => true);
+                });
             });
         }
 
