@@ -31,6 +31,7 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0"/>
         <PackageReference Include="Dapr.AspNetCore" Version="1.17.3"/>
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
+        <PackageReference Include="Dapr.AspNetCore" Version="1.17.3"/>
     </ItemGroup>
 
     <ItemGroup>

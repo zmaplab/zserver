@@ -48,7 +48,7 @@ namespace ZServer.API;
 public class Program
 {
     private static bool _enableAuthorization;
-    private static readonly string CrosPoliy = "___my_cors";
+    private static readonly string CrosPolicy = "___my_cors";
 
     /// <summary>
     /// 
@@ -85,7 +85,7 @@ public class Program
         app.UseResponseCaching();
 
         app.UseRouting();
-        app.UseCors(CrosPoliy);
+        app.UseCors(CrosPolicy);
 
         var healthCheckPath = Environment.GetEnvironmentVariable("HEALTH_CHECK_PATH") ?? "/healthz";
         app.UseHealthChecks(healthCheckPath, HealthCheckUtils.CreateHealthCheckOptions());
@@ -97,7 +97,7 @@ public class Program
         app.UseCloudEvents();
         app.MapSubscribeHandler();
         app.MapControllers()
-            .RequireCors(CrosPoliy);
+            .RequireCors(CrosPolicy);
         app.MapMetrics();
         await app.RunAsync();
     }
@@ -155,7 +155,7 @@ public class Program
         services.Configure<ClusterOptions>("Orleans", builder.Configuration);
         services.AddCors(option =>
         {
-            option.AddPolicy(CrosPoliy, policy =>
+            option.AddPolicy(CrosPolicy, policy =>
                 policy.AllowAnyMethod()
                     .SetIsOriginAllowed(_ => true)
                     .AllowAnyHeader()
