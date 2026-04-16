@@ -24,6 +24,7 @@ using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
 using Prometheus;
 using Serilog;
+using ZMap;
 using ZMap.DynamicCompiler;
 using ZMap.Infrastructure;
 using ZMap.Permission;
@@ -113,7 +114,15 @@ public class Program
             options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(20);
         });
 
+        if (File.Exists("conf/appsettings.json"))
+        {
+            builder.Configuration.AddJsonFile("conf/appsettings.json", optional: true, reloadOnChange: true);
+        }
+
         builder.Configuration.AddEnvironmentVariables("ZSERVER_");
+
+        EnvironmentVariables.OrleansHostIP =
+            EnvironmentVariables.GetValue(builder.Configuration, "HOST_IP", "HostIP");
 
         builder.AddSerilog();
         builder.Host.UseSerilog();
@@ -202,10 +211,7 @@ public class Program
             // 注册授权策略
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("default", policy =>
-                {
-                    policy.RequireAssertion(_ => true);
-                });
+                options.AddPolicy("default", policy => { policy.RequireAssertion(_ => true); });
             });
         }
 

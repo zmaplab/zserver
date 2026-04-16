@@ -19,7 +19,11 @@ RUN rm -rf src/ZServer.API/out/conf/appsettings.json
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS zserver
 ENV LANG C.UTF-8
+LABEL build-date=${BUILD_DATE}
 WORKDIR /app
 COPY --from=api-builder /app/src/ZServer.API/out .
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 RUN mkdir /app/shapes && mkdir /app/Fonts
-ENTRYPOINT ["dotnet", "zapi.dll"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["dotnet", "zapi.dll"]

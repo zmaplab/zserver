@@ -7,7 +7,7 @@ fc-cache -f -v
 # 输入文件名
 input_file="${CONFIG_SOURCE}"
 # 输出文件名
-output_file="/app/conf/appsettings.json"
+output_file="/app/appsettings.json"
 
 # 检查输入文件是否存在
 if [ -f "${input_file}" ]; then
