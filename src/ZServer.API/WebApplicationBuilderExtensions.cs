@@ -91,7 +91,7 @@ public static class WebApplicationBuilderExtensions
                     .GetValue<double?>("SamplerProbability") ?? 0.5;
                 var instanceId =
                     $"{Environment.GetEnvironmentVariable("DAPR_HOST_IP") ?? Environment.GetEnvironmentVariable("HOST_IP")}:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT")}";
-                instanceId = string.IsNullOrWhiteSpace(instanceId) ? null : instanceId;
+                instanceId = string.IsNullOrWhiteSpace(instanceId) ? null : $"{serviceName}-{instanceId}";
                 var @namespace = builder.Configuration["OpenTelemetry:Namespace"];
                 // 2. 添加 OpenTelemetry 服务
                 builder.Services.AddOpenTelemetry()
