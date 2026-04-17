@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +17,6 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
-using Prometheus;
 using Serilog;
 using ZMap;
 using ZMap.DynamicCompiler;
@@ -30,13 +24,11 @@ using ZMap.Infrastructure;
 using ZMap.Permission;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
-using ZServer.API.Authentication;
 using ZServer.API.Features;
 using ZServer.API.Filters;
 using ZServer.API.Middlewares;
 using ZServer.API.Permission;
 using ZServer.Silo;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 #if !DEBUG
 #endif
@@ -99,7 +91,6 @@ public class Program
         app.MapSubscribeHandler();
         app.MapControllers()
             .RequireCors(CrosPolicy);
-        app.MapMetrics();
         await app.RunAsync();
     }
 

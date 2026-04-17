@@ -20,17 +20,15 @@
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0"/>
         <PackageReference Include="Serilog.Expressions" Version="5.0.0"/>
         <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.2" />
+        <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.2"/>
         <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0"/>
         <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2"/>
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1"/>
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.2" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.2"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.1"/>
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.2" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.2"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0"/>
-        <PackageReference Include="Dapr.AspNetCore" Version="1.17.3"/>
-        <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
         <PackageReference Include="Dapr.AspNetCore" Version="1.17.3"/>
     </ItemGroup>
 

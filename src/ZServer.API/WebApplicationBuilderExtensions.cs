@@ -87,20 +87,25 @@ public static class WebApplicationBuilderExtensions
             {
                 var apiKey = builder.Configuration["OpenTelemetry:ApiKey"];
                 var authorization = string.IsNullOrEmpty(apiKey) ? null : $"Authorization={apiKey}";
-                // 1. 配置通用服务名称和资源属性（推荐方式）
-                ResourceBuilder.CreateDefault()
-                    .AddService(
-                        serviceName: serviceName, // 替换为你的服务名
-                        serviceVersion: "1.0.0")
-                    .AddAttributes(new Dictionary<string, object>
-                    {
-                        ["deployment.environment"] = builder.Environment.EnvironmentName
-                    });
-
+                var samplerProbability = builder.Configuration.GetSection("OpenTelemetry")
+                    .GetValue<double?>("SamplerProbability") ?? 0.5;
+                var instanceId =
+                    $"{Environment.GetEnvironmentVariable("DAPR_HOST_IP") ?? Environment.GetEnvironmentVariable("HOST_IP")}:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT")}";
+                instanceId = string.IsNullOrWhiteSpace(instanceId) ? null : instanceId;
+                var @namespace = builder.Configuration["OpenTelemetry:Namespace"];
                 // 2. 添加 OpenTelemetry 服务
                 builder.Services.AddOpenTelemetry()
-                    // 配置资源，让所有信号（Trace/Metrics/Logs）共享
-                    .ConfigureResource(r => r.AddService(serviceName))
+                    .ConfigureResource(configure =>
+                    {
+                        configure.AddService(
+                                serviceName: serviceName, // 替换为你的服务名
+                                serviceVersion: "1.0.0", serviceInstanceId: instanceId, serviceNamespace: @namespace,
+                                autoGenerateServiceInstanceId: true)
+                            .AddAttributes(new Dictionary<string, object>
+                            {
+                                ["deployment.environment"] = builder.Environment.EnvironmentName
+                            });
+                    })
                     // 🔍 追踪（Traces）配置
                     .WithTracing(tracing => tracing
                         .AddAspNetCoreInstrumentation(options =>
@@ -110,13 +115,14 @@ public static class WebApplicationBuilderExtensions
                             options.Filter = context => !context.Request.Path.StartsWithSegments("/health");
                         })
                         .AddHttpClientInstrumentation() // 追踪 HttpClient 调用
-                        .SetSampler(new ParentBasedSampler(new AlwaysOnSampler())) // 全量采样（生产可调整）
+                        .SetSampler(new ParentBasedSampler(new TraceIdRatioBasedSampler(samplerProbability))) // 采样率
                         .AddOtlpExporter(options =>
                         {
                             options.Endpoint = new Uri(otlpEndpoint);
                             options.ExportProcessorType = ExportProcessorType.Batch; // 批量导出提升性能
                             // 👇 关键：添加 Authorization Header
                             options.Headers = authorization;
+                            options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
                         }))
                     // 📊 指标（Metrics）配置
                     .WithMetrics(metrics => metrics
@@ -129,6 +135,8 @@ public static class WebApplicationBuilderExtensions
                             options.Endpoint = new Uri(otlpEndpoint);
                             // 👇 关键：添加 Authorization Header
                             options.Headers = authorization;
+                            options.ExportProcessorType = ExportProcessorType.Batch; // 批量导出提升性能
+                            options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
                         }))
                     // 📝 日志（Logs）配置
                     // 统一由 Serilog 管理
