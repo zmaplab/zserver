@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 
 namespace ZMap.Ogc.Wmts;
 
@@ -48,72 +48,20 @@ public class WmtsService(
                     $"Could not find tile matrix set {tileMatrixSet}");
             }
 
-            var tuple = Utility.GetWmtsPath(layers, zFilter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
-            if (string.IsNullOrEmpty(tuple.FullPath))
-            {
-                displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
-                    tileRow, tileCol, zFilter);
-                Logger.Value.LogError("{Url}, wmts key is empty", displayUrl);
-                return new MapResult(Stream.Null, "WMTSKeyIsEmpty",
-                    "wmts key is empty");
-            }
-
-#if !DEBUG
-            if (File.Exists(tuple.FullPath))
-            {
-                if (EnvironmentVariables.EnableSensitiveDataLogging)
-                {
-                    displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
-                        tileRow, tileCol, zFilter);
-                    Logger.Value.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
-                }
-
-                return new MapResult(File.OpenRead(tuple.FullPath), null, null);
-            }
-#endif
-
-            var folder = Path.GetDirectoryName(tuple.FullPath);
-            // TODO: 优化减小磁盘 IO
-            if (folder != null && !Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-
-            var gridSetEnvelope = gridSet.GetEnvelope(tileMatrix, tileCol, tileRow);
-            if (gridSetEnvelope == null)
-            {
-                displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
-                    tileRow, tileCol, zFilter);
-                Logger.Value.LogError("{Url}, could not get envelope from grid set", displayUrl);
-                return new MapResult(Stream.Null, null, null);
-            }
-
-            var layerQueries =
-                new List<LayerQuery>();
-
             var layerNames = layers.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            // 如果有多个图层过滤条件
             var filterList = string.IsNullOrEmpty(zFilter)
                 ? []
                 : zFilter.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            if (filterList.Length > 0 && filterList.Length != layerNames.Length)
-            {
-                return new MapResult(Stream.Null, "FilterDefinedError", "filter count not match layer count");
-            }
-
             var styleList = string.IsNullOrEmpty(styles)
                 ? []
                 : styles.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            if (styleList.Length > 0 && styleList.Length != layerNames.Length)
-            {
-                return new MapResult(Stream.Null, "StyleDefinedError", "style count not match layer count");
-            }
+
+            var layerQueries = new List<LayerQuery>();
 
             for (var i = 0; i < layerNames.Length; i++)
             {
                 var layerName = layerNames[i];
                 var layerQuery = layerName.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                // var filter = filterList.ElementAtOrDefault(i);
                 switch (layerQuery.Length)
                 {
                     case 2:
@@ -142,11 +90,24 @@ public class WmtsService(
                 return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
+            if (filterList.Length > 0 && filterList.Length != layerList.Count)
+            {
+                return new MapResult(Stream.Null, "FilterDefinedError", "filter count not match layer count");
+            }
+
+            if (styleList.Length > 0 && styleList.Length != layerList.Count)
+            {
+                return new MapResult(Stream.Null, "StyleDefinedError", "style count not match layer count");
+            }
+
+            var mergedFilters = new string[layerList.Count];
             for (var i = 0; i < layerList.Count; ++i)
             {
                 var layer = layerList[i];
                 layer.HttpClientFactory = httpClientFactory;
-                layer.Filter = filterList.ElementAtOrDefault(i);
+                mergedFilters[i] = FilterMerger.Merge(layer.DefaultFilter,
+                    filterList.ElementAtOrDefault(i));
+                layer.Filter = mergedFilters[i];
 
                 var permission =
                     await permissionService.EnforceAsync("read", layer.ResourceId, PolicyEffect.Allow);
@@ -156,6 +117,48 @@ public class WmtsService(
                 }
 
                 return new MapResult(Stream.Null, "403", "Forbidden");
+            }
+
+            var mergedFilterStr = string.Join(";", mergedFilters.Where(f => f != null));
+            var tuple = Utility.GetWmtsPath(layers, mergedFilterStr, format, tileMatrixSet, tileMatrix, tileRow,
+                tileCol);
+            if (string.IsNullOrEmpty(tuple.FullPath))
+            {
+                displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
+                    tileRow, tileCol, mergedFilterStr);
+                Logger.Value.LogError("{Url}, wmts key is empty", displayUrl);
+                return new MapResult(Stream.Null, "WMTSKeyIsEmpty",
+                    "wmts key is empty");
+            }
+
+#if !DEBUG
+            if (File.Exists(tuple.FullPath))
+            {
+                if (EnvironmentVariables.EnableSensitiveDataLogging)
+                {
+                    displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
+                        tileRow, tileCol, mergedFilterStr);
+                    Logger.Value.LogInformation("[{TraceIdentifier}] {Url}, CACHED", traceIdentifier, displayUrl);
+                }
+
+                return new MapResult(File.OpenRead(tuple.FullPath), null, null);
+            }
+#endif
+
+            var folder = Path.GetDirectoryName(tuple.FullPath);
+            // TODO: 优化减小磁盘 IO
+            if (folder != null && !Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            var gridSetEnvelope = gridSet.GetEnvelope(tileMatrix, tileCol, tileRow);
+            if (gridSetEnvelope == null)
+            {
+                displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
+                    tileRow, tileCol, mergedFilterStr);
+                Logger.Value.LogError("{Url}, could not get envelope from grid set", displayUrl);
+                return new MapResult(Stream.Null, null, null);
             }
 
             var scale = gridSetEnvelope.ScaleDenominator;
