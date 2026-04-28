@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -32,6 +33,7 @@ public class LayerStore(
     {
         var existKeys = Cache.Keys.ToList();
         var keys = new List<string>();
+        var changedLayerKeys = new List<string>();
 
         foreach (var configuration in configurations)
         {
@@ -50,6 +52,14 @@ public class LayerStore(
                     ? null
                     : await resourceGroupStore.FindAsync(resourceGroupName);
 
+                var newDefaultFilter = section.Value["defaultFilter"]?.ToObject<string>();
+
+                if (Cache.TryGetValue(name, out var oldLayer)
+                    && oldLayer.DefaultFilter != newDefaultFilter)
+                {
+                    changedLayerKeys.Add(name);
+                }
+
                 var layer = await BindLayerAsync(name, section.Value as JObject, resourceGroup);
                 if (layer == null)
                 {
@@ -65,6 +75,34 @@ public class LayerStore(
         foreach (var removedKey in removedKeys)
         {
             Cache.TryRemove(removedKey, out _);
+        }
+
+        ClearWmtsCache(changedLayerKeys);
+    }
+
+    private static void ClearWmtsCache(List<string> layerKeys)
+    {
+        if (layerKeys.Count == 0) return;
+
+        var cacheRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", "wmts");
+        if (!Directory.Exists(cacheRoot)) return;
+
+        foreach (var layerKey in layerKeys)
+        {
+            // layerKey 可能是 "resourceGroup:layer" 或 "layer"，缓存路径用 ':'→'_' 替换
+            var dirName = layerKey.Replace(':', '_');
+            var layerDir = Path.Combine(cacheRoot, dirName);
+            if (!Directory.Exists(layerDir)) continue;
+
+            try
+            {
+                Directory.Delete(layerDir, true);
+                Logger.Value.LogInformation("已清除图层 {Layer} 的 WMTS 缓存: {Path}", layerKey, layerDir);
+            }
+            catch (Exception ex)
+            {
+                Logger.Value.LogError(ex, "清除图层 {Layer} 的 WMTS 缓存失败: {Path}", layerKey, layerDir);
+            }
         }
     }
 
@@ -204,7 +242,8 @@ public class LayerStore(
         var layer = new Layer(resourceGroup, services, name, source, styleGroups, envelope)
         {
             Buffers = section["buffers"]?.ToObject<List<GridBuffer>>() ?? new List<GridBuffer>(),
-            Enabled = section["enabled"]?.ToObject<bool>() ?? true
+            Enabled = section["enabled"]?.ToObject<bool>() ?? true,
+            DefaultFilter = section["defaultFilter"]?.ToObject<string>()
         };
         return layer;
     }

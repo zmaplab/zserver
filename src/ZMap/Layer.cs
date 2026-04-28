@@ -81,9 +81,15 @@ public partial class Layer : IVisibleLimit
     public HashSet<ServiceType> Services { get; set; }
 
     /// <summary>
-    /// 过滤条件
+    /// 前端传入的过滤条件（运行时赋值）
     /// </summary>
     public string Filter { get; set; }
+
+    /// <summary>
+    /// 默认过滤条件（配置级别），DynamicFilterInfo JSON 格式。
+    /// 前端未传入 filter 时追加；前端传入同名 Field 时以前端为准。
+    /// </summary>
+    public string DefaultFilter { get; set; }
 
     /// <summary>
     /// HttpClient 工厂
@@ -216,7 +222,8 @@ public partial class Layer : IVisibleLimit
             MaxZoom = MaxZoom,
             ZoomUnit = ZoomUnit,
             Enabled = Enabled,
-            Buffers = Buffers
+            Buffers = Buffers,
+            DefaultFilter = DefaultFilter
         };
     }
 

@@ -56,7 +56,8 @@ public class WmsService(
             {
                 var layer = layerList[i];
                 layer.HttpClientFactory = httpClientFactory;
-                layer.Filter = requestParameters.Filters.ElementAtOrDefault(i);
+                layer.Filter = FilterMerger.Merge(layer.DefaultFilter,
+                    requestParameters.Filters.ElementAtOrDefault(i));
 
                 var permission =
                     await permissionService.EnforceAsync("read", layer.ResourceId, PolicyEffect.Allow);
@@ -129,6 +130,12 @@ public class WmsService(
 
             var tuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
             var layerList = tuple.Layers;
+
+            foreach (var layer in layerList)
+            {
+                layer.Filter = FilterMerger.Merge(layer.DefaultFilter, null);
+            }
+
             var featureCollection = await GetFeatureInfoAsync(layerList, featureCount, srs,
                 validateResult.Parameters.Envelope,
                 width, height, x, y);
@@ -198,7 +205,7 @@ public class WmsService(
             var envelope = new Envelope(minX, maxX, minY, maxY);
             var targetEnvelope = envelope.Transform(srid, spatialDatabaseSource.Srid);
             var features = await spatialDatabaseSource
-                .GetFeaturesAsync(targetEnvelope, null);
+                .GetFeaturesAsync(targetEnvelope, layer.Filter);
 
             foreach (var feature in features)
             {

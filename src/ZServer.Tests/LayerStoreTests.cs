@@ -42,6 +42,27 @@ public class LayerStoreTests : BaseTests
         await Test1(store);
         await Test2(store);
         await Test3(store);
+        await TestDefaultFilter(store);
+    }
+
+    [Fact]
+    public async Task LoadDefaultFilter()
+    {
+        var store = GetScopedService<ILayerStore>();
+        await TestDefaultFilter(store);
+    }
+
+    private async Task TestDefaultFilter(ILayerStore store)
+    {
+        var layer = await store.FindAsync("resourceGroup1", "berlin_db_filtered");
+        Assert.NotNull(layer);
+        Assert.Equal("berlin_db_filtered", layer.Name);
+        Assert.False(string.IsNullOrEmpty(layer.DefaultFilter));
+        Assert.Contains("status", layer.DefaultFilter);
+        Assert.Contains("Equal", layer.DefaultFilter);
+
+        var cloned = layer.Clone();
+        Assert.Equal(layer.DefaultFilter, cloned.DefaultFilter);
     }
 
     [Fact]
@@ -196,10 +217,14 @@ public class LayerStoreTests : BaseTests
     {
         var layers = await store.GetAllAsync();
         Assert.NotNull(layers);
-        Assert.Equal(2, layers.Count);
+        Assert.Equal(3, layers.Count);
 
         var pgLayer = layers.First(x => x.Name == "berlin_db");
         var shpLayer = layers.First(x => x.Name == "berlin_shp");
+        var filteredLayer = layers.First(x => x.Name == "berlin_db_filtered");
+        Assert.NotNull(filteredLayer);
+        Assert.False(string.IsNullOrEmpty(filteredLayer.DefaultFilter));
+        Assert.Contains("status", filteredLayer.DefaultFilter);
         Assert.Equal("berlin_db", pgLayer.Name);
         Assert.Equal("berlin_shp", shpLayer.Name);
 

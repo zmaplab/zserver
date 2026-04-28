@@ -186,6 +186,18 @@
       "styleGroups": [
         "style1"
       ]
+    },
+    "berlin_db_filtered": {
+      "resourceGroup": "resourceGroup1",
+      "services": [],
+      "source": "berlin_db",
+      "sourceTable": "osmbuildings",
+      "sourceGeometry": "geom",
+      "sourceSRID": 4326,
+      "defaultFilter": "{\"Logic\":\"And\",\"Filters\":[{\"Field\":\"status\",\"Operator\":\"Equal\",\"Value\":1}]}",
+      "styleGroups": [
+        "style1"
+      ]
     }
   },
   "gridSets": {
