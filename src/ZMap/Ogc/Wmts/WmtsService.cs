@@ -88,9 +88,6 @@ public class WmtsService(
                 return new MapResult(Stream.Null, null, null);
             }
 
-            var layerQueries =
-                new List<LayerQuery>();
-
             var layerNames = layers.Split(',', StringSplitOptions.RemoveEmptyEntries);
             // 如果有多个图层过滤条件
             var filterList = string.IsNullOrEmpty(zFilter)
@@ -109,18 +106,19 @@ public class WmtsService(
                 return new MapResult(Stream.Null, "StyleDefinedError", "style count not match layer count");
             }
 
+            var layerQueries = new List<LayerQuery>();
+
             for (var i = 0; i < layerNames.Length; i++)
             {
                 var layerName = layerNames[i];
-                var layerQuery = layerName.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                // var filter = filterList.ElementAtOrDefault(i);
-                switch (layerQuery.Length)
+                var parts = layerName.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                switch (parts.Length)
                 {
                     case 2:
-                        layerQueries.Add(new LayerQuery(layerQuery[0], layerQuery[1], styleList.ElementAtOrDefault(i)));
+                        layerQueries.Add(new LayerQuery(parts[0], parts[1], styleList.ElementAtOrDefault(i)));
                         break;
                     case 1:
-                        layerQueries.Add(new LayerQuery(null, layerQuery[0], styleList.ElementAtOrDefault(i)));
+                        layerQueries.Add(new LayerQuery(null, parts[0], styleList.ElementAtOrDefault(i)));
                         break;
                     default:
                     {
@@ -134,9 +132,9 @@ public class WmtsService(
                 }
             }
 
-            var layerTuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
-            var layerList = layerTuple.Layers;
-            if (layerTuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerTuple.FetchCount)
+            var queryResult = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = queryResult.Layers;
+            if (queryResult.FetchCount == 0 || layerList.Count == 0 || layerList.Count != queryResult.FetchCount)
             {
                 Logger.Value.LogWarning("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
                 return new MapResult(Stream.Null, "QueryLayerError", null);
@@ -146,7 +144,7 @@ public class WmtsService(
             {
                 var layer = layerList[i];
                 layer.HttpClientFactory = httpClientFactory;
-                layer.Filter = filterList.ElementAtOrDefault(i);
+                layer.Filter = filterList.ElementAtOrDefault(queryResult.LayerQueryIndices[i]);
 
                 var permission =
                     await permissionService.EnforceAsync("read", layer.ResourceId, PolicyEffect.Allow);

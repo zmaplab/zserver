@@ -22,22 +22,30 @@ public class LayerQueryService(
     /// <param name="queryLayerRequests"></param>
     /// <param name="traceIdentifier"></param>
     /// <returns></returns>
-    public async Task<(List<Layer> Layers, int FetchCount)> GetLayersAsync(
+    public async Task<LayerQueryResult> GetLayersAsync(
         List<LayerQuery> queryLayerRequests, string traceIdentifier)
     {
         var list = new List<Layer>();
+        var queryIndices = new List<int>();
         var hashSet = new HashSet<string>();
 
         var count = 0;
-        foreach (var layerQuery in queryLayerRequests)
+        for (var i = 0; i < queryLayerRequests.Count; ++i)
         {
+            var layerQuery = queryLayerRequests[i];
             if (layerQuery.ResourceGroup == null)
             {
                 var layer = await layerStore.FindAsync(layerQuery.Layer);
                 if (layer != null)
                 {
                     await SetStyle(layer, layerQuery.Style);
-                    TryAdd(hashSet, list, layer);
+                    if (TryAdd(hashSet, list, layer))
+                    {
+                        count++;
+                        continue;
+                    }
+
+                    queryIndices.Add(i);
                     count++;
                     continue;
                 }
@@ -53,7 +61,13 @@ public class LayerQueryService(
                 foreach (var layer in layerGroup.Layers)
                 {
                     await SetStyle(layer, layerQuery.Style);
-                    TryAdd(hashSet, list, layer);
+                    if (TryAdd(hashSet, list, layer))
+                    {
+                        count++;
+                        continue;
+                    }
+
+                    queryIndices.Add(i);
                     count++;
                 }
             }
@@ -63,7 +77,13 @@ public class LayerQueryService(
                 if (layer != null)
                 {
                     await SetStyle(layer, layerQuery.Style);
-                    TryAdd(hashSet, list, layer);
+                    if (TryAdd(hashSet, list, layer))
+                    {
+                        count++;
+                        continue;
+                    }
+
+                    queryIndices.Add(i);
                     count++;
                 }
                 else
@@ -75,7 +95,7 @@ public class LayerQueryService(
             }
         }
 
-        return (list, count);
+        return new LayerQueryResult(list, count, queryIndices);
     }
 
     private async Task SetStyle(Layer layer, string styleName)

@@ -34,29 +34,29 @@ public class WmsService(
             }
 
             var dpi = Utility.GetDpi(formatOptions);
-            var layerQueries = new List<LayerQuery>();
             var requestParameters = validateResult.Parameters;
 
+            var layerQueries = new List<LayerQuery>();
             for (var i = 0; i < requestParameters.Layers.Count; ++i)
             {
-                var layer = requestParameters.Layers.ElementAt(i);
-                layerQueries.Add(new LayerQuery(layer.ResourceGroup, layer.Layer,
+                var reqLayer = requestParameters.Layers.ElementAt(i);
+                layerQueries.Add(new LayerQuery(reqLayer.ResourceGroup, reqLayer.Layer,
                     requestParameters.Styles.ElementAtOrDefault(i)));
             }
 
-            var layerTuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
-            var layerList = layerTuple.Layers;
-            if (layerTuple.FetchCount == 0 || layerList.Count == 0 || layerList.Count != layerTuple.FetchCount)
+            var queryResult = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
+            var layerList = queryResult.Layers;
+            if (queryResult.FetchCount == 0 || layerList.Count == 0 || layerList.Count != queryResult.FetchCount)
             {
                 Logger.Value.LogWarning("[{TraceIdentifier}] 图层 {Layer} 中存在缺失图层", traceIdentifier, layers);
                 return new MapResult(Stream.Null, "QueryLayerError", null);
             }
 
-            for (var i = 0; i < requestParameters.Layers.Count; ++i)
+            for (var i = 0; i < layerList.Count; ++i)
             {
                 var layer = layerList[i];
                 layer.HttpClientFactory = httpClientFactory;
-                layer.Filter = requestParameters.Filters.ElementAtOrDefault(i);
+                layer.Filter = requestParameters.Filters.ElementAtOrDefault(queryResult.LayerQueryIndices[i]);
 
                 var permission =
                     await permissionService.EnforceAsync("read", layer.ResourceId, PolicyEffect.Allow);
@@ -127,8 +127,7 @@ public class WmsService(
                 layerQueries.Add(new LayerQuery(layer.ResourceGroup, layer.Layer, null));
             }
 
-            var tuple = await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier);
-            var layerList = tuple.Layers;
+            var layerList = (await layerQueryService.GetLayersAsync(layerQueries, traceIdentifier)).Layers;
             var featureCollection = await GetFeatureInfoAsync(layerList, featureCount, srs,
                 validateResult.Parameters.Envelope,
                 width, height, x, y);
