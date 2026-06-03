@@ -30,24 +30,23 @@ public static partial class Utility
     /// <param name="tileMatrix"></param>
     /// <param name="tileRow"></param>
     /// <param name="tileCol"></param>
+    /// <param name="bordered"></param>
     /// <returns></returns>
     public static PathInfo GetWmtsPath(string layers, string filter, string format,
         string tileMatrixSet,
         string tileMatrix, int tileRow,
-        int tileCol)
+        int tileCol, bool bordered)
     {
         // group1:layer1,layer2 -> group1_layer1.group2_layer2
         var layerKey = layers.Replace(',', '.').Replace(':', '_');
-        var cqlFilterKey = string.IsNullOrWhiteSpace(filter)
-            ? string.Empty
-            : CryptographyUtility.ComputeHash(Encoding.UTF8.GetBytes(filter));
+        var group = CryptographyUtility.ComputeHash(Encoding.UTF8.GetBytes(filter + "_" + bordered));
 
         var imageExtension = GetImageExtension(format);
 
         var tileMatrixSetPath = tileMatrixSet.Replace(":", "").Replace("/", "_");
-        var intervalPath = string.IsNullOrEmpty(cqlFilterKey)
+        var intervalPath = string.IsNullOrEmpty(group)
             ? $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}{imageExtension}"
-            : $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}_{cqlFilterKey}{imageExtension}";
+            : $"wmts{Path.DirectorySeparatorChar}{layerKey}{Path.DirectorySeparatorChar}{tileMatrixSetPath}{Path.DirectorySeparatorChar}{tileMatrix}{Path.DirectorySeparatorChar}{tileRow}{Path.DirectorySeparatorChar}{tileCol}_{group}{imageExtension}";
         var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache", intervalPath);
         return new PathInfo(fullPath, intervalPath);
     }

@@ -48,7 +48,9 @@ public class WmtsService(
                     $"Could not find tile matrix set {tileMatrixSet}");
             }
 
-            var tuple = Utility.GetWmtsPath(layers, zFilter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
+            var bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b;
+            var tuple = Utility.GetWmtsPath(layers, zFilter, format, tileMatrixSet, tileMatrix, tileRow, tileCol,
+                bordered);
             if (string.IsNullOrEmpty(tuple.FullPath))
             {
                 displayUrl = GetTileDisplayUrl(traceIdentifier, layers, styles, format, tileMatrixSet, tileMatrix,
@@ -157,7 +159,7 @@ public class WmtsService(
             }
 
             var scale = gridSetEnvelope.ScaleDenominator;
-            var bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b;
+
             var viewport = new Viewport
             {
                 Tile = new Tile(tileMatrix, tileCol, tileRow),

@@ -34,7 +34,7 @@ public abstract class BaseTests
         serviceCollection.TryAddSingleton<RefreshConfigService>();
         Service = serviceCollection.BuildServiceProvider();
         var syncService = Service.GetRequiredService<RefreshConfigService>();
-        var configurationProvider = Service.GetRequiredService<FileJsonStoreProvider>();
+        var configurationProvider = Service.GetRequiredService<IJsonStoreProvider>();
 
         syncService.RefreshAsync(configurationProvider, NullLogger.Instance).GetAwaiter().GetResult();
     }

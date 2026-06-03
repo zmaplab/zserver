@@ -46,13 +46,12 @@ public class WMTSController(
     public async Task GetAsync([Required] [FromQuery(Name = "layer"), StringLength(100)] string layers,
         [StringLength(255)] string style,
         [Required, StringLength(100)] string tileMatrix, [Required] int tileRow, [Required] int tileCol,
-        [StringLength(25)]
-        string format = "image/png",
+        [StringLength(25)] string format = "image/png",
         [Required, StringLength(50)] string tileMatrixSet = "EPSG:4326",
         [FromQuery(Name = "Z_FILTER"), StringLength(2048)]
         string filter = null, bool bordered = false)
     {
-        var tuple = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol);
+        var tuple = Utility.GetWmtsPath(layers, filter, format, tileMatrixSet, tileMatrix, tileRow, tileCol, bordered);
 
         logger.LogDebug("[{TraceIdentifier}] Request wmts service {TileMatrix} {TileMatrixSet}  {TileCol}  {TileRow}",
             HttpContext.TraceIdentifier, tileMatrix, tileMatrixSet, tileCol, tileRow);
