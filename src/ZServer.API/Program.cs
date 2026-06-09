@@ -24,6 +24,7 @@ using ZMap.Infrastructure;
 using ZMap.Permission;
 // using ZMap.DynamicCompiler;
 using ZMap.Renderer.SkiaSharp.Utilities;
+using ZServer.API.Authentication;
 using ZServer.API.Features;
 using ZServer.API.Filters;
 using ZServer.API.Middlewares;
@@ -40,7 +41,6 @@ namespace ZServer.API;
 /// </summary>
 public class Program
 {
-    private static bool _enableAuthorization;
     private static readonly string CrosPolicy = "___my_cors";
 
     /// <summary>
@@ -126,8 +126,6 @@ public class Program
             builder.Services.AddOpenApi();
         }
 
-        _enableAuthorization = builder.Configuration.GetValue<bool>("EnableAuthorization");
-
         var services = builder.Services;
         // 可选：启用OpenTelemetry追踪（如需可视化/导出TraceId）
         // 替换默认的 IHttpContextFactory, 创建后立即修改 启用OpenTelemetry 相关 Header 才能启作用
@@ -176,35 +174,7 @@ public class Program
         }
 
         builder.AddOtel(apiName);
-
-        if (_enableAuthorization)
-        {
-            // 认证
-            var schemas = services.AddAuthentication(builder.Configuration, apiName);
-
-            // 注册授权策略
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("default", policy =>
-                {
-                    policy.AddAuthenticationSchemes(schemas.ToArray());
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", apiName);
-                });
-            });
-        }
-        else
-        {
-            // 当授权被禁用时，添加一个“空”的授权服务或什么都不做。
-            // 为了确保 MVC 能正常运行，我们可以添加一个允许所有请求的授权策略到全局过滤器。
-            // 但更优雅的方式是通过自定义过滤器处理（见下一步）。
-            // services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();
-            // 注册授权策略
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("default", policy => { policy.RequireAssertion(_ => true); });
-            });
-        }
+        builder.AddApiAuthentication(apiName);
 
         return builder.Build();
     }

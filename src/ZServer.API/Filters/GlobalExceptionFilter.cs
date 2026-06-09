@@ -11,6 +11,7 @@ namespace ZServer.API.Filters;
 /// 
 /// </summary>
 /// <param name="logger"></param>
+/// /// <param name="hostEnvironment"></param>
 public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger, IWebHostEnvironment hostEnvironment)
     : IExceptionFilter
 {

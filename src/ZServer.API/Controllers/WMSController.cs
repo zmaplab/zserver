@@ -17,6 +17,7 @@ namespace ZServer.API.Controllers;
 /// </summary>
 /// <param name="clusterClient"></param>
 /// <param name="options"></param>
+/// <param name="wmsService"></param>
 [ApiController]
 [Route("[controller]")]
 [Authorize(Policy = "default")]

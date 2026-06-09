@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 
-namespace ZServer.API.Authentication;
+namespace ZServer.API.Authentication.Token;
 
 /// <summary>
 /// 

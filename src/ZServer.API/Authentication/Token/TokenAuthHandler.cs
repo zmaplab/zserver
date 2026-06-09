@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace ZServer.API.Authentication;
+namespace ZServer.API.Authentication.Token;
 
 /// <summary>
 /// 
@@ -41,9 +41,9 @@ public class TokenAuthHandler(IOptionsMonitor<TokenAuthOptions> options, ILogger
             return AuthenticateResult.NoResult();
         }
 
-        if (token.Length != 24)
+        if (token.Length < 24)
         {
-            Logger.LogError("traceId {TraceId}: token 长度必须小于等于 24", Context.TraceIdentifier);
+            Logger.LogError("traceId {TraceId}: token 长度必须大于或等于 24", Context.TraceIdentifier);
             return AuthenticateResult.Fail("401");
         }
 
