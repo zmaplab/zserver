@@ -4,21 +4,16 @@
       "Serilog.Sinks.Async",
       "Serilog.Sinks.Console",
       "Serilog.Expressions",
-      "Serilog.Sinks.Grafana.Loki",
       "Serilog.Enrichers.Environment",
       "Serilog.Enrichers.HttpHeader"
     ],
     "MinimumLevel": {
       "Default": "Information",
       "Override": {
-        "Microsoft": "Information",
-        "System": "Information",
         "Microsoft.AspNetCore": "Warning",
         "Microsoft.EntityFrameworkCore": "Warning",
         "Microsoft.EntityFrameworkCore.Model.Validation": "Warning",
         "Microsoft.AspNetCore.Cors.Infrastructure.CorsService": "Warning",
-        "Microsoft.AspNetCore.Mvc": "Warning",
-        "Microsoft.AspNetCore.Hosting": "Information",
         "Orleans": "Warning"
       }
     },

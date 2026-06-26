@@ -17,6 +17,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using NetTopologySuite.IO.Converters;
 using Orleans.Configuration;
+using Orleans.Dashboard;
 using Serilog;
 using ZMap;
 using ZMap.DynamicCompiler;
@@ -91,12 +92,22 @@ public class Program
         app.MapSubscribeHandler();
         app.MapControllers()
             .RequireCors(CrosPolicy);
+        app.MapOrleansDashboard(routePrefix: "/dashboard")
+            .AllowAnonymous();
         await app.RunAsync();
     }
 
     private static WebApplication CreateApp(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        if (File.Exists("conf/appsettings.json"))
+        {
+            builder.Configuration.AddJsonFile("conf/appsettings.json", optional: true, reloadOnChange: true);
+        }
+
+        builder.Configuration.AddEnvironmentVariables("ZSERVER_");
+        builder.AddSubstitution();
+
         builder.WebHost.ConfigureKestrel((_, options) =>
         {
             // Handle requests up to 500 MB
@@ -105,12 +116,6 @@ public class Program
             options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(20);
         });
 
-        if (File.Exists("conf/appsettings.json"))
-        {
-            builder.Configuration.AddJsonFile("conf/appsettings.json", optional: true, reloadOnChange: true);
-        }
-
-        builder.Configuration.AddEnvironmentVariables("ZSERVER_");
 
         EnvironmentVariables.OrleansHostIP =
             EnvironmentVariables.GetValue(builder.Configuration, "HOST_IP", "HostIP");

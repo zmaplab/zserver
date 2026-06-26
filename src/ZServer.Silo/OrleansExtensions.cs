@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
+using Orleans.Dashboard;
 using Orleans.Hosting;
 using ZMap;
 using ZMap.Infrastructure;
@@ -28,35 +29,22 @@ public static class OrleansExtensions
     {
         var enableDashboard =
             EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboard", "Orleans:Dashboard");
-        var dashboardPort =
-            EnvironmentVariables.GetValue(context.Configuration, "ClusterDashboardPort", "Orleans:DashboardPort");
-        if (string.IsNullOrEmpty(dashboardPort))
-        {
-            dashboardPort = "8182";
-        }
 
         siloBuilder.AddMemoryGrainStorageAsDefault();
         var logger = Log.CreateLogger("OrleansExtensions");
+
+        if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
+        {
+            siloBuilder.AddDashboard();
+        }
 
         if ("true".Equals(context.Configuration["standalone"], StringComparison.OrdinalIgnoreCase))
         {
             siloBuilder.UseLocalhostClustering(11111, 30000, null, "zserver", "zserver");
             siloBuilder.UseInMemoryReminderService();
-            if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
-            {
-                siloBuilder.UseDashboard(options =>
-                {
-                    options.Port = int.Parse(dashboardPort);
-                    var basePath = context.Configuration["Orleans:DashboardBasePath"];
-                    if (!string.IsNullOrEmpty(basePath))
-                    {
-                        options.BasePath = basePath;
-                    }
-                });
-            }
 
             logger.LogInformation(
-                $"Standalone: true, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
+                $"Standalone: true, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}");
             return;
         }
 
@@ -73,7 +61,7 @@ public static class OrleansExtensions
                 "Orleans:GatewayPort"));
 
         logger.LogInformation(
-            $"Standalone: false, Invariant: {invariant}, SiloName: {siloName}, ClusterId: {clusterId}, ServiceId: {serviceId}, SiloPort: {siloPort}, GatewayPort: {gatewayPort}, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}, DashboardPort: {dashboardPort}");
+            $"Standalone: false, Invariant: {invariant}, SiloName: {siloName}, ClusterId: {clusterId}, ServiceId: {serviceId}, SiloPort: {siloPort}, GatewayPort: {gatewayPort}, API: {EnvironmentVariables.Port}, Dashboard: {enableDashboard}");
         var assembly = Assembly.Load($"{invariant}");
 
         var scriptPath = $"{invariant}.sql";
@@ -150,17 +138,5 @@ public static class OrleansExtensions
                 options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, options.GatewayPort);
             });
 
-        if ("true".Equals(enableDashboard, StringComparison.OrdinalIgnoreCase))
-        {
-            siloBuilder.UseDashboard(options =>
-            {
-                options.Port = int.Parse(dashboardPort);
-                var basePath = context.Configuration["Orleans:DashboardBasePath"];
-                if (!string.IsNullOrEmpty(basePath))
-                {
-                    options.BasePath = basePath;
-                }
-            });
-        }
     }
 }

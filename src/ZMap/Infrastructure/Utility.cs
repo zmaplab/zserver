@@ -20,6 +20,15 @@ public static partial class Utility
         Console.WriteLine(info);
     }
 
+    public static string SubstituteEnv(string text)
+    {
+        return Regex.Replace(text, @"\$\{(?<k>.*?)\}", m =>
+        {
+            var key = m.Groups["k"].Value.Trim();
+            return Environment.GetEnvironmentVariable(key) ?? m.Value;
+        });
+    }
+
     /// <summary>
     /// WMTS 缓存文件的 Key
     /// </summary>

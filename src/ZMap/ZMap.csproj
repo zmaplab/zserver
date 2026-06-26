@@ -3,19 +3,19 @@
     <Import Project="../../package.props"/>
     <Import Project="../../version.props"/>
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="3.1.4" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />
+        <PackageReference Include="MessagePack" Version="3.1.7" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.9" />
         <PackageReference Include="NetTopologySuite" Version="2.6.0" />
         <PackageReference Include="NetTopologySuite.Features" Version="2.2.0" />
         <PackageReference Include="ProjNET" Version="2.1.0" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.9" />
 <!--        <PackageReference Include="System.Net.Http" Version="4.3.4" />-->
 <!--        <PackageReference Include="System.Text.Json" Version="9.0.10" />-->
-        <PackageReference Include="Dapper" Version="2.1.72" />
+        <PackageReference Include="Dapper" Version="2.1.79" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.3" />
-        <PackageReference Include="MongoDB.Bson" Version="3.7.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
+        <PackageReference Include="MongoDB.Bson" Version="3.9.0" />
     </ItemGroup>
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">

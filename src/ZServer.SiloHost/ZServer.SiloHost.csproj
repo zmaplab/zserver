@@ -11,13 +11,12 @@
 
     <ItemGroup>
         <PackageReference Include="DotNetCore.Compile.Environment" Version="3.2.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
-        <PackageReference Include="Microsoft.Orleans.Client" Version="9.1.2" />
-        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="9.1.2" />
-        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="9.1.2" />
-        <PackageReference Include="Microsoft.Orleans.Server" Version="9.1.2" />
-        <PackageReference Include="OrleansDashboard" Version="8.2.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+        <PackageReference Include="Microsoft.Orleans.Server" Version="10.2.1" />
+        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="10.2.1" />
+        <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="10.2.1" />
+        <PackageReference Include="Microsoft.Orleans.Dashboard" Version="10.2.1" />
+        <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
         <PackageReference Include="Serilog.Expressions" Version="4.0.0" />

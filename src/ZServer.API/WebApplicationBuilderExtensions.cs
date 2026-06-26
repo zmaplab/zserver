@@ -4,14 +4,17 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
+using ZMap.Infrastructure;
 using ZServer.API.Serilog;
 using ExportProcessorType = OpenTelemetry.ExportProcessorType;
+using Log = Serilog.Log;
 
 namespace ZServer.API;
 
@@ -22,6 +25,63 @@ public static class WebApplicationBuilderExtensions
 {
     extension(WebApplicationBuilder builder)
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public void AddSubstitution()
+        {
+            var env = builder.Environment;
+            var replaceFiles = new Dictionary<string, int?>
+            {
+                { "appsettings.json", null },
+                { $"appsettings.{env.EnvironmentName}.json", null },
+                { "conf/appsettings.json", null }
+            };
+            var sources = builder.Configuration.Sources;
+            for (var i = 0; i < builder.Configuration.Sources.Count; i++)
+            {
+                if (sources[i] is not FileConfigurationSource fcs)
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(fcs.Path))
+                {
+                    continue;
+                }
+
+                if (replaceFiles.ContainsKey(fcs.Path))
+                {
+                    replaceFiles[fcs.Path] = i;
+                }
+            }
+
+            void ReplaceSource(ConfigurationManager configurationManager, int index, string path)
+            {
+                if (!File.Exists(path))
+                {
+                    return;
+                }
+
+                using var stream =
+                    new MemoryStream(System.Text.Encoding.UTF8.GetBytes(Utility.SubstituteEnv(File.ReadAllText(path))));
+                configurationManager.Sources[index] = new JsonStreamConfigurationSource
+                {
+                    Stream = stream
+                };
+            }
+
+            foreach (var kv in replaceFiles)
+            {
+                if (kv.Value == null)
+                {
+                    continue;
+                }
+
+                ReplaceSource(builder.Configuration, kv.Value.Value, kv.Key);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
