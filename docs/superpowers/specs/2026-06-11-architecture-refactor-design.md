@@ -1,166 +1,166 @@
-# ZServer Architecture Refactoring
+# ZServer 整体架构重构方案
 
-**Date**: 2026-06-11 | **Status**: Draft | **Approach**: B — Modular Monolith
+**日期**: 2026-06-11 | **状态**: 草稿 | **方案**: B — 模块化单体
 
-## Goals
+## 目标
 
-1. **Code organization** — Break up ZMap (204 files) into focused packages with clean boundaries
-2. **Performance/scaling prep** — Make renderer/source truly pluggable, preparing for future Orleans distribution
-3. **Technical debt** — Enable nullable, fix sync-over-async, consolidate logging, clean up Orleans config
+1. **代码组织** — 拆分 ZMap（204 文件）为职责清晰的独立包
+2. **性能/扩展准备** — 渲染器和数据源实现真正的插件化，为未来的 Orleans 分布式做准备
+3. **技术债务** — 启用可空检查、修复同步异步混用、统一日志、清理 Orleans 配置
 
-## Section 1: Package Split
+## 第一节：包拆分
 
-### Current
+### 当前状态
 
-16 projects, ZMap is a single project with 204 files mixing 8 concerns.
+16 个项目，ZMap 单个项目 204 个文件，混入了 8 种职责。
 
-### Target
+### 目标结构
 
 ```
 src/
 ├── ZMap.Core/                    # Layer, Map, Feature, Envelope, Zoom, ResourceGroup
-│                                 # ~15 files — pure domain, zero infrastructure deps
-├── ZMap.Ogc/                     # WMS/WMTS protocol parsing, request validation
+│                                 # ~15 文件 — 纯领域模型，无基础设施依赖
+├── ZMap.Ogc/                     # WMS/WMTS 协议解析、请求参数校验
 │   ├── Wms/                      # WmsService, ParameterValidator
-│   └── Wmts/                     # WmtsService, tile matrix logic
-│                                 # refs: ZMap.Core, ZMap.TileGrid
-├── ZMap.Style/                   # StyleGroup, SldStyleVisitor, IStyleVisitor, style defs
-│                                 # refs: ZMap.Core, ZMap.DynamicCompiler
+│   └── Wmts/                     # WmtsService, 瓦片矩阵计算
+│                                 # 依赖: ZMap.Core, ZMap.TileGrid
+├── ZMap.Style/                   # StyleGroup, SldStyleVisitor, IStyleVisitor, 样式定义
+│                                 # 依赖: ZMap.Core, ZMap.DynamicCompiler
 ├── ZMap.Rendering.Abstractions/  # IGraphicsService, IGraphicsServiceProvider, Viewport
-│                                 # refs: ZMap.Core
-├── ZMap.SLD/                     # Auto-generated XSD classes (112 files, moved from ZMap)
-│                                 # refs: none (pure data model)
+│                                 # 依赖: ZMap.Core
+├── ZMap.SLD/                     # 自动生成的 XSD 类（112 文件，从 ZMap 移出）
+│                                 # 依赖: 无（纯数据模型）
 ├── ZMap.Source.Abstractions/     # IVectorSource, IRasterSource, ITiledSource, ISource
-│                                 # refs: ZMap.Core
-├── ZMap.TileGrid/                # Unchanged — GridSet, GridSetFactory
-├── ZMap.DynamicCompiler/         # Unchanged — Natasha-based compilation
+│                                 # 依赖: ZMap.Core
+├── ZMap.TileGrid/                # 保持不变 — GridSet, GridSetFactory
+├── ZMap.DynamicCompiler/         # 保持不变 — Natasha 运行时编译
 │
-├── ZMap.Renderer.SkiaSharp/      # Unchanged — SkiaSharp impl
-├── ZMap.Source.Postgre/          # Unchanged
-├── ZMap.Source.ShapeFile/        # Unchanged
-├── ZMap.Source.GDAL/             # Unchanged
-├── ZMap.Source.CloudOptimizedGeoTIFF/  # Unchanged
+├── ZMap.Renderer.SkiaSharp/      # 保持不变 — SkiaSharp 实现
+├── ZMap.Source.Postgre/          # 保持不变
+├── ZMap.Source.ShapeFile/        # 保持不变
+├── ZMap.Source.GDAL/             # 保持不变
+├── ZMap.Source.CloudOptimizedGeoTIFF/  # 保持不变
 │
-├── ZServer.Core/                 # Store layer + DI composition root
+├── ZServer.Core/                 # Store 层 + DI 组合根
 │   ├── Store/                    # LayerStore, SourceStore, GridSetStore, LayerQueryService
-│   └── Extensions/               # Service registration, plugin wiring
-│                                 # refs: ZMap.Core, ZMap.Ogc, ZMap.Style,
+│   └── Extensions/               # 服务注册、插件编排
+│                                 # 依赖: ZMap.Core, ZMap.Ogc, ZMap.Style,
 │                                 #   ZMap.Rendering.Abstractions, ZMap.Source.Abstractions
-├── ZServer.Interfaces/           # Unchanged — grain contracts
-├── ZServer.Grains/               # Unchanged — grain implementations
-├── ZServer.Silo/                 # Unchanged (Orleans config cleaned in Section 3d)
-├── ZServer.SiloHost/             # Unchanged
-├── ZServer.API/                  # Web host — refs ZServer.Core only (no individual sources)
-└── ZServer.Tests/                # Unit tests per package
+├── ZServer.Interfaces/           # 保持不变 — Orleans 契约接口
+├── ZServer.Grains/               # 保持不变 — Orleans 实现
+├── ZServer.Silo/                 # 保持不变（Orleans 配置在第三节 d 清理）
+├── ZServer.SiloHost/             # 保持不变
+├── ZServer.API/                  # Web 主机 — 只依赖 ZServer.Core（不直接引用原始 Source）
+└── ZServer.Tests/                # 按包划分的单元测试
 ```
 
-### Migration Strategy
+### 迁移顺序
 
-1. Extract `ZMap.SLD` first — pure move, no logic changes, zero risk
-2. Extract `ZMap.Rendering.Abstractions` — IGraphicsService, IGraphicsServiceProvider, Viewport
-3. Extract `ZMap.Source.Abstractions` — IVectorSource, IRasterSource, ISource
-4. Extract `ZMap.Core` — Layer, Map, Feature, Envelope, Zoom, ResourceGroup
-5. Extract `ZMap.Ogc` — WmsService, WmtsService, ParameterValidator
-6. Extract `ZMap.Style` — StyleGroup, SldStyleVisitor, IStyleVisitor
-7. Remaining files (Extensions, Indexing, Infrastructure, Permission) stay in ZMap temporarily. ZMap re-exports moved types via `[assembly: TypeForwardedTo]` to avoid breaking existing usages.
-8. After all consumers migrate to new packages, the old ZMap project is archived.
-9. Rename `ZServer` → `ZServer.Core` with consolidated stores
+1. 先抽 `ZMap.SLD` — 纯移动，无逻辑变更，零风险
+2. 再抽 `ZMap.Rendering.Abstractions` — IGraphicsService, IGraphicsServiceProvider, Viewport
+3. 再抽 `ZMap.Source.Abstractions` — IVectorSource, IRasterSource, ISource
+4. 再抽 `ZMap.Core` — Layer, Map, Feature, Envelope, Zoom, ResourceGroup
+5. 再抽 `ZMap.Ogc` — WmsService, WmtsService, ParameterValidator
+6. 再抽 `ZMap.Style` — StyleGroup, SldStyleVisitor, IStyleVisitor
+7. 剩余文件（Extensions, Indexing, Infrastructure, Permission）留在旧 ZMap。旧 ZMap 通过 `[assembly: TypeForwardedTo]` 重导出已移走的类型，保持现有引用不中断
+8. 所有消费者迁移到新包后，旧 ZMap 项目归档
+9. `ZServer` 更名为 `ZServer.Core`，Store 层合并
 
-## Section 2: Plugin Architecture
+## 第二节：插件架构
 
-### Problem
+### 问题
 
-`ZServer.csproj` hard-references `ZMap.Renderer.SkiaSharp` and `ZMap.Source.ShapeFile`.
-`ZServer.API.csproj` hard-references individual source implementations.
-Adding a new renderer or source requires touching multiple projects.
+`ZServer.csproj` 硬引用了 `ZMap.Renderer.SkiaSharp` 和 `ZMap.Source.ShapeFile`。
+`ZServer.API.csproj` 硬引用了各种 Source 实现。
+新增一个渲染器或数据源要改多个项目。
 
-### Solution
+### 方案
 
-Each plugin ships a self-contained DI registration extension. `ZServer.Core` is the composition root.
+每个插件提供独立的 DI 注册扩展方法，`ZServer.Core` 统一编排。
 
-**Plugin pattern**:
+**插件模式**：
 ```csharp
-// Each plugin exposes:
+// 每个插件暴露：
 public static IServiceCollection AddXxx(this IServiceCollection services) { ... }
 
-// ZServer.Core wires them:
+// ZServer.Core 统一注册：
 services.AddSkiaSharpRenderer();
 services.AddPostgreSource();
 services.AddShapeFileSource();
 services.AddCloudOptimizedGeoTIFFSource();
 ```
 
-**Dependency flow**:
+**依赖流向**：
 ```
-ZServer.API → ZServer.Core → ZMap.*.Abstractions (compile-time)
-ZServer.Core → ZMap.Renderer.SkiaSharp, ZMap.Source.* (runtime, via DI)
-```
-
-**Benefits**:
-- New renderer (e.g. ImageSharp)? One package + one extension method.
-- New data source? Same pattern.
-- No compile-time dependency from API/ZServer to individual implementations.
-- Testability: unit tests swap renderer with a stub via DI.
-
-## Section 3: Technical Debt
-
-### 3a. Enable Nullable — Incrementally
-
-- Remove `<Nullable>disable</Nullable>` from `package.props`
-- Each new package enables `<Nullable>enable</Nullable>` in its own `.csproj`
-- Files that genuinely need nullable disabled (JSON config deserialization) opt out per-file with `#nullable disable`
-- Existing ZMap (during migration) keeps `#nullable disable` until moved to new packages
-
-### 3b. Fix Sync-over-Async
-
-3 files use `.Result`/`.Wait()` — replace with `await` up the call chain.
-Likely locations: Orleans bootstrap (synchronous silo setup), GDAL interop.
-
-### 3c. Consolidate Logging
-
-7 files use `Console.WriteLine` (mostly Console/Client sample projects).
-Replace with `Log.CreateLogger<T>()` using the existing Serilog infrastructure.
-
-### 3d. Clean Up Orleans Config (`OrleansExtensions.cs`, 166 lines)
-
-- Replace `Assembly.Load($"{invariant}")` with typed ADO.NET clustering registration
-- Extract SQL provisioning to a separate `ClusterProvisioner` service
-- Split `ConfigureSilo` into `ConfigureStandalone()` / `ConfigureClustered()`
-- **Dashboard port sharing**: Replace `ISiloBuilder.UseDashboard()` (separate Kestrel) with `app.UseOrleansDashboard()` middleware on the API port, mounted at `/dashboard` path. This eliminates the need for a second port forward on the gateway.
-  - Standalone mode: Remove `UseDashboard()` from silo config, add middleware in `Program.cs` API pipeline
-  - Cluster mode: SiloHost still uses `UseDashboard()` on its own port (separate process, no ASP.NET Core host)
-
-## Section 4: Store Layer Consolidation
-
-### Problem
-
-`LayerQueryService` delegates to `LayerGroupStore` + `LayerStore` + `StyleGroupStore`.
-Duplicated "find by resourceGroup:layerName" logic across 3 classes.
-Style setting interleaved with layer resolution.
-
-### Solution
-
-`LayerQueryService` becomes the single public entry point.
-`LayerGroupStore`, `LayerStore`, `StyleGroupStore` become internal.
-`IRefresher` removed from `ILayerGroupStore` — refresh handled by `RefreshConfigService`.
-
-```
-LayerQueryService ──► WmsService/WmtsService (single facade)
-  └── internal: LayerGroupStore, LayerStore, StyleGroupStore
+ZServer.API → ZServer.Core → ZMap.*.Abstractions（编译期）
+ZServer.Core → ZMap.Renderer.SkiaSharp, ZMap.Source.*（运行时，通过 DI）
 ```
 
-## Non-Goals (Out of Scope)
+**优点**：
+- 新渲染器（如 ImageSharp）？加一个包 + 一个扩展方法，搞定
+- 新数据源？同一模式
+- API/ZServer 不再编译期依赖具体实现
+- 可测试性：单元测试通过 DI 替换渲染器为桩
 
-- Orleans grain distribution (Approach C — deferred)
-- Tile caching strategy changes
-- Frontend (Web/) changes
-- Client/Console sample updates (best-effort)
+## 第三节：技术债务
 
-## Risks
+### 3a. 启用可空检查 — 渐进式
 
-| Risk | Mitigation |
-|------|------------|
-| Package split breaks existing import paths | Incremental extraction; old ZMap re-exports via `[assembly: TypeForwardedTo]` where needed |
-| Plugin DI breaks startup | Each extraction validated with `dotnet build && dotnet test` before next step |
-| Nullable enable reveals hidden bugs | Per-package opt-in, not big-bang; existing tests catch regressions |
-| Store consolidation changes behavior | `LayerQueryService` interface unchanged; internal refactor only |
+- 移除 `package.props` 中的 `<Nullable>disable</Nullable>`
+- 每个新包在自己的 `.csproj` 中启用 `<Nullable>enable</Nullable>`
+- 确实需要禁用可空的文件（如 JSON 配置反序列化）用 `#nullable disable` 按文件关闭
+- 旧 ZMap 在迁移完成前保持 `#nullable disable`
+
+### 3b. 修复同步异步混用
+
+3 个文件使用了 `.Result`/`.Wait()` — 替换为 `await` 上溯调用链。
+可能位置：Orleans 引导（同步 silo 配置）、GDAL 互操作。
+
+### 3c. 统一日志
+
+7 个文件使用了 `Console.WriteLine`（主要在 Console/Client 示例项目）。
+替换为 `Log.CreateLogger<T>()`，使用已有 Serilog 基础设施。
+
+### 3d. 清理 Orleans 配置（`OrleansExtensions.cs`，166 行）
+
+- 将 `Assembly.Load($"{invariant}")` 替换为类型化的 ADO.NET 集群注册
+- 将 SQL 预配逻辑抽到独立 `ClusterProvisioner` 服务
+- 将 `ConfigureSilo` 拆分为 `ConfigureStandalone()` / `ConfigureClustered()`
+- **仪表盘端口合并**：将 `ISiloBuilder.UseDashboard()`（独立 Kestrel 端口）替换为 `app.UseOrleansDashboard()` 中间件，挂在 API 同一端口的 `/dashboard` 路径下。前置网关无需再配两个端口转发
+  - 单机模式：从 silo 配置中移除 `UseDashboard()`，在 `Program.cs` API 管道中添加中间件
+  - 集群模式：SiloHost 仍使用 `UseDashboard()` 独立端口（独立进程，无 ASP.NET Core 主机）
+
+## 第四节：Store 层合并
+
+### 问题
+
+`LayerQueryService` 委托给 `LayerGroupStore` + `LayerStore` + `StyleGroupStore`。
+"按 resourceGroup:layerName 查找"的逻辑在 3 个类中重复。
+样式设置与图层解析交织在一起。
+
+### 方案
+
+`LayerQueryService` 成为唯一的公开入口。
+`LayerGroupStore`、`LayerStore`、`StyleGroupStore` 改为内部实现。
+从 `ILayerGroupStore` 移除 `IRefresher` — 刷新由 `RefreshConfigService` 统一处理。
+
+```
+LayerQueryService ──► WmsService/WmtsService（单一外观）
+  └── 内部: LayerGroupStore, LayerStore, StyleGroupStore
+```
+
+## 不纳入范围
+
+- Orleans 粒度分布式（方案 C — 延后）
+- 瓦片缓存策略变更
+- 前端（Web/）变更
+- Client/Console 示例更新（尽力而为）
+
+## 风险
+
+| 风险 | 应对 |
+|------|------|
+| 包拆分导致现有导入路径损坏 | 渐进抽取；旧 ZMap 通过 `[assembly: TypeForwardedTo]` 重导出已移类型 |
+| 插件 DI 导致启动失败 | 每一步抽取后用 `dotnet build && dotnet test` 验证 |
+| 启用可空发现隐藏缺陷 | 按包启用，非全量开启；已有测试覆盖回归 |
+| Store 合并改变行为 | `LayerQueryService` 接口不变，仅内部重构 |
