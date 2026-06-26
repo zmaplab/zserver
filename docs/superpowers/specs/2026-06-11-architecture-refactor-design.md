@@ -126,6 +126,9 @@ Replace with `Log.CreateLogger<T>()` using the existing Serilog infrastructure.
 - Replace `Assembly.Load($"{invariant}")` with typed ADO.NET clustering registration
 - Extract SQL provisioning to a separate `ClusterProvisioner` service
 - Split `ConfigureSilo` into `ConfigureStandalone()` / `ConfigureClustered()`
+- **Dashboard port sharing**: Replace `ISiloBuilder.UseDashboard()` (separate Kestrel) with `app.UseOrleansDashboard()` middleware on the API port, mounted at `/dashboard` path. This eliminates the need for a second port forward on the gateway.
+  - Standalone mode: Remove `UseDashboard()` from silo config, add middleware in `Program.cs` API pipeline
+  - Cluster mode: SiloHost still uses `UseDashboard()` on its own port (separate process, no ASP.NET Core host)
 
 ## Section 4: Store Layer Consolidation
 
