@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZServer — 分布式地图瓦片服务器</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ─── Navigation ─── -->
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="#" class="logo">
+            <span class="logo-icon">🗺</span>
+            <span class="logo-text">ZServer</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#features">特性</a></li>
+            <li><a href="#architecture">架构</a></li>
+            <li><a href="#sources">数据源</a></li>
+            <li><a href="#quickstart">快速开始</a></li>
+            <li><a href="https://github.com/zmaplab/zserver" target="_blank" rel="noopener" class="nav-gh">GitHub</a></li>
+        </ul>
+        <button class="nav-toggle" aria-label="菜单">☰</button>
+    </div>
+</nav>
+
+<!-- ─── Hero ─── -->
+<header class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-inner">
+        <h1 class="hero-title">ZServer</h1>
+        <p class="hero-subtitle">基于 Actor 模型的分布式计算地图服务器</p>
+        <p class="hero-desc">符合 OpenGIS Web 服务器规范，支持 WMS / WMTS 协议，天然水平扩展</p>
+        <div class="hero-actions">
+            <a href="#quickstart" class="btn btn-primary">快速开始</a>
+            <a href="https://github.com/zmaplab/zserver" target="_blank" rel="noopener" class="btn btn-secondary">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+        </div>
+        <div class="hero-version">v1.5.4 · .NET 10 · Orleans 10</div>
+    </div>
+</header>
+
+<!-- ─── Features ─── -->
+<section class="section" id="features">
+    <div class="container">
+        <h2 class="section-title">核心特性</h2>
+        <p class="section-desc">ZServer 将地图瓦片模型与 Actor 模型天然结合，提供高性能、可水平扩展的地图服务</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>OGC 标准兼容</h3>
+                <p>完整支持 WMS（GetMap / GetFeatureInfo）和 WMTS 协议，兼容主流 GIS 客户端（QGIS、Leaflet、OpenLayers）</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Actor 模型</h3>
+                <p>基于 Orleans 实现，每个瓦片对应一个 Actor，天然无锁并发。水平扩展只需添加 Silo 节点</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <h3>多数据源</h3>
+                <p>支持 PostgreSQL/PostGIS、ShapeFile、COG GeoTIFF、远程 WMTS 等数据源，可扩展插件式架构</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>SLD 样式</h3>
+                <p>支持 SLD（Styled Layer Descriptor）样式配置，灵活控制地图渲染风格</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h3>瓦片缓存</h3>
+                <p>本地文件系统缓存 + 实时渲染，兼顾首次加载速度和重复访问性能</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡</div>
+                <h3>授权认证</h3>
+                <p>内置 JWT 认证 + 基于 Scope 的授权策略，支持生产环境安全控制</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Architecture ─── -->
+<section class="section section-dark" id="architecture">
+    <div class="container">
+        <h2 class="section-title">系统架构</h2>
+        <p class="section-desc">基于 Orleans 的分层架构，从数据接入到地图输出完整链路</p>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <span class="arch-label">HTTP</span>
+                <span class="arch-detail">ASP.NET Core · WMS / WMTS / XYZ 控制器 · JWT 认证</span>
+            </div>
+            <div class="arch-layer">
+                <span class="arch-label">Grains</span>
+                <span class="arch-detail">WMSGrain · WMTSGrain · XyzGrain — 无状态工作者，[Reentrant] 并发</span>
+            </div>
+            <div class="arch-layer">
+                <span class="arch-label">Server</span>
+                <span class="arch-detail">LayerStore · SourceStore · GridSetStore · StyleGroupStore</span>
+            </div>
+            <div class="arch-layer">
+                <span class="arch-label">Rendering</span>
+                <span class="arch-detail">SkiaSharp · Style→Visitor→Renderer 管线 · 动态编译 (CQL 过滤)</span>
+            </div>
+            <div class="arch-layer">
+                <span class="arch-label">Data Sources</span>
+                <span class="arch-detail">PostgreSQL / PostGIS · ShapeFile · COG GeoTIFF · GDAL</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Data Sources ─── -->
+<section class="section" id="sources">
+    <div class="container">
+        <h2 class="section-title">支持的数据源</h2>
+        <p class="section-desc">插件式数据源架构，可轻松扩展</p>
+        <div class="sources-grid">
+            <div class="source-card">
+                <div class="source-icon">🐘</div>
+                <h3>PostgreSQL / PostGIS</h3>
+                <p>矢量数据存储，支持空间查询和过滤，生产环境首选</p>
+            </div>
+            <div class="source-card">
+                <div class="source-icon">📐</div>
+                <h3>ShapeFile</h3>
+                <p>经典 GIS 矢量格式，快速加载本地数据</p>
+            </div>
+            <div class="source-card">
+                <div class="source-icon">🛰</div>
+                <h3>COG GeoTIFF</h3>
+                <p>云优化 GeoTIFF，支持高效影像数据发布</p>
+            </div>
+            <div class="source-card">
+                <div class="source-icon">🌍</div>
+                <h3>GDAL</h3>
+                <p>通过 GDAL 支持更多栅格和矢量格式</p>
+            </div>
+            <div class="source-card">
+                <div class="source-icon">🔗</div>
+                <h3>远程 WMTS</h3>
+                <p>代理远程 WMTS 服务，统一接口管理</p>
+            </div>
+            <div class="source-card">
+                <div class="source-icon">🧩</div>
+                <h3>插件扩展</h3>
+                <p>实现 IVectorSource / IRasterSource 接口即可添加新数据源</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Quick Start ─── -->
+<section class="section section-dark" id="quickstart">
+    <div class="container">
+        <h2 class="section-title">快速开始</h2>
+        <p class="section-desc">3 步启动 ZServer</p>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h3>启动 PostgreSQL</h3>
+                <pre><code>docker run --name postgis \
+  -p 5432:5432 \
+  -e POSTGRES_PASSWORD=1qazZAQ! \
+  -d postgis/postgis</code></pre>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h3>启动 ZServer API</h3>
+                <pre><code>git clone https://github.com/zmaplab/zserver.git
+cd zserver
+
+dotnet run --project src/ZServer.API \
+  --Standalone true \
+  --ClusterDashboard true \
+  --ClusterDashboardPort 8182 \
+  --Port 8200</code></pre>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h3>访问服务</h3>
+                <pre><code># 浏览器打开
+http://localhost:8200/wms?request=GetCapabilities
+
+# 或使用仪表盘
+http://localhost:8200/dashboard</code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Footer ─── -->
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="footer-col">
+            <h4>ZServer</h4>
+            <p>基于 Actor 模型的分布式计算地图服务器<br/>符合 OpenGIS Web 服务器规范</p>
+        </div>
+        <div class="footer-col">
+            <h4>链接</h4>
+            <ul>
+                <li><a href="https://github.com/zmaplab/zserver" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://github.com/zmaplab/zserver/releases" target="_blank" rel="noopener">Releases</a></li>
+                <li><a href="https://github.com/zmaplab/zserver/issues" target="_blank" rel="noopener">Issues</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>技术栈</h4>
+            <ul>
+                <li>.NET 10</li>
+                <li>Orleans 10</li>
+                <li>SkiaSharp</li>
+                <li>PostgreSQL / PostGIS</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>许可证</h4>
+            <p>Apache License 2.0<br/>Copyright © zmap lab</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container">
+            <span>Made with ❤️ by ZServer Team</span>
+            <span class="footer-gh-link">
+                <a href="https://github.com/zmaplab/zserver" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    zmaplab/zserver
+                </a>
+            </span>
+        </div>
+    </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
