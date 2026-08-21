@@ -5,33 +5,138 @@
 /// </summary>
 public static class GeographicUtility
 {
+    private const double OgcPixelSizeMeters = 0.00028D;
+    private const double OgcEquatorialRadiusMeters = 6378137D;
+
     /// <summary>
-    /// 经纬度坐标系的比例尺计算
+    /// 使用 OGC 固定像元尺寸计算 CRS 感知的比例尺分母。
     /// </summary>
-    /// <param name="envelope"></param>
-    /// <param name="width"></param>
-    /// <param name="dpi"></param>
-    /// <returns></returns>
+    /// <param name="envelope">请求范围。</param>
+    /// <param name="srid">请求范围使用的 EPSG SRID。</param>
+    /// <param name="imageWidth">输出图像宽度（像素）。</param>
+    /// <returns>OGC/SLD 比例尺分母。</returns>
+    /// <exception cref="ArgumentNullException">范围为 null。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">图像宽度不是正数。</exception>
+    /// <exception cref="ArgumentException">SRID 未注册、CRS 不是二维水平 CRS 或单位无效。</exception>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static double CalculateOGCScale(Envelope envelope, int width, double dpi)
+    public static double CalculateOGCScaleForSrid(Envelope envelope, int srid, int imageWidth)
     {
-        var widthMeters = envelope.Width * Defaults.MetersPerDegreeAtEquator;
-        return widthMeters / (width / dpi * 0.0254D);
+        ValidateEnvelope(envelope);
+        ValidateImageWidth(imageWidth);
+
+        var coordinateSystem = CoordinateReferenceSystem.Get(srid);
+        if (coordinateSystem == null)
+        {
+            throw new ArgumentException($"未注册的坐标参考系统 EPSG:{srid}", nameof(srid));
+        }
+
+        if (coordinateSystem.Dimension != 2)
+        {
+            throw new ArgumentException("比例尺计算只支持二维水平坐标参考系统", nameof(srid));
+        }
+
+        var imageWidthMeters = imageWidth * OgcPixelSizeMeters;
+        return coordinateSystem switch
+        {
+            ProjectedCoordinateSystem projected =>
+                Math.Abs(envelope.Width) * GetMetersPerUnit(projected, srid) / imageWidthMeters,
+            GeographicCoordinateSystem geographic =>
+                Math.Abs(envelope.Width) * GetRadiansPerUnit(geographic, srid) * OgcEquatorialRadiusMeters /
+                imageWidthMeters,
+            _ => throw new ArgumentException("比例尺计算只支持二维水平坐标参考系统", nameof(srid))
+        };
     }
 
     /// <summary>
-    /// 经纬度坐标系的比例尺计算
+    /// 按打印输出语义计算比例尺分母。
     /// </summary>
-    /// <param name="envelope"></param>
-    /// <param name="srid"></param>
-    /// <param name="width"></param>
-    /// <param name="dpi"></param>
-    /// <returns></returns>
+    /// <param name="envelope">经度/纬度范围。</param>
+    /// <param name="imageWidth">输出图像宽度（像素）。</param>
+    /// <param name="dpi">打印输出 DPI。</param>
+    /// <returns>打印语义的比例尺分母。</returns>
+    /// <exception cref="ArgumentNullException">范围为 null。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">图像宽度或 DPI 不是正数。</exception>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static double CalculatePrintScale(Envelope envelope, int imageWidth, double dpi)
+    {
+        ValidateEnvelope(envelope);
+        ValidateImageWidth(imageWidth);
+        if (!double.IsFinite(dpi) || dpi <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(dpi), dpi, "DPI 必须是正数");
+        }
+
+        var widthMeters = Math.Abs(envelope.Width) * Defaults.MetersPerDegreeAtEquator;
+        return widthMeters / (imageWidth / dpi * 0.0254D);
+    }
+
+    /// <summary>
+    /// 兼容旧调用方的打印比例尺计算入口。
+    /// </summary>
+    [Obsolete("请使用 CalculatePrintScale；WMS/SLD 比例尺请使用 CalculateOGCScaleForSrid。")]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static double CalculateOGCScale(Envelope envelope, int width, double dpi)
+    {
+        return CalculatePrintScale(envelope, width, dpi);
+    }
+
+    /// <summary>
+    /// 兼容旧调用方的打印比例尺计算入口。
+    /// </summary>
+    [Obsolete("请使用 CalculatePrintScale；WMS/SLD 比例尺请使用 CalculateOGCScaleForSrid。")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static double CalculateOGCScale(Envelope envelope, int srid, int width, double dpi)
     {
         var envelope4326 = envelope.Transform(srid, 4326);
-        return CalculateOGCScale(envelope4326, width, dpi);
+        return CalculatePrintScale(envelope4326, width, dpi);
+    }
+
+    private static double GetMetersPerUnit(ProjectedCoordinateSystem coordinateSystem, int srid)
+    {
+        var metersPerUnit = coordinateSystem.LinearUnit?.MetersPerUnit;
+        if (!metersPerUnit.HasValue || !IsPositiveFinite(metersPerUnit.Value))
+        {
+            throw new ArgumentException($"CRS EPSG:{srid} 缺少有效的线性单位", nameof(srid));
+        }
+
+        return metersPerUnit.Value;
+    }
+
+    private static double GetRadiansPerUnit(GeographicCoordinateSystem coordinateSystem, int srid)
+    {
+        var radiansPerUnit = coordinateSystem.AngularUnit?.RadiansPerUnit;
+        if (!radiansPerUnit.HasValue || !IsPositiveFinite(radiansPerUnit.Value))
+        {
+            throw new ArgumentException($"CRS EPSG:{srid} 缺少有效的角度单位", nameof(srid));
+        }
+
+        return radiansPerUnit.Value;
+    }
+
+    private static void ValidateEnvelope(Envelope envelope)
+    {
+        if (envelope == null)
+        {
+            throw new ArgumentNullException(nameof(envelope));
+        }
+
+        if (envelope.IsNull || !double.IsFinite(envelope.Width))
+        {
+            throw new ArgumentException("范围必须是有效的二维范围", nameof(envelope));
+        }
+    }
+
+    private static void ValidateImageWidth(int imageWidth)
+    {
+        if (imageWidth <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(imageWidth), imageWidth, "图像宽度必须是正数");
+        }
+    }
+
+    private static bool IsPositiveFinite(double value)
+    {
+        return value > 0 && double.IsFinite(value);
     }
 
     /// <summary>
