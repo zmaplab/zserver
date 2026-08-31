@@ -1,4 +1,6 @@
-﻿namespace ZMap.Ogc.Wms;
+﻿using System.Globalization;
+
+namespace ZMap.Ogc.Wms;
 
 public static class ParameterValidator
 {
@@ -33,15 +35,18 @@ public static class ParameterValidator
         }
 
         var points = bbox.Split(',', StringSplitOptions.RemoveEmptyEntries);
-        if (points.Length != 4 || !float.TryParse(points[0], out var x1) ||
-            !float.TryParse(points[1], out var y1)
-            || !float.TryParse(points[2], out var x2)
-            || !float.TryParse(points[3], out var y2))
+        if (points.Length != 4 || !TryParseFiniteCoordinate(points[0], out var x1) ||
+            !TryParseFiniteCoordinate(points[1], out var y1)
+            || !TryParseFiniteCoordinate(points[2], out var x2)
+            || !TryParseFiniteCoordinate(points[3], out var y2))
         {
             return new ValidateResult(null, "InvalidBBox", $"The request bounding box is invalid: {bbox}");
         }
 
-        if (x2 - x1 <= 0 || y2 - y1 <= 0)
+        var bboxWidth = x2 - x1;
+        var bboxHeight = y2 - y1;
+        if (!double.IsFinite(bboxWidth) || bboxWidth <= 0 ||
+            !double.IsFinite(bboxHeight) || bboxHeight <= 0)
         {
             return new ValidateResult(null, "InvalidBBox", $"The request bounding box has zero area: {bbox}");
         }
@@ -99,6 +104,12 @@ public static class ParameterValidator
 
         var envelope = new Envelope(x1, x2, y1, y2);
         return new ValidateResult(new RequestParameters(envelope, srid, list, styleList, filterList), null, null);
+    }
+
+    private static bool TryParseFiniteCoordinate(string value, out double coordinate)
+    {
+        return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out coordinate) &&
+               double.IsFinite(coordinate);
     }
 
     public static ValidateResult VerifyAndBuildWmsGetFeatureInfoArguments(

@@ -33,7 +33,6 @@ public class WmsService(
                 return new MapResult(Stream.Null, validateResult.Code, validateResult.Message);
             }
 
-            var dpi = Utility.GetDpi(formatOptions);
             var requestParameters = validateResult.Parameters;
 
             var layerQueries = new List<LayerQuery>();
@@ -78,9 +77,9 @@ public class WmsService(
                 Bordered = arguments.TryGetValue("Bordered", out var b) && (bool)b
             };
 
-            var scale = GeographicUtility.CalculateOGCScale(validateResult.Parameters.Envelope,
+            var scale = GeographicUtility.CalculateOGCScaleForSrid(validateResult.Parameters.Envelope,
                 validateResult.Parameters.SRID,
-                width, dpi);
+                width);
             var map = new Map();
             await map.SetId(traceIdentifier)
                 .SetSrid(validateResult.Parameters.SRID)
