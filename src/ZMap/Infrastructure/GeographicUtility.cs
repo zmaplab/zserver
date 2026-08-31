@@ -35,16 +35,21 @@ public static class GeographicUtility
             throw new ArgumentException("比例尺计算只支持二维水平坐标参考系统", nameof(srid));
         }
 
-        var imageWidthMeters = imageWidth * OgcPixelSizeMeters;
-        return coordinateSystem switch
+        var imageWidthMeters = RequirePositiveFinite(
+            imageWidth * OgcPixelSizeMeters,
+            "输出图像的 OGC 像元宽度必须是有限正数",
+            nameof(imageWidth));
+
+        var scale = coordinateSystem switch
         {
-            ProjectedCoordinateSystem projected =>
-                Math.Abs(envelope.Width) * GetMetersPerUnit(projected, srid) / imageWidthMeters,
-            GeographicCoordinateSystem geographic =>
-                Math.Abs(envelope.Width) * GetRadiansPerUnit(geographic, srid) * OgcEquatorialRadiusMeters /
-                imageWidthMeters,
+            ProjectedCoordinateSystem projected => CalculateProjectedOgcScale(
+                envelope, projected, srid, imageWidthMeters),
+            GeographicCoordinateSystem geographic => CalculateGeographicOgcScale(
+                envelope, geographic, srid, imageWidthMeters),
             _ => throw new ArgumentException("比例尺计算只支持二维水平坐标参考系统", nameof(srid))
         };
+
+        return RequirePositiveFinite(scale, "OGC 比例尺必须是有限正数", nameof(envelope));
     }
 
     /// <summary>
@@ -87,8 +92,35 @@ public static class GeographicUtility
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static double CalculateOGCScale(Envelope envelope, int srid, int width, double dpi)
     {
+        ValidateEnvelope(envelope);
         var envelope4326 = envelope.Transform(srid, 4326);
         return CalculatePrintScale(envelope4326, width, dpi);
+    }
+
+    private static double CalculateProjectedOgcScale(Envelope envelope,
+        ProjectedCoordinateSystem coordinateSystem, int srid, double imageWidthMeters)
+    {
+        var widthMeters = RequirePositiveFinite(
+            envelope.Width * GetMetersPerUnit(coordinateSystem, srid),
+            "范围转换后的宽度必须是有限正数",
+            nameof(envelope));
+        var scale = widthMeters / imageWidthMeters;
+        return RequirePositiveFinite(scale, "OGC 比例尺必须是有限正数", nameof(envelope));
+    }
+
+    private static double CalculateGeographicOgcScale(Envelope envelope,
+        GeographicCoordinateSystem coordinateSystem, int srid, double imageWidthMeters)
+    {
+        var widthRadians = RequirePositiveFinite(
+            envelope.Width * GetRadiansPerUnit(coordinateSystem, srid),
+            "范围转换后的角度宽度必须是有限正数",
+            nameof(envelope));
+        var widthMeters = RequirePositiveFinite(
+            widthRadians * OgcEquatorialRadiusMeters,
+            "范围转换后的米制宽度必须是有限正数",
+            nameof(envelope));
+        var scale = widthMeters / imageWidthMeters;
+        return RequirePositiveFinite(scale, "OGC 比例尺必须是有限正数", nameof(envelope));
     }
 
     private static double GetMetersPerUnit(ProjectedCoordinateSystem coordinateSystem, int srid)
@@ -120,7 +152,13 @@ public static class GeographicUtility
             throw new ArgumentNullException(nameof(envelope));
         }
 
-        if (envelope.IsNull || !double.IsFinite(envelope.Width))
+        if (envelope.IsNull ||
+            !double.IsFinite(envelope.MinX) ||
+            !double.IsFinite(envelope.MaxX) ||
+            !double.IsFinite(envelope.MinY) ||
+            !double.IsFinite(envelope.MaxY) ||
+            !IsPositiveFinite(envelope.Width) ||
+            !IsPositiveFinite(envelope.Height))
         {
             throw new ArgumentException("范围必须是有效的二维范围", nameof(envelope));
         }
@@ -137,6 +175,16 @@ public static class GeographicUtility
     private static bool IsPositiveFinite(double value)
     {
         return value > 0 && double.IsFinite(value);
+    }
+
+    private static double RequirePositiveFinite(double value, string message, string parameterName)
+    {
+        if (!IsPositiveFinite(value))
+        {
+            throw new ArgumentException(message, parameterName);
+        }
+
+        return value;
     }
 
     /// <summary>

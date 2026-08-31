@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using Xunit;
 using ZMap.Infrastructure;
+using ZMap.Ogc.Wms;
 
 namespace ZServer.Tests;
 
@@ -172,6 +175,119 @@ public class ScaleTests : BaseTests
 
         Assert.Throws<ArgumentException>(() =>
             GeographicUtility.CalculateOGCScaleForSrid(envelope, 3857, 1000));
+    }
+
+    [Theory]
+    [MemberData(nameof(NonFiniteEnvelopeCases))]
+    public void CalculateOgcScaleRejectsNonFiniteEnvelopeBoundaries(Envelope envelope)
+    {
+        Assert.Throws<ArgumentException>(() =>
+            GeographicUtility.CalculateOGCScaleForSrid(envelope, 3857, 1000));
+    }
+
+    public static IEnumerable<object[]> NonFiniteEnvelopeCases()
+    {
+        yield return new object[] { new Envelope(double.PositiveInfinity, 1, 0, 1) };
+        yield return new object[] { new Envelope(0, double.PositiveInfinity, 0, 1) };
+        yield return new object[] { new Envelope(0, 1, double.NegativeInfinity, double.PositiveInfinity) };
+        yield return new object[] { new Envelope(0, 1, double.PositiveInfinity, 0) };
+        yield return new object[] { new Envelope(0, 1, 0, double.PositiveInfinity) };
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CalculateOgcScaleRejectsNonPositiveEnvelopeDimensions(bool zeroWidth)
+    {
+        var envelope = zeroWidth
+            ? new Envelope(10, 10, 0, 1)
+            : new Envelope(0, 1, 10, 10);
+
+        Assert.Throws<ArgumentException>(() =>
+            GeographicUtility.CalculateOGCScaleForSrid(envelope, 3857, 1000));
+    }
+
+    [Fact]
+    public void CalculateOgcScaleRejectsNonFiniteComputedScale()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            GeographicUtility.CalculateOGCScaleForSrid(
+                new Envelope(0, double.MaxValue, 0, 1), 4326, 1000));
+    }
+
+    [Fact]
+    public void CalculateOgcScaleRejectsScaleThatUnderflowsToZero()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            GeographicUtility.CalculateOGCScaleForSrid(
+                new Envelope(0, double.Epsilon, 0, 1), 3857, int.MaxValue));
+    }
+
+    [Theory]
+    [InlineData("NaN,0,1,1")]
+    [InlineData("0,NaN,1,1")]
+    [InlineData("0,0,NaN,1")]
+    [InlineData("0,0,1,NaN")]
+    [InlineData("Infinity,0,1,1")]
+    [InlineData("0,Infinity,1,1")]
+    [InlineData("0,0,Infinity,1")]
+    [InlineData("0,0,1,Infinity")]
+    public void GetMapValidatorRejectsNonFiniteBboxCoordinates(string bbox)
+    {
+        var result = ParameterValidator.VerifyAndBuildWmsGetMapArguments(
+            "zserver:layer", "EPSG:3857", bbox, 256, 256, "image/png", null, null);
+
+        Assert.Equal("InvalidBBox", result.Code);
+        Assert.Null(result.Parameters);
+    }
+
+    [Theory]
+    [InlineData("0,0,0,1")]
+    [InlineData("0,0,1,0")]
+    [InlineData("1,0,0,1")]
+    [InlineData("0,1,1,1")]
+    public void GetMapValidatorRejectsNonPositiveBboxRange(string bbox)
+    {
+        var result = ParameterValidator.VerifyAndBuildWmsGetMapArguments(
+            "zserver:layer", "EPSG:3857", bbox, 256, 256, "image/png", null, null);
+
+        Assert.Equal("InvalidBBox", result.Code);
+        Assert.Null(result.Parameters);
+    }
+
+    [Fact]
+    public void GetMapValidatorRejectsBboxRangeOverflow()
+    {
+        var result = ParameterValidator.VerifyAndBuildWmsGetMapArguments(
+            "zserver:layer", "EPSG:3857", "-1.7E308,0,1.7E308,1", 256, 256, "image/png", null, null);
+
+        Assert.Equal("InvalidBBox", result.Code);
+        Assert.Null(result.Parameters);
+    }
+
+    [Fact]
+    public void GetMapValidatorPreservesFiniteBboxPrecision()
+    {
+        var result = ParameterValidator.VerifyAndBuildWmsGetMapArguments(
+            "zserver:layer", "EPSG:3857",
+            "0.12345678901234567,0.25,0.22345678901234567,0.75",
+            256, 256, "image/png", null, null);
+
+        Assert.Null(result.Code);
+        Assert.Equal(0.12345678901234567D, result.Parameters.Envelope.MinX);
+        Assert.Equal(0.22345678901234567D, result.Parameters.Envelope.MaxX);
+    }
+
+    [Fact]
+    public async Task GetMapRejectsNonFiniteBboxBeforeMapExecution()
+    {
+        var service = new WmsService(null, null, null, null);
+
+        using var result = await service.GetMapAsync(
+            "zserver:layer", null, "EPSG:3857", "NaN,0,1,1", 256, 256, "image/png",
+            false, null, 0, "dpi:180", null, new Dictionary<string, object>());
+
+        Assert.Equal("InvalidBBox", result.Code);
     }
 
     Envelope Get(double x1, double y1, double x2, double y2)
